@@ -14,6 +14,8 @@ export interface WeeklySummary {
   goalMinutes: number;
   practiceTip: string;
   statusLine: string;
+  /** All subjects: the subjects of the week (the message then names them instead of "English"). */
+  subjects?: string[];
 }
 
 export type ShareResult = { ok: true; channel: 'email' | 'whatsapp'; id?: string; stub?: boolean; preview?: string } | { ok: false; channel: 'email' | 'whatsapp'; code: string };
@@ -39,7 +41,9 @@ export const emailReportSender: ReportSender = {
 };
 
 export function whatsappText(s: WeeklySummary): string {
-  return `${s.childName}'s week in English: ${s.statusLine}. ${s.minutesDone} of ${s.goalMinutes} minutes. Try this at home: ${s.practiceTip} Open ENARA Parents: /parents`;
+  const what = s.subjects ? (s.subjects.length ? ` (${s.subjects.join(', ')})` : '') : ' in English';
+  const tip = s.practiceTip ? ` Try this at home: ${s.practiceTip}` : '';
+  return `${s.childName}'s week${what}: ${s.statusLine}. ${s.minutesDone} of ${s.goalMinutes} minutes.${tip} Open ENARA Parents: /parents`;
 }
 
 export const whatsappStubSender: ReportSender = {

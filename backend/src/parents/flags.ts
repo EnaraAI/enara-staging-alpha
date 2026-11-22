@@ -12,6 +12,9 @@
 //   PARENT_GRADES_AFTER_REVIEW_ENABLED P3: the school's "Show results to parents:
 //                               immediately / after the teacher releases them" (default
 //                               after release, D7), applied to every score a parent sees
+//   PARENT_ALL_SUBJECTS_ENABLED every subject a child studies (subject chips, per-subject progress, results,
+//                               points to practise, sessions, next, smart recommendations) and no placeholder
+//                               cards (docs/parents/ALL_SUBJECTS_PLAN.md)
 //   PARENT_CSV_INVITES_ENABLED  P5: CSV invitations (plus the school's own "CSV invites"
 //                               setting, default off), one email per parent address
 const on = (name: string) => /^(true|1|yes)$/i.test((process.env[name] ?? '').trim());
@@ -22,3 +25,4 @@ export const parentCodeToolsEnabled = () => on('PARENT_CODE_TOOLS_ENABLED');
 export const parentEmailSigninEnabled = () => on('PARENT_EMAIL_SIGNIN_ENABLED');
 export const parentGradesAfterReviewEnabled = () => on('PARENT_GRADES_AFTER_REVIEW_ENABLED');
 export const parentCsvInvitesEnabled = () => on('PARENT_CSV_INVITES_ENABLED');
+export const parentAllSubjectsEnabled = () => on('PARENT_ALL_SUBJECTS_ENABLED');

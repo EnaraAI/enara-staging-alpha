@@ -13,6 +13,7 @@ import { Account } from './screens/Account';
 import { LinkChild } from './screens/LinkChild';
 import { ShareSheet } from './screens/ShareSheet';
 import { AddEmail } from './screens/AddEmail';
+import { ALL, SubjectChips } from './screens/Subjects';
 
 // ENARA Parents Portal: a parent mode inside the ENARA app, under /parents.
 // Mobile-first; English and Arabic with full RTL; week starts Saturday;
@@ -90,6 +91,13 @@ const ParentsApp: React.FC<{ userName?: string; onSignOut: () => void }> = ({ on
   useEffect(() => { if (learner) write(LEARNER_KEY, learner.studentId); }, [learner?.studentId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const status = useLive(() => (learner ? parentsApi.status(learner.studentId).then((r) => r.status) : Promise.resolve(null)), [learner?.studentId], refreshKey);
+  // All subjects: the chips under the child picker (none when the server has the feature off: 404).
+  const subjects = useLive(() => (learner ? parentsApi.subjects(learner.studentId).catch(() => null) : Promise.resolve(null)), [learner?.studentId], refreshKey);
+  const [subject, setSubject] = useState<string>(ALL);
+  useEffect(() => { setSubject(ALL); }, [learner?.studentId]);
+  const subjectList = subjects.data?.subjects ?? [];
+  const chosen = subject === ALL ? null : subjectList.find((x) => x.key === subject) ?? null;
+  const subjectKey = chosen ? chosen.key : ALL;
   const [screenFetched, setScreenFetched] = useState<{ at: Date | null; loading: boolean }>({ at: null, loading: false });
   const onFetched = useCallback((at: Date | null, loading: boolean) => setScreenFetched({ at, loading }), []);
   useEffect(() => { setScreenFetched({ at: null, loading: false }); }, [tab, learner?.studentId]);
@@ -166,11 +174,12 @@ const ParentsApp: React.FC<{ userName?: string; onSignOut: () => void }> = ({ on
           )}
           {!showLink && learner && (
             <>
+              {(tab === 'home' || tab === 'progress' || tab === 'activity') && <SubjectChips subjects={subjectList} value={subjectKey} onChange={setSubject} />}
               {status.data && <StatusLine status={status.data} />}
               <Updated at={fetched} loading={status.loading || screenFetched.loading} onRefresh={refresh} />
-              {tab === 'home' && <Home learner={learner} refreshKey={refreshKey} go={(k) => go(k as Tab)} onShare={() => setSharing(true)} onFetched={onFetched} />}
-              {tab === 'progress' && <Progress learner={learner} refreshKey={refreshKey} onFetched={onFetched} />}
-              {tab === 'activity' && <Activity learner={learner} refreshKey={refreshKey} onFetched={onFetched} />}
+              {tab === 'home' && <Home learner={learner} refreshKey={refreshKey} go={(k) => go(k as Tab)} onShare={() => setSharing(true)} onFetched={onFetched} subjectKey={subjectKey} overview={subjectList} onPickSubject={(k) => { setSubject(k); window.scrollTo({ top: 0 }); }} />}
+              {tab === 'progress' && <Progress learner={learner} refreshKey={refreshKey} onFetched={onFetched} subjectKey={subjectKey} english={!!chosen?.english} />}
+              {tab === 'activity' && <Activity learner={learner} refreshKey={refreshKey} onFetched={onFetched} subjectKey={subjectKey} />}
               {tab === 'controls' && <Controls learner={learner} refreshKey={refreshKey} />}
               {tab === 'account' && <Account refreshKey={refreshKey} setLang={setLang} onLink={() => go('link')} onPick={(id) => { setSelectedId(id); go('home'); }} onChanged={refresh} onSignOut={onSignOut} />}
             </>

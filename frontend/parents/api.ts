@@ -17,8 +17,8 @@ export interface Home { generatedAt: string; learner: LearnerHeader; status: Wee
 // Multi-class (step 6, Q3): only for a child in several classes.
 export interface ClassTag { id: string; name: string }
 export interface ClassChoice { items: ClassTag[]; filter: string | null }
-export interface Progress { classes?: ClassChoice; generatedAt: string; learner: LearnerHeader; level: Level; ladder: { cefr: string; label: Bi; state: 'done' | 'current' | 'ahead' }[]; skills: { mock: boolean; items: { skill: string; pct: number; trend: 'up' | 'flat' | 'down' }[] }; trend: { mock: boolean; weeks: { weekStart: string; score: number; assessment?: boolean }[] }; canDos: { mock: boolean; items: { id: string; text: Bi; state: 'achieved' | 'in_progress' | 'not_started' }[] }; strengths: { mock: boolean; strengths: Bi[]; focusAreas: Bi[] }; lessonsCompleted: { count: number }; assessments: { mock: boolean; items: { id: string; title: string; score: number | null; submittedAt: string; passed: boolean | null; verified: boolean; waiting?: boolean; class?: ClassTag | null }[] } }
-export interface SessionCard { id: string; day: string; startedAt: string; startTime: string; durationMin: number; title: string; mode: 'chat' | 'voice'; methods: Bi[]; speakingMin: number; insight: { mock: boolean; wentWell: Bi; wasHard: Bi; words: string[]; focus: 'high' | 'medium' | 'low' }; transcript: { available: boolean; retentionDays: number }; audio: { available: boolean }; class?: ClassTag | null }
+export interface Progress { classes?: ClassChoice; generatedAt: string; learner: LearnerHeader; level: Level; ladder: { cefr: string; label: Bi; state: 'done' | 'current' | 'ahead' }[]; skills: { mock: boolean; items: { skill: string; pct: number; trend: 'up' | 'flat' | 'down' }[] }; trend: { mock: boolean; weeks: { weekStart: string; score: number; assessment?: boolean }[] }; canDos: { mock: boolean; items: { id: string; text: Bi; state: 'achieved' | 'in_progress' | 'not_started' }[] }; strengths: { mock: boolean; strengths: Bi[]; focusAreas: Bi[] }; lessonsCompleted: { count: number }; assessments: { mock: boolean; items: { id: string; title: string; score: number | null; submittedAt: string; passed: boolean | null; verified: boolean; waiting?: boolean; class?: ClassTag | null; subject?: SubjectTag | null }[] } }
+export interface SessionCard { id: string; day: string; startedAt: string; startTime: string; durationMin: number; title: string; mode: 'chat' | 'voice'; methods: Bi[]; speakingMin: number; insight: { mock: boolean; wentWell: Bi; wasHard: Bi; words: string[]; focus: 'high' | 'medium' | 'low' }; transcript: { available: boolean; retentionDays: number }; audio: { available: boolean }; class?: ClassTag | null; subject?: SubjectTag | null }
 export interface Activity { classes?: ClassChoice; generatedAt: string; learner: LearnerHeader; calendar: { days: { day: string; state: 'practised' | 'missed' | 'today' | 'upcoming'; isToday: boolean; minutes: number }[]; practisedCount: number; pastCount: number }; sessions: SessionCard[] }
 export interface Transcript { learner: LearnerHeader; session: { id: string; title: string; startedAt: string }; expiresAt: string; messages: { id: string; from: 'learner' | 'enara'; text: string; at: string }[]; audio: { available: boolean } }
 export interface Controls { learner: LearnerHeader; controls: { weeklyGoalMin: number; dailyLimitMin: number; focus: string; reminders: boolean; liveAvatar: boolean; microphone: boolean; camera: boolean; learnerAccepted?: boolean }; mode: 'parent_sets' | 'co_set'; enforced: boolean }
@@ -28,6 +28,18 @@ export interface Report { learner: LearnerHeader; shareEmail?: ParentEmailState;
 export interface Account { learners: LearnerChip[]; pending: { linkId: string }[]; guardians: { byLearner: { studentId: string; canManage: boolean; items: { linkId: string; name: string; role: LinkRole; isYou: boolean }[] }[] }; plan: AccountPlan; preferences: { language: 'en' | 'ar'; alertChannels: string[]; emails?: { weeklySummary: boolean; newResults: boolean } }; signIn?: { method: 'code' | 'password' | 'google'; hasEmail: boolean; emailSignin?: boolean; email?: string; emailVerified?: boolean; suggestedEmail?: string }; hiddenBySchool?: number }
 // Parents P1: with PARENT_SETTINGS_ENABLED the plan is "Provided by <school>" (no price); otherwise the mock plan.
 export type AccountPlan = { mock: true; name: Bi; price: string; learners: number; renewsOn: string; payment: Bi } | { mock: false; kind: 'school'; providedBy: string[] };
+
+// All subjects (PARENT_ALL_SUBJECTS_ENABLED): 404 when the switch is off (the portal then shows no subject chips).
+export interface SubjectTag { key: string; name: Bi }
+export interface Rec { kind: string; do: Bi; why: Bi; say: Bi; ai: boolean }
+export interface Cefr { cefr: string; label: Bi; subLevel: string | null; subLevelPct: number | null; next: string | null; nextLabel: Bi | null }
+export interface SubjectCard { key: string; name: Bi; english: boolean; lessons: { done: number; total: number }; outcomes: { mastered: number; total: number; band: string | null; bandLabel: Bi | null }; cefr?: Cefr; latestResult: { title: string; score: number; submittedAt: string | null } | null; lessonsThisWeek: number; pointsCount: number; minutesThisWeek: number; top: Rec | null }
+export interface SubjectsOverview { learner: LearnerHeader; subjects: SubjectCard[]; minutesThisWeek: number }
+export interface SubjectFull {
+  learner: LearnerHeader;
+  subject: { key: string; name: Bi; english: boolean; cefr?: Cefr; lessons: { done: number; total: number; thisWeek: number }; outcomes: { mastered: number; inProgress: number; total: number; band: string | null; bandLabel: Bi | null; items: { id: string; title: string; state: 'achieved' | 'in_progress' | 'not_started' }[] }; results: { id: string; title: string; score: number | null; submittedAt: string | null; passed: boolean | null; waiting?: true }[]; latestResult: SubjectCard['latestResult']; points: { id: string; objective: string; error: string; occurrences: number; since: string }[]; sessions: { id: string; title: string; day: string; startTime: string; durationMin: number; mode: 'chat' | 'voice' }[]; minutesThisWeek: number; next: { lesson: string | null; due: { title: string; dueAt: string } | null } };
+  recommendations: { source: string; items: Rec[] };
+}
 
 const L = (id: string) => `/api/parents/learners/${encodeURIComponent(id)}`;
 export const parentsApi = {
@@ -40,6 +52,8 @@ export const parentsApi = {
   alerts: (id: string) => apiRequest<{ alerts: { mock: boolean; items: Alert[] } }>('GET', `${L(id)}/alerts`),
   report: (id: string) => apiRequest<Report>('GET', `${L(id)}/report`),
   share: (id: string, channel: 'email' | 'whatsapp') => apiRequest<{ ok: boolean; preview?: string; stub?: boolean }>('POST', `${L(id)}/report/share`, { channel }),
+  subjects: (id: string) => apiRequest<SubjectsOverview>('GET', `${L(id)}/subjects`),
+  subject: (id: string, key: string) => apiRequest<SubjectFull>('GET', `${L(id)}/subjects/${encodeURIComponent(key)}`),
   controls: (id: string) => apiRequest<Controls>('GET', `${L(id)}/controls`),
   saveControls: (id: string, body: Partial<Controls['controls']>) => apiRequest<Controls>('PUT', `${L(id)}/controls`, body),
   setGuardianRole: (id: string, linkId: string, role: 'full' | 'view') => apiRequest('PUT', `${L(id)}/guardians/${encodeURIComponent(linkId)}`, { role }),
