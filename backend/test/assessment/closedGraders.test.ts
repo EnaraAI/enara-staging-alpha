@@ -76,6 +76,18 @@ describe('matching', () => {
 
 describe('numeric', () => {
   const item = (key: Record<string, unknown>, lang = 'en') => base({ type: 'numeric', language: lang, answer_key: key, error_codes: ['arithmetic'] });
+  it('how learners write: x = 7, cm^2, cm², سم²; with no unit in the key, %, ° and words after the number are ignored (bench finding)', () => {
+    expect(gradeClosed(item({ value: 7 }), 'x = 7').total).toBe(1);
+    expect(gradeClosed(item({ value: 7 }, 'ar'), 'س = ٧').total).toBe(1);
+    expect(gradeClosed(item({ value: 240, unit: 'cm^3' }), '240 cm^3').total).toBe(1);
+    expect(gradeClosed(item({ value: 24, unit: 'cm^2' }), '24 cm²').total).toBe(1);
+    expect(gradeClosed(item({ value: 24, unit: 'cm^2' }, 'ar'), '٢٤ سم²').total).toBe(1);
+    expect(gradeClosed(item({ value: 25 }), '25%').total).toBe(1);
+    expect(gradeClosed(item({ value: 65 }), '65°').total).toBe(1);
+    expect(gradeClosed(item({ value: 27 }), '27 students').total).toBe(1);
+    expect(gradeClosed(item({ value: 27 }), '28 students').total).toBe(0);
+    expect(gradeClosed(item({ value: 0.5 }), '1/2').total).toBe(1);
+  });
   it('numbers in both scripts, decimal marks, thousands', () => {
     expect(gradeClosed(item({ value: 12.5 }), '12.5').total).toBe(1);
     expect(gradeClosed(item({ value: 12.5 }, 'ar'), '١٢٫٥').total).toBe(1);

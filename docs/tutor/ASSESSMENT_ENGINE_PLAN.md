@@ -1,14 +1,14 @@
 # ENARA Assessment Engine: final plan
 
-Status: **go given (22 Nov 2026). P1a in progress.** Branch `claude/tutor-assessment-engine` (tutor track). lms-test only; test.enara.app frozen until Mohamed reopens it.
+Status: **go given (22 Nov 2026). P2b in progress.** Branch `claude/tutor-assessment-engine` (tutor track). lms-test only; test.enara.app frozen until Mohamed reopens it.
 
 ## Progress
 | Phase | Status | PR |
 |---|---|---|
 | P1a schema, seeds, ar.ts, uiLanguage, closed graders | done (seeds deferred: CURRICULUM_BOOKS_NEEDED.md) | #88 |
 | P1b learner UI for closed types + E2E ar/en | done | #89 |
-| P2a grading engine core, language + math graders, flags, teacher queue, override, error codes → workOn | PR open | – |
-| P2b language + math bench (ar + en), open within-1 ≥ 0.85 | not started | – |
+| P2a grading engine core, language + math graders, flags, teacher queue, override, error codes → workOn | done (live on lms-test; first real quiz graded 14/18) | #90 |
+| P2b language + math bench (ar + en), open within-1 ≥ 0.85 (no Anthropic spending, §7a) | PR open | – |
 | P3 science, humanities, code graders, listening/speaking, bench | not started | – |
 | P4 generation, checks, judge, teacher review, generation bench | not started | – |
 | P5 CI regression gate, admin card, cost/latency report | not started | – |
@@ -190,6 +190,20 @@ Switch: `assessGen`.
   - hard cap $20 per full run and $5 per PR run, with a hard stop at the cap;
   - CI never regenerates datasets; it only re-grades and re-judges.
 
+## 7a. Budget change (owner, 22 Nov 2026: "I only have 5 usd in credits"; go given for the plan below)
+- **No Anthropic spending** by the bench. Grading runs on the configured provider (DeepSeek on lms-test); every bench call has the model
+  fallback off (a failed DeepSeek call is never retried on Anthropic). An Anthropic sample check (≤ $2) only on the owner's word.
+- **Gold: author (provisional).** Gold scores are written with the datasets against the rubric level descriptions (not by the graded
+  model), until teacher-graded answers (`gold_teacher.json`) replace them. Reports say which.
+- **Smaller sets first:** 30 items per domain × language (language: 15 short answers + 15 essays; maths: 30 worked problems), 3 answers
+  each (weak / mid / strong) = 360 answers. Grown later.
+- **Where it runs:** the DeepSeek key is only on lms-test, so the live bench runs there (`POST /api/maintenance/assessment-bench`,
+  resumable batches, results in `assessment_bench_results`, $5 cap per run from the call records) through an ops job. The CI job
+  `assessment-bench` always checks the datasets and the bench unit tests; it grades live only if the secret `TUTOR_LLM_API_KEY` is
+  added to GitHub (then $5 hard stop per run).
+- **Baseline:** `data/assessment-bench/baseline.json` holds the last within-1 per set on lms-test-live (the 0.03 regression rule).
+- **Data path:** `data/assessment-bench/<domain>/<lang>/` (served with the backend like `data/curricula`).
+
 ## 8. UI (existing apps, ar + en, RTL, phone first)
 - **Teacher:** a "Question bank" tab in AssessmentBuilder; GradingReview extended with per-criterion model scores, reasons and override.
 - **Learner:** AssessmentInterface extended for all closed types first (fill_blank inline inputs, matching tap pairs, numeric + unit, ordering, dropdown, multi-answer mcq), then open and media types.
@@ -230,4 +244,4 @@ Each phase has its own switch and E2E on its PR, and the plan status is updated 
 5. Switches and judge:
    - a) existing switch names;
    - b) Anthropic judge once the key is in place, provisional until then;
-   - c) $20 / $5 caps.
+   - c) $20 / $5 caps (superseded for the bench by §7a: no Anthropic spending, $5 cap per run on the configured provider).

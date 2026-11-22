@@ -373,4 +373,21 @@ router.post('/llm-ping', async (_req, res, next) => {
   try { res.json(await llmPing()); } catch (e) { next(e); }
 });
 
+// Assessment bench (docs/tutor/ASSESSMENT_ENGINE_PLAN.md §7): grade the next bench answers of a run with the real engine, or the run's
+// numbers. Bench answers are fake (written for the bench). Spending cap per run; never retried on the fallback provider.
+router.post('/assessment-bench', async (req, res, next) => {
+  try {
+    const b = (req.body ?? {}) as { action?: string; runId?: string; domain?: string; lang?: string; limit?: number; capUsd?: number };
+    const runId = String(b.runId ?? '');
+    if (!/^[a-zA-Z0-9_-]{3,60}$/.test(runId)) { res.status(400).json({ error: 'runId: 3-60 letters, digits, _ or -' }); return; }
+    const bench = await import('../assessment/bench/run');
+    if (b.action === 'start') { res.json(await bench.startRun({ runId, capUsd: b.capUsd })); return; }
+    if (b.action === 'summary') { res.json(await bench.summary(runId)); return; }
+    if (b.action === 'misses') { res.json(await bench.misses(runId)); return; }
+    if (b.action !== 'grade' || !['language', 'math'].includes(String(b.domain)) || !['en', 'ar'].includes(String(b.lang))) { res.status(400).json({ error: 'action start|grade|summary|misses; grade needs domain language|math and lang en|ar' }); return; }
+    const { engineModelReadyForBench } = await import('../assessment/bench/ready');
+    res.json(await bench.gradeBatch({ runId, domain: b.domain as 'language' | 'math', lang: b.lang as 'en' | 'ar', limit: Number(b.limit) || 6, modelReady: engineModelReadyForBench() }));
+  } catch (e) { next(e); }
+});
+
 export default router;

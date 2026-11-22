@@ -1,4 +1,4 @@
-import { isOpenEngine } from '../assessment/questionBridge';
+import { isOpenEngine, describeKey, describeAnswer } from '../assessment/questionBridge';
 const OVERRIDE_REASONS = ['too_strict', 'too_lenient', 'wrong_criterion', 'rubric_unclear'] as const;
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/auth.middleware';
@@ -133,6 +133,8 @@ export const getSubmissionForReview = asyncHandler(async (req: AuthRequest, res:
       return {
         question: q,
         answer,
+        // Engine questions: the key and the answer in plain words (maths steps and final, not the screen's JSON; no key for essays).
+        ...(q.type === 'engine' ? { keyText: describeKey(q as never), answerText: describeAnswer(q as never, answer?.studentAnswer) } : {}),
         // The evaluation the grade came from, and every evaluation made (audit).
         aiProposal: (answer?.proposalId ? proposals.find((p) => p.id === answer.proposalId) : null) ?? proposals.find((p) => p.questionId === q.id) ?? null,
         evaluations: proposals.filter((p) => p.questionId === q.id),

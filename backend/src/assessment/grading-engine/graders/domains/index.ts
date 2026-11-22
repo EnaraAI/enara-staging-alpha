@@ -98,8 +98,13 @@ export function checkExtras(raw: unknown, domain: 'language' | 'math', ui: 'ar' 
   return { confidence, errorCodes: [...new Set(codes)] };
 }
 
+/** The assessment bench's runs: not stored as GradingProposals (store false), never on the fallback provider (allowFallback false). */
+export interface RunOptions { store?: boolean; allowFallback?: boolean }
+
 /** One independent model run for one open answer; always returns (a failed or invalid run is stored and returned as such). */
-export async function gradeOpenRun(p: { attempt: { id: string; institutionId?: string; assignmentId?: string }; item: OpenItem; answer: unknown; uiLanguage: 'ar' | 'en'; run: number }): Promise<RunResult> {
+
+export async function gradeOpenRun(p: { attempt: { id: string; institutionId?: string; assignmentId?: string }; item: OpenItem; answer: unknown; uiLanguage: 'ar' | 'en'; run: number; options?: RunOptions }): Promise<RunResult> {
+  const store = p.options?.store !== false;
   const { item } = p;
   const rubric = rubricFor(item.domain, item.type, item.language)!;
   const scored = new Set(modelCriteria(item.domain, item.type));
@@ -119,7 +124,7 @@ export async function gradeOpenRun(p: { attempt: { id: string; institutionId?: s
   let extras = { confidence: 0, errorCodes: [] as string[] };
   try {
     const { value, model } = await askForJson({
-      feature: 'ai_grading', institutionId: p.attempt.institutionId, refs: { attemptId: p.attempt.id }, maxTokens: 2500,
+      feature: 'ai_grading', institutionId: p.attempt.institutionId, refs: { attemptId: p.attempt.id }, maxTokens: 2500, ...(p.options?.allowFallback === false ? { allowFallback: false } : {}),
       system: `${SYSTEM[item.domain](LANG_NAME(p.uiLanguage), LANG_NAME(item.language))} ${FORMAT}`,
       user,
       validate: (raw) => { extras = checkExtras(raw, item.domain, p.uiLanguage); return validateProposal(raw, modelRubric as never, answerText); },
@@ -127,12 +132,12 @@ export async function gradeOpenRun(p: { attempt: { id: string; institutionId?: s
     const criteria = [...value.criteria, ...(final && finalCrit ? [{ criterionId: 'final_answer', levelId: `p${final.points}`, points: final.points, evidence: [], rationale: 'scored by code' }] : [])];
     const errorCodes = [...new Set([...extras.errorCodes, ...(final?.unitIssue ? ['units'] : [])])];
     const points = criteria.reduce((n, c) => n + c.points, 0);
-    const doc = await GradingProposal.create({ ...base, status: 'proposed', criteria, points, feedback: value.feedback, scoreExplanation: value.scoreExplanation, strengths: value.strengths, improvements: value.improvements, confidence: extras.confidence >= 0.85 ? 'high' : extras.confidence >= 0.7 ? 'medium' : 'low', flags: value.flags, modelName: model });
+    const doc = !store ? { id: '' } : await GradingProposal.create({ ...base, status: 'proposed', criteria, points, feedback: value.feedback, scoreExplanation: value.scoreExplanation, strengths: value.strengths, improvements: value.improvements, confidence: extras.confidence >= 0.85 ? 'high' : extras.confidence >= 0.7 ? 'medium' : 'low', flags: value.flags, modelName: model });
     return { proposalId: doc.id, status: 'proposed', criterionScores: criteria.map((c) => ({ criterionId: c.criterionId, levelId: c.levelId, points: c.points })), points, confidence: extras.confidence, errorCodes, feedback: value.feedback, scoreExplanation: value.scoreExplanation, strengths: value.strengths, improvements: value.improvements, flags: value.flags, modelName: model };
   } catch (error) {
     const code = (error as { code?: string }).code;
     logger.warn('engine_grading_run_failed', { attemptId: p.attempt.id, questionId: item.questionId, code });
-    const doc = await GradingProposal.create({ ...base, status: code === 'AI_BAD_OUTPUT' ? 'invalid' : 'failed', error: String((error as Error).message).slice(0, 300) }).catch(() => null);
+    const doc = !store ? null : await GradingProposal.create({ ...base, status: code === 'AI_BAD_OUTPUT' ? 'invalid' : 'failed', error: String((error as Error).message).slice(0, 300) }).catch(() => null);
     return { proposalId: doc?.id ?? '', status: code === 'AI_BAD_OUTPUT' ? 'invalid' : 'failed', criterionScores: [], points: 0, confidence: 0, errorCodes: [], feedback: '', scoreExplanation: '', strengths: [], improvements: [], flags: [], error: (error as { code?: string }).code ?? 'error' };
   }
 }

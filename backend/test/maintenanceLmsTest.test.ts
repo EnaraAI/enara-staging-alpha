@@ -28,7 +28,9 @@ beforeAll(async () => {
   resetConfig = (await import('../src/config/env')).resetConfigForTests;
   setEnv({ MONGODB_URI: mongo.getUri() });
   await mongoose.connect(mongo.getUri()); // the app's config URI below is only used for the safety check
-});
+  // Load the app once here: its first import (every route module) is slow on CI runners and used to count against the first test.
+  await import('../src/app');
+}, 60_000);
 afterAll(async () => {
   setEnv({ MAINTENANCE_ENDPOINTS_ENABLED: undefined, MAINTENANCE_TOKEN: undefined, MAINTENANCE_CI_TOKEN: undefined });
   await mongoose.disconnect();

@@ -1,0 +1,60 @@
+# Assessment bench (docs/tutor/ASSESSMENT_ENGINE_PLAN.md §7). On pull requests that change how answers are graded, and by hand.
+#   1. Always: the bench datasets are checked (shape, counts, gold scores against the rubrics) and the bench unit tests run.
+#   2. Only when the repository has the secret TUTOR_LLM_API_KEY: the real engine grades the bench in a throwaway database, on the
+#      DeepSeek endpoint named in deploy/lms-test.flags.json, with a hard $5 stop and no fallback provider (no Anthropic spending);
+#      the job fails below the thresholds. Without the secret this step says "skipped" and the live bench runs on lms-test instead
+#      (ops job: POST /api/maintenance/assessment-bench).
+name: assessment-bench
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'backend/src/assessment/rubrics/**'
+      - 'backend/src/assessment/grading-engine/**'
+      - 'backend/src/assessment/bench/**'
+      - 'backend/src/assessment/prompts/**'
+      - 'backend/src/assessment/generate/**'
+      - 'backend/src/scripts/assessmentBench.ts'
+      - 'data/assessment-bench/**'
+      - '.github/workflows/assessment-bench.yml'
+permissions:
+  contents: read
+jobs:
+  bench:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+        working-directory: backend
+      - name: Bench unit tests
+        working-directory: backend
+        run: npx vitest run test/assessment/bench.test.ts
+      - name: Bench (datasets; live grading only with a model key)
+        working-directory: backend
+        env:
+          TUTOR_LLM_API_KEY: ${{ secrets.TUTOR_LLM_API_KEY }}
+          NODE_ENV: test
+          JWT_SECRET: bench-jwt-secret-32-characters-minimum-x
+          INGEST_HMAC_SECRET: bench-hmac-secret-32-characters-minimum-x
+          CORS_ALLOWED_ORIGINS: http://localhost:5173
+        run: |
+          if [ -n "$TUTOR_LLM_API_KEY" ]; then
+            export ENARA_ENGINE_V2=assessGrading
+            export TUTOR_LLM_PROVIDER=deepseek
+            export TUTOR_LLM_ENDPOINT="$(node -e "const f=require('../deploy/lms-test.flags.json');console.log(f.features.find(x=>x.flags.TUTOR_LLM_ENDPOINT).flags.TUTOR_LLM_ENDPOINT)")"
+            export TUTOR_LLM_MODEL="$(node -e "const f=require('../deploy/lms-test.flags.json');console.log(f.features.find(x=>x.flags.TUTOR_LLM_MODEL).flags.TUTOR_LLM_MODEL)")"
+            # The JSON helper needs an Anthropic key to be configured; with the fallback off it is never called.
+            export ANTHROPIC_API_KEY=unused-by-the-bench
+          fi
+          npm run bench:assessment -- --cap 5 --out bench-result.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: assessment-bench
+          path: backend/bench-result.json
+          if-no-files-found: ignore
