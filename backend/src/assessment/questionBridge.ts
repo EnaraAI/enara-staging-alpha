@@ -14,12 +14,25 @@ export const ENGINE_TYPE = 'engine' as const;
 export const OPEN_ENGINE_TYPES = ['short_answer', 'essay', 'math_steps'] as const;
 export type OpenEngineType = (typeof OPEN_ENGINE_TYPES)[number];
 export const isOpenEngine = (q: { type?: string; engine?: { type?: string } | null }): boolean => q.type === 'engine' && (OPEN_ENGINE_TYPES as readonly string[]).includes(String(q.engine?.type));
-const OpenContent = z.discriminatedUnion('type', [
-  z.object({ type: z.literal('short_answer'), domain: z.literal('language'), language: z.string().regex(/^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$/), answer_key: z.object({ model_answer: z.string().max(2000).optional() }).strict().optional(), flags: z.record(z.boolean()).optional() }).strict(),
-  z.object({ type: z.literal('essay'), domain: z.literal('language'), language: z.string().regex(/^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$/), answer_key: z.object({ model_answer: z.string().max(4000).optional() }).strict().optional(), flags: z.record(z.boolean()).optional() }).strict(),
-  z.object({ type: z.literal('math_steps'), domain: z.literal('math'), language: z.string().regex(/^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$/), answer_key: z.object({ final: z.object({ value: z.union([z.number(), z.string().min(1).max(100)]), tolerance_abs: z.number().nonnegative().optional(), tolerance_rel: z.number().nonnegative().max(1).optional(), unit: z.string().max(32).nullable().optional() }).strict(), solution: z.string().max(4000).optional() }).strict(), flags: z.record(z.boolean()).optional() }).strict(),
+const LANG = z.string().regex(/^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$/);
+const POINTS = z.array(z.string().trim().min(2).max(300)).min(1).max(6);
+// P3a (switch assessSubjects): science (content points checklist, units when flags.units) and humanities (required points, judged
+// only against the source passage the learner reads).
+const OpenContent = z.union([
+  z.object({ type: z.literal('short_answer'), domain: z.literal('language'), language: LANG, answer_key: z.object({ model_answer: z.string().max(2000).optional() }).strict().optional(), flags: z.record(z.boolean()).optional() }).strict(),
+  z.object({ type: z.literal('essay'), domain: z.literal('language'), language: LANG, answer_key: z.object({ model_answer: z.string().max(4000).optional() }).strict().optional(), flags: z.record(z.boolean()).optional() }).strict(),
+  z.object({ type: z.literal('math_steps'), domain: z.literal('math'), language: LANG, answer_key: z.object({ final: z.object({ value: z.union([z.number(), z.string().min(1).max(100)]), tolerance_abs: z.number().nonnegative().optional(), tolerance_rel: z.number().nonnegative().max(1).optional(), unit: z.string().max(32).nullable().optional() }).strict(), solution: z.string().max(4000).optional() }).strict(), flags: z.record(z.boolean()).optional() }).strict(),
+  z.object({ type: z.enum(['short_answer', 'essay']), domain: z.literal('science'), language: LANG, answer_key: z.object({ content_points: POINTS, model_answer: z.string().max(4000).optional() }).strict(), flags: z.record(z.boolean()).optional() }).strict(),
+  z.object({ type: z.enum(['short_answer', 'essay']), domain: z.literal('humanities'), language: LANG, source: z.string().trim().min(40).max(8000), answer_key: z.object({ required_points: POINTS, model_answer: z.string().max(4000).optional() }).strict(), flags: z.record(z.boolean()).optional() }).strict(),
 ]);
-export interface EngineContent { type: ClosedType | OpenEngineType; domain?: 'language' | 'math'; options?: unknown; answer_key: unknown; flags?: Record<string, boolean>; language: string; error_codes?: string[] }
+/** The per-item rubric extras of an open engine question (science and humanities checklists). */
+export function rubricExtrasOf(e: { domain?: string; answer_key?: unknown; flags?: Record<string, boolean> } | null | undefined) {
+  const k = (e?.answer_key ?? {}) as { content_points?: string[]; required_points?: string[] };
+  const points = e?.domain === 'science' ? k.content_points : e?.domain === 'humanities' ? k.required_points : undefined;
+  return { points, units: e?.flags?.units === true };
+}
+export const isSubjectEngine = (e: { domain?: string } | null | undefined): boolean => e?.domain === 'science' || e?.domain === 'humanities';
+export interface EngineContent { type: ClosedType | OpenEngineType; domain?: 'language' | 'math' | 'science' | 'humanities'; source?: string; options?: unknown; answer_key: unknown; flags?: Record<string, boolean>; language: string; error_codes?: string[] }
 type Q = { id: string; type: string; text: string; points?: number; difficulty?: number; engine?: EngineContent | null };
 
 /** The engine item of a question, in the schema the graders check. */
@@ -39,8 +52,10 @@ export function checkEngineQuestion(q: Q): { ok: true; engine: EngineContent; ru
     const parsed = OpenContent.safeParse(e);
     if (!parsed.success) return { ok: false, problems: parsed.error.issues.map((i) => `${i.path.join('.') || 'engine'}: ${i.message}`) };
     const c = parsed.data;
-    // The rubric and points are the engine's fixed template for (domain, type), in the item's language.
-    return { ok: true, engine: c as EngineContent, rubric: rubricFor(c.domain, c.type, c.language), points: totalPoints(c.domain, c.type) };
+    // The rubric and points are the engine's template for (domain, type) in the item's language; science and humanities add the
+    // item's own content points as a checklist.
+    const extras = rubricExtrasOf(c);
+    return { ok: true, engine: c as EngineContent, rubric: rubricFor(c.domain, c.type, c.language, extras), points: totalPoints(c.domain, c.type, extras) };
   }
   if (!e || typeof e !== 'object' || !(CLOSED_TYPES as readonly string[]).includes(String(e.type))) return { ok: false, problems: [`engine.type must be one of ${CLOSED_TYPES.join(', ')}`] };
   const parsed = ClosedItem.safeParse(itemOf(q));
@@ -74,6 +89,8 @@ export function describeKey(q: Q): string {
     case 'ordering': return (k.order as string[]).map((id) => text(e.options, id)).join(' → ');
     case 'dropdown': return Object.entries(k.choices as Record<string, string>).sort().map(([, v]) => v).join(' · ');
     case 'math_steps': { const f = (k as { final?: { value: unknown; unit?: string | null } } | undefined)?.final; return f ? `${String(f.value)}${f.unit ? ` ${f.unit}` : ''}` : ''; }
+    // Science and humanities: the points the answer should state (the teacher's view; never sent to a learner).
+    case 'short_answer': case 'essay': return (rubricExtrasOf(e).points ?? []).join(' · ');
     default: return '';
   }
 }

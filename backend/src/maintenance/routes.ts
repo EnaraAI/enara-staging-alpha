@@ -384,9 +384,9 @@ router.post('/assessment-bench', async (req, res, next) => {
     if (b.action === 'start') { res.json(await bench.startRun({ runId, capUsd: b.capUsd })); return; }
     if (b.action === 'summary') { res.json(await bench.summary(runId)); return; }
     if (b.action === 'misses') { res.json(await bench.misses(runId)); return; }
-    if (b.action !== 'grade' || !['language', 'math'].includes(String(b.domain)) || !['en', 'ar'].includes(String(b.lang))) { res.status(400).json({ error: 'action start|grade|summary|misses; grade needs domain language|math and lang en|ar' }); return; }
+    if (b.action !== 'grade' || !['language', 'math', 'science', 'humanities'].includes(String(b.domain)) || !['en', 'ar'].includes(String(b.lang))) { res.status(400).json({ error: 'action start|grade|summary|misses; grade needs domain language|math|science|humanities and lang en|ar' }); return; }
     const { engineModelReadyForBench } = await import('../assessment/bench/ready');
-    res.json(await bench.gradeBatch({ runId, domain: b.domain as 'language' | 'math', lang: b.lang as 'en' | 'ar', limit: Number(b.limit) || 6, modelReady: engineModelReadyForBench() }));
+    res.json(await bench.gradeBatch({ runId, domain: b.domain as 'language' | 'math' | 'science' | 'humanities', lang: b.lang as 'en' | 'ar', limit: Number(b.limit) || 6, modelReady: engineModelReadyForBench() }));
   } catch (e) { next(e); }
 });
 

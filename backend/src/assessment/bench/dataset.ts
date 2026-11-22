@@ -4,20 +4,22 @@
 import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { z } from 'zod';
-import { templateFor } from '../rubrics/templates';
+import { templateFor, rubricFor, isChecklist } from '../rubrics/templates';
 import { ERROR_CODES, type OpenItem } from '../grading-engine/graders/domains';
 
 export const BENCH_SETS = [
   { domain: 'language', lang: 'en' }, { domain: 'language', lang: 'ar' },
   { domain: 'math', lang: 'en' }, { domain: 'math', lang: 'ar' },
+  { domain: 'science', lang: 'en' }, { domain: 'science', lang: 'ar' },
+  { domain: 'humanities', lang: 'en' }, { domain: 'humanities', lang: 'ar' },
 ] as const;
-export type BenchDomain = 'language' | 'math';
+export type BenchDomain = 'language' | 'math' | 'science' | 'humanities';
 export type BenchLang = 'en' | 'ar';
 
 const Item = z.object({
   id: z.string().min(1),
   type: z.enum(['short_answer', 'essay', 'math_steps']),
-  domain: z.enum(['language', 'math']),
+  domain: z.enum(['language', 'math', 'science', 'humanities']),
   language: z.enum(['en', 'ar']),
   level: z.string().min(1),
   difficulty: z.number().int().min(1).max(3),
@@ -25,6 +27,9 @@ const Item = z.object({
   model_answer: z.string().optional(),
   final: z.object({ value: z.union([z.number(), z.string()]), unit: z.string().nullable().optional(), tolerance_abs: z.number().nonnegative().optional(), tolerance_rel: z.number().nonnegative().optional() }).optional(),
   solution: z.string().optional(),
+  points: z.array(z.string().min(2)).min(1).max(6).optional(),
+  units: z.boolean().optional(),
+  source: z.string().min(40).optional(),
 });
 const Answer = z.object({
   id: z.string().min(1),
@@ -59,6 +64,8 @@ export function checkSet(set: { domain: string; lang: string; items: unknown; an
     if (it.domain !== set.domain || it.language !== set.lang) problems.push(`${it.id}: domain/language is not ${set.domain}/${set.lang}`);
     if (!templateFor(it.domain, it.type)) problems.push(`${it.id}: no rubric for ${it.domain}/${it.type}`);
     if (it.type === 'math_steps' && !it.final) problems.push(`${it.id}: math item without final`);
+    if (isChecklist(it.domain, it.type) && !it.points?.length) problems.push(`${it.id}: ${it.domain} item without points`);
+    if (it.domain === 'humanities' && !it.source) problems.push(`${it.id}: humanities item without a source`);
     const n = answers.data.filter((a) => a.itemId === it.id);
     if (n.length !== 3 || new Set(n.map((a) => a.band)).size !== 3) problems.push(`${it.id}: needs one weak, one mid, one strong answer`);
   }
@@ -66,11 +73,11 @@ export function checkSet(set: { domain: string; lang: string; items: unknown; an
   for (const a of answers.data) {
     const it = byId.get(a.itemId);
     if (!it) { problems.push(`${a.id}: unknown item ${a.itemId}`); continue; }
-    const t = templateFor(it.domain, it.type)!;
-    const want = t.criteria.map((c) => c.code).sort();
+    const crit = rubricFor(it.domain, it.type, it.language, { points: it.points, units: it.units })!.criteria;
+    const want = crit.map((c) => c.id).sort();
     const got = Object.keys(a.gold).sort();
     if (want.join() !== got.join()) problems.push(`${a.id}: gold criteria ${got.join(',')} (want ${want.join(',')})`);
-    for (const c of t.criteria) if ((a.gold[c.code] ?? 0) > c.levels.length - 1) problems.push(`${a.id}: ${c.code} over its max`);
+    for (const c of crit) if ((a.gold[c.id] ?? 0) > c.maxPoints) problems.push(`${a.id}: ${c.id} over its max`);
     if (Object.values(a.gold).reduce((x, y) => x + y, 0) !== a.goldTotal) problems.push(`${a.id}: goldTotal is not the sum`);
     if (it.type === 'math_steps' && typeof a.answer === 'string') problems.push(`${a.id}: maths answers are {steps, final}`);
     const bad = a.errorCodes.filter((c) => !codes.includes(c));
@@ -93,6 +100,7 @@ export function openItemOf(it: BenchItem): OpenItem {
   return {
     questionId: it.id, stem: it.stem, type: it.type, domain: it.domain, language: it.language,
     ...(it.solution ? { solution: it.solution } : {}),
+    ...(it.points ? { points: it.points, units: it.units === true } : {}), ...(it.source ? { source: it.source } : {}),
     ...(it.final ? { final: { value: it.final.value, unit: it.final.unit ?? null, ...(it.final.tolerance_abs !== undefined ? { tolerance_abs: it.final.tolerance_abs } : {}), ...(it.final.tolerance_rel !== undefined ? { tolerance_rel: it.final.tolerance_rel } : {}) } } : {}),
   };
 }
