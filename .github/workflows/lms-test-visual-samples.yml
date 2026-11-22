@@ -10,7 +10,7 @@ jobs:
   render:
     if: github.repository == 'EnaraAI/enara-staging-alpha'
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -22,7 +22,7 @@ jobs:
         working-directory: deploy/lms-test/avatarcost
         env:
           LMSTEST_MAINTENANCE_TOKEN: ${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}
-          SET: arabic
+          SET: all
         run: node samples.mjs
       - name: Publish
         working-directory: deploy/lms-test/avatarcost

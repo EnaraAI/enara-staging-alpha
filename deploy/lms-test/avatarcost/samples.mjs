@@ -38,7 +38,7 @@ const shot = async (html) => { const q = await browser.newPage({ viewport: { wid
 const cell = (label, color, img, ms) => `<div class="c"><div class="h" style="color:${color}">${label} <span style="color:#667;font-weight:400;font-size:15px">· drawn in ${(ms / 1000).toFixed(1)} s</span></div><img src="${img}" style="width:600px"></div>`;
 const index = [];
 const ONLY = (process.env.ONLY || '').split(',').filter(Boolean);
-for (const m of (process.env.SET === 'arabic' ? AR : M).filter((x) => !ONLY.length || ONLY.includes(x.id))) {
+for (const m of (process.env.SET === 'arabic' ? AR : process.env.SET === 'all' ? [...M, ...AR] : M).filter((x) => !ONLY.length || ONLY.includes(x.id))) {
   const [oldV, newV] = [await ask(m, false), await ask(m, true)];
   writeFileSync(`samples/${m.id}-old.html`, oldV.html || ''); writeFileSync(`samples/${m.id}-new.html`, newV.html || '');
   index.push({ id: m.id, oldMs: oldV.ms, newMs: newV.ms, old: Boolean(oldV.html), new: Boolean(newV.html), err: oldV.error || newV.error || null });
