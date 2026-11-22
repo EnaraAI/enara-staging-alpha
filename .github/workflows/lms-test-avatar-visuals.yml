@@ -1,0 +1,32 @@
+# One-off (owner, 22 Nov 2026): render the avatar test calls' on-screen visuals as PNGs; pushed to claude/tutor-lms-avatar-visuals.
+name: lms-test avatar visuals
+on:
+  push:
+    branches: ['claude/tutor-lms-avatarcost-run']
+    paths: ['deploy/lms-test/avatarcost/visuals.mjs', '.github/workflows/lms-test-avatar-visuals.yml']
+permissions:
+  contents: write
+jobs:
+  render:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Playwright
+        working-directory: deploy/lms-test/avatarcost
+        run: npm i --no-save playwright@1.48.2 && npx playwright install --with-deps chromium
+      - name: Render
+        working-directory: deploy/lms-test/avatarcost
+        env:
+          LMSTEST_MAINTENANCE_TOKEN: ${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}
+        run: node visuals.mjs
+      - name: Publish
+        working-directory: deploy/lms-test/avatarcost
+        run: |
+          cd vis && git init -q && git checkout -q -b claude/tutor-lms-avatar-visuals
+          git config user.name github-actions && git config user.email github-actions@users.noreply.github.com
+          git add -A && git commit -qm "avatar visuals ${GITHUB_SHA::8}"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" claude/tutor-lms-avatar-visuals
