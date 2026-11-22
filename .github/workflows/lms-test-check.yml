@@ -1,0 +1,29 @@
+# Read-only maintenance checks on lms-test (deploy/lms-test/check/check.json); the answers go to claude/tutor-lms-check-results.
+name: lms-test checks (read-only)
+on:
+  push:
+    branches: ['claude/tutor-lms-dscompare-run']
+    paths: ['deploy/lms-test/check/**', '.github/workflows/lms-test-check.yml']
+permissions:
+  contents: write
+jobs:
+  check:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Checks
+        env:
+          LMSTEST_MAINTENANCE_TOKEN: ${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}
+        run: node deploy/lms-test/check/run.mjs | tee out.txt
+      - name: Publish
+        if: always()
+        run: |
+          mkdir pub && cp out.txt pub/ 2>/dev/null || echo none > pub/out.txt
+          cd pub && git init -q && git checkout -q -b claude/tutor-lms-check-results
+          git config user.name github-actions && git config user.email github-actions@users.noreply.github.com
+          git add -A && git commit -qm "checks ${GITHUB_SHA::8}"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" claude/tutor-lms-check-results
