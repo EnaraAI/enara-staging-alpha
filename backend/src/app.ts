@@ -43,6 +43,7 @@ import learningRoutes from './routes/learning.routes';
 import assignmentsRoutes from './routes/assignments.routes';
 import gradingRoutes from './routes/grading.routes';
 import teachingRoutes from './routes/teaching.routes';
+import itemBankRoutes from './routes/itemBank.routes';
 import lessonPlansRoutes from './routes/lessonPlans.routes';
 import aiControlsRoutes from './routes/aiControls.routes';
 import workspaceRoutes from './routes/workspace.routes';
@@ -322,6 +323,8 @@ export function createApp() {
   app.use('/api/assignments', assignmentsRoutes);
   app.use('/api/grading', gradingRoutes);
   app.use('/api/teaching', teachingRoutes);
+  // Assessment engine P4: the item bank and the question generator (switch assessGen).
+  app.use('/api/item-bank', itemBankRoutes);
   app.use('/api/lesson-plans', lessonPlansRoutes);
   app.use('/api/ingestion', ingestionRoutes);
   app.use('/api/upload', uploadRoutes);

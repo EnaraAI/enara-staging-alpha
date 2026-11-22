@@ -1839,3 +1839,10 @@ export const fetchMoodleQuizzes = (platformId: string) => request<{ quizzes: Moo
 export const mapMoodleQuiz = (platformId: string, q: { quizId: string; courseExternalId: string; quizName?: string; objectiveId: string | null }) =>
   request<{ ok: boolean }>('PUT', `${mq(platformId)}/quizzes/${encodeURIComponent(q.quizId)}`, { courseExternalId: q.courseExternalId, quizName: q.quizName, objectiveId: q.objectiveId });
 export const runMoodleQuizImport = (platformId: string) => request<{ quizzes: number; attempts: number; wrong: number; right: number; skipped: number; errors: number }>('POST', `${mq(platformId)}/run`, {});
+
+// Assessment engine P4: the item bank and the question generator (switch assessGen).
+export const fetchBankItems = (params: { status?: string; subject?: string; language?: string } = {}) =>
+  request<{ items: any[] }>('GET', `/api/item-bank?${new URLSearchParams(Object.entries(params).filter(([, v]) => v) as [string, string][]).toString()}`);
+export const generateBankItems = (body: any) => request<{ created: any[]; refused: any[] }>('POST', '/api/item-bank/generate', body);
+export const reviewBankItem = (id: string, body: { decision: 'approve' | 'edit' | 'reject'; reasonCode?: string; edits?: any }) => request<any>('POST', `/api/item-bank/${encodeURIComponent(id)}/review`, body);
+export const bankItemQuestion = (id: string) => request<{ question: any }>('GET', `/api/item-bank/${encodeURIComponent(id)}/question`);

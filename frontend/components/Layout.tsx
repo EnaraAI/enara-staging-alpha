@@ -220,6 +220,7 @@ export const AdminSidebar: React.FC<{
     { id: 'assessment-builder', label: 'Assessment Builder', icon: FileText },
     { id: 'class-assignments', label: 'Class Assignments', icon: ClipboardCheck },
     { id: 'grading', label: 'Grading', icon: ListChecks },
+    { id: 'question-bank', label: 'Question bank', icon: FileText },
     { id: 'lesson-planner', label: 'Lesson Planner', icon: BookOpen },
     { id: 'documents', label: 'Documents', icon: FileText },
     { id: 'ai-chat', label: 'AI Chat', icon: MessageSquare },

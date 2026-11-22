@@ -29,6 +29,8 @@ export interface IBankItem extends Document {
   created_by: string;
   created_at: Date;
   school_id: string | null;
+  // Humanities: the source passage the item is answered from (shown to the learner).
+  passage?: string | null;
 }
 
 const schema = new Schema<IBankItem>(
@@ -61,6 +63,7 @@ const schema = new Schema<IBankItem>(
     created_by: { type: String, required: true },
     created_at: { type: Date, default: Date.now },
     school_id: { type: String, default: null },
+    passage: { type: String, default: null, maxlength: 8000 },
   },
   { collection: 'bank_items', versionKey: false },
 );
