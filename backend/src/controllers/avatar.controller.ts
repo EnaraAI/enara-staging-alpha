@@ -1,3 +1,6 @@
+import { engineV2 } from '../services/engineV2';
+import { guardedEmitter } from '../services/guardedStream';
+import { guardSpokenMarker, spokenLines } from '../services/spokenInput';
 import { DEMO_LIMITS, isDemoSessionInstitution } from '../config/demo';
 import { resolveSessionClassId } from '../services/sessionClass';
 import { cachedAssignmentTutorPolicy, policyRule } from '../services/tutorHandoff';
@@ -754,6 +757,8 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
   // avatarSpeaking (NEXT_PLAN item 5): speaking-practice line, and one pronunciation tip from the learner's last scored sentence (then cleared).
   const lastPron = avatarSpeakingOn() && languagePrep ? (session as { lastPronunciation?: { summary: string; words: string[] } }).lastPronunciation : undefined;
   const speakingLines = avatarSpeakingOn() && languagePrep ? `\n\n${SPEAKING_PRACTICE_LINE}${lastPron ? `\n${PRONUNCIATION_NOTE_LINE(lastPron.summary, lastPron.words)}` : ''}` : '';
+  // Spoken input (owner, 22 Nov 2026): the learner's words come from speech-to-text; never correct what may be a mishearing.
+  const heardLines = languagePrep && kind !== 'opening' && kind !== 'nudge' ? spokenLines(last?.content ?? '') : '';
   if (lastPron) waitUntil(AvatarSession.updateOne({ id: session.id }, { $unset: { lastPronunciation: 1 } }).then(() => undefined, () => undefined));
   const languageLine = languagePrep
     ? '(Reply only in English.)'
@@ -805,17 +810,32 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
       learner: learner ? describeSnapshot(learner) : undefined,
       pedagogy: arbitratePedagogy([plan?.prompt, policyRule(tutorPolicy.policy)].filter(Boolean).join('\n\n') || undefined, Boolean(languagePrep)),
       planActive: Boolean(plan),
-      ...(languagePrep?.parts ? { languageContextStable: languagePrep.parts.stable, languageContextDynamic: `${languagePrep.parts.dynamic}${speakingLines}` } : { languageContext: languagePrep?.prompt ? `${languagePrep.prompt}${speakingLines}` : languagePrep?.prompt }),
+      ...(languagePrep?.parts ? { languageContextStable: languagePrep.parts.stable, languageContextDynamic: `${languagePrep.parts.dynamic}${speakingLines}${heardLines}` } : { languageContext: languagePrep?.prompt ? `${languagePrep.prompt}${speakingLines}${heardLines}` : languagePrep?.prompt }),
     });
     // Language course: buffer the reply so the shared guards and marker handling run BEFORE anything is spoken or shown (same guarantees as the text chat).
     async function* chunks(): AsyncGenerator<string> {
       if (!languagePrep) { yield* modelStream; return; }
+      if (engineV2('avatarSentences')) { // speed step 6: speak each sentence once the guards keep it (guardedStream.ts)
+        const filter = new AssessmentMarkerFilter();
+        const em = guardedEmitter((t) => applyReplyGuards(languagePrep.context, t, last?.content ?? ''));
+        let answer = '';
+        for await (const d of modelStream) { if (closed) break; const v = filter.push(d); if (!v) continue; answer += v; const out = em.push(v); if (out) yield out; }
+        const tail = filter.end();
+        if (tail) { answer += tail; const out = em.push(tail); if (out) yield out; }
+        const summary = filterSummary(filter, answer);
+        languageMarker = heardLines ? guardSpokenMarker(summary, last?.content ?? '') : summary;
+        const g = applyReplyGuards(languagePrep.context, answer.trim(), last?.content ?? '');
+        guardedRemoved = g.removed; guardedClosingAsk = g.closingAsk;
+        const rest = em.end(); if (rest) yield rest;
+        if (em.diverged) logger.info('avatar_sentence_guard_diverged', { removed: g.removed });
+        return;
+      }
       const filter = new AssessmentMarkerFilter();
       let answer = '';
       for await (const d of modelStream) { if (closed) break; const v = filter.push(d); if (v) answer += v; }
       const tail = filter.end();
       if (tail) answer += tail;
-      languageMarker = filterSummary(filter, answer);
+      languageMarker = heardLines ? guardSpokenMarker(filterSummary(filter, answer), last?.content ?? '') : filterSummary(filter, answer);
       const g = applyReplyGuards(languagePrep.context, answer.trim(), last?.content ?? '');
       guardedRemoved = g.removed; guardedClosingAsk = g.closingAsk;
       if (g.text) yield g.text;

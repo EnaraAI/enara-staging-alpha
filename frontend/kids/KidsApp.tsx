@@ -702,7 +702,8 @@ function TutorDrawer({ ctx, tutor, onClose }: { ctx: Ctx; tutor: Tutor; onClose:
     if (tutor.sessionId) api.getTutorSession(tutor.sessionId).then((s: any) => setMessages(D.chatMessages(s.messages)), () => undefined);
   }, [tutor.sessionId]);
 
-  const send = useCallback(async (text: string) => {
+  // spoken: the child used the microphone (speech-to-text), so the tutor never corrects what may be a mishearing.
+  const send = useCallback(async (text: string, opts?: { spoken?: boolean }) => {
     setMessages(m => [...m, { from: 'child', text }]);
     setThinking(true);
     try {
@@ -712,7 +713,8 @@ function TutorDrawer({ ctx, tutor, onClose }: { ctx: Ctx; tutor: Tutor; onClose:
         id = s.id;
         setSessionId(id);
       }
-      const r: any = await api.sendTutorMessage(id!, text, tutor.courseId ? { courseId: tutor.courseId, lessonId: tutor.lessonId } : undefined);
+      const context = { ...(tutor.courseId ? { courseId: tutor.courseId, lessonId: tutor.lessonId } : {}), ...(opts?.spoken ? { spoken: true } : {}) };
+      const r: any = await api.sendTutorMessage(id!, text, Object.keys(context).length ? context : undefined);
       setMessages(m => [...m, { from: 'tutor', text: r.assistantMessage?.text || '', ...(r.assistantMessage?.meta?.pics ? { pics: D.kidsPics(r.assistantMessage.meta.pics) } : {}), ...(Array.isArray(r.assistantMessage?.meta?.citations) ? { citations: r.assistantMessage.meta.citations } : {}) }]);
     } catch (e) {
       setMessages(m => [...m, { from: 'tutor', text: ctx.T('Sorry, I couldn’t answer just now. Please try again.', 'عذرًا، لم أستطع الإجابة الآن. حاول مرة أخرى.') }]);
@@ -732,7 +734,7 @@ function TutorDrawer({ ctx, tutor, onClose }: { ctx: Ctx; tutor: Tutor; onClose:
     if (!SR) return;
     const r = new SR();
     r.continuous = false; r.interimResults = false; r.lang = 'en-US';
-    r.onresult = (e: any) => { const t = String(e.results?.[0]?.[0]?.transcript || '').trim(); setListening(false); if (t) sendRef.current(t); };
+    r.onresult = (e: any) => { const t = String(e.results?.[0]?.[0]?.transcript || '').trim(); setListening(false); if (t) sendRef.current(t, { spoken: true }); };
     r.onerror = (e: any) => { setListening(false); const problem = classifySpeechRecognitionError(String(e.error ?? ''), isInFrame()); if (problem) micRef.current.fail(problem); };
     r.onend = () => setListening(false);
     recognition.current = r;
