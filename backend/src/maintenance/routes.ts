@@ -9,6 +9,7 @@ import { shadowReport } from '../services/enrollmentShadowReport';
 import { cleanDanglingClassMembers, planDanglingClassMembers } from '../services/danglingClassMembers';
 import { maintenanceAllowed, maintenanceAuthorised } from './guards';
 import { seedLmsTest } from './lmsTestSeed';
+import { fullSeedStatus, removeFullSeed, runFullSeed, SeedRefused } from './fullSeed/run';
 import { mockLmsRouter } from './mockLms';
 import { runHealthCheck, setupHealthCheck } from './healthCheck';
 import { avatarUsageReport, parseAvatarIds } from './avatarUsageReport';
@@ -95,6 +96,33 @@ router.post('/seed-lms-test', async (req, res, next) => {
     const result = await seedLmsTest(password);
     logger.info('maintenance_seed', result as unknown as Record<string, unknown>);
     res.json({ seeded: result });
+  } catch (e) {
+    next(e);
+  }
+});
+
+// Full data set for lms-test (docs/lms/FULL_SEED_PLAN.md): action run | remove | status. The password comes only from the server's
+// SEED_USER_PASSWORD (never the body, never logged); run refuses and writes nothing without it. remove deletes exactly what
+// seed_registry lists. The response lists users without passwords.
+router.post('/full-seed', async (req, res, next) => {
+  try {
+    const action = (req.body as { action?: unknown })?.action;
+    if (action === 'status') { res.json(await fullSeedStatus()); return; }
+    if (action === 'remove') {
+      const out = await removeFullSeed();
+      logger.info('maintenance_full_seed_remove', { registryRowsDeleted: out.registryRowsDeleted });
+      res.json(out);
+      return;
+    }
+    if (action !== 'run') { res.status(400).json({ error: "action must be 'run', 'remove' or 'status'" }); return; }
+    try {
+      const out = await runFullSeed();
+      logger.info('maintenance_full_seed_run', { total: out.total });
+      res.json(out);
+    } catch (e) {
+      if (e instanceof SeedRefused) { res.status(409).json({ error: e.message }); return; }
+      throw e;
+    }
   } catch (e) {
     next(e);
   }

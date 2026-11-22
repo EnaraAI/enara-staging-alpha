@@ -16,3 +16,4 @@ Status as of 19 Nov 2026. Owner: Mohamed unless noted.
 | 10 | Revoke the Vercel "Protection Bypass for Automation" secret on `enara-lms-test` | Mohamed | Open |
 | 11 | Tutor and avatar on lms-test: `ANAM_API_KEY`, then "turn on AI on lms-test" ($25 cap already set) | Mohamed | Open |
 | 12 | Children's speaking and voice processing need parent consent and the legal review before the first real school. (On for lms-test only: internal switch `kidsSpeaking`; audio is never stored.) | Mohamed + legal review | Open |
+| 13 | lms-test full data set (`docs/lms/SEED_USERS.md`): records listed in the hidden `seed_registry` collection are never copied to test.enara.app or production. Before go-live, run the full-seed remove (`POST /api/maintenance/full-seed` `{"action":"remove"}`) and check `status` shows 0. | LMS track | Open |
