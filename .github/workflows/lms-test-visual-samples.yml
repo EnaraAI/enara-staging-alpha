@@ -1,0 +1,32 @@
+# One-off (owner, 22 Nov 2026): 12 fake lesson moments drawn old vs new, as PNGs; pushed to claude/tutor-lms-visual-samples.
+name: lms-test visual samples
+on:
+  push:
+    branches: ['claude/tutor-lms-avatarcost-run']
+    paths: ['deploy/lms-test/avatarcost/samples.mjs', '.github/workflows/lms-test-visual-samples.yml']
+permissions:
+  contents: write
+jobs:
+  render:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Playwright
+        working-directory: deploy/lms-test/avatarcost
+        run: npm i --no-save playwright@1.48.2 && npx playwright install --with-deps chromium
+      - name: Render
+        working-directory: deploy/lms-test/avatarcost
+        env:
+          LMSTEST_MAINTENANCE_TOKEN: ${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}
+        run: node samples.mjs
+      - name: Publish
+        working-directory: deploy/lms-test/avatarcost
+        run: |
+          cd samples && git init -q && git checkout -q -b claude/tutor-lms-visual-samples
+          git config user.name github-actions && git config user.email github-actions@users.noreply.github.com
+          git add -A && git commit -qm "avatar visuals ${GITHUB_SHA::8}"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" claude/tutor-lms-visual-samples
