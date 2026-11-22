@@ -13,13 +13,13 @@ for (const t of targets) {
   const r = await fetch(`${SITE}/api/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: t.email, password: PW }) });
   const j = await r.json().catch(() => ({}));
   const parent = t.name.startsWith('parent');
-  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1.5 });
+  const ctx = await browser.newContext(t.phone ? { viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true } : { viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1.5 });
   const page = await ctx.newPage();
   if (r.ok && j.token) {
     await ctx.addInitScript(([token, user, uiRole]) => { try { localStorage.setItem('enara_token', token); localStorage.setItem('enara_user', JSON.stringify(user)); localStorage.setItem('enara_ui_role', uiRole); } catch {} }, [j.token, j.user, ({ student: 'student', teacher: 'admin', admin: 'admin', academic_manager: 'academic-manager', 'enara-admin': 'enara-admin', parent: 'parent' })[j.user.role] || 'student']);
   }
   const shots = [];
-  const snap = async (label) => { await page.waitForTimeout(2500); const f = `shots/${t.name}--${label.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}.png`; await page.screenshot({ path: f, fullPage: false }); shots.push(f); console.log('shot', f); };
+  const snap = async (label) => { await page.waitForTimeout(2500); const f = `shots/${t.name}--${label.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}.png`; await page.screenshot({ path: f, fullPage: !!t.phone }); shots.push(f); console.log('shot', f); };
   try {
     await page.goto(parent ? `${SITE}/parents` : SITE, { waitUntil: 'networkidle', timeout: 60_000 }).catch(() => undefined);
     if (!r.ok) { // what the person sees: the sign-in page, then the error after trying
@@ -27,7 +27,8 @@ for (const t of targets) {
     } else {
       await snap('home');
       for (const tab of t.tabs) {
-        const el = page.getByRole('button', { name: tab, exact: true }).or(page.getByRole('link', { name: tab, exact: true })).first();
+        // 'lang' switches the parents portal between English and Arabic.
+        const el = tab === 'lang' ? page.locator('.pp-langbtn').first() : page.getByRole('button', { name: tab, exact: true }).or(page.getByRole('link', { name: tab, exact: true })).first();
         if (await el.count() && await el.isVisible().catch(() => false)) { await el.click().catch(() => undefined); await page.waitForLoadState('networkidle').catch(() => undefined); await snap(tab); }
         else console.log('no tab', t.name, tab);
       }
