@@ -29,7 +29,8 @@ describe('visual check', () => {
     expect(p.some((x) => /^"Start/.test(x) || /^"Add where/.test(x))).toBe(false); // what was said is fine
   });
   it('the drawing rules: only the conversation, no names from speech, simple labelled pictures', () => {
-    expect(VISUAL_RULES_EXTRA).toMatch(/never add new facts/);
+    expect(VISUAL_RULES_EXTRA).toMatch(/Never make up facts about the student/);
+    expect(VISUAL_RULES_EXTRA).toMatch(/textbook\s+examples for the lesson point are welcome/);
     expect(VISUAL_RULES_EXTRA).toMatch(/Never write people's names from the student's message/);
     expect(VISUAL_RULES_EXTRA).toMatch(/never on a line/);
   });

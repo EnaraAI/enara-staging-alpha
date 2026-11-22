@@ -144,9 +144,10 @@ export function contentProblems(lines: string[], conversation: string): string[]
 }
 
 export const VISUAL_RULES_EXTRA = [
-  'Use only what was said in the conversation: never add new facts, people or sentences of your own.',
+  'Never make up facts about the student (their family, age, name, likes) or sentences in their voice that they did not say; normal textbook',
+  'examples for the lesson point are welcome and expected (fill every example cell).',
   'Never write people\'s names from the student\'s message (speech-to-text often mishears them); write "my friend", "my sister" and so on.',
-  'Prefer table, list, steps or dialogue. Use svg only for a concrete picture (where things are, a shape, a number line, a bar model), with',
-  'at most 5 objects, each one labelled once, the label in clear space above or below its object and never on a line; no decoration',
-  '(no dots, stars or lines that mean nothing).',
+  'Choose the clearest form: a picture when it shows something (where things are, particles, a process, a right/wrong card), a table or list',
+  'for rules and words, and the numberline, fractions or shape kinds for maths with numbers. In a picture: at most 6 objects, each labelled',
+  'once, the label in clear space above or below its object and never on a line; no decoration (no dots, stars or lines that mean nothing).',
 ].join(' ');

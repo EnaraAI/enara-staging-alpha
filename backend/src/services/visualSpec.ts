@@ -2,6 +2,7 @@
 // The model describes the visual in a few hundred tokens of JSON instead of
 // writing a whole HTML page (about 2,000 tokens, 8-9 s); the page is built
 // here from fixed, escaped templates.
+import { MATH_SPEC_FORMAT, drawMath, parseMathSpec, type MathSpec } from './mathVisuals';
 
 export type VisualSpec =
   | { kind: 'none' }
@@ -12,6 +13,7 @@ export type VisualSpec =
       | { kind: 'dialogue'; lines: { speaker: string; text: string }[] }
       | { kind: 'timeline'; items: { when: string; text: string }[] }
       | { kind: 'svg'; svg: string; caption?: string }
+      | { kind: 'math'; math: MathSpec; caption?: string }
     ));
 
 export const VISUAL_SPEC_FORMAT = `Reply with ONLY one JSON object, no Markdown fences, in one of these shapes:
@@ -20,7 +22,8 @@ export const VISUAL_SPEC_FORMAT = `Reply with ONLY one JSON object, no Markdown 
 {"kind":"steps","title":"...","items":["...","..."]}   (worked steps, instructions)
 {"kind":"dialogue","title":"...","lines":[{"speaker":"A","text":"..."}]}
 {"kind":"timeline","title":"...","items":[{"when":"...","text":"..."}]}
-{"kind":"svg","title":"...","svg":"<svg viewBox=\\"0 0 600 360\\" width=\\"100%\\" xmlns=\\"http://www.w3.org/2000/svg\\">...</svg>","caption":"..."}   (only for a real picture: shapes, a number line, a graph, a bar model)
+{"kind":"svg","title":"...","svg":"<svg viewBox=\\"0 0 600 360\\" width=\\"100%\\" xmlns=\\"http://www.w3.org/2000/svg\\">...</svg>","caption":"..."}   (a real picture: where things are, particles, a process, a right/wrong card, a graph)
+${MATH_SPEC_FORMAT}
 Every shape may add "note" (one short line under it) and "rtl":true when it is in Arabic.
 Pick the simplest shape that explains it; keep it short: at most 8 rows, items or lines, each under about 12 words.
 For svg: shapes only plus at most 8 labels of at most 4 words, font-size 14 to 18, labels at least 14px from each other and from lines, 24px margin inside the viewBox, white background, blue #0056D2 accents.`;
@@ -70,6 +73,12 @@ export function parseVisualSpec(text: string): VisualSpec | null {
     case 'timeline': {
       const items = arr<Record<string, unknown>>(raw.items).map((i) => ({ when: str(i?.when, 60), text: str(i?.text, 200) })).filter((i) => i.text);
       return items.length ? { ...base, kind: 'timeline', items } : null;
+    }
+    case 'numberline':
+    case 'fractions':
+    case 'shape': {
+      const math = parseMathSpec(raw);
+      return math ? { ...base, kind: 'math', math, caption: str(raw.caption, 200) || undefined } : null;
     }
     case 'svg': {
       const svg = str(raw.svg, 30_000);
@@ -125,6 +134,14 @@ export function renderVisualSpec(spec: Exclude<VisualSpec, { kind: 'none' }>, sa
     case 'timeline':
       parts.push(`<div class="tl">${spec.items.map((i) => `<div>${i.when ? `<span class="when">${esc(i.when)}</span>` : ''}${esc(i.text)}</div>`).join('')}</div>`);
       break;
+    case 'math': {
+      // Drawn and worked out by code (mathVisuals.ts): always to scale and always right.
+      const m = drawMath(spec.math, Boolean(spec.rtl));
+      parts.push(sanitizeSvg(m.svg));
+      if (m.result) parts.push(`<p class="result" style="font-size:20px;font-weight:700;color:#0b3d91;margin:12px 0 0">${esc(m.result)}</p>`);
+      if (spec.caption) parts.push(`<p class="note">${esc(spec.caption)}</p>`);
+      break;
+    }
     case 'svg':
       parts.push(sanitizeSvg(spec.svg));
       if (spec.caption) parts.push(`<p class="note">${esc(spec.caption)}</p>`);
