@@ -55,6 +55,8 @@ test.describe.serial('20 · Parents: every subject the child studies', () => {
     await page.locator('#si-code').fill(code);
     await page.getByRole('button', { name: 'Continue' }).click();
     await page.getByRole('button', { name: 'Yes, open ENARA Parents' }).click();
+    // Signed in once the child chip shows (as in scenario 12); then the session token is stored.
+    await expect(page.locator('.pp-switcher .pp-chip:not(.pp-chip--add)')).toHaveCount(1, { timeout: 30_000 });
     const token = await page.evaluate(() => localStorage.getItem('enara_token') || '');
 
     // API: the 3 subjects, the held quiz nowhere on the overview, and only "waiting" (no score) on the Maths page.
