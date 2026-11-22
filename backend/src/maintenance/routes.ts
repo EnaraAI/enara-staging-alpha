@@ -285,6 +285,19 @@ router.get('/enrollment-shadow-report', async (req, res, next) => {
 });
 
 // Avatar cost and latency test (avatarUsageReport.ts): numbers for up to 30 listed avatar calls. Read only; IDs and numbers only.
+// The last on-screen visual of each test avatar call (owner, 22 Nov 2026: "let me see them"). Test database only; fake learners;
+// returns the stored visual page (HTML the tutor drew), nothing else.
+router.get('/avatar-visuals', async (req, res, next) => {
+  try {
+    const ids = parseAvatarIds(req.query.ids);
+    if (!ids) { res.status(400).json({ error: 'ids: 1 to 30 avatar call ids (av-<uuid>), comma separated' }); return; }
+    const { AvatarSession } = await import('../models/AvatarSession');
+    const rows = await AvatarSession.find({ id: { $in: ids } }, { id: 1, artifactHtml: 1 }).lean();
+    res.json({ visuals: ids.map((id) => ({ id, html: (rows.find((r) => r.id === id) as { artifactHtml?: string } | undefined)?.artifactHtml ?? null })) });
+  } catch (e) {
+    next(e);
+  }
+});
 router.get('/avatar-usage', async (req, res, next) => {
   try {
     const ids = parseAvatarIds(req.query.ids);
