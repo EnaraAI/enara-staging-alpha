@@ -34,3 +34,9 @@ Do this only when a school confirms in writing that a student who was permanentl
 1. As an ENARA admin, `GET /api/lms/suppressions?institutionId=…` gives the rows by ID. Then `POST /api/lms/suppressions/:id/lift`.
 2. The lift is audited (`lms.identity_suppression_lifted`).
 3. The next roster sync creates a **new** account, with no old data.
+
+## 4. The live avatar's Anam account (lms-test)
+- **Account:** since 22 Nov 2026, lms-test's `ANAM_API_KEY` (Vercel, Production, Sensitive, set by hand) is a key of the Anam organization **"Enara"**. The organization it used before had reached its usage limit.
+- **Free plan limits:** 30 session minutes a month (hard cap), 3 minutes per session, 1 session at a time. Real lessons are cut off at 3 minutes on this plan.
+- **Changing the key:** a new value applies only after the next deploy, i.e. the next PR into `lms-test-live`.
+- **Checking minutes:** in Lab (lab.anam.ai) → Usage, or through the Anam connector (`anam_usage_get`).
