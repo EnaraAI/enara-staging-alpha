@@ -37,7 +37,7 @@ export async function gradeBatch(p: { runId: string; domain: BenchDomain; lang: 
   const items = new Map(set.items.map((i) => [i.id, i]));
   await Promise.all(batch.map(async (a) => {
     const it = items.get(a.itemId)!;
-    const rubric = rubricFor(it.domain, it.type, it.language)!;
+    const rubric = rubricFor(it.domain, it.type, it.language, { points: it.points, units: it.units })!;
     const maxByCriterion = Object.fromEntries(rubric.criteria.map((c) => [c.id, c.maxPoints]));
     const t0 = Date.now();
     const g = await gradeOpenAnswer({

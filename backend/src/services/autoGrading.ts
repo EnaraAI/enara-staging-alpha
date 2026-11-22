@@ -1,4 +1,4 @@
-import { gradeEngineQuestion, isOpenEngine } from '../assessment/questionBridge';
+import { gradeEngineQuestion, isOpenEngine, rubricExtrasOf } from '../assessment/questionBridge';
 import { gradeOpenAnswer, nearPassMark } from '../assessment/grading-engine/open';
 import type { OpenItem } from '../assessment/grading-engine/graders/domains';
 import { engineV2 } from './engineV2';
@@ -275,8 +275,13 @@ async function recordFailure(attempt: AttemptDoc, error: unknown, now: Date) {
 // One grading run. Safe to call any number of times, from anywhere.
 // Assessment engine (P2a): the engine item of an open engine question, for its domain grader.
 function openItemOf(q: IQuestion): OpenItem {
-  const e = q.engine as { type: OpenItem['type']; domain: OpenItem['domain']; language: string; answer_key?: { final?: OpenItem['final']; solution?: string } };
-  return { questionId: q.id, stem: q.text, type: e.type, domain: e.domain, language: e.language, ...(e.answer_key?.final ? { final: e.answer_key.final } : {}), ...(e.answer_key?.solution ? { solution: e.answer_key.solution } : {}) };
+  const e = q.engine as { type: OpenItem['type']; domain: OpenItem['domain']; language: string; source?: string; flags?: Record<string, boolean>; answer_key?: { final?: OpenItem['final']; solution?: string } };
+  const extras = rubricExtrasOf(e);
+  return {
+    questionId: q.id, stem: q.text, type: e.type, domain: e.domain, language: e.language,
+    ...(e.answer_key?.final ? { final: e.answer_key.final } : {}), ...(e.answer_key?.solution ? { solution: e.answer_key.solution } : {}),
+    ...(extras.points ? { points: extras.points, units: extras.units } : {}), ...(e.source ? { source: e.source } : {}),
+  };
 }
 
 export async function processAttempt(attemptId: string, now = new Date()): Promise<'released' | 'finalized' | 'review' | 'failed' | 'exception' | 'skipped'> {

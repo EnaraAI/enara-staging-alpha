@@ -9,7 +9,8 @@ Status: **go given (22 Nov 2026). P2b in progress.** Branch `claude/tutor-assess
 | P1b learner UI for closed types + E2E ar/en | done | #89 |
 | P2a grading engine core, language + math graders, flags, teacher queue, override, error codes → workOn | done (live on lms-test; first real quiz graded 14/18) | #90 |
 | P2b language + math bench (ar + en), open within-1 ≥ 0.85 (no Anthropic spending, §7a) | PR open | – |
-| P3 science, humanities, code graders, listening/speaking, bench | not started | – |
+| P3a science + humanities graders (checklist rubrics per item; humanities judged only against the source), bench ar + en | PR open | – |
+| P3b listening + speaking; code grader (needs a sandbox: owner decision) | not started | – |
 | P4 generation, checks, judge, teacher review, generation bench | not started | – |
 | P5 CI regression gate, admin card, cost/latency report | not started | – |
 

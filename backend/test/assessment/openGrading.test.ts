@@ -20,7 +20,7 @@ vi.mock('../../src/models/GradingProposal', () => ({ GradingProposal: { create: 
 const { gradeOpenRun, checkExtras, splitMathAnswer, finalAnswerPoints, ERROR_CODES } = await import('../../src/assessment/grading-engine/graders/domains');
 const { combineRuns, gradeOpenAnswer, nearPassMark } = await import('../../src/assessment/grading-engine/open');
 const { rubricFor, totalPoints, modelCriteria } = await import('../../src/assessment/rubrics/templates');
-const { checkEngineQuestion, isOpenEngine, describeKey } = await import('../../src/assessment/questionBridge');
+const { checkEngineQuestion, isOpenEngine, describeKey, forLearner } = await import('../../src/assessment/questionBridge');
 
 const attempt = { id: 'att-1', institutionId: 'sch-1', assignmentId: 'asg-1' };
 const essayItem = { questionId: 'q1', stem: 'Write about your family.', type: 'essay' as const, domain: 'language' as const, language: 'en' };
@@ -155,5 +155,49 @@ describe('maths answers', () => {
     expect(finalAnswerPoints(item, '120')).toEqual({ points: 1, correct: false, unitIssue: true });
     expect(finalAnswerPoints(item, '100 سم')).toEqual({ points: 0, correct: false, unitIssue: false });
     expect(finalAnswerPoints(item, '')).toEqual({ points: 0, correct: false, unitIssue: false });
+  });
+});
+
+describe('P3a: science and humanities (checklist rubrics built per item)', () => {
+  const sciPoints = ['Plants make glucose by photosynthesis', 'Light energy is needed'];
+  it('science: one 0-1 criterion per content point, then reasoning and terms; units only when the item asks', () => {
+    const r = rubricFor('science', 'short_answer', 'en', { points: sciPoints })!;
+    expect(r.criteria.map((c) => c.id)).toEqual(['point_1', 'point_2', 'reasoning', 'terminology']);
+    expect(r.criteria[0]).toMatchObject({ title: sciPoints[0], maxPoints: 1 });
+    expect(totalPoints('science', 'short_answer', { points: sciPoints })).toBe(5);
+    expect(totalPoints('science', 'essay', { points: sciPoints, units: true })).toBe(6);
+    expect(rubricFor('science', 'essay', 'ar', { points: sciPoints, units: true })!.criteria.map((c) => c.id)).toContain('units');
+  });
+  it('humanities: required points, accuracy against the source, structure (0-1 short, 0-2 essay)', () => {
+    expect(rubricFor('humanities', 'essay', 'en', { points: ['a1', 'b2', 'c3'] })!.criteria.map((c) => `${c.id}:${c.maxPoints}`)).toEqual(['point_1:1', 'point_2:1', 'point_3:1', 'accuracy_vs_source:2', 'structure:2']);
+    expect(totalPoints('humanities', 'short_answer', { points: ['a1', 'b2'] })).toBe(5);
+  });
+  it('a teacher\'s question: science needs content points, humanities needs a source; the rubric and points come from the item', () => {
+    const sci = checkEngineQuestion({ id: 'q', type: 'engine', text: 'Why do plants need light?', engine: { type: 'short_answer', domain: 'science', language: 'en', answer_key: { content_points: sciPoints } } as never });
+    expect(sci.ok && sci.points).toBe(5);
+    const noPoints = checkEngineQuestion({ id: 'q', type: 'engine', text: 'Why?', engine: { type: 'short_answer', domain: 'science', language: 'en', answer_key: {} } as never });
+    expect(noPoints.ok).toBe(false);
+    const noSource = checkEngineQuestion({ id: 'q', type: 'engine', text: 'Why?', engine: { type: 'essay', domain: 'humanities', language: 'ar', answer_key: { required_points: ['نقطة أولى'] } } as never });
+    expect(noSource.ok).toBe(false);
+    const hum = checkEngineQuestion({ id: 'q', type: 'engine', text: 'Why was the canal built?', engine: { type: 'essay', domain: 'humanities', language: 'en', source: 'The canal was opened in 1869 to join the Mediterranean and the Red Sea, shortening the trip to Asia.', answer_key: { required_points: ['opened in 1869', 'joins two seas', 'shorter trip to Asia'] } } as never });
+    expect(hum.ok && hum.points).toBe(7);
+    expect(describeKey({ id: 'q', type: 'engine', text: 't', engine: { type: 'short_answer', domain: 'science', language: 'en', answer_key: { content_points: sciPoints } } as never })).toBe(sciPoints.join(' · '));
+    // The learner's copy: the points never appear (not in the key, not in the rubric titles); found by E2E 23.
+    if (!hum.ok) return;
+    const learner = forLearner({ id: 'q', type: 'engine', text: 't', rubric: hum.rubric, engine: hum.engine } as never) as { rubric: { criteria: { title: string }[] } };
+    expect(JSON.stringify(learner)).not.toMatch(/joins two seas|shorter trip to Asia|required_points/);
+    expect(learner.rubric.criteria.map((c) => c.title).slice(0, 4)).toEqual(['Required point 1', 'Required point 2', 'Required point 3', 'Accuracy against the source']);
+    expect(JSON.stringify(learner)).toContain('The canal was opened in 1869'); // the source itself is for the learner
+  });
+  it('humanities: the model gets the source and is told to judge only against it; science error codes are accepted', async () => {
+    replies = [{ criteria: [{ criterionId: 'point_1', levelId: 'p1', evidence: ['in 1869'], rationale: 'ok' }, { criterionId: 'accuracy_vs_source', levelId: 'p2', evidence: ['in 1869'], rationale: 'ok' }, { criterionId: 'structure', levelId: 'p1', evidence: ['It opened in 1869'], rationale: 'ok' }], errorCodes: ['unsupported_claim'], confidence: 0.8, scoreExplanation: 'Good.', strengths: [], improvements: [], feedback: 'Good use of the source.', flags: [] }];
+    const item = { questionId: 'q', stem: 'When did the canal open?', type: 'short_answer' as const, domain: 'humanities' as const, language: 'en', points: ['opened in 1869'], source: 'The canal was opened in 1869 to join the Mediterranean and the Red Sea.' };
+    const r = await gradeOpenRun({ attempt, item, answer: 'It opened in 1869.', uiLanguage: 'en', run: 1 });
+    expect(r.status).toBe('proposed');
+    expect(r.points).toBe(4);
+    expect(calls[0].system).toMatch(/ONLY against the source/);
+    expect(JSON.parse(calls[0].user).item.source).toContain('opened in 1869');
+    expect(checkExtras({ confidence: 0.8, errorCodes: ['misconception'], feedback: 'ok' }, 'science', 'en').errorCodes).toEqual(['misconception']);
+    expect(() => checkExtras({ confidence: 0.8, errorCodes: ['arithmetic'], feedback: 'ok' }, 'science', 'en')).toThrow(/unknown error codes/);
   });
 });

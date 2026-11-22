@@ -4,7 +4,11 @@
 // view and the learning evidence work unchanged. CEFR-specific descriptors (curriculum=cefr) come later with the CEFR seed titles.
 export type Bi = { ar: string; en: string };
 interface CriterionTemplate { code: string; title: Bi; levels: Bi[] /* index = points */; byCode?: boolean }
-interface RubricTemplate { domain: 'language' | 'math'; type: 'short_answer' | 'essay' | 'math_steps'; criteria: CriterionTemplate[] }
+export type Domain = 'language' | 'math' | 'science' | 'humanities';
+export type OpenType = 'short_answer' | 'essay' | 'math_steps';
+interface RubricTemplate { domain: Domain; type: OpenType; criteria: CriterionTemplate[]; checklist?: boolean }
+/** Per item (science and humanities): the content points of the answer key, and whether units are marked. */
+export interface RubricExtras { points?: string[]; units?: boolean }
 
 const L = (ar: string, en: string): Bi => ({ ar, en });
 
@@ -33,17 +37,43 @@ export const TEMPLATES: RubricTemplate[] = [
       { code: 'representation', title: L('العرض والكتابة الرياضية', 'Representation'), levels: [L('عرض غير واضح', 'Unclear working'), L('عرض واضح بالرموز والوحدات', 'Clear working with symbols and units')] },
     ],
   },
+  // P3a. Science and humanities: a checklist built per item (one 0-1 criterion per content point of the answer key: point_1..point_n,
+  // titled with the point itself), then the fixed criteria below. Units only when the item asks for them.
+  ...(['short_answer', 'essay'] as const).map((type): RubricTemplate => ({
+    domain: 'science', type, checklist: true, criteria: [
+      { code: 'reasoning', title: L('التفسير العلمي', 'Reasoning'), levels: [L('لا تفسير أو تفسير خاطئ', 'No reasoning or wrong reasoning'), L('يفسر جزئيًا لماذا أو كيف', 'Partly explains why or how'), L('يفسر لماذا أو كيف بوضوح وصحة', 'Explains why or how clearly and correctly')] },
+      { code: 'terminology', title: L('المصطلحات العلمية', 'Scientific terms'), levels: [L('مصطلحات ناقصة أو مستخدمة خطأ', 'Terms missing or misused'), L('مصطلحات علمية صحيحة', 'Correct scientific terms')] },
+      { code: 'units', title: L('الوحدات', 'Units'), levels: [L('وحدات ناقصة أو خاطئة', 'Units missing or wrong'), L('وحدات صحيحة', 'Correct units')] },
+    ],
+  })),
+  ...(['short_answer', 'essay'] as const).map((type): RubricTemplate => ({
+    domain: 'humanities', type, checklist: true, criteria: [
+      { code: 'accuracy_vs_source', title: L('الدقة مقارنة بالنص', 'Accuracy against the source'), levels: [L('ادعاءات تخالف النص أو ليست فيه', 'Claims contradict the source or are not in it'), L('يوافق النص في الغالب مع خطأ بسيط أو ادعاء غير مدعوم', 'Mostly matches the source, with a minor inaccuracy or an unsupported claim'), L('كل ما ذُكر يوافق النص', 'Everything stated matches the source')] },
+      type === 'essay'
+        ? { code: 'structure', title: L('البناء', 'Structure'), levels: [L('لا ترتيب واضح', 'No clear order'), L('بعض الترتيب', 'Some order'), L('مقدمة واضحة ونقاط مرتبة وخاتمة', 'Clear opening, points in order, conclusion')] }
+        : { code: 'structure', title: L('الوضوح', 'Structure'), levels: [L('غير واضح', 'Unclear'), L('واضح ومباشر', 'Clear and direct')] },
+    ],
+  })),
 ];
+
+const POINT_LEVELS: Bi[] = [L('ناقصة أو خاطئة', 'Missing or wrong'), L('مذكورة بشكل صحيح', 'Stated correctly')];
+
+/** The criteria of an item: the template's, with the checklist points first (science, humanities) and units only when asked. */
+function criteriaOf(t: RubricTemplate, extras: RubricExtras = {}): CriterionTemplate[] {
+  if (!t.checklist) return t.criteria;
+  const points = (extras.points ?? []).map((p, i): CriterionTemplate => ({ code: `point_${i + 1}`, title: L(p, p), levels: POINT_LEVELS }));
+  return [...points, ...t.criteria.filter((c) => c.code !== 'units' || extras.units === true)];
+}
 
 export const templateFor = (domain: string, type: string): RubricTemplate | undefined => TEMPLATES.find((t) => t.domain === domain && t.type === type);
 
 /** The rubric in today's question.rubric shape, in the item's language (criterion id = code; level id = `p<points>`). */
-export function rubricFor(domain: string, type: string, lang: string) {
+export function rubricFor(domain: string, type: string, lang: string, extras?: RubricExtras) {
   const t = templateFor(domain, type);
   if (!t) return null;
   const k: keyof Bi = lang.startsWith('ar') ? 'ar' : 'en';
   return {
-    criteria: t.criteria.map((c) => ({
+    criteria: criteriaOf(t, extras).map((c) => ({
       id: c.code,
       title: c.title[k],
       maxPoints: c.levels.length - 1,
@@ -54,5 +84,8 @@ export function rubricFor(domain: string, type: string, lang: string) {
 }
 
 /** Criteria the model scores (the final answer of a maths item is scored by code). */
-export const modelCriteria = (domain: string, type: string): string[] => (templateFor(domain, type)?.criteria ?? []).filter((c) => !c.byCode).map((c) => c.code);
-export const totalPoints = (domain: string, type: string): number => (templateFor(domain, type)?.criteria ?? []).reduce((n, c) => n + c.levels.length - 1, 0);
+const itemCriteria = (domain: string, type: string, extras?: RubricExtras) => { const t = templateFor(domain, type); return t ? criteriaOf(t, extras) : []; };
+export const modelCriteria = (domain: string, type: string, extras?: RubricExtras): string[] => itemCriteria(domain, type, extras).filter((c) => !c.byCode).map((c) => c.code);
+export const totalPoints = (domain: string, type: string, extras?: RubricExtras): number => itemCriteria(domain, type, extras).reduce((n, c) => n + c.levels.length - 1, 0);
+/** Science and humanities rubrics are built per item from its content points. */
+export const isChecklist = (domain: string, type: string): boolean => !!templateFor(domain, type)?.checklist;

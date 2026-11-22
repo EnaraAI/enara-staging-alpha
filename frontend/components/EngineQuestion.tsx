@@ -7,7 +7,7 @@ import React from 'react';
 
 export type UiLang = 'ar' | 'en';
 type Opt = { id: string; text: string };
-export interface EngineQ { id: string; text: string; engine: { type: string; options?: unknown; language: string } }
+export interface EngineQ { id: string; text: string; engine: { type: string; options?: unknown; language: string; source?: string } }
 
 const T = {
   en: { yourAnswer: 'Your answer', steps: 'Your working (steps)', final: 'Final answer', chooseAll: 'Choose all that apply', chooseOne: 'Choose one', true: 'True', false: 'False', blank: 'Blank', choose: 'Choose…', number: 'Number', unit: 'Unit', up: 'Move up', down: 'Move down', matchWith: 'matches', orderHint: 'Put these in the right order', matchHint: 'Match each item on the start with one on the end', numberHint: 'Write a number (and its unit if needed)' },
@@ -146,6 +146,10 @@ export const EngineQuestion: React.FC<{ q: EngineQ; value: string; onChange: (v:
     case 'essay':
       return (
         <div className="mt-3" dir={dir} data-testid={`eq-${q.id}`}>
+          {e.source && (
+            // Humanities (P3a): the source passage the answer is judged against.
+            <blockquote className="mb-3 border-s-4 border-slate-300 bg-slate-50 rounded p-3 text-sm text-slate-800 whitespace-pre-wrap" data-testid={`eq-source-${q.id}`}>{e.source}</blockquote>
+          )}
           <textarea aria-label={label(t.yourAnswer)} dir="auto" value={value}
             className={`w-full border border-slate-300 rounded-lg p-3 text-base ${e.type === 'essay' ? 'min-h-[180px]' : 'min-h-[80px]'}`}
             onChange={(ev) => onChange(ev.target.value)} />
