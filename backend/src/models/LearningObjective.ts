@@ -41,7 +41,7 @@ export interface ILearningObjective extends Document {
   level?: string;
   subjectKey?: string;
   track?: 'science' | 'maths' | 'literary';
-  source?: { document: string; year: number | null; status: 'verified' | 'unverified' };
+  source?: { document: string; year: number | null; url?: string; status: 'verified' | 'unverified' };
   extraction?: {
     method: string;
     model?: string;
@@ -82,7 +82,7 @@ const objectiveSchema = new Schema<ILearningObjective>(
     level: String,
     subjectKey: String,
     track: { type: String, enum: ['science', 'maths', 'literary'] },
-    source: { type: { document: String, year: Number, status: { type: String, enum: ['verified', 'unverified'] }, _id: false }, default: undefined },
+    source: { type: { document: String, year: Number, url: String, status: { type: String, enum: ['verified', 'unverified'] }, _id: false }, default: undefined },
     extraction: {
       method: String,
       model: String,

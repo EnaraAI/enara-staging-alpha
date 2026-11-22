@@ -139,6 +139,12 @@ All 21 Egyptian national files exist in `data/curricula/eg-national/` with statu
 | Primary G6 | the same four (`g6/*.json`) |
 | Thanaweya Amma G12 | Arabic, Mathematics, Physics, Chemistry, Biology, History, Geography, Philosophy and Logic, Psychology and Sociology (`g12/*.json`, each with its tracks) |
 
+**Deferred (Mohamed, 22 Nov 2026): seeds come later.** To fill them I need one of these:
+- **Network access:** add `edu2-egypt.com`, `moe.gov.eg` and `ellibrary.moe.gov.eg` to the environment's allowed domains. I then take units and lessons from the official textbooks, with the book, year and link recorded.
+- **Or the documents:** for each grade and subject, the Ministry textbook PDF or just its contents pages, both terms, the school year printed on it, and the Arabic edition (plus the English edition for Maths and Science if the school uses it).
+
+For G12: one book per track where they differ (Maths: pure and applied; Physics and Chemistry: science and maths tracks).
+
 - **CEFR** is loaded from the existing outcome bank (`data/outcomes/outcomes.json`, 95 outcomes, A1–A2). That bank is itself marked DRAFT, so its objectives load as drafts.
 - **CEFR Arabic titles are missing:** the bank has English statements only, so CEFR objectives have no Arabic title yet.
 

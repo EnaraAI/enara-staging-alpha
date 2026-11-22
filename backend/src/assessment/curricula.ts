@@ -28,7 +28,7 @@ export const SeedFile = z.object({
   subject_title: z.object({ ar: z.string().min(1), en: z.string().min(1) }).strict(),
   tracks: z.array(z.enum(TRACKS)).optional(),
   version: z.number().int().min(1),
-  source: z.object({ document: z.string().min(10), year: z.number().int().min(1990).max(2100).nullable(), status: z.enum(['verified', 'unverified']) }).strict(),
+  source: z.object({ document: z.string().min(10), year: z.number().int().min(1990).max(2100).nullable(), url: z.string().url().optional(), status: z.enum(['verified', 'unverified']) }).strict(),
   note: z.string().optional(),
   objectives: z.array(SeedObjective),
 }).strict().superRefine((f, ctx) => {
@@ -42,7 +42,7 @@ export type SeedFile = z.infer<typeof SeedFile>;
 export interface SeedObjectiveRow {
   id: string; curriculumKey: string; curriculumId: string; level: string; subjectKey: string; domain: string; code: string;
   titleAr: string | null; titleEn: string; language: 'ar' | 'en'; tracks: string[];
-  source: { document: string; year: number | null; status: 'verified' | 'unverified' };
+  source: { document: string; year: number | null; url?: string; status: 'verified' | 'unverified' };
 }
 
 export function curriculaDir(): string | null {
