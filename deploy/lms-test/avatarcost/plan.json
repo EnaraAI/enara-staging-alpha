@@ -1,10 +1,14 @@
 {
  "$comment": "Avatar cost/latency/STT run on lms-test only (synthetic voices). 'run' picks which calls this push runs; hard cap 40 calls in total including tries (owner: 1 check call + 10 more on 22 Nov 2026, new Anam account).",
  "run": {
-  "ids": [],
-  "attempt": 17,
+  "ids": [
+   "a08",
+   "a09",
+   "c01"
+  ],
+  "attempt": 18,
   "diagnose": false,
-  "$note": "Avatar calls used: 40 of 40 (the 10 on 22 Nov all completed). Parked. Results: docs/tutor/AVATAR_TEST_REPORT.md."
+  "$note": "Avatar calls used: 40 of 43. Speed step 6 (avatarSentences, live in #76): a08, a09 (adult), c01 (child-like) to measure when the avatar starts speaking."
  },
  "voices": {
   "amy": {
