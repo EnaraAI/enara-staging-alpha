@@ -29,8 +29,16 @@ The tutor's own time on the server was 1.13 s at the median. The rest is speech-
 
 ## Cost
 - **Anam minutes:** 13.8 used today (calls of 64–94 s). **16.2 of the 30 free minutes are left** this month.
-- **On a paid plan**, at Anam's public prices from 21 Nov ($0.24 to $0.11 per minute): 1.0 to 2.2 cents per minute of call, so a 3-minute lesson costs about **$0.35 to $0.75**.
-- **DeepSeek model**, for the tutor's replies and the screen visuals: about **$0.009 per call**, at the safe upper-bound price.
+- **On a paid plan**, at Anam's public prices from 21 Nov: **$0.11 to $0.24 per minute** (11 to 24 cents).
+- **DeepSeek model**, for the tutor's replies and the screen visuals: about $0.009 per 70-second call, so about **$0.008 per minute**, at the safe upper-bound price.
+
+| Avatar lesson | Anam ($0.11–0.24/min) | DeepSeek | **Total** |
+|---|---|---|---|
+| 3 minutes | $0.33–0.72 | $0.02 | **$0.35–0.74** |
+| 10 minutes | $1.10–2.40 | $0.08 | **$1.18–2.48** |
+| 20 minutes | $2.20–4.80 | $0.16 | **$2.36–4.96** |
+
+Anam is almost all of the cost. On the free plan a session stops at 3 minutes, so 10- and 20-minute lessons need a paid plan.
 
 ## Worth knowing
 - **Free plan:** a session can last 3 minutes at most, and only 1 can run at a time. Real lessons would be cut off at 3 minutes.
