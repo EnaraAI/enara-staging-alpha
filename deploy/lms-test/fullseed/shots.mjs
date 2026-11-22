@@ -16,7 +16,7 @@ for (const t of targets) {
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1.5 });
   const page = await ctx.newPage();
   if (r.ok && j.token) {
-    await ctx.addInitScript(([token, user, isParent]) => { try { localStorage.setItem('enara_token', token); localStorage.setItem('enara_user', JSON.stringify(user)); if (isParent) localStorage.setItem('enara_ui_role', 'parent'); } catch {} }, [j.token, j.user, parent]);
+    await ctx.addInitScript(([token, user, uiRole]) => { try { localStorage.setItem('enara_token', token); localStorage.setItem('enara_user', JSON.stringify(user)); localStorage.setItem('enara_ui_role', uiRole); } catch {} }, [j.token, j.user, ({ student: 'student', teacher: 'admin', admin: 'admin', academic_manager: 'academic-manager', 'enara-admin': 'enara-admin', parent: 'parent' })[j.user.role] || 'student']);
   }
   const shots = [];
   const snap = async (label) => { await page.waitForTimeout(2500); const f = `shots/${t.name}--${label.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}.png`; await page.screenshot({ path: f, fullPage: false }); shots.push(f); console.log('shot', f); };
