@@ -4,7 +4,7 @@
 // view and the learning evidence work unchanged. CEFR-specific descriptors (curriculum=cefr) come later with the CEFR seed titles.
 export type Bi = { ar: string; en: string };
 interface CriterionTemplate { code: string; title: Bi; levels: Bi[] /* index = points */; byCode?: boolean }
-export type Domain = 'language' | 'math' | 'science' | 'humanities';
+export type Domain = 'language' | 'math' | 'science' | 'humanities' | 'listening';
 export type OpenType = 'short_answer' | 'essay' | 'math_steps';
 interface RubricTemplate { domain: Domain; type: OpenType; criteria: CriterionTemplate[]; checklist?: boolean }
 /** Per item (science and humanities): the content points of the answer key, and whether units are marked. */
@@ -54,6 +54,14 @@ export const TEMPLATES: RubricTemplate[] = [
         : { code: 'structure', title: L('الوضوح', 'Structure'), levels: [L('غير واضح', 'Unclear'), L('واضح ومباشر', 'Clear and direct')] },
     ],
   })),
+  // P3b. Listening: the points heard in the recording, accuracy against the recording (its transcript), clarity. Language mistakes are
+  // not marked here (it is listening, not writing).
+  {
+    domain: 'listening', type: 'short_answer', checklist: true, criteria: [
+      { code: 'accuracy_vs_source', title: L('الدقة مقارنة بالتسجيل', 'Accuracy against the recording'), levels: [L('ادعاءات تخالف التسجيل أو ليست فيه', 'Claims contradict the recording or are not in it'), L('يوافق التسجيل في الغالب مع خطأ بسيط أو ادعاء غير مدعوم', 'Mostly matches the recording, with a minor inaccuracy or an unsupported claim'), L('كل ما ذُكر يوافق التسجيل', 'Everything stated matches the recording')] },
+      { code: 'structure', title: L('الوضوح', 'Structure'), levels: [L('غير واضح', 'Unclear'), L('واضح ومباشر', 'Clear and direct')] },
+    ],
+  },
 ];
 
 const POINT_LEVELS: Bi[] = [L('ناقصة أو خاطئة', 'Missing or wrong'), L('مذكورة بشكل صحيح', 'Stated correctly')];

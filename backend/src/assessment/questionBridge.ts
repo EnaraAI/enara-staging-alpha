@@ -18,21 +18,26 @@ const LANG = z.string().regex(/^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$/);
 const POINTS = z.array(z.string().trim().min(2).max(300)).min(1).max(6);
 // P3a (switch assessSubjects): science (content points checklist, units when flags.units) and humanities (required points, judged
 // only against the source passage the learner reads).
+// P3b (switch assessMedia): a recording on any engine item. The learner gets the url only; the transcript is the grader's source.
+const AUDIO = z.object({ url: z.string().trim().max(2000).regex(/^(https:\/\/|\/uploads\/)/, 'an https:// or /uploads/ address'), transcript: z.string().trim().min(20).max(8000) }).strict();
 const OpenContent = z.union([
   z.object({ type: z.literal('short_answer'), domain: z.literal('language'), language: LANG, answer_key: z.object({ model_answer: z.string().max(2000).optional() }).strict().optional(), flags: z.record(z.boolean()).optional() }).strict(),
   z.object({ type: z.literal('essay'), domain: z.literal('language'), language: LANG, answer_key: z.object({ model_answer: z.string().max(4000).optional() }).strict().optional(), flags: z.record(z.boolean()).optional() }).strict(),
   z.object({ type: z.literal('math_steps'), domain: z.literal('math'), language: LANG, answer_key: z.object({ final: z.object({ value: z.union([z.number(), z.string().min(1).max(100)]), tolerance_abs: z.number().nonnegative().optional(), tolerance_rel: z.number().nonnegative().max(1).optional(), unit: z.string().max(32).nullable().optional() }).strict(), solution: z.string().max(4000).optional() }).strict(), flags: z.record(z.boolean()).optional() }).strict(),
   z.object({ type: z.enum(['short_answer', 'essay']), domain: z.literal('science'), language: LANG, answer_key: z.object({ content_points: POINTS, model_answer: z.string().max(4000).optional() }).strict(), flags: z.record(z.boolean()).optional() }).strict(),
+  z.object({ type: z.literal('short_answer'), domain: z.literal('listening'), language: LANG, audio: AUDIO, answer_key: z.object({ required_points: POINTS, model_answer: z.string().max(2000).optional() }).strict(), flags: z.record(z.boolean()).optional() }).strict(),
   z.object({ type: z.enum(['short_answer', 'essay']), domain: z.literal('humanities'), language: LANG, source: z.string().trim().min(40).max(8000), answer_key: z.object({ required_points: POINTS, model_answer: z.string().max(4000).optional() }).strict(), flags: z.record(z.boolean()).optional() }).strict(),
 ]);
 /** The per-item rubric extras of an open engine question (science and humanities checklists). */
 export function rubricExtrasOf(e: { domain?: string; answer_key?: unknown; flags?: Record<string, boolean> } | null | undefined) {
   const k = (e?.answer_key ?? {}) as { content_points?: string[]; required_points?: string[] };
-  const points = e?.domain === 'science' ? k.content_points : e?.domain === 'humanities' ? k.required_points : undefined;
+  const points = e?.domain === 'science' ? k.content_points : e?.domain === 'humanities' || e?.domain === 'listening' ? k.required_points : undefined;
   return { points, units: e?.flags?.units === true };
 }
 export const isSubjectEngine = (e: { domain?: string } | null | undefined): boolean => e?.domain === 'science' || e?.domain === 'humanities';
-export interface EngineContent { type: ClosedType | OpenEngineType; domain?: 'language' | 'math' | 'science' | 'humanities'; source?: string; options?: unknown; answer_key: unknown; flags?: Record<string, boolean>; language: string; error_codes?: string[] }
+/** A recording (any engine item) or a listening question needs the switch assessMedia. */
+export const isMediaEngine = (e: { domain?: string; audio?: unknown } | null | undefined): boolean => !!e?.audio || e?.domain === 'listening';
+export interface EngineContent { type: ClosedType | OpenEngineType; domain?: 'language' | 'math' | 'science' | 'humanities' | 'listening'; source?: string; audio?: { url: string; transcript?: string }; options?: unknown; answer_key: unknown; flags?: Record<string, boolean>; language: string; error_codes?: string[] }
 type Q = { id: string; type: string; text: string; points?: number; difficulty?: number; engine?: EngineContent | null };
 
 /** The engine item of a question, in the schema the graders check. */
@@ -61,7 +66,13 @@ export function checkEngineQuestion(q: Q): { ok: true; engine: EngineContent; ru
   const parsed = ClosedItem.safeParse(itemOf(q));
   if (!parsed.success) return { ok: false, problems: parsed.error.issues.map((i) => `${i.path.join('.') || 'item'}: ${i.message}`) };
   const p = parsed.data;
-  return { ok: true, engine: { type: p.type, options: p.options ?? undefined, answer_key: p.answer_key, flags: p.flags, language: p.language, ...(p.error_codes.length ? { error_codes: p.error_codes } : {}) } };
+  let audio: { url: string; transcript: string } | undefined;
+  if (e.audio !== undefined) {
+    const a = AUDIO.safeParse(e.audio);
+    if (!a.success) return { ok: false, problems: a.error.issues.map((i) => `audio.${i.path.join('.')}: ${i.message}`) };
+    audio = a.data;
+  }
+  return { ok: true, engine: { type: p.type, options: p.options ?? undefined, answer_key: p.answer_key, flags: p.flags, language: p.language, ...(p.error_codes.length ? { error_codes: p.error_codes } : {}), ...(audio ? { audio } : {}) } };
 }
 
 /** The learner's answer: JSON text for structured answers (lists, pairs, blanks), else the text itself. */
@@ -137,13 +148,15 @@ export function forLearner<T extends Q>(q: T): T {
   }
   // A multi-answer choice shows checkboxes: whether it is multi is not secret (which options are right is).
   const multi = rest.type === 'mcq' && (q.engine.answer_key as { multi?: boolean } | undefined)?.multi === true;
-  // Science and humanities: the checklist criteria are titled with the answer's points; the learner sees "Required point N" instead.
+  // A recording: the learner gets its address only, never the transcript.
+  const audio = rest.audio ? { url: rest.audio.url } : undefined;
+  // Science, humanities, listening: the checklist criteria are titled with the answer's points; the learner sees "Required point N".
   const rubric = (q as { rubric?: { criteria?: { id: string; title?: string; levels?: { description?: string }[] }[] } }).rubric;
   const ar = String(rest.language ?? '').startsWith('ar');
   const safeRubric = rubric?.criteria?.some((c) => /^point_\d+$/.test(c.id))
     ? { ...rubric, criteria: rubric.criteria.map((c) => { const m = /^point_(\d+)$/.exec(c.id); return m ? { ...c, title: ar ? `النقطة المطلوبة ${m[1]}` : `Required point ${m[1]}`, levels: (c.levels ?? []).map((l) => ({ ...l, description: '' })) } : c; }) }
     : undefined;
-  return { ...q, ...(safeRubric ? { rubric: safeRubric } : {}), engine: { ...rest, options, ...(multi ? { multi: true } : {}) } };
+  return { ...q, ...(safeRubric ? { rubric: safeRubric } : {}), engine: { ...rest, options, ...(multi ? { multi: true } : {}), ...(audio ? { audio } : {}) } };
 }
 
 /** Grades one engine question; the fields of the stored attempt answer. A malformed item is a problem for a person, not a score. */

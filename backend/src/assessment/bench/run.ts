@@ -19,6 +19,13 @@ export async function spentSince(since: Date): Promise<number> {
   return Math.round((r[0]?.usd ?? 0) * 10000) / 10000;
 }
 
+/** Grading calls since a time, by model (to show which provider was used: the bench never falls back to Anthropic). */
+export async function spentByModel(since: Date): Promise<{ model: string; calls: number; usd: number }[]> {
+  const { AiCall } = await import('../../models/AiCall');
+  const r = await AiCall.aggregate([{ $match: { feature: 'ai_grading', createdAt: { $gte: since } } }, { $group: { _id: '$modelName', calls: { $sum: 1 }, usd: { $sum: '$costUsd' } } }]);
+  return r.map((x: { _id: string; calls: number; usd: number }) => ({ model: String(x._id), calls: x.calls, usd: Math.round(x.usd * 10000) / 10000 }));
+}
+
 export async function startRun(p: { runId: string; capUsd?: number; note?: string }) {
   const cap = Math.min(20, Math.max(0.1, p.capUsd ?? DEFAULT_CAP_USD));
   await AssessmentBenchRun.updateOne({ runId: p.runId }, { $setOnInsert: { runId: p.runId, startedAt: new Date(), capUsd: cap, note: p.note ?? '' } }, { upsert: true });
@@ -75,7 +82,8 @@ export async function summary(runId: string) {
   const failures = gate(sets.filter((s) => expected[s.set]), { baseline: baseline(), expected });
   const spentUsd = await spentSince(run.startedAt);
   await AssessmentBenchRun.updateOne({ runId }, { $set: { summary: sets, failures, finishedAt: new Date() } });
-  return { runId, gold: 'author (provisional)', spentUsd, capUsd: run.capUsd, lines: sets.map(oneLine), failures, passed: failures.length === 0, sets };
+  const byModel = await spentByModel(run.startedAt);
+  return { runId, gold: 'author (provisional)', spentUsd, byModel, capUsd: run.capUsd, lines: sets.map(oneLine), failures, passed: failures.length === 0, sets };
 }
 
 /** Rows that disagree by more than 1 point, for reading (fake bench answers only). */
