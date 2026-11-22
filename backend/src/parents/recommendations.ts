@@ -2,9 +2,10 @@
 // 1. Code picks what matters most from the child's real data in that subject (pickFocus): open points to practise (released only), the
 //    weakest outcome, a low RELEASED result, no practice this week, something due soon, the next lesson. An unreleased result never
 //    reaches this file (SubjectDetail.latestResult and .points hold only what the parent may see).
-// 2. The model writes it in plain words (both languages), and checkWritten() refuses anything off: wrong language, too long, links,
-//    Markdown, numbers that are not in the data, or answer-giving words. A refused or missing item gets the written-in-advance text.
-// 3. Saved per child, subject and week; written again only when the data it was built from changes.
+// 2. Code writes it (fallbackRec, both languages, a different activity idea from week to week) and the parent sees it at once.
+// 3. The model only adds variation (owner, 22 Nov 2026): in the background it rewords the code's text, keeping every fact; checkWritten()
+//    refuses anything off (wrong language, too long, links, Markdown, numbers not in the code's text, answer-giving words), and a refused
+//    item keeps the code's text. The reworded version is saved per child, subject and week and shown from the next visit.
 import { createHash } from 'crypto';
 import Anthropic from '@anthropic-ai/sdk';
 import { getConfig } from '../config/env';
@@ -36,6 +37,25 @@ export function pickFocus(s: SubjectDetail, now = new Date()): Focus[] {
 
 // ----------------------------------------------------------------- written in advance (always available)
 
+const ACTIVITY_B: Record<Family, { kid: Bi; teen: Bi }> = {
+  language: {
+    kid: { en: 'play a quick game: take turns saying a sentence with it about something in the room', ar: 'العبا لعبة سريعة: بالدور قولوا جملة بها عن شيء في الغرفة' },
+    teen: { en: 'ask them to write a short message to a friend using it, and read it to you', ar: 'اطلب منه أن يكتب رسالة قصيرة لصديق يستخدمها فيها ويقرأها لك' },
+  },
+  maths: {
+    kid: { en: 'use coins, fruit or toys to make 3 small problems together', ar: 'استخدما عملات أو فاكهة أو ألعابًا لعمل ٣ مسائل صغيرة معًا' },
+    teen: { en: 'ask them to make up one problem like it for you to solve, then check your answer', ar: 'اطلب منه أن يؤلف لك مسألة مثلها لتحلها، ثم يصحح إجابتك' },
+  },
+  science: {
+    kid: { en: 'do a tiny kitchen experiment or drawing about it and talk about what you see', ar: 'اعملا تجربة صغيرة في المطبخ أو رسمة عنه وتحدّثا عمّا تريانه' },
+    teen: { en: 'ask them to explain it to you in their own words with one real example', ar: 'اطلب منه أن يشرحه لك بكلماته مع مثال حقيقي واحد' },
+  },
+  general: {
+    kid: { en: 'ask them to tell you a short story about it', ar: 'اطلب منه أن يحكي لك قصة قصيرة عنه' },
+    teen: { en: 'ask them what they found most interesting about it and why', ar: 'اسأله ما أكثر شيء شدّه فيه ولماذا' },
+  },
+};
+
 const ACTIVITY: Record<Family, { kid: Bi; teen: Bi }> = {
   language: {
     kid: { en: 'make up 3 short sentences about your day with it and say them out loud', ar: 'كوّنا ٣ جمل قصيرة عن يومكم بها وقولوها بصوت عالٍ' },
@@ -61,9 +81,9 @@ function dueWords(iso: string, lang: 'en' | 'ar'): string {
 }
 
 /** The written-in-advance suggestion for one focus. Never empty, never made up: every fact in it comes from the focus. */
-export function fallbackRec(f: Focus, ctx: { name: string; subject: Bi; family: Family; tier: Tier }): Rec {
+export function fallbackRec(f: Focus, ctx: { name: string; subject: Bi; family: Family; tier: Tier; variant?: number }): Rec {
   const kid = ctx.tier === 'kid';
-  const act = ACTIVITY[ctx.family][kid ? 'kid' : 'teen'];
+  const act = (ctx.variant ? ACTIVITY_B : ACTIVITY)[ctx.family][kid ? 'kid' : 'teen'];
   const n = ctx.name; const sub = ctx.subject; const t = f.topic ?? '';
   const say = (kidEn: string, kidAr: string, teenEn: string, teenAr: string): Bi => (kid ? { en: kidEn, ar: kidAr } : { en: teenEn, ar: teenAr });
   switch (f.kind) {
@@ -137,7 +157,7 @@ export function checkWritten(w: { do?: Bi; why?: Bi; say?: Bi } | undefined, fac
     if (AR.test(b.en)) return `${part}: Arabic in the English text`;
     if (!AR.test(b.ar)) return `${part}: the Arabic text is not Arabic`;
     // Topic names may be English inside the Arabic text, but not whole English sentences.
-    if ((b.ar.match(LATIN_WORD) ?? []).length > 6) return `${part}: too much English in the Arabic text`;
+    if ((b.ar.match(LATIN_WORD) ?? []).length > 10) return `${part}: too much English in the Arabic text`;
     for (const s of [b.en, b.ar]) {
       if (/https?:|www\.|[*#`_]{2,}|^\s*[-*#]/.test(s)) return `${part}: link or Markdown`;
       if (ANSWER_WORDS.test(s)) return `${part}: gives an answer`;
@@ -149,65 +169,100 @@ export function checkWritten(w: { do?: Bi; why?: Bi; say?: Bi } | undefined, fac
 }
 
 const SYSTEM = [
-  'You write short, warm suggestions for a parent: how they can help their child this week in one school subject.',
-  'You get the child\'s first name, age group, the subject and up to 3 focus points picked from the child\'s real data. Write exactly one suggestion per focus point, in the same order.',
-  'Each suggestion has: "do" (one home activity of 5 to 10 minutes that needs nothing special), "why" (one sentence, only facts given to you), "say" (one thing the parent can say to the child).',
-  'Rules: use only the facts given. Never invent scores, dates, names or numbers. Never give the answer to any school work. No lists, no Markdown, no links.',
-  'Age group "kid": activities the parent and child do together, playful. Age group "13plus": respectful, suggest asking or talking, never checking up or testing.',
-  'Write every field in English ("en") and in simple Modern Standard or Egyptian Arabic ("ar"). Topic names may stay as given.',
-  'Reply with JSON only: {"items":[{"do":{"en":"","ar":""},"why":{"en":"","ar":""},"say":{"en":"","ar":""}}]}',
+  'You reword short suggestions for a parent about helping their child at home in one school subject, so they do not read the same every week.',
+  'You get the suggestions already written in English ("en") and Arabic ("ar"). Rewrite each one in fresh, warm, plain words.',
+  'Keep exactly the same meaning, the same activity idea, the same facts, names, topics, numbers and dates. Add nothing new. Never give the answer to any school work.',
+  'Keep each field about as short as the original. Plain sentences: no lists, no Markdown, no links, no emojis.',
+  'English fields in English only. Arabic fields in simple Arabic (Modern Standard or Egyptian); topic names in quotes may stay as given.',
+  'Reply with JSON only, the same number of items in the same order: {"items":[{"do":{"en":"","ar":""},"why":{"en":"","ar":""},"say":{"en":"","ar":""}}]}',
 ].join('\n');
 
 let client: Anthropic | null = null;
 const modelOn = (): boolean => deepseekReady() || Boolean(getConfig().anthropicApiKey);
+type Written = { do: Bi; why: Bi; say: Bi } | undefined;
 
-async function writeWithModel(focus: Focus[], ctx: { name: string; subject: Bi; tier: Tier; institutionId?: string }, timeoutMs: number): Promise<({ do: Bi; why: Bi; say: Bi } | undefined)[]> {
-  if (!modelOn() || !focus.length) return [];
+/** The model's rewording of the code's suggestions (throws on a failed call or an unreadable reply). */
+async function rewordWithModel(items: Rec[], ctx: { tier: Tier; institutionId?: string }, timeoutMs: number): Promise<Written[]> {
+  if (!modelOn() || !items.length) return [];
   client ??= new Anthropic({ apiKey: getConfig().anthropicApiKey || 'unused', timeout: timeoutMs, maxRetries: 0 });
   const model = llmModel(getConfig().anthropicVoiceModel);
-  const input = { child: ctx.name, ageGroup: ctx.tier, subject: ctx.subject.en, focus: focus.map((f) => ({ kind: f.kind, topic: f.topic, detail: f.detail, score: f.score, due: f.dueAt ? new Date(f.dueAt).toISOString().slice(0, 10) : undefined })) };
+  const input = { ageGroup: ctx.tier, items: items.map((r) => ({ do: r.do, why: r.why, say: r.say })) };
   const { trackAiCall } = await import('../services/aiCalls');
-  const res = await trackAiCall('parent_recommendations', model, () => llmClient(client!, timeoutMs).messages.create({ model, max_tokens: 900, system: SYSTEM, messages: [{ role: 'user', content: JSON.stringify(input) }] }), { institutionId: ctx.institutionId });
+  const res = await trackAiCall('parent_recommendations', model, () => llmClient(client!, timeoutMs).messages.create({ model, max_tokens: 2000, system: SYSTEM, messages: [{ role: 'user', content: JSON.stringify(input) }] }), { institutionId: ctx.institutionId });
   const text = (res.content ?? []).map((b) => (b.type === 'text' ? b.text : '')).join('').trim();
-  const json = text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1);
-  const items = (JSON.parse(json) as { items?: unknown[] }).items;
-  return Array.isArray(items) ? (items as { do: Bi; why: Bi; say: Bi }[]) : [];
+  const start = text.indexOf('{'); const end = text.lastIndexOf('}');
+  if (start < 0 || end <= start) throw new Error(`no JSON in the reply (${text.length} chars, stop ${String((res as { stop_reason?: string }).stop_reason)})`);
+  const parsed = (JSON.parse(text.slice(start, end + 1)) as { items?: unknown[] }).items;
+  return Array.isArray(parsed) ? (parsed as Written[]) : [];
 }
 
-export const inputHashOf = (focus: Focus[], tier: Tier): string => createHash('sha256').update(JSON.stringify({ focus, tier, v: 1 })).digest('hex').slice(0, 16);
+/** Each reworded item if it passes the checks against the code's own text, else the code's item. */
+export function mergeReworded(code: Rec[], written: Written[]): { items: Rec[]; refused: string[] } {
+  const refused: string[] = [];
+  const items = code.map((c, i) => {
+    const why = checkWritten(written[i], JSON.stringify([c.do, c.why, c.say]));
+    if (why) { refused.push(`${c.kind}: ${why}`); return c; }
+    return { ...c, do: written[i]!.do, why: written[i]!.why, say: written[i]!.say, ai: true };
+  });
+  return { items, refused };
+}
 
-/** The suggestions of one subject this week: the saved ones when the data is the same, else written now (model, with checks and fallback). */
+export const inputHashOf = (focus: Focus[], tier: Tier): string => createHash('sha256').update(JSON.stringify({ focus, tier, v: 2 })).digest('hex').slice(0, 16);
+const variantOf = (studentId: string, subjectKey: string, weekStart: string): number => createHash('sha256').update(`${studentId}:${subjectKey}:${weekStart}`).digest()[0] % 2;
+const running = new Set<string>();
+
+/**
+ * The suggestions of one subject this week, at once: the model's reworded version when it is saved for the same data, else the code's.
+ * When there is no reworded version yet, the rewording runs in the background (after the reply) and is saved for the next visit.
+ */
 export async function recommendationsFor(
   s: SubjectDetail,
   ctx: { studentId: string; name: string; tier: Tier; institutionId?: string; weekStart: string; now?: Date },
-  opts: { timeoutMs?: number; write?: typeof writeWithModel } = {},
+  opts: { timeoutMs?: number; reword?: typeof rewordWithModel; wait?: boolean } = {},
 ): Promise<{ source: 'ai' | 'rules' | 'mixed'; items: Rec[] }> {
   const focus = pickFocus(s, ctx.now);
   if (!focus.length) return { source: 'rules', items: [] };
   const hash = inputHashOf(focus, ctx.tier);
-  const saved = await ParentRecommendation.findOne({ studentId: ctx.studentId, subjectKey: s.key, weekStart: ctx.weekStart }).lean().catch(() => null);
-  if (saved && saved.inputHash === hash) return { source: saved.source, items: saved.items as Rec[] };
-  const base = { name: ctx.name, subject: s.name, family: s.family, tier: ctx.tier };
-  let written: ({ do: Bi; why: Bi; say: Bi } | undefined)[] = [];
+  const where = { studentId: ctx.studentId, subjectKey: s.key, weekStart: ctx.weekStart };
+  const saved = await ParentRecommendation.findOne(where).lean().catch(() => null);
+  if (saved && saved.inputHash === hash && saved.source !== 'rules') return { source: saved.source, items: saved.items as Rec[] };
+  const code = focus.map((f) => fallbackRec(f, { name: ctx.name, subject: s.name, family: s.family, tier: ctx.tier, variant: variantOf(ctx.studentId, s.key, ctx.weekStart) }));
+  const job = `${ctx.studentId}:${s.key}:${ctx.weekStart}:${hash}`;
+  const tried = saved && saved.inputHash === hash && saved.source === 'rules' && Date.now() - new Date(saved.triedAt ?? 0).getTime() < 3_600_000;
+  if ((opts.reword || modelOn()) && !running.has(job) && !tried) {
+    running.add(job);
+    const task = (async () => {
+      let note = '';
+      let out: { items: Rec[]; refused: string[] } = { items: code, refused: [] };
+      try {
+        out = mergeReworded(code, await (opts.reword ?? rewordWithModel)(code, { tier: ctx.tier, institutionId: ctx.institutionId }, opts.timeoutMs ?? 25_000));
+        note = out.refused.join('; ');
+      } catch (e) {
+        note = `model: ${String((e as Error).message ?? e).slice(0, 160)}`;
+      }
+      const ai = out.items.filter((x) => x.ai).length;
+      const source = ai === out.items.length ? 'ai' : ai ? 'mixed' : 'rules';
+      if (note) logger.info('parents.recommendations_reword', { source, note: note.slice(0, 200) });
+      await ParentRecommendation.updateOne(where, { $set: { inputHash: hash, source, items: out.items, note: note.slice(0, 300), triedAt: new Date() } }, { upsert: true }).catch(() => undefined);
+    })().finally(() => running.delete(job));
+    if (opts.wait) await task;
+    else import('@vercel/functions').then(({ waitUntil }) => waitUntil(task)).catch(() => undefined);
+  }
+  return { source: 'rules', items: code };
+}
+
+/** Maintenance check (lms-test): one rewording of a sample, with timing, the outcome and each refusal reason. No learner data. */
+export async function rewordCheck(institutionId?: string): Promise<Record<string, unknown>> {
+  const sample: Rec[] = [
+    fallbackRec({ kind: 'error', topic: 'Halves and quarters', detail: 'mixes up halves and quarters' }, { name: 'Mona', subject: { en: 'Maths', ar: 'الرياضيات' }, family: 'maths', tier: 'kid' }),
+    fallbackRec({ kind: 'result', topic: 'Unit quiz', score: 45 }, { name: 'Mona', subject: { en: 'Maths', ar: 'الرياضيات' }, family: 'maths', tier: 'kid' }),
+  ];
+  const t = Date.now();
   try {
-    written = await (opts.write ?? writeWithModel)(focus, { ...base, institutionId: ctx.institutionId }, opts.timeoutMs ?? 9_000);
+    const written = await rewordWithModel(sample, { tier: 'kid', institutionId }, 25_000);
+    const m = mergeReworded(sample, written);
+    return { ok: true, modelOn: modelOn(), ms: Date.now() - t, returned: written.length, accepted: m.items.filter((x) => x.ai).length, refused: m.refused, sample: m.items.map((x) => ({ ai: x.ai, do: x.do })) };
   } catch (e) {
-    logger.warn('parents.recommendations_model_failed', { reason: (e as Error).message?.slice(0, 120) });
+    return { ok: false, modelOn: modelOn(), ms: Date.now() - t, error: String((e as Error).message ?? e).slice(0, 300), code: (e as { code?: string }).code ?? null };
   }
-  const items = focus.map((f, i) => {
-    const facts = [f.topic, f.detail, f.score, ctx.name, s.name.en].join(' ');
-    const why = checkWritten(written[i], facts);
-    if (why) {
-      if (written.length) logger.info('parents.recommendation_refused', { kind: f.kind, why });
-      return fallbackRec(f, base);
-    }
-    return { kind: f.kind, do: written[i]!.do, why: written[i]!.why, say: written[i]!.say, ai: true };
-  });
-  const ai = items.filter((x) => x.ai).length;
-  const source = ai === items.length ? 'ai' : ai ? 'mixed' : 'rules';
-  // A rules-only result is kept for the week only when the model is not in use; otherwise the next visit tries the model again.
-  if (source !== 'rules' || !modelOn()) {
-    await ParentRecommendation.updateOne({ studentId: ctx.studentId, subjectKey: s.key, weekStart: ctx.weekStart }, { $set: { inputHash: hash, source, items } }, { upsert: true }).catch(() => undefined);
-  }
-  return { source, items };
 }

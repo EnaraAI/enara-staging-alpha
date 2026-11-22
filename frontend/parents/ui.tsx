@@ -111,3 +111,11 @@ export const Sheet: React.FC<{ title: string; onClose: () => void; children: Rea
     </div>
   );
 };
+
+/** The line under an English level: how far to the next level, or, once the share needed is reached (80 %, parents/levels.ts), that the
+ * checkpoint test is what moves the child up (otherwise "100 % of the way" while staying at the same level reads wrong). */
+export function levelNextLine(ctx: PCtx, l: { cefr: string; subLevelPct: number | null; next: string | null; nextLabel: { en: string; ar: string } | null }): string | null {
+  if (l.subLevelPct === null || !l.next || !l.nextLabel) return null;
+  const next = `${l.nextLabel[ctx.lang] || l.nextLabel.en} (${l.next})`;
+  return l.subLevelPct >= 80 ? ctx.t.readyCheckpoint(l.cefr, next) : ctx.t.toNext(ctx.n(l.subLevelPct), next);
+}

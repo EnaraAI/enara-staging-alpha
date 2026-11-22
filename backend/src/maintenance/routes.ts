@@ -353,6 +353,10 @@ router.get('/avatar-usage', async (req, res, next) => {
   }
 });
 
+// Parents suggestions: one model rewording of a fixed sample, with timing, the outcome and each refusal reason (no learner data).
+router.get('/parent-recs-check', async (req, res, next) => {
+  try { const { rewordCheck } = await import('../parents/recommendations'); res.json(await rewordCheck(typeof req.query.institutionId === 'string' ? req.query.institutionId : undefined)); } catch (e) { next(e); }
+});
 // Tutor provider checks (llmCheck.ts): the endpoint's models and timings, and one request through the adapter for the quality check.
 router.get('/llm-check', async (_req, res, next) => {
   try { res.json(await llmCheck()); } catch (e) { next(e); }

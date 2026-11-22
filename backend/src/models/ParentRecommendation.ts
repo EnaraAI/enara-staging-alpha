@@ -9,6 +9,10 @@ export interface IParentRecommendation extends Document {
   inputHash: string;
   source: 'ai' | 'rules' | 'mixed';
   items: { kind: string; do: { en: string; ar: string }; why: { en: string; ar: string }; say: { en: string; ar: string }; ai: boolean }[];
+  /** Why the model's rewording was not (fully) used, for the maintenance check. */
+  note?: string;
+  /** When the rewording was last tried (a failed try is not repeated within the hour). */
+  triedAt?: Date;
   createdAt: Date;
 }
 
@@ -21,6 +25,8 @@ const schema = new Schema<IParentRecommendation>(
     inputHash: { type: String, required: true },
     source: { type: String, enum: ['ai', 'rules', 'mixed'], required: true },
     items: { type: [{ _id: false, kind: String, do: Bi, why: Bi, say: Bi, ai: Boolean }], default: [] },
+    note: { type: String, maxlength: 300 },
+    triedAt: Date,
   },
   { timestamps: { createdAt: true, updatedAt: false } },
 );

@@ -1,7 +1,7 @@
 import React from 'react';
 import { bi } from '../i18n';
 import { cairoDate, parentsApi, type LearnerChip, type Rec, type SubjectCard } from '../api';
-import { AiBadge, ErrorBox, Icon, Loading, useP } from '../ui';
+import { AiBadge, ErrorBox, Icon, Loading, levelNextLine, useP } from '../ui';
 import { useLive } from '../useLive';
 
 // All subjects (docs/parents/ALL_SUBJECTS_PLAN.md): the subject chips, the "All subjects" overview, one subject's page and the
@@ -90,7 +90,8 @@ export const SubjectsOverview: React.FC<{ subjects: SubjectCard[]; onPick: (key:
 
 /** One subject: on Home the level, suggestions, points to practise, next and recent sessions; on Progress the outcomes and results. */
 export const SubjectView: React.FC<{ learner: LearnerChip; subjectKey: string; mode: 'home' | 'progress'; refreshKey: number; onFetched: (d: Date | null, loading: boolean) => void }> = ({ learner, subjectKey, mode, refreshKey, onFetched }) => {
-  const { t, n, lang } = useP();
+  const ctx = useP();
+  const { t, n, lang } = ctx;
   const q = useLive(() => parentsApi.subject(learner.studentId, subjectKey), [learner.studentId, subjectKey], refreshKey);
   React.useEffect(() => onFetched(q.fetchedAt, q.loading), [q.fetchedAt, q.loading]); // eslint-disable-line react-hooks/exhaustive-deps
   if (!q.data) return q.error ? <ErrorBox onRetry={q.reload} /> : <Loading />;
@@ -101,7 +102,7 @@ export const SubjectView: React.FC<{ learner: LearnerChip; subjectKey: string; m
     <section className="pp-card" aria-labelledby="pp-sub-level">
       <p className="pp-eyebrow" id="pp-sub-level">{t.subjectLevel}</p>
       <LevelLine s={s} />
-      {s.english && s.cefr && s.cefr.subLevelPct !== null && s.cefr.nextLabel && <p className="pp-sub">{t.toNext(n(s.cefr.subLevelPct), `${bi(s.cefr.nextLabel, lang)} (${s.cefr.next})`)}</p>}
+      {s.english && s.cefr && levelNextLine(ctx, s.cefr) && <p className="pp-sub">{levelNextLine(ctx, s.cefr)}</p>}
       {s.lessons.total > 0 && (
         <>
           <div className="pp-bar" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct} aria-label={t.lessonsOf(n(s.lessons.done), n(s.lessons.total))}><i style={{ inlineSize: `${pct}%` }} /></div>
