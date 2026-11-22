@@ -178,6 +178,7 @@ const SYSTEM = [
 ].join('\n');
 
 let client: Anthropic | null = null;
+const MAX_OUT = 2000;
 const modelOn = (): boolean => deepseekReady() || Boolean(getConfig().anthropicApiKey);
 type Written = { do: Bi; why: Bi; say: Bi } | undefined;
 
@@ -187,8 +188,12 @@ async function rewordWithModel(items: Rec[], ctx: { tier: Tier; institutionId?: 
   client ??= new Anthropic({ apiKey: getConfig().anthropicApiKey || 'unused', timeout: timeoutMs, maxRetries: 0 });
   const model = llmModel(getConfig().anthropicVoiceModel);
   const input = { ageGroup: ctx.tier, items: items.map((r) => ({ do: r.do, why: r.why, say: r.say })) };
-  const { trackAiCall } = await import('../services/aiCalls');
-  const res = await trackAiCall('parent_recommendations', model, () => llmClient(client!, timeoutMs).messages.create({ model, max_tokens: 2000, system: SYSTEM, messages: [{ role: 'user', content: JSON.stringify(input) }] }), { institutionId: ctx.institutionId });
+  const content = JSON.stringify(input);
+  const { meteredMessage } = await import('../services/aiGateway');
+  const { textTokenBound } = await import('../services/priceCatalog');
+  // The call states its cost ceiling (input and output tokens), as the tutor's calls do: the lms-test spend cap refuses a call without one.
+  const res = await meteredMessage({ feature: 'parent_recommendations', modelName: model, institutionId: ctx.institutionId, bound: { inputTokens: textTokenBound(SYSTEM, content), outputTokens: MAX_OUT } },
+    () => llmClient(client!, timeoutMs).messages.create({ model, max_tokens: MAX_OUT, system: SYSTEM, messages: [{ role: 'user', content }] }));
   const text = (res.content ?? []).map((b) => (b.type === 'text' ? b.text : '')).join('').trim();
   const start = text.indexOf('{'); const end = text.lastIndexOf('}');
   if (start < 0 || end <= start) throw new Error(`no JSON in the reply (${text.length} chars, stop ${String((res as { stop_reason?: string }).stop_reason)})`);
