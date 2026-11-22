@@ -4,12 +4,12 @@
 import { writeFileSync, mkdirSync } from 'node:fs';
 export async function engineShots(browser, SITE, PW) {
   mkdirSync('shots', { recursive: true });
-  const login = async (email) => { const r = await fetch(`${SITE}/api/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password: PW }) }); const j = await r.json(); if (!r.ok) throw new Error(`login ${email} ${r.status}`); return j; };
-  const api = async (method, path, who, body) => { const r = await fetch(`${SITE}${path}`, { method, headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${who.token}` }, body: body ? JSON.stringify(body) : undefined }); const t = await r.text(); let j; try { j = JSON.parse(t); } catch { j = t; } if (!r.ok) throw new Error(`${method} ${path} ${r.status} ${t.slice(0, 300)}`); return j; };
   const out = { steps: [] };
-  try {
-    const admin = await login('ahmed.anwar@school.enara.app');
-    const student = await login('farida.fahmy@school.enara.app');
+  const login = async (email) => { const r = await fetch(`${SITE}/api/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password: PW }) }); const j = await r.json(); if (!r.ok) throw new Error(`login ${email} ${r.status}`); return j; };
+  const api = async (method, path, who, body, again = true) => { const r = await fetch(`${SITE}${path}`, { method, headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${who.token}` }, body: body ? JSON.stringify(body) : undefined }); if (r.status === 401 && again && who.email) { const fresh = await login(who.email); who.token = fresh.token; out.steps.push({ relogin: path }); return api(method, path, who, body, false); } const t = await r.text(); let j; try { j = JSON.parse(t); } catch { j = t; } if (!r.ok) throw new Error(`${method} ${path} ${r.status} ${t.slice(0, 300)}`); return j; };
+    try {
+    const admin = { ...(await login('ahmed.anwar@school.enara.app')), email: 'ahmed.anwar@school.enara.app' };
+    const student = { ...(await login('farida.fahmy@school.enara.app')), email: 'farida.fahmy@school.enara.app' };
     const mc = await api('GET', '/api/me/classes', student);
     const classId = mc.current && mc.current !== '__all__' ? mc.current : mc.classes?.[0]?.id;
     const studentId = student.user.studentId ?? student.user.id;
