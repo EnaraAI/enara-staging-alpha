@@ -17,6 +17,18 @@ const M = [
   { id: 'ar-jumla', title: 'Arabic grammar (teen): nominal sentence', question: 'يعني إيه جملة اسمية؟', answer: 'الجملة الاسمية تبدأ باسم، ولها ركنان: المبتدأ والخبر. مثال: «الطالبُ مجتهدٌ»: الطالبُ مبتدأ، ومجتهدٌ خبر.' },
   { id: 'ar-math', title: 'Maths in Arabic (child): the perimeter', question: 'إزاي أحسب محيط المستطيل؟', answer: 'نجمع أطوال الأضلاع الأربعة. مستطيل طوله ٧ سم وعرضه ٣ سم: ٧ + ٣ + ٧ + ٣ = ٢٠ سم.' },
 ];
+const AR = [
+  { id: 'ar-fail', title: 'Arabic grammar (teen): الفاعل', question: 'مين الفاعل في جملة نجح الطالبُ؟', answer: 'الفاعل هو من قام بالفعل. في «نجحَ الطالبُ»: نجحَ فعل، والطالبُ فاعل مرفوع بالضمة.' },
+  { id: 'ar-mafool', title: 'Arabic grammar (teen): المفعول به', question: 'إزاي أعرف المفعول به؟', answer: 'بعد الفعل والفاعل اسأل: ماذا؟ في «قرأ الولدُ القصةَ»: ماذا قرأ الولد؟ القصةَ، وهي مفعول به منصوب.' },
+  { id: 'ar-kana', title: 'Arabic grammar (adult): كان وأخواتها', question: 'كان بتعمل إيه في الجملة؟', answer: 'كان تدخل على الجملة الاسمية: ترفع المبتدأ ويسمى اسمها، وتنصب الخبر ويسمى خبرها. «الجوُّ جميلٌ» ← «كانَ الجوُّ جميلًا».' },
+  { id: 'ar-jar', title: 'Arabic grammar (child): حروف الجر', question: 'ما هي حروف الجر؟', answer: 'من حروف الجر: من، إلى، عن، على، في. الاسم بعدها يكون مجرورًا بالكسرة: ذهبتُ إلى المدرسةِ.' },
+  { id: 'ar-taa', title: 'Arabic spelling (child): التاء المربوطة', question: 'أكتب مدرسة ولا مدرسه؟', answer: 'نكتبها «مدرسة» بالتاء المربوطة (ة) لأنها اسم مؤنث، وننطقها هاءً عند الوقف. ومثلها: شجرة، سيارة.' },
+  { id: 'ar-frac', title: 'Maths in Arabic (child): الكسور', question: 'يعني إيه نص وربع؟', answer: 'النصف: نقسم الشيء جزأين متساويين ونأخذ جزءًا: ١/٢. الربع: نقسمه أربعة أجزاء متساوية ونأخذ جزءًا: ١/٤.' },
+  { id: 'ar-area', title: 'Maths in Arabic (teen): مساحة المستطيل', question: 'ما هو قانون مساحة المستطيل؟', answer: 'مساحة المستطيل = الطول × العرض. مستطيل طوله ٦ سم وعرضه ٤ سم: المساحة = ٦ × ٤ = ٢٤ سم².' },
+  { id: 'ar-photo', title: 'Science in Arabic (9-12): البناء الضوئي', question: 'إيه هي عملية البناء الضوئي؟', answer: 'النبات يصنع غذاءه في الأوراق: يأخذ ثاني أكسيد الكربون من الهواء والماء من التربة، وبضوء الشمس يصنع السكر ويطلق الأكسجين.' },
+  { id: 'ar-states', title: 'Science in Arabic (child): حالات المادة', question: 'ما حالات المادة الثلاث؟', answer: 'للمادة ثلاث حالات: صلبة مثل الثلج، وسائلة مثل الماء، وغازية مثل بخار الماء.' },
+  { id: 'ar-magnet', title: 'Science in Arabic (teen): المغناطيس', question: 'إزاي المغناطيس بيشد الحديد؟ وإيه هما قطبينه؟', answer: 'للمغناطيس قطبان: شمالي وجنوبي. الأقطاب المختلفة تتجاذب، والأقطاب المتشابهة تتنافر. ويجذب المغناطيس الحديد والنيكل.' },
+];
 const ask = (m, check) => fetch('https://lms-test.enara.app/api/maintenance/visual-sample', { method: 'POST', headers: H, body: JSON.stringify({ question: m.question, answer: m.answer, check }), signal: AbortSignal.timeout(170_000) }).then((r) => r.json()).catch((e) => ({ error: String(e) }));
 mkdirSync('samples', { recursive: true });
 const browser = await chromium.launch();
@@ -26,12 +38,12 @@ const shot = async (html) => { const q = await browser.newPage({ viewport: { wid
 const cell = (label, color, img, ms) => `<div class="c"><div class="h" style="color:${color}">${label} <span style="color:#667;font-weight:400;font-size:15px">· drawn in ${(ms / 1000).toFixed(1)} s</span></div><img src="${img}" style="width:600px"></div>`;
 const index = [];
 const ONLY = (process.env.ONLY || '').split(',').filter(Boolean);
-for (const m of M.filter((x) => !ONLY.length || ONLY.includes(x.id))) {
+for (const m of (process.env.SET === 'arabic' ? AR : M).filter((x) => !ONLY.length || ONLY.includes(x.id))) {
   const [oldV, newV] = [await ask(m, false), await ask(m, true)];
   writeFileSync(`samples/${m.id}-old.html`, oldV.html || ''); writeFileSync(`samples/${m.id}-new.html`, newV.html || '');
   index.push({ id: m.id, oldMs: oldV.ms, newMs: newV.ms, old: Boolean(oldV.html), new: Boolean(newV.html), err: oldV.error || newV.error || null });
   console.log(m.id, oldV.ms, newV.ms, oldV.error || '', newV.error || '');
-  await page.setContent(`<html><body style="font-family:system-ui;margin:20px;background:#f6f7fa"><style>.c{display:inline-block;vertical-align:top;width:620px;margin-right:16px;background:#fff;border:1px solid #cfd6e4;border-radius:10px;padding:10px}.h{font-weight:700;font-size:18px;margin:2px 4px 8px}</style><h2 style="margin:0 0 4px;color:#08172b">${m.title}</h2><div style="color:#445;margin-bottom:12px">Learner: ${m.question}</div>${cell('Before (old drawing)', '#b42318', await shot(oldV.html), oldV.ms ?? 0)}${cell('After (new rules + check)', '#067647', await shot(newV.html), newV.ms ?? 0)}</body></html>`);
+  await page.setContent(`<html><body style="font-family:system-ui;margin:20px;background:#f6f7fa"><style>.c{display:inline-block;vertical-align:top;width:620px;margin-right:16px;background:#fff;border:1px solid #cfd6e4;border-radius:10px;padding:10px}.h{font-weight:700;font-size:18px;margin:2px 4px 8px}</style><h2 style="margin:0 0 4px;color:#08172b">${m.title}</h2><div style="color:#445;margin-bottom:12px" dir="auto">Learner: ${m.question}</div>${cell('Before (old drawing)', '#b42318', await shot(oldV.html), oldV.ms ?? 0)}${cell('After (new rules + check)', '#067647', await shot(newV.html), newV.ms ?? 0)}</body></html>`);
   await page.waitForTimeout(700);
   await page.screenshot({ path: `samples/${m.id}.png`, fullPage: true });
 }

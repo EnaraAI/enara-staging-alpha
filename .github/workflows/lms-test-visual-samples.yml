@@ -22,6 +22,7 @@ jobs:
         working-directory: deploy/lms-test/avatarcost
         env:
           LMSTEST_MAINTENANCE_TOKEN: ${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}
+          SET: arabic
         run: node samples.mjs
       - name: Publish
         working-directory: deploy/lms-test/avatarcost
