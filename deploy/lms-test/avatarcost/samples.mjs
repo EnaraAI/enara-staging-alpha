@@ -23,8 +23,10 @@ const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 1320, height: 800 }, deviceScaleFactor: 2 });
 const cell = (label, color, html) => `<div class="c"><div class="h" style="color:${color}">${label}</div><iframe sandbox srcdoc="${(html || '<p style=\'font-family:system-ui;color:#888;padding:20px\'>(no visual)</p>').replace(/&/g, '&amp;').replace(/"/g, '&quot;')}"></iframe></div>`;
 const index = [];
-for (const m of M) {
+const ONLY = (process.env.ONLY || '').split(',').filter(Boolean);
+for (const m of M.filter((x) => !ONLY.length || ONLY.includes(x.id))) {
   const [oldV, newV] = [await ask(m, false), await ask(m, true)];
+  writeFileSync(`samples/${m.id}-old.html`, oldV.html || ''); writeFileSync(`samples/${m.id}-new.html`, newV.html || '');
   index.push({ id: m.id, oldMs: oldV.ms, newMs: newV.ms, old: Boolean(oldV.html), new: Boolean(newV.html), err: oldV.error || newV.error || null });
   console.log(m.id, oldV.ms, newV.ms, oldV.error || '', newV.error || '');
   await page.setContent(`<html><body style="font-family:system-ui;margin:20px;background:#f6f7fa"><style>.c{display:inline-block;vertical-align:top;width:620px;margin-right:16px;background:#fff;border:1px solid #cfd6e4;border-radius:10px;padding:10px}.h{font-weight:700;font-size:18px;margin:2px 4px 8px}iframe{width:600px;height:560px;border:0}</style><h2 style="margin:0 0 4px;color:#08172b">${m.title}</h2><div style="color:#445;margin-bottom:12px">Learner: ${m.question}</div>${cell('Before (old drawing)', '#b42318', oldV.html)}${cell('After (new rules + check)', '#067647', newV.html)}</body></html>`);
