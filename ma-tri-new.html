@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+
+<title>Area of a Triangle</title>
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    background: #ffffff;
+    color: #1a1a1a;
+    padding: 20px;
+    max-width: 720px;
+    margin: 0 auto;
+    line-height: 1.5;
+    font-size: 16px;
+  }
+  h2 {
+    font-size: 22px;
+    color: #0056D2;
+    margin-bottom: 12px;
+  }
+  p {
+    margin-bottom: 10px;
+  }
+  .eq {
+    font-size: 18px;
+    margin: 12px 0;
+    padding: 10px 14px;
+    background: #f0f5ff;
+    border-left: 4px solid #0056D2;
+    border-radius: 6px;
+  }
+  .eq span {
+    font-weight: 600;
+  }
+  .steps {
+    margin-top: 14px;
+    padding-left: 20px;
+  }
+  .steps li {
+    margin-bottom: 6px;
+  }
+  svg {
+    display: block;
+    max-width: 100%;
+    margin: 10px 0;
+  }
+  .highlight {
+    color: #0056D2;
+    font-weight: 600;
+  }
+  .note {
+    font-size: 14px;
+    color: #555;
+    margin-top: 8px;
+  }
+</style>
+</head>
+<body>
+
+<h2>Area of a Triangle</h2>
+<p>Base = <span class="highlight">6</span> &nbsp;•&nbsp; Height = <span class="highlight">4</span></p>
+
+<!-- Illustration -->
+<svg viewBox="0 0 520 300" width="100%" role="img" aria-label="Triangle with base 6 and height 4, plus a matching rectangle showing the relationship">
+  <!-- Margin 24px on all sides inside viewBox -->
+
+  <!-- Triangle: base from (60,210) to (300,210), apex at (180,90) -->
+  <!-- Height: 4 units, base: 6 units => scale: base 240px = 6 units => 40px/unit; height 120px = 4 units => 30px/unit -->
+  <!-- Slight inconsistency is fine for clarity; use consistent 40px/unit horizontally, 30px/unit vertically -->
+
+  <!-- Right rectangle half (shaded light) to show 'half' concept -->
+  <rect x="60" y="90" width="120" height="120" fill="#e8f0fe" stroke="#c0d0e8" stroke-width="1.5" stroke-dasharray="5 4"/>
+
+  <!-- Triangle outline -->
+  <polygon points="60,210 300,210 180,90" fill="#d0e0ff" stroke="#0056D2" stroke-width="2.5" stroke-linejoin="round"/>
+
+  <!-- Base dimension line -->
+  <line x1="60" y1="228" x2="300" y2="228" stroke="#444" stroke-width="1.5"/>
+  <line x1="60" y1="224" x2="60" y2="232" stroke="#444" stroke-width="1.5"/>
+  <line x1="300" y1="224" x2="300" y2="232" stroke="#444" stroke-width="1.5"/>
+  <text x="180" y="248" text-anchor="middle" font-size="16" font-family="system-ui, sans-serif" fill="#1a1a1a">base = 6</text>
+
+  <!-- Height dashed line -->
+  <line x1="180" y1="90" x2="180" y2="210" stroke="#444" stroke-width="1.8" stroke-dasharray="6 4"/>
+  <!-- Right angle marker -->
+  <polyline points="180,202 188,202 188,210" fill="none" stroke="#444" stroke-width="1.5"/>
+
+  <!-- Height label to the right of dashed line, above the right-angle mark -->
+  <text x="196" y="150" text-anchor="start" font-size="16" font-family="system-ui, sans-serif" fill="#1a1a1a">height = 4</text>
+
+  <!-- Labels for half rectangle -->
+  <text x="120" y="75" text-anchor="middle" font-size="15" font-family="system-ui, sans-serif" fill="#0056D2">half of rectangle</text>
+
+  <!-- Full rectangle outline (dashed) to the right, to show doubling -->
+  <rect x="300" y="90" width="120" height="120" fill="none" stroke="#0056D2" stroke-width="2" stroke-dasharray="8 5" opacity="0.6"/>
+  <text x="360" y="75" text-anchor="middle" font-size="15" font-family="system-ui, sans-serif" fill="#0056D2">same again</text>
+
+  <!-- Small note inside SVG about area -->
+  <text x="180" y="275" text-anchor="middle" font-size="15" font-family="system-ui, sans-serif" fill="#0056D2" font-weight="600">Area = 12 square units</text>
+</svg>
+
+<!-- Explanation -->
+<p>The triangle is exactly <strong>half</strong> of a rectangle that has the same base and height.</p>
+
+<div class="eq">
+  Area = <span dir="ltr">½ × base × height</span> = <span dir="ltr">½ × 6 × 4</span> = <span dir="ltr">12</span>
+</div>
+
+<ol class="steps">
+  <li>Multiply the base by the height: <span dir="ltr">6 × 4 = 24</span></li>
+  <li>Take half of that result: <span dir="ltr">24 ÷ 2 = 12</span></li>
+  <li>The area is <span class="highlight">12 square units</span>.</li>
+</ol>
+
+<p class="note">The dashed rectangle helps show why we divide by 2 — the triangle fits neatly inside half of it.</p>
+
+</body>
+</html>

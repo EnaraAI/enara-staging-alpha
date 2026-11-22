@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: #ffffff;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: #1f2937;
+    padding: 22px 26px 28px;
+    max-width: 720px;
+  }
+  h2 {
+    font-size: 1.32rem;
+    color: #0056D2;
+    margin: 0 0 6px;
+    font-weight: 700;
+  }
+  p {
+    font-size: 0.96rem;
+    line-height: 1.45;
+    margin: 0 0 12px;
+  }
+  .eq {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 1rem;
+    color: #0f172a;
+    background: #f1f5fb;
+    border-left: 4px solid #0056D2;
+    padding: 6px 12px;
+    border-radius: 4px;
+    display: inline-block;
+    margin: 3px 0;
+  }
+  .steps {
+    margin: 10px 0 6px;
+    padding-left: 20px;
+  }
+  .steps ol {
+    margin: 0;
+    padding-left: 20px;
+    font-size: 0.96rem;
+    line-height: 1.55;
+  }
+  .steps li { margin-bottom: 7px; }
+  .result {
+    font-size: 1.12rem;
+    font-weight: 700;
+    color: #0056D2;
+    margin-top: 10px;
+  }
+  .svg-wrap {
+    width: 100%;
+    margin: 6px 0 16px;
+  }
+  svg { width: 100%; height: auto; display: block; }
+</style>
+</head>
+<body>
+
+<h2>Area of a Triangle: base = 6, height = 4</h2>
+<p>The area is half of a rectangle with the same base and height. The dotted rectangle helps show why:</p>
+
+<div class="svg-wrap">
+<svg viewBox="0 0 360 260" role="img" aria-label="Triangle with base 6 and height 4, inside a dotted rectangle of the same size">
+  <!-- dotted bounding rectangle -->
+  <rect x="70" y="50" width="240" height="160" fill="none" stroke="#94a3b8" stroke-width="1.8" stroke-dasharray="6 6" rx="2"/>
+
+  <!-- triangle -->
+  <polygon points="70,210 310,210 70,50" fill="#dbeafe" stroke="#0056D2" stroke-width="2.6" stroke-linejoin="round"/>
+
+  <!-- right angle mark at base-left corner -->
+  <path d="M 70 196 L 84 196 L 84 210" fill="none" stroke="#0056D2" stroke-width="2"/>
+
+  <!-- height dashed line inside? label above/left -->
+  <line x1="70" y1="50" x2="70" y2="210" stroke="#0056D2" stroke-width="2.2"/>
+
+  <!-- base measurement label below -->
+  <text x="190" y="240" text-anchor="middle" font-size="17" fill="#0f172a" font-weight="600">base = 6</text>
+
+  <!-- height label to the left, with small tick marks -->
+  <text x="54" y="130" text-anchor="end" font-size="17" fill="#0f172a" font-weight="600">height = 4</text>
+
+  <!-- side length labels (optional but useful) -->
+  <text x="150" y="118" text-anchor="middle" font-size="15" fill="#0056D2" font-weight="600">6</text>
+  <text x="54" y="172" text-anchor="end" font-size="15" fill="#0056D2" font-weight="600">4</text>
+
+  <!-- small square at right angle bottom-left already drawn -->
+</svg>
+</div>
+
+<div class="steps">
+  <ol>
+    <li>Area of a rectangle = base × height:
+      <div><span class="eq" dir="ltr">6 × 4 = 24</span></div>
+    </li>
+    <li>A triangle is half of that rectangle:
+      <div><span class="eq" dir="ltr">Area = ½ × base × height</span></div>
+    </li>
+    <li>Substitute the numbers:
+      <div><span class="eq" dir="ltr">½ × 6 × 4 = 12</span></div>
+    </li>
+  </ol>
+</div>
+
+<p class="result">Area = <span dir="ltr">12 square units</span></p>
+
+</body>
+</html>
