@@ -278,7 +278,7 @@ export async function processAttempt(attemptId: string, now = new Date()): Promi
     });
     const questions = version.questions as IQuestion[];
     const byId = new Map(questions.map((q) => [q.id, q]));
-    const unsupported = questions.find((q) => !AUTO_GRADED.has(q.type) && q.type !== 'open-response');
+    const unsupported = questions.find((q) => !AUTO_GRADED.has(q.type) && q.type !== 'open-response' && q.type !== 'engine');
     if (unsupported) throw new GradingError('unsupported_question', `Question type ${unsupported.type} can't be graded automatically`, false);
 
     const todo = attempt.answers.filter((a) => needsAiEvaluation(byId.get(a.questionId), a));
