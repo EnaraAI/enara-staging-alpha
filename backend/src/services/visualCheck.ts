@@ -43,6 +43,13 @@ function lines(svg: string): Seg[] {
     const a = m[1]; const v = ['x1', 'y1', 'x2', 'y2'].map((n) => num(a, n));
     if (v.every((x) => x !== undefined)) out.push(v as Seg);
   }
+  // Box outlines (not the background) are lines too: a label must not sit on a box edge.
+  const vb = viewBox(svg);
+  for (const m of svg.matchAll(/<rect\b([^>]*)\/?>/gi)) {
+    const a = m[1]; const w = num(a, 'width'); const h = num(a, 'height'); const x = num(a, 'x') ?? 0; const y = num(a, 'y') ?? 0;
+    if (w === undefined || h === undefined || w * h >= vb.w * vb.h * 0.8 || w <= 30 || h <= 30) continue;
+    out.push([x, y, x + w, y], [x + w, y, x + w, y + h], [x + w, y + h, x, y + h], [x, y + h, x, y]);
+  }
   // Paths and polylines, roughly: straight pieces through their points (a curve's control point included), enough to see a label on a curve.
   for (const m of svg.matchAll(/<(?:path\b[^>]*\bd|polyline\b[^>]*\bpoints)\s*=\s*["']([^"']+)["']/gi)) {
     const n = (m[1].match(/-?[\d.]+/g) ?? []).map(Number);
@@ -68,28 +75,35 @@ function smallShapes(svg: string, vb: { w: number; h: number }): Shape[] {
   }
   return out;
 }
+const setX = (attrs: string, x: number) => attrs.replace(/((?:^|\s)x\s*=\s*["']?)-?[\d.]+/, `$1${Math.round(x)}`);
 const setY = (attrs: string, y: number) => (/(?:^|\s)y\s*=/.test(attrs) ? attrs.replace(/((?:^|\s)y\s*=\s*["']?)-?[\d.]+/, `$1${Math.round(y)}`) : `${attrs} y="${Math.round(y)}"`);
 
 /** Moves labels that overlap another label or sit on a line to the nearest free place (up or down, within the picture). */
 export function fixSvgLayout(svg: string): { svg: string; moved: number } {
   const vb = viewBox(svg); const segs = lines(svg); const ts = texts(svg);
   const dots: Box[] = smallShapes(svg, vb).map((d) => ({ x0: d.cx - d.size, y0: d.cy - d.size, x1: d.cx + d.size, y1: d.cy + d.size }));
-  const placed: Box[] = [...dots]; let moved = 0; const newY = new Map<number, number>();
+  const placed: Box[] = [...dots]; let moved = 0; const dxOf = new Map<number, number>(); const newY = new Map<number, number>();
   for (const t of ts) {
     const free = (y: number) => { const b = pad(boxOf({ ...t, y }), 5); return b.y0 >= 0 && b.y1 <= vb.h && !placed.some((p) => hit(p, b)) && !segs.some((s) => segHitsBox(s, b)); };
     let y = t.y;
     if (!free(y)) {
       const step = Math.ceil(t.fs * 0.6);
-      for (let k = 1; k <= 12; k++) { if (free(t.y + k * step)) { y = t.y + k * step; break; } if (free(t.y - k * step)) { y = t.y - k * step; break; } }
-      if (y !== t.y) { moved += 1; newY.set(t.start, y); }
+      const freeAt = (dx: number, y: number) => { const b = pad(boxOf({ ...t, x: t.x + dx, y }), 5); return b.x0 >= 0 && b.x1 <= vb.w && b.y0 >= 0 && b.y1 <= vb.h && !placed.some((p) => hit(p, b)) && !segs.some((s) => segHitsBox(s, b)); };
+      /* at most about 2.5 label heights up or down, or a little sideways, so the label stays next to what it names */
+      const tries: [number, number][] = [];
+      for (let k = 1; k <= 4; k++) tries.push([0, k * step], [0, -k * step]);
+      for (const dx of [-24, 24, -48, 48]) for (const dy of [0, step, -step]) tries.push([dx, dy]);
+      const ok = tries.find(([dx, dy]) => freeAt(dx, t.y + dy));
+      if (ok) { y = t.y + ok[1]; dxOf.set(t.start, ok[0]); }
+      if (y !== t.y || dxOf.get(t.start)) { moved += 1; newY.set(t.start, y); }
     }
-    placed.push(pad(boxOf({ ...t, y }), 3));
+    placed.push(pad(boxOf({ ...t, x: t.x + (dxOf.get(t.start) ?? 0), y }), 3));
   }
   if (!moved) return { svg, moved };
   let out = ''; let last = 0;
   for (const t of ts) {
     if (!newY.has(t.start)) continue;
-    out += svg.slice(last, t.start) + svg.slice(t.start, t.end).replace(t.attrs, setY(t.attrs, newY.get(t.start)!)); last = t.end;
+    out += svg.slice(last, t.start) + svg.slice(t.start, t.end).replace(t.attrs, setX(setY(t.attrs, newY.get(t.start)!), t.x + (dxOf.get(t.start) ?? 0))); last = t.end;
   }
   return { svg: out + svg.slice(last), moved };
 }
