@@ -4,7 +4,8 @@ const SITE = 'https://lms-test.enara.app';
 const H = { Authorization: `Bearer ${process.env.LMSTEST_MAINTENANCE_TOKEN}`, 'Content-Type': 'application/json' };
 const call = async (action) => { const r = await fetch(`${SITE}/api/maintenance/full-seed`, { method: 'POST', headers: H, body: JSON.stringify({ action }), signal: AbortSignal.timeout(300_000) }); const j = await r.json().catch(() => ({})); return { status: r.status, body: j }; };
 const action = process.env.ACTION || 'run';
-const t = Date.now(); const out = await call(action);
+if (action === 'rerun') { const r = await call('remove'); console.log('REMOVE', r.status, JSON.stringify(r.body).slice(0, 300)); if (r.status >= 400) process.exit(1); }
+const t = Date.now(); const out = await call(action === 'rerun' ? 'run' : action);
 const { users, ...rest } = out.body ?? {};
 console.log('ACTION', action, 'HTTP', out.status, 'seconds', Math.round((Date.now() - t) / 1000));
 console.log('RESULT', JSON.stringify({ ...rest, users: Array.isArray(users) ? users.length : undefined }));
