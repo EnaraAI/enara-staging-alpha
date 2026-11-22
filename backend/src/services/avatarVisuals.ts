@@ -193,6 +193,7 @@ function visualLines(spec: Shown): string[] {
     case 'steps': return spec.items;
     case 'dialogue': return spec.lines.map((l) => l.text);
     case 'timeline': return spec.items.map((i) => `${i.when} ${i.text}`);
+    case 'math': return spec.caption ? [spec.caption] : [];
     case 'svg': return [...[...spec.svg.matchAll(/<text\b[^>]*>([\s\S]*?)<\/text>/gi)].map((m) => m[1].replace(/<[^>]+>/g, '').trim()).filter(Boolean), ...(spec.caption ? [spec.caption] : [])];
   }
 }
