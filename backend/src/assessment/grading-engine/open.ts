@@ -9,19 +9,27 @@
 // Rules-first (switch rulesFirst, off by default; docs/tutor/RULES_FIRST_GRADING_PLAN.md §2): code rules run first. When they decide
 // every criterion (a blank answer, the wrong script, the question copied) the grade is code's alone: no model call, confidence 1,
 // grader 'code'. Otherwise the model scores only what code left open; code scores stand, and confidence and flags are the model's share.
+// Mishkat split (switch mishkatSplit, off by default, named only; docs/tutor/MISHKAT_SPLIT_PLAN.md): for a written language answer,
+// Mishkat (a trained scorer on its own service) is called in parallel with the two v3b runs and its allowed criteria replace v3b's
+// (mishkat/merge.ts). Off, or Mishkat unavailable: exactly today's grade.
 import { gradeOpenRun, type CriterionScore, type OpenItem, type RunResult, type RunOptions } from './graders/domains';
 import { runRules, type RulesResult } from './rules';
 import { engineV2 } from '../../services/engineV2';
+import { logger } from '../../utils/logging';
+import { scoreWithMishkat, type MishkatResult } from './mishkat/client';
+import { mishkatTarget } from './mishkat/manifest';
+import { mergeMishkat } from './mishkat/merge';
 
 export const CONFIDENCE_FLAG = 0.7;
-export const FLAG_REASONS = ['model_unavailable', 'model_error', 'low_confidence', 'runs_disagree', 'integrity', 'near_pass_mark'] as const;
+export const FLAG_REASONS = ['model_unavailable', 'model_error', 'low_confidence', 'runs_disagree', 'integrity', 'near_pass_mark', 'graders_disagree'] as const;
 export type FlagReason = (typeof FLAG_REASONS)[number];
 
 export interface OpenGrade {
   points: number;
   maxPoints: number;
   criterionScores: CriterionScore[];
-  criteria: { code: string; points: number; max: number; reasonCode: string; scoredBy?: 'code' | 'model'; rule?: string; reason?: string }[];
+  // modelPoints: v3b's own score on a criterion Mishkat scored (the teacher's "v3b's view"; never shown to the learner).
+  criteria: { code: string; points: number; max: number; reasonCode: string; scoredBy?: 'code' | 'model' | 'mishkat'; rule?: string; reason?: string; modelPoints?: number }[];
   errorCodes: string[];
   confidence: number;
   flagged: boolean;
@@ -96,8 +104,18 @@ export async function gradeOpenAnswer(p: { attempt: { id: string; institutionId?
   const rules = engineV2('rulesFirst') ? rulesFor(p.item, p.answer, p.maxByCriterion) : undefined;
   if (rules?.allDecided) return codeGrade(rules, p.maxByCriterion, p.uiLanguage);
   if (!p.modelReady) return combineRuns([{ proposalId: '', status: 'failed', criterionScores: [], points: 0, confidence: 0, errorCodes: [], feedback: '', scoreExplanation: '', strengths: [], improvements: [], flags: [], error: 'AI_UNAVAILABLE' }], p.maxByCriterion);
+  // Mishkat starts before the v3b runs so the two run in parallel; never with the switch off, never for spoken or non-language items.
+  const target = engineV2('mishkatSplit') ? mishkatTarget(p.item) : null;
+  const mishkat: Promise<MishkatResult> | undefined = target
+    ? scoreWithMishkat({ ...target, text: String(p.answer ?? '') }).catch(() => ({ status: 'unavailable' as const, reason: 'network_error' as const }))
+    : undefined;
   const runs = await Promise.all([1, 2].map((run) => gradeOpenRun({ attempt: p.attempt, item: p.item, answer: p.answer, uiLanguage: p.uiLanguage, run, options: p.options, ...(rules ? { rules } : {}) })));
-  return combineRuns(runs, p.maxByCriterion);
+  const combined = combineRuns(runs, p.maxByCriterion);
+  if (!mishkat) return combined;
+  const { grade, log } = mergeMishkat(combined, await mishkat, { item: p.item, maxByCriterion: p.maxByCriterion });
+  // Counts and criterion ids only: never the answer text or the token.
+  logger.info('mishkat_split', { attemptId: p.attempt.id, questionId: p.item.questionId, ...log });
+  return grade;
 }
 
 /** The rules on one answer against the item's rubric (criterion → max points). */
