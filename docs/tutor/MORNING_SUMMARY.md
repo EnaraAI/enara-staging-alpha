@@ -72,4 +72,4 @@ Share of generated questions passing the code checks and the reviewer model; the
 - **Cost:** the call records estimate about $1.86 and $4.44 for the two grading runs, plus the generation runs. That is **DeepSeek on your Modal endpoint**, and the estimates are upper bounds because no DeepSeek price is set.
 - **Model fallback:** benchmark and generation calls are blocked from it. Normal grading on lms-test still has "model fallback" on, which retries a failed DeepSeek call on Anthropic. Turn it off if you want zero Anthropic use until you add credits.
 - **One mistake overnight:** a screenshot helper accidentally started the data reload on lms-test. That rolled back one deploy; it was redeployed and the data was fully restored (14,232 records).
-- **Where everything is:** the plan and its progress table are in `docs/tutor/ASSESSMENT_ENGINE_PLAN.md`; the benchmark data (1,080 practice answers, 12 sets) is in `data/assessment-bench/` in the lms repo.
+- **Where everything is:** the plan and its progress table are in `docs/tutor/ASSESSMENT_ENGINE_PLAN.md`; the benchmark data (900 practice answers, 10 sets) is in `data/assessment-bench/` in the lms repo.
