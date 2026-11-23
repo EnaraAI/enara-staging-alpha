@@ -26,6 +26,12 @@ for (const t of targets.filter((x) => !x.engine)) {
     if (!r.ok) { // what the person sees: the sign-in page, then the error after trying
       await snap(`login-refused-${r.status}`);
     } else {
+      // P4: generate real questions into the school's bank first (DeepSeek on lms-test), then the Question bank page shows them.
+      for (const g of t.bankGenerate ?? []) {
+        const gr = await fetch(`${SITE}/api/item-bank/generate`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${j.token}` }, body: JSON.stringify(g), signal: AbortSignal.timeout(90_000) }).catch((e) => ({ status: 0, json: async () => ({ error: String(e) }) }));
+        const gj = await gr.json().catch(() => ({}));
+        console.log('generate', g.domain, g.language, gr.status, JSON.stringify({ created: gj.created?.length, refused: gj.refused?.map((x) => x.problems) }).slice(0, 600));
+      }
       await snap('home');
       for (const tab of t.tabs) {
         // 'lang' switches the parents portal between English and Arabic.

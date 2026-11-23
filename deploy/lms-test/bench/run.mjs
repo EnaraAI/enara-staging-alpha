@@ -33,7 +33,8 @@ if (cfg.mode === 'gen') {
     const [domain, lang] = set.split('/');
     const agg = { set, n: 0, schemaOk: 0, checksOk: 0, passed: 0, regenerated: 0, problems: [] };
     for (let k = 0; k < (cfg.callsPerSet ?? 2); k++) {
-      const r = await gcall({ domain, lang, count: 5, level: lang === 'ar' ? 'grade 6' : 'A2/grade 6', objective: `${domain}-${lang}-bench`, ...(domain === 'humanities' ? { source: cfg.sources?.[lang] } : {}) });
+      const [objective, objectiveTitle] = cfg.objectives?.[set] ?? [`${domain}-${lang}-bench`, undefined];
+      const r = await gcall({ domain, lang, count: 5, level: lang === 'ar' ? 'grade 6' : 'A2/grade 6', objective, objectiveTitle, ...(domain === 'humanities' ? { source: cfg.sources?.[lang] } : {}) });
       if (!r) continue;
       for (const f of ['n', 'schemaOk', 'checksOk', 'passed', 'regenerated']) agg[f] += r[f];
       agg.problems.push(...r.problems); agg.judge = r.judge;
