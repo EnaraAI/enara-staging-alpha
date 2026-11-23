@@ -211,7 +211,7 @@ export async function gradeOpenRun(p: { attempt: { id: string; institutionId?: s
       criteria = [...criteria.map((c) => (c.criterionId === 'final_answer' ? { ...c, scoredBy: 'code' as const, rule: 'final_answer', reason: 'final answer checked by code' } : { ...c, scoredBy: 'model' as const })), ...code]
         .sort((a, b) => order.indexOf(a.criterionId) - order.indexOf(b.criterionId));
     }
-    const errorCodes = [...new Set([...extras.errorCodes, ...(final?.unitIssue ? ['units'] : [])])];
+    const errorCodes = [...new Set([...extras.errorCodes, ...(final?.unitIssue ? ['units'] : []), ...(p.rules?.errorCodes ?? [])])];
     const points = criteria.reduce((n, c) => n + c.points, 0);
     const doc = !store ? { id: '' } : await GradingProposal.create({ ...base, status: 'proposed', criteria, points, feedback: value.feedback, scoreExplanation: value.scoreExplanation, strengths: value.strengths, improvements: value.improvements, confidence: extras.confidence >= 0.85 ? 'high' : extras.confidence >= 0.7 ? 'medium' : 'low', flags: value.flags, modelName: model });
     return { proposalId: doc.id, status: 'proposed', criterionScores: criteria.map((c) => ({ criterionId: c.criterionId, levelId: c.levelId, points: c.points, ...(c.scoredBy ? { scoredBy: c.scoredBy, ...(c.rule ? { rule: c.rule } : {}), ...(c.reason ? { reason: c.reason } : {}) } : {}) })), points, confidence: extras.confidence, errorCodes, feedback: value.feedback, scoreExplanation: value.scoreExplanation, strengths: value.strengths, improvements: value.improvements, flags: value.flags, modelName: model };

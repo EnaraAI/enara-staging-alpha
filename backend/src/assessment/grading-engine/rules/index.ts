@@ -8,17 +8,28 @@
 //     ONE sentence, with no negation, "or", opposite or extra number/day that could change the meaning. A miss is never 0 by code
 //     (paraphrases exist): it goes to the model;
 //   - science units: the item's expected number stated with a unit that converts (1), or stated bare with no unit anywhere (0);
-//   - length and structure (sentence count against the task, a very short essay): findings only.
-// Spelling and dialect rules wait for licensed word lists (plan §5).
+//   - length and structure (sentence count against the task, a very short essay): findings only;
+//   - spelling (rules/spelling.ts, Hunspell word lists in backend/assets/dictionaries): language items get spelling and capital
+//     findings, and mechanics is DECIDED only far from the level boundaries (thresholds checked on the bench); other written answers
+//     get the findings only. Spoken answers are never spelling-checked (a transcript is not the learner's writing);
+//   - colloquial Arabic (Egyptian, a high-precision word list): a finding for grammar_accuracy, never a decision (the bench has no
+//     answer that would let us check a decision; the model applies the owner rule "mostly colloquial = lowest grammar level").
+// Error codes from code findings (spelling, capitalisation, hamza_spelling) are added to the grade's error codes.
 import { splitMathAnswer, type OpenItem } from '../graders/domains';
 import { convert, normalizeNumberText, unitName } from '../graders/closed/numeric';
 import { westernDigits } from '../../text/ar';
+import { spellChecker, type SpellChecker } from '../../text/dictionaries';
+import { dialectReport, mechanicsDecision, spellingReport, type SpellingReport, type DialectReport } from './spelling';
 import { ARABIC, LATIN, fold, isFact, isNegation, isOr, isStop, letterWords, oppositesOf, sameWord, sentences, tokens, type Token } from './text';
 
-export type RuleId = 'blank' | 'wrong_script' | 'copied_stem' | 'point_phrase' | 'units_stated' | 'units_missing' | 'sentence_count' | 'too_short';
+export type RuleId = 'blank' | 'wrong_script' | 'copied_stem' | 'point_phrase' | 'units_stated' | 'units_missing' | 'sentence_count' | 'too_short'
+  | 'spelling' | 'capitalisation' | 'mechanics_spelling' | 'colloquial';
 export interface Finding { criterion?: string; value?: number | string; evidence: string; ruleId: RuleId }
-export interface Decision { points: number; ruleId: RuleId; reason: string }
-export interface RulesResult { findings: Finding[]; decided: Record<string, Decision>; allDecided: boolean }
+export interface Decision { points: number; ruleId: RuleId; reason: string; evidence?: string }
+/** errorCodes: codes code found with certainty (language items only), added to the grade's error codes. */
+export interface RulesResult { findings: Finding[]; decided: Record<string, Decision>; allDecided: boolean; errorCodes?: string[] }
+/** Where the rules get a spelling dictionary (tests pass their own; default: the shipped Hunspell files, loaded once). */
+export interface RulesOptions { spell?: (language: string) => SpellChecker | null }
 export interface RuleCriterion { id: string; maxPoints: number }
 
 const clip = (s: string, n = 160) => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
@@ -197,11 +208,12 @@ export function sentenceRange(stem: string): { lo: number; hi: number; words: st
 
 // ------------------------------------------------------------------------------------------------------------------------- entry
 /** Runs every rule on one answer. `criteria` is the item's rubric (id and max points); `lang` the item's language. */
-export function runRules(item: OpenItem, answer: unknown, criteria: RuleCriterion[], lang: string = item.language): RulesResult {
+export function runRules(item: OpenItem, answer: unknown, criteria: RuleCriterion[], lang: string = item.language, opts: RulesOptions = {}): RulesResult {
   const text = answerTextOf(item, answer);
   const findings: Finding[] = [];
   const decided: Record<string, Decision> = {};
-  const done = (): RulesResult => ({ findings, decided, allDecided: criteria.length > 0 && criteria.every((c) => decided[c.id] !== undefined) });
+  const errorCodes = new Set<string>();
+  const done = (): RulesResult => ({ findings, decided, allDecided: criteria.length > 0 && criteria.every((c) => decided[c.id] !== undefined), ...(errorCodes.size ? { errorCodes: [...errorCodes] } : {}) });
 
   const zero = wholeAnswerZero({ ...item, language: lang }, text);
   if (zero) {
@@ -235,6 +247,60 @@ export function runRules(item: OpenItem, answer: unknown, criteria: RuleCriterio
   if (range && (count < range.lo || count > range.hi)) findings.push({ ...(target ? { criterion: target } : {}), ruleId: 'sentence_count', value: count, evidence: `${count} sentence(s); the task says "${range.words}"` });
   const words = (text.match(/[\p{L}\d]+/gu) ?? []).length;
   if (item.type === 'essay' && words < 20) findings.push({ ...(target ? { criterion: target } : {}), ruleId: 'too_short', value: words, evidence: clip(text.trim()) });
+
+  // Spelling (written answers only; maths steps are symbols, not prose).
+  if (item.domain !== 'math' && !item.spoken) {
+    const spell = (opts.spell ?? spellChecker)(lang);
+    const ctx = { stem: item.stem, source: item.source };
+    const r = spellingReport(lang, text, spell, ctx);
+    const language = item.domain === 'language';
+    if (r) {
+      findings.push(...spellingFindings(r, language && has('mechanics') ? 'mechanics' : undefined));
+      if (language) {
+        if (r.misspelled.some((m) => m.certain && m.kind !== 'hamza')) errorCodes.add('spelling');
+        if (r.misspelled.some((m) => m.certain && m.kind === 'hamza')) errorCodes.add('hamza_spelling');
+        if (r.capitals.length) errorCodes.add('capitalisation');
+        const m = has('mechanics') ? mechanicsDecision(item.type, r) : null;
+        if (m && m.points <= has('mechanics')!.maxPoints) decided.mechanics = { points: m.points, ruleId: 'mechanics_spelling', reason: m.reason, evidence: m.evidence };
+      }
+    }
+    if (language && lang.startsWith('ar')) {
+      const d = dialectReport(text, spell, ctx);
+      const f = colloquialFinding(d, has('grammar_accuracy') ? 'grammar_accuracy' : undefined);
+      if (f) findings.push(f);
+    }
+  }
   return done();
+}
+
+const KIND_TEXT: Record<string, string> = { spelling: 'spelling', hamza: 'hamza', taa_marbuta: 'taa marbuta (ة/ه)', alef_maqsura: 'alef maqsura (ى/ي)' };
+/** The spelling report as findings for the model: "Code found 3 spelling errors: …" (the learner's words, with the corrected form). */
+export function spellingFindings(r: SpellingReport, criterion?: string): Finding[] {
+  const out: Finding[] = [];
+  const c = criterion ? { criterion } : {};
+  const certain = r.misspelled.filter((m) => m.certain);
+  const unsure = r.misspelled.filter((m) => !m.certain);
+  if (certain.length) {
+    const kinds = [...new Set(certain.map((m) => m.kind))].map((k) => KIND_TEXT[k]).join(', ');
+    out.push({ ...c, ruleId: 'spelling', value: certain.length, evidence: `Code found ${certain.length} spelling error(s) (${kinds}): ${certain.map((m) => (m.fix ? `${m.word} → ${m.fix} (${KIND_TEXT[m.kind]})` : m.word)).join(', ')}` });
+  }
+  if (unsure.length || r.doubtful.length) {
+    const words = [...unsure.map((m) => (m.fix ? `${m.word} (${m.fix}?)` : m.word)), ...r.doubtful.map((d) => `${d.word} (${d.fix}?)`)];
+    out.push({ ...c, ruleId: 'spelling', value: 0, evidence: `Not in the dictionary, may be a name, a place, a loanword or a misspelling (judge yourself): ${words.join(', ')}` });
+  }
+  if (r.capitals.length) {
+    out.push({ ...c, ruleId: 'capitalisation', value: r.capitals.length, evidence: `Code found ${r.capitals.length} capital-letter error(s): ${r.capitals.map((x) => `${x.word} → ${x.fix}`).join(', ')}` });
+  }
+  return out;
+}
+
+/** Colloquial (Egyptian) words in an Arabic answer, as a finding for grammar_accuracy; null when there are none. */
+export function colloquialFinding(d: DialectReport, criterion?: string): Finding | null {
+  if (!d.colloquial.length) return null;
+  const words = [...new Set(d.colloquial.map((c) => c.word))];
+  return {
+    ...(criterion ? { criterion } : {}), ruleId: 'colloquial', value: Math.round(d.share * 100) / 100,
+    evidence: `Colloquial (not MSA) words in ${d.colloquialSentences} of ${d.sentences} sentence(s), ${d.colloquial.length} of ${d.words} words: ${words.join('، ')}`,
+  };
 }
 

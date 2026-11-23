@@ -119,3 +119,49 @@ describe('the release check accepts a code-only grade only when the rules give e
     expect(check(answer)).toBe('rule_mismatch');
   });
 });
+
+describe('spelling by code (language items)', () => {
+  const essay = { questionId: 'q2', stem: 'Write about your last holiday.', type: 'essay' as const, domain: 'language' as const, language: 'en' };
+  const emax = Object.fromEntries(rubricFor('language', 'essay', 'en', {})!.criteria.map((c) => [c.id, c.maxPoints]));
+  const text = 'last summer i go to alex with my family. we swim in the sea. it is very good. i eat fish.';
+  const ids = ['task_completion', 'grammar_accuracy', 'vocabulary_range', 'organisation', 'mechanics'];
+  const langReply = (only: string[] = ids) => ({
+    criteria: only.map((c) => ({ criterionId: c, levelId: 'p1', evidence: ['we swim in the sea'], rationale: 'ok' })),
+    errorCodes: ['verb_tense'], confidence: 0.9, scoreExplanation: 'Some errors.', strengths: [], improvements: [], feedback: 'Good start. Use the past tense.', flags: [],
+  });
+  const gradeEssay = () => gradeOpenAnswer({ attempt, item: essay, answer: text, uiLanguage: 'en', maxByCriterion: emax, modelReady: true, options: { store: false } });
+
+  it('switch off: no spelling findings, the model scores mechanics, prompts identical with "all"', async () => {
+    process.env.ENARA_ENGINE_V2 = '';
+    replies = [langReply(), langReply()];
+    const off = await gradeEssay();
+    const before = calls.splice(0);
+    process.env.ENARA_ENGINE_V2 = 'all,assessGrading';
+    replies = [langReply(), langReply()];
+    expect(await gradeEssay()).toEqual(off);
+    expect(calls).toEqual(before);
+    expect(before[0].user).not.toMatch(/codeFindings|Code found/);
+    expect(off.errorCodes).toEqual(['verb_tense']);
+    expect(off.criteria.find((c) => c.code === 'mechanics')).toEqual({ code: 'mechanics', points: 1, max: 2, reasonCode: 'partly_met' });
+  });
+  it('switch on: mechanics scored by code with the words as its reason, findings to the model, code error codes added', async () => {
+    process.env.ENARA_ENGINE_V2 = 'assessGrading,rulesFirst';
+    replies = [langReply(ids.slice(0, 4)), langReply(ids.slice(0, 4))];
+    const g = await gradeEssay();
+    const user = JSON.parse(calls[0].user);
+    expect(user.rubric.map((c: { criterionId: string }) => c.criterionId)).toEqual(ids.slice(0, 4));
+    expect(user.codeScores).toEqual([{ criterionId: 'mechanics', points: 1, reason: expect.stringContaining('i → I') }]);
+    expect(user.codeFindings.find((f: { rule: string }) => f.rule === 'capitalisation')).toMatchObject({ criterionId: 'mechanics', evidence: expect.stringContaining('Code found') });
+    expect(g.criteria.find((c) => c.code === 'mechanics')).toMatchObject({ points: 1, scoredBy: 'code', rule: 'mechanics_spelling' });
+    expect(g.errorCodes.sort()).toEqual(['capitalisation', 'verb_tense']);
+  });
+  it('switch on, spoken item: no spelling at all (mechanics is not even in the rubric)', async () => {
+    process.env.ENARA_ENGINE_V2 = 'assessGrading,rulesFirst';
+    const spoken = { ...essay, spoken: true };
+    const smax = Object.fromEntries(rubricFor('language', 'essay', 'en', { spoken: true })!.criteria.map((c) => [c.id, c.maxPoints]));
+    replies = [langReply(ids.slice(0, 4)), langReply(ids.slice(0, 4))];
+    const g = await gradeOpenAnswer({ attempt, item: spoken, answer: text, uiLanguage: 'en', maxByCriterion: smax, modelReady: true, options: { store: false } });
+    expect(calls[0].user).not.toMatch(/Code found|capitalisation/);
+    expect(g.errorCodes).toEqual(['verb_tense']);
+  });
+});
