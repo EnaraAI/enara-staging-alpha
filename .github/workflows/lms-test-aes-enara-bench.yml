@@ -1,0 +1,72 @@
+# Evaluation 4.4 (owner, 23 Nov 2026: "Go on evaluation 4.4"): the trained essay scorers and today's DeepSeek grader on ENARA's own
+# language benchmark (data/assessment-bench, synthetic answers in the repo), side by side. No switch, no fine-tuning, nothing stored on lms-test.
+name: lms-test essay scoring on ENARA benchmark
+on:
+  push:
+    branches: ['claude/tutor-lms-dscompare-run']
+    paths: ['.github/workflows/lms-test-aes-enara-bench.yml']
+permissions:
+  contents: write
+jobs:
+  trained:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    strategy:
+      fail-fast: false
+      matrix:
+        dataset: [ellipse, laila]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - name: ENARA benchmark (lms-test-live)
+        run: git fetch -q --depth 1 origin lms-test-live && git worktree add -q live FETCH_HEAD
+      - name: Libraries
+        run: |
+          pip install -q torch --index-url https://download.pytorch.org/whl/cpu
+          pip install -q numpy pandas scipy scikit-learn transformers sentencepiece protobuf tiktoken
+      - name: Train and score
+        working-directory: deploy/lms-test/aes
+        env: { HF_HUB_DISABLE_PROGRESS_BARS: '1', TRANSFORMERS_VERBOSITY: error, AES_MAX_LEN: '256', AES_DATASETS: '${{ matrix.dataset }}', AES_BENCH_DIR: '${{ github.workspace }}/live/data/assessment-bench' }
+        run: python train.py 2>&1 | tee train.log
+      - name: Publish (numbers only)
+        if: always()
+        working-directory: deploy/lms-test/aes
+        run: |
+          B=claude/tutor-lms-aes-enara-${{ matrix.dataset }}
+          mkdir -p results && cp train.log results/ 2>/dev/null || true
+          cd results && git init -q && git checkout -q -b "$B"
+          git config user.name github-actions && git config user.email github-actions@users.noreply.github.com
+          git add -A && git commit -qm "enara bench, trained ${{ matrix.dataset }} ${GITHUB_SHA::8}"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" "$B"
+  deepseek:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Today's grader (lms-test-live)
+        run: |
+          git fetch -q origin lms-test-live && git worktree add -q live FETCH_HEAD
+          cd live/backend && npm ci --silent
+      - name: Grade ENARA benchmark
+        working-directory: deploy/lms-test/ellipse
+        env:
+          LMSTEST_MAINTENANCE_TOKEN: ${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}
+          LIVE_BACKEND: ${{ github.workspace }}/live/backend
+          BASELINE_CONFIG: '{"datasets":["bench-en","bench-ar"],"concurrency":4}'
+        run: |
+          export TUTOR_LLM_MODEL="$(node -e "const f=require('${{ github.workspace }}/live/deploy/lms-test.flags.json');console.log(f.features.find(x=>x.flags.TUTOR_LLM_MODEL).flags.TUTOR_LLM_MODEL)")"
+          ${{ github.workspace }}/live/backend/node_modules/.bin/tsx baseline.mts 2>&1 | tee run.log
+      - name: Publish (numbers only)
+        if: always()
+        working-directory: deploy/lms-test/ellipse
+        run: |
+          mkdir -p out && cp run.log out/ 2>/dev/null || true
+          cd out && git init -q && git checkout -q -b claude/tutor-lms-aes-enara-ds
+          git config user.name github-actions && git config user.email github-actions@users.noreply.github.com
+          git add -A && git commit -qm "enara bench, DeepSeek ${GITHUB_SHA::8}"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" claude/tutor-lms-aes-enara-ds
