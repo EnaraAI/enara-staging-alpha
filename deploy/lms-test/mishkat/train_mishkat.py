@@ -174,14 +174,30 @@ AUG = os.environ.get('MK_AUG') == '1'
 PAD_TRAIN = {'en': ['We go to the park on Fridays.', 'My brother likes football.', 'The weather is nice today.', 'I read a book every week.', 'Our teacher is very kind.', 'We eat dinner together.'],
              'ar': ['نذهب إلى الحديقة يوم الجمعة.', 'يحب أخي كرة القدم.', 'الجو جميل اليوم.', 'أقرأ كتابًا كل أسبوع.', 'معلمنا لطيف جدًا.', 'نتناول العشاء معًا.']}[LANG]
 SPLIT = lambda t: [x for x in re.split(r'(?<=[.!?؟])\s+', t.strip()) if x]
+K = 5
+for typ_ in ('essay', 'short_answer'):  # the same fold assignment the CV loop uses
+    gs = sorted({r['group'] for r in rows if r['type'] == typ_}); random.Random(SEED).shuffle(gs); fo = {g: n % K for n, g in enumerate(gs)}
+    for r in rows:
+        if r['type'] == typ_: r['fold'] = fo[r['group']]
+# Padding (owner decision (b), 23 Nov 2026): pad with sentences that carry the answer's own kind of errors = sentences from OTHER answers
+# of the same type, the same fold and the same grammar and spelling marks, so the share of faulty sentences stays the same. Used for the
+# training copies and for the padding test; always inside one fold, so no test text reaches training.
+POOL = {}
+for n_, r in enumerate(rows):
+    for sn in SPLIT(r['answer']):
+        if len(sn.split()) >= 3: POOL.setdefault((r['type'], r['fold'], r['label']['grammar_accuracy'], r['label']['mechanics']), []).append((n_, sn))
+def pad_like(i, k_, rng):
+    r = rows[i]; cand = [sn for (n_, sn) in POOL.get((r['type'], r['fold'], r['label']['grammar_accuracy'], r['label']['mechanics']), []) if n_ != i]
+    return ' '.join(rng.sample(cand, min(k_, len(cand)))) if cand else ''
 aug_src, aug_texts = [], []
 if AUG:
     rr = random.Random(SEED)
     for i, r in enumerate(rows):
         ss = SPLIT(r['answer']); keep = 2 if r['type'] == 'essay' else 1
         if len(ss) > keep: aug_src.append(i); aug_texts.append(' '.join(ss[:keep]))
-        for kpad in (1, 2, 3, 4, 6):  # several padding amounts, so adding correct sentences never moves grammar or spelling
-            aug_src.append(i); aug_texts.append(r['answer'] + ' ' + ' '.join(rr.sample(PAD_TRAIN, kpad)))
+        for kpad in (1, 2, 4):  # several padding amounts with same-kind sentences
+            pad = pad_like(i, kpad, rr)
+            if pad: aug_src.append(i); aug_texts.append(r['answer'] + ' ' + pad)
     Xaug = cached('aug', aug_texts, 'length-augmented copies')
     log(f'length augmentation: {len(aug_texts)} copies')
 aug_src = np.array(aug_src, dtype=int)
@@ -199,7 +215,6 @@ log(f'stage 1 after removing re-check essays: {len(Xpre)}; human re-check essays
 
 report = {'label': 'MODEL-MARKED: development only, not for claims, never for a real school', 'lang': LANG, 'encoder': ENC, 'maxTokens': MAXLEN,
           'stage1Essays': int(len(Xpre)), 'enaraLabelled': len(rows), 'ownerCorrections': n_corr, 'evaluation': '5-fold cross-validation by question (every answer tested once, never trained on in its fold)', 'types': {}}
-K = 5
 RECIPE = 'two_stage' if LANG == 'en' else 'stage2_only'  # run 2-3: the better recipe per language
 CMP = None
 if os.environ.get('MK_COMPARE') and os.path.exists(os.environ['MK_COMPARE']):  # answers Claude graded earlier
@@ -214,7 +229,7 @@ for typ in ['essay', 'short_answer']:
         for j, c in enumerate(crit):
             if mx[c] == 1: Ypre[:, j] = np.where(np.isnan(Ypre[:, j]), np.nan, (Ypre[:, j] >= 1).astype(np.float32))
     T = [i for i, r in enumerate(rows) if r['type'] == typ]
-    groups = sorted({rows[i]['group'] for i in T}); random.Random(SEED).shuffle(groups); fold_of = {g: n % K for n, g in enumerate(groups)}
+    groups = sorted({rows[i]['group'] for i in T}); fold_of = {rows[i]['group']: rows[i]['fold'] for i in T}
     Y_of = lambda idx: np.array([[rows[i]['label'][c] for c in crit] for i in idx], dtype=np.float32)
     d = Xpre.shape[1]
     torch.manual_seed(SEED); s1 = fit(Head(d, len(crit)), Xpre, Ypre, 15, 1e-3)
@@ -240,8 +255,8 @@ for typ in ['essay', 'short_answer']:
         if typ == 'essay':
             strong = [n for n, i in enumerate(te) if rows[i]['label']['grammar_accuracy'] == 2 and len(re.split(r'(?<=[.!?؟])\s+', rows[i]['answer'])) >= 4]
             if strong: Xc = Z(X_of([' '.join(re.split(r'(?<=[.!?؟])\s+', rows[te[n]]['answer'])[:3]) for n in strong], f'truncation test fold {k + 1}'))
-            PAD = {'en': ' I like my school. My school is big. We learn many things there.', 'ar': ' أحب مدرستي. مدرستي كبيرة. نتعلم فيها أشياء كثيرة.'}[LANG]
-            Xp = Z(X_of([rows[i]['answer'] + PAD for i in te], f'padding test fold {k + 1}'))
+            rp = random.Random(SEED + 100 + k)  # padding test: 3 same-kind sentences from other test answers of this fold
+            Xp = Z(X_of([rows[i]['answer'] + ' ' + pad_like(i, 3, rp) for i in te], f'padding test fold {k + 1}'))
         for rname, mdl in (('two_stage', s2), ('stage2_only', s2o)):
             P_ = predict(mdl, Xen[te]); acc = tests_acc[rname]
             if typ == 'short_answer':
