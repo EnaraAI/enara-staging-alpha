@@ -180,7 +180,8 @@ if AUG:
     for i, r in enumerate(rows):
         ss = SPLIT(r['answer']); keep = 2 if r['type'] == 'essay' else 1
         if len(ss) > keep: aug_src.append(i); aug_texts.append(' '.join(ss[:keep]))
-        aug_src.append(i); aug_texts.append(r['answer'] + ' ' + ' '.join(rr.sample(PAD_TRAIN, 2)))
+        for kpad in (1, 2, 4):  # several padding amounts, so adding correct sentences never moves grammar or spelling
+            aug_src.append(i); aug_texts.append(r['answer'] + ' ' + ' '.join(rr.sample(PAD_TRAIN, kpad)))
     Xaug = cached('aug', aug_texts, 'length-augmented copies')
     log(f'length augmentation: {len(aug_texts)} copies')
 aug_src = np.array(aug_src, dtype=int)

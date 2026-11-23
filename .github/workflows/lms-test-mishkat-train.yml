@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        lang: [ar]  # run 3: Arabic only, with length augmentation (English passed its length tests in run 2)
+        lang: [ar]  # run 4: Arabic only, length augmentation with 1, 2 and 4 padding sentences
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
