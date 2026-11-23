@@ -16,7 +16,7 @@ const BAND_TEXT = { weak: 'a weak learner: many mistakes, simple words, may answ
 function system(lang) {
   return 'You write realistic test data: questions a teacher would set and answers that school learners would really write. ' +
     (lang === 'ar'
-      ? 'Everything is in Modern Standard Arabic (fusha): questions and answers. Weak learners may make spelling mistakes (hamza, taa marbuta, alef maqsura), grammar mistakes and an occasional colloquial (Egyptian) word slip as real learners do, but never write an answer in colloquial on purpose. Context: Egyptian schools (grades 4-9). '
+      ? 'Everything is in Modern Standard Arabic (fusha): questions and answers. Every answer is written in fusha, also the weak ones: a weak learner makes fusha mistakes (hamza, taa marbuta, alef maqsura, agreement, case endings, simple sentences), and AT MOST one or two colloquial (Egyptian) words slip into the whole answer. Never write sentences in colloquial (no عشان، مش، ده، دلوقتي، حاجة، كتير، بنعمل، هنروح, etc. beyond one or two slips). Context: Egyptian schools (grades 4-9). '
       : 'Everything is in English, written by Egyptian learners of English (CEFR A1-B2): their mistakes are typical of Arabic speakers learning English. ') +
     'Each answer must have exactly the requested length in words and match the requested learner level. Questions must be self-contained (no recording or text needed to understand them; for listening and humanities, phrase the question so that it names its topic). ' +
     'Reply with JSON only: {"items":[{"id":"...","stem":"the question","answer":"the learner\'s answer"}]}';
@@ -36,8 +36,9 @@ const parse = (t) => { try { const s = t.slice(t.indexOf('{'), t.lastIndexOf('}'
 const words = (s) => s.trim().split(/\s+/).filter(Boolean).length;
 mkdirSync('out', { recursive: true });
 const report = {};
-for (const lang of ['en', 'ar']) {
-  const todo = cells(lang); const done = [];
+const REGEN = process.env.REGEN ? Object.fromEntries(process.env.REGEN.split(';').map((x) => { const [l, ids] = x.split(':'); return [l, new Set(ids.split(','))]; })) : null;
+for (const lang of REGEN ? Object.keys(REGEN) : ['en', 'ar']) {
+  const todo = cells(lang).filter((c) => !REGEN || REGEN[lang].has(c.id)); const done = [];
   const per = 3; let calls = 0;
   for (let k = 0; k < 3 && todo.length; k++) { // up to 3 passes for missing ids
     const batches = []; for (let i = 0; i < todo.length; i += per) batches.push(todo.slice(i, i + per));
@@ -59,7 +60,7 @@ for (const lang of ['en', 'ar']) {
     console.log(lang, 'pass', k + 1, 'have', done.length, 'missing', todo.length);
   }
   done.sort((a, b) => a.id.localeCompare(b.id));
-  writeFileSync(`out/new-${lang}.json`, JSON.stringify(done, null, 1));
+  writeFileSync(`out/${REGEN ? 'regen' : 'new'}-${lang}.json`, JSON.stringify(done, null, 1));
   report[lang] = { written: done.length, missing: todo.map((c) => c.id), calls };
 }
 writeFileSync('out/report.json', JSON.stringify(report, null, 1));

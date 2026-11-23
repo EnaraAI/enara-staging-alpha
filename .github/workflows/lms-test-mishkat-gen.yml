@@ -1,5 +1,5 @@
 # Mishkat (owner go, 23 Nov 2026): write 140 new synthetic learner answers per language (DeepSeek on lms-test via llm-compare).
-# Synthetic, model-marked dev data only. Published to claude/tutor-lms-mishkat-gen.
+# Synthetic, model-marked dev data only. Published to claude/tutor-lms-mishkat-regen.
 name: lms-test Mishkat new answers
 on:
   push:
@@ -20,13 +20,14 @@ jobs:
         working-directory: deploy/lms-test/mishkat
         env:
           LMSTEST_MAINTENANCE_TOKEN: ${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}
+          REGEN: 'ar:mk-ar-002,mk-ar-004,mk-ar-005,mk-ar-006,mk-ar-007,mk-ar-008,mk-ar-009,mk-ar-010,mk-ar-011,mk-ar-012,mk-ar-038,mk-ar-039,mk-ar-043,mk-ar-044,mk-ar-045,mk-ar-046,mk-ar-047,mk-ar-048,mk-ar-055,mk-ar-056,mk-ar-057,mk-ar-073,mk-ar-074,mk-ar-075,mk-ar-076,mk-ar-077,mk-ar-078,mk-ar-079,mk-ar-080,mk-ar-081,mk-ar-082,mk-ar-083,mk-ar-084,mk-ar-109,mk-ar-117,mk-ar-118,mk-ar-119,mk-ar-120,mk-ar-122,mk-ar-127,mk-ar-132'
         run: node gen.mjs 2>&1 | tee gen.log
       - name: Publish
         if: always()
         working-directory: deploy/lms-test/mishkat
         run: |
           mkdir -p out && cp gen.log out/ 2>/dev/null || true
-          cd out && git init -q && git checkout -q -b claude/tutor-lms-mishkat-gen
+          cd out && git init -q && git checkout -q -b claude/tutor-lms-mishkat-regen
           git config user.name github-actions && git config user.email github-actions@users.noreply.github.com
           git add -A && git commit -qm "Mishkat new answers ${GITHUB_SHA::8}"
-          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" claude/tutor-lms-mishkat-gen
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" claude/tutor-lms-mishkat-regen
