@@ -27,7 +27,7 @@ jobs:
           LIVE_BACKEND: ${{ github.workspace }}/live/backend
         run: |
           export TUTOR_LLM_MODEL="$(node -e "const f=require('${{ github.workspace }}/live/deploy/lms-test.flags.json');console.log(f.features.find(x=>x.flags.TUTOR_LLM_MODEL).flags.TUTOR_LLM_MODEL)")"
-          ${{ github.workspace }}/live/backend/node_modules/.bin/tsx baseline.ts 2>&1 | grep -vE "full_text|essay text" | tee run.log
+          ${{ github.workspace }}/live/backend/node_modules/.bin/tsx baseline.mts 2>&1 | grep -vE "full_text|essay text" | tee run.log
       - name: Publish (numbers only)
         if: always()
         working-directory: deploy/lms-test/ellipse
