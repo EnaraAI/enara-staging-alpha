@@ -4,12 +4,11 @@
 # Output: numbers only (results/report.json). CPU only, no secrets.
 import json, os, re, subprocess, sys, time, random, zipfile, io, copy
 import numpy as np, pandas as pd, torch
-from transformers import AutoTokenizer, AutoModel
 
 T0 = time.time()
 def log(*a): print(f"[{time.strftime('%H:%M:%S')} +{(time.time() - T0) / 60:.1f} min]", *a, flush=True)
 LANG = os.environ['MK_LANG']; DATA = os.environ['MK_DATA']; SEED = 20261123
-ENC = {'en': 'microsoft/deberta-v3-base', 'ar': 'CAMeL-Lab/bert-base-arabic-camelbert-msa'}[LANG]
+ENC = {'en': 'microsoft/deberta-v3-base', 'ar': 'CAMeL-Lab/bert-base-arabic-camelbert-msa'}[LANG]  # = mishkat_features.ENCODERS
 MAXLEN = 256; PRE_N = int(os.environ.get('MK_PRE_N', '2500'))
 rng = np.random.default_rng(SEED); random.seed(SEED); torch.manual_seed(SEED)
 torch.set_num_threads(max(1, min(4, len(os.sched_getaffinity(0)))))
@@ -18,53 +17,12 @@ CR = ['task_completion', 'grammar_accuracy', 'vocabulary_range', 'organisation',
 SHORT_CR = ['task_completion', 'grammar_accuracy', 'mechanics']
 MAX = {'essay': {c: 2 for c in CR}, 'short_answer': {'task_completion': 2, 'grammar_accuracy': 1, 'mechanics': 1}}
 
-# ---------------- length-robust features ----------------
-LINK = {'en': set('and but because so then also however therefore first firstly second finally moreover although while when after before since if or furthermore besides instead'.split()),
-        'ar': set('ثم لأن لان لكن لذلك أيضا ايضا أيضًا كما بعد قبل عندما أولا اولا أولًا ثانيا أخيرا اخيرا بالإضافة إذ حيث لكي كي إذا اذا بينما رغم لذا وبالتالي'.split())}
-SUB = {'en': set('because although while when if since which who that whose whom unless until'.split()), 'ar': set('الذي التي الذين لأن لان عندما إذا اذا حيث لكي كي بينما رغم أن ان'.split())}
-COLLOQ = set('عشان علشان مش ده دي دول دلوقتي بتاع حاجة حاجه حاجات كتير اوي أوي ازاي إزاي فين ليه كده عايز عاوز اللي مافيش مفيش بقى احنا إحنا برضو خالص شوية زي'.split())
-WRE = re.compile(r'[^\W\d_]+', re.U)
-def hunspell_miss(texts):
-    d = 'en_US' if LANG == 'en' else 'ar'
-    inp = '\n'.join('^' + (re.sub(r'\s+', ' ', t).replace('^', ' ') or '.') for t in texts) + '\n'  # '^' = check this line as text
-    out = subprocess.run(['hunspell', '-a', '-d', d], input=inp, capture_output=True, text=True).stdout.split('\n')[1:]
-    res, cur = [], 0
-    for line in out:
-        if line == '': res.append(cur); cur = 0
-        elif line[0] in '&#': cur += 1
-    return (res + [0] * len(texts))[:len(texts)]
-def mattr(ws, w=25):
-    if len(ws) <= w: return len(set(ws)) / max(1, len(ws))
-    return float(np.mean([len(set(ws[i:i + w])) / w for i in range(0, len(ws) - w + 1)]))
-def feats(texts):
-    miss = hunspell_miss(texts); rows = []
-    for t, m in zip(texts, miss):
-        ws = [w.lower() for w in WRE.findall(t)]; n = max(1, len(ws))
-        sents = [s for s in re.split(r'[.!?؟\n]+', t) if s.strip()]; ns = max(1, len(sents))
-        lower_start = sum(1 for s in sents if LANG == 'en' and s.strip()[:1].islower()) / ns
-        rows.append([
-            100 * m / n,                                           # spelling errors per 100 words
-            100 * len(re.findall(r'[.,;:!?؟،؛]', t)) / n,          # punctuation per 100 words
-            sum(1 for w in ws if w in LINK[LANG] or (LANG == 'ar' and w.startswith('و') and len(w) > 3 and w[1:] in LINK['ar'])) / ns,
-            sum(1 for w in ws if w in SUB[LANG]) / ns,             # subordinate markers per sentence
-            min(60, n / ns),                                       # mean words per sentence
-            float(np.mean([len(w) for w in ws])) if ws else 0,     # mean word length
-            mattr(ws),                                             # moving-window word variety
-            100 * sum(1 for w in ws if w in COLLOQ) / n,           # colloquial per 100 words (Arabic)
-            lower_start, 100 * sum(1 for w in WRE.findall(t) if w == 'i' and LANG == 'en') / n,  # lowercase 'i' as a word
-        ])
-    return np.array(rows, dtype=np.float32)
-_tok = AutoTokenizer.from_pretrained(ENC); _enc = AutoModel.from_pretrained(ENC).eval()
-def embed(texts, part):
-    out = []; t1 = time.time(); n = len(texts)
-    with torch.no_grad():
-        for i in range(0, n, 16):
-            b = _tok(list(texts[i:i + 16]), truncation=True, max_length=MAXLEN, padding=True, return_tensors='pt')
-            h = _enc(**b).last_hidden_state; m = b['attention_mask'].unsqueeze(-1).float()
-            out.append(((h * m).sum(1) / m.sum(1)).numpy())
-            if (i // 16 + 1) % 25 == 0 or i + 16 >= n: log(f'encoder {part}: {min(i + 16, n)}/{n}, ~{(time.time() - t1) / min(i + 16, n) * (n - min(i + 16, n)) / 60:.1f} min left')
-    return np.vstack(out).astype(np.float32)
-def X_of(texts, part): return np.hstack([embed(texts, part), feats(texts)])
+# ---------------- length-robust features + encoder: shared with the Modal service (mishkat_features.py), same numbers ----------------
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import mishkat_features as MF
+from mishkat_features import Head
+_E = MF.Encoder(ENC, MAXLEN)
+def X_of(texts, part): return MF.X_of(texts, LANG, _E, part, log)
 
 # ---------------- stage-1 data (public datasets, never stored) ----------------
 def sh(c): subprocess.run(c, shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -118,9 +76,7 @@ def enara():
     return rows, n_corr
 
 # ---------------- the head: pre-train (stage 1), fine-tune (stage 2) ----------------
-class Head(torch.nn.Module):
-    def __init__(self, d, k): super().__init__(); self.net = torch.nn.Sequential(torch.nn.Linear(d, 128), torch.nn.ReLU(), torch.nn.Dropout(0.2), torch.nn.Linear(128, k))
-    def forward(self, x): return self.net(x)
+# Head: imported from mishkat_features (the service builds the same module)
 def fit(model, X, Y, epochs, lr, Xv=None, Yv=None):
     opt = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=1e-4); Xt = torch.tensor(X); Yt = torch.tensor(Y); best = (1e9, copy.deepcopy(model.state_dict())); bad = 0
     for ep in range(epochs):
@@ -221,6 +177,7 @@ if os.environ.get('MK_COMPARE') and os.path.exists(os.environ['MK_COMPARE']):  #
     CMP = json.load(open(os.environ['MK_COMPARE']))
     Xcmp = Z(cached('compare', [c['answer'] for c in CMP], 'Claude comparison answers')) if CMP else None
 report['recipe'] = RECIPE; report['oof'] = {}; report['compareScores'] = {}
+EXPORT_TYPES = {}  # final model per type, for the service bundle (MK_EXPORT=1)
 rnd_of = lambda P, crit, mx: np.stack([np.clip(np.rint(P[:, j]), 0, mx[c]) for j, c in enumerate(crit)], 1).astype(int)
 for typ in ['essay', 'short_answer']:
     crit = CR if typ == 'essay' else SHORT_CR; ix = [CR.index(c) for c in crit]; mx = MAX[typ]
@@ -298,6 +255,7 @@ for typ in ['essay', 'short_answer']:
                 if c in ('grammar_accuracy', 'mechanics'): Ya[m_, j] = rows[aug_src[n]]['label'][c]
         Xtr, Ytr = np.vstack([Xtr, Xaug[sel_a]]), np.vstack([Ytr, Ya])
     torch.manual_seed(SEED); final = fit(copy.deepcopy(s1) if RECIPE == 'two_stage' else Head(d, len(crit)), Xtr, Ytr, 80, 3e-4 if RECIPE == 'two_stage' else 1e-3, Xen[va], Y_of(va))
+    EXPORT_TYPES[typ] = {'model': final, 'criteria': crit, 'max': mx, 'passesBar': bar}
     if CMP:
         ci = [n for n, c in enumerate(CMP) if c['type'] == typ]
         if ci:
@@ -313,5 +271,16 @@ for typ in ['essay', 'short_answer']:
         entry['humanRecheck']['v3b_deepseek'] = {c: {'n': 200, 'exact': V3B[c]['exact'], 'within1': V3B[c]['within1'], 'qwk': V3B[c]['qwk']} for c in crit if c in h_Y and c in V3B}
     report['types'][typ] = entry
     log(typ, json.dumps({c: (per[c]['vsMedian']['two_stage']['qwk'], per[c]['vsMedian']['stage2_only']['qwk'], per[c]['vsMedian']['v3b_deepseek']['qwk']) for c in crit}), json.dumps(tests), json.dumps(tests_s2))
+# ---------------- service bundle (MK_EXPORT=1; only languages in MK_EXPORT_LANGS, default "en") ----------------
+# Written to results/bundle-<lang>/ and uploaded by the workflow as an Actions artifact (never committed). Only grammar_accuracy,
+# mechanics (+ vocabulary_range for essays) are listed as served; task_completion and organisation stay with v3b.
+EXPORT_LANGS = [x.strip() for x in os.environ.get('MK_EXPORT_LANGS', 'en').split(',') if x.strip()]
+if os.environ.get('MK_EXPORT') == '1' and LANG in EXPORT_LANGS:
+    sha = os.environ.get('GITHUB_SHA') or subprocess.run(['git', 'rev-parse', 'HEAD'], capture_output=True, text=True).stdout.strip() or 'nogit'
+    version = f"mishkat-{LANG}-{time.strftime('%Y%m%d', time.gmtime())}-{sha[:8]}"
+    man = MF.write_bundle(f'results/bundle-{LANG}', LANG, version, ENC, MAXLEN, RECIPE, mu, sd, EXPORT_TYPES, {'augmentation': AUG})
+    log(f'bundle {version}: ' + json.dumps({t: v['served'] for t, v in man['types'].items()}))
+    report['bundle'] = {'version': version, 'served': {t: v['served'] for t, v in man['types'].items()}}
+elif os.environ.get('MK_EXPORT') == '1': log(f'bundle: {LANG} not in MK_EXPORT_LANGS={EXPORT_LANGS}; not exported')
 json.dump(report, open('results/report.json', 'w'), indent=1)
 log('done')
