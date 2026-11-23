@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Loader2, Sparkles } from 'lucide-react';
-import { bankItemQuestion, fetchAssessments, fetchBankItems, generateBankItems, reviewBankItem, updateAssessment } from '../../services/apiService';
+import { bankItemQuestion, fetchAssessments, fetchBankItems, fetchBankStats, generateBankItems, reviewBankItem, updateAssessment } from '../../services/apiService';
 import { toast } from '../../services/toastService';
 
 // Assessment engine P4 (docs/tutor/ASSESSMENT_ENGINE_PLAN.md §6.4): the question bank. Generate items (checked by code and by a judge
@@ -18,6 +18,26 @@ function keyText(it: any): string {
   if (it.type === 'math_steps') return `${k.final?.value ?? ''}${k.final?.unit ? ` ${k.final.unit}` : ''}`;
   return (k.content_points ?? k.required_points ?? []).join(' · ') || k.model_answer || '';
 }
+
+// P5: the Item bank card: what is in the bank, how the reviewer model judges it, how often engine-graded answers go to the teacher,
+// and the last benchmark (agreement with reference scores, speed) on this deployment.
+const BankCard: React.FC = () => {
+  const [s, setS] = useState<any>(null);
+  useEffect(() => { fetchBankStats().then(setS).catch(() => setS(null)); }, []);
+  if (!s) return null;
+  const tile = 'border border-slate-200 rounded-lg p-3 bg-white';
+  const pct = (x: number | null | undefined) => (x === null || x === undefined ? '—' : `${Math.round(x * 100)}%`);
+  return (
+    <section className="grid grid-cols-2 md:grid-cols-4 gap-2" data-testid="bank-card">
+      <div className={tile}><p className="text-xs text-slate-500">Questions in the bank</p><p className="text-xl font-bold">{s.items.total}</p><p className="text-xs text-slate-500">{Object.entries(s.items.byStatus).map(([k, v]) => `${k} ${v}`).join(' · ')}</p></div>
+      <div className={tile}><p className="text-xs text-slate-500">Passed the reviewer model</p><p className="text-xl font-bold">{pct(s.judgePassRate)}</p><p className="text-xs text-slate-500">{Object.entries(s.items.bySubject).map(([k, v]) => `${k} ${v}`).join(' · ')}</p></div>
+      <div className={tile}><p className="text-xs text-slate-500">Answers sent to the teacher (30 days)</p><p className="text-xl font-bold">{pct(s.grading30d.flagRate)}</p><p className="text-xs text-slate-500">{s.grading30d.answers} graded by the engine</p></div>
+      <div className={tile}><p className="text-xs text-slate-500">Last benchmark: agreement with reference scores</p>
+        {s.lastBench ? <><p className="text-xl font-bold">{pct(Math.min(...s.lastBench.sets.map((x: any) => x.within1)))}+</p><p className="text-xs text-slate-500">{s.lastBench.sets.length} sets · {s.lastBench.failures.length ? `${s.lastBench.failures.length} below the bar` : 'all at or above 85%'} · typical answer {(Math.max(...s.lastBench.sets.map((x: any) => x.p50)) / 1000).toFixed(1)}s</p></> : <p className="text-sm text-slate-500">Not run yet</p>}
+      </div>
+    </section>
+  );
+};
 
 export const QuestionBank: React.FC = () => {
   const [status, setStatus] = useState('judged');
@@ -60,6 +80,7 @@ export const QuestionBank: React.FC = () => {
         <h1 className="text-2xl font-bold text-slate-900">Question bank</h1>
         <p className="text-sm text-slate-600 max-w-2xl">Generated questions are checked by code and by a reviewer model before you see them. Approve the ones you want, reject the rest with a reason, and add approved questions to a draft assessment.</p>
       </div>
+      <BankCard />
       <section className="border border-slate-200 rounded-xl p-4 space-y-3 bg-white">
         <h2 className="font-semibold text-slate-900 flex items-center gap-2"><Sparkles className="w-4 h-4" /> Generate</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">

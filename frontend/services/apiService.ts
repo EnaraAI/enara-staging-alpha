@@ -1846,3 +1846,4 @@ export const fetchBankItems = (params: { status?: string; subject?: string; lang
 export const generateBankItems = (body: any) => request<{ created: any[]; refused: any[] }>('POST', '/api/item-bank/generate', body);
 export const reviewBankItem = (id: string, body: { decision: 'approve' | 'edit' | 'reject'; reasonCode?: string; edits?: any }) => request<any>('POST', `/api/item-bank/${encodeURIComponent(id)}/review`, body);
 export const bankItemQuestion = (id: string) => request<{ question: any }>('GET', `/api/item-bank/${encodeURIComponent(id)}/question`);
+export const fetchBankStats = () => request<any>('GET', '/api/item-bank/stats');

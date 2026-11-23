@@ -8,12 +8,12 @@ Status: **go given (22 Nov 2026). P2b in progress.** Branch `claude/tutor-assess
 | P1a schema, seeds, ar.ts, uiLanguage, closed graders | done (seeds deferred: CURRICULUM_BOOKS_NEEDED.md) | #88 |
 | P1b learner UI for closed types + E2E ar/en | done | #89 |
 | P2a grading engine core, language + math graders, flags, teacher queue, override, error codes → workOn | done (live on lms-test; first real quiz graded 14/18) | #90 |
-| P2b language + math bench (ar + en), open within-1 ≥ 0.85 (no Anthropic spending, §7a) | PR open | – |
-| P3a science + humanities graders (checklist rubrics per item; humanities judged only against the source), bench ar + en | PR open | – |
-| P3b listening (recording + hidden transcript; answers judged against the transcript), bench ar + en | PR open | – |
+| P2b language + math bench (ar + en), open within-1 ≥ 0.85 (no Anthropic spending, §7a) | done: run 1 maths 0.91/0.97; language calibrated (engine-v2) → run 2 0.89/0.91 | #91, #93 |
+| P3a science + humanities graders (checklist rubrics per item; humanities judged only against the source), bench ar + en | done: science 0.97/0.93, humanities 0.96/0.89 | #92 |
+| P3b listening (recording + hidden transcript; answers judged against the transcript), bench ar + en | done: 0.99/0.98 | #93 |
 | P3c speaking through the engine; code grader (sandbox) | owner decisions (MORNING_SUMMARY) | – |
-| P4 generation, code checks, judge (provisional: DeepSeek), teacher review (Question bank page), generation bench | PR open | – |
-| P5 CI regression gate, admin card, cost/latency report | not started | – |
+| P4 generation, code checks, judge (provisional: DeepSeek), teacher review (Question bank page), generation bench | PR open | #94 |
+| P5 baseline (all 10 sets) for the regression rule, Item bank card (bank, judge pass rate, flag rate, last bench, speed), cost/latency in baseline.json | PR open (after P4) | – |
 
 ## 0. Reuse what exists
 Build INTO the existing system. Engine lives in `backend/src/assessment/` (no `packages/` folder).

@@ -43,4 +43,9 @@ test('25 · item bank: checks, review with reasons, versions, approve, add to an
   const started = await enaraApi.post(`/api/me/assignments/${assignmentId}/attempts`, student, {});
   await enaraApi.post(`/api/me/assignments/${assignmentId}/attempts/${started.attempt.id}/submit`, student, { answers: { [question.id]: 'b' } });
   await expect.poll(async () => (await enaraApi.get(`/api/grading/attempts/${started.attempt.id}`, admin)).attempt.totalPoints, { timeout: 60_000 }).toBe(1);
+  // P5: the Item bank card counts the school's items by status.
+  const stats = await enaraApi.get('/api/item-bank/stats', admin);
+  expect(stats.items.total).toBeGreaterThanOrEqual(1);
+  expect(stats.items.byStatus.approved).toBeGreaterThanOrEqual(1);
+  expect(stats.grading30d).toHaveProperty('flagRate');
 });

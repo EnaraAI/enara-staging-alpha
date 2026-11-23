@@ -1,6 +1,17 @@
 {
-  "$comment": "Within-1 agreement per set on lms-test-live (the 0.03 regression rule). Updated only from a passing lms-test run. gold: author (provisional).",
-  "updated": "2026-11-22",
-  "run": "p2b-first (engine-v1)",
-  "within1": { "math/en": 0.911, "math/ar": 0.967 }
+  "$comment": "Within-1 agreement per set on lms-test-live (the 0.03 regression rule). Updated only from a passing lms-test run. gold: author (provisional). Maths from run p2b-first (engine-v1); the rest from run p3-v2 (engine-v2).",
+  "updated": "2026-11-23",
+  "runs": { "p2b-first": "engine-v1, 360 answers", "p3-v2": "engine-v2, 720 answers, DeepSeek only (1,478 calls, 0 Anthropic)" },
+  "within1": {
+    "math/en": 0.911, "math/ar": 0.967,
+    "language/en": 0.889, "language/ar": 0.911,
+    "science/en": 0.967, "science/ar": 0.933,
+    "humanities/en": 0.956, "humanities/ar": 0.889,
+    "listening/en": 0.989, "listening/ar": 0.978
+  },
+  "latencyMs": {
+    "p50": { "language/en": 4102, "language/ar": 4682, "science/en": 4185, "science/ar": 4701, "humanities/en": 4211, "humanities/ar": 4579, "listening/en": 3406, "listening/ar": 3990 },
+    "p95": { "language/en": 5296, "language/ar": 9631, "science/en": 5545, "science/ar": 6003, "humanities/en": 7218, "humanities/ar": 8803, "listening/en": 4178, "listening/ar": 4974 }
+  },
+  "costEstimateUsdPerAnswer": { "p3-v2": 0.0062, "p2b-first": 0.0052, "$comment": "upper-bound DeepSeek estimate from the call records (no DeepSeek price set); two runs per answer" }
 }
