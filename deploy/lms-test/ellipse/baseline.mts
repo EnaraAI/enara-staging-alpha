@@ -156,7 +156,7 @@ for (const ds of (cfg.datasets ?? []).filter((d) => d.startsWith('bench-'))) {
 for (const ds of (cfg.datasets ?? []).filter((d) => d.startsWith('mishkat-'))) {
   const name = ds.slice(8); // 'en' | 'ar' (the dev pool) or 'compare-en' | 'compare-ar' (answers Claude graded earlier)
   const { gradeOpenRun } = await import(join(LIVE, 'src/assessment/grading-engine/graders/domains/index.ts'));
-  const file = name.startsWith('compare-') ? join(LIVE, '..', 'data', 'mishkat-dev', 'claude-compare', `${name}.json`) : join(LIVE, '..', 'data', 'mishkat-dev', `pool-${name}.json`);
+  const file = name.startsWith('compare-') ? join(LIVE, '..', 'data', 'mishkat-dev', 'claude-compare', `${name}.json`) : name.startsWith('remark-') ? join(LIVE, '..', 'data', 'mishkat-dev', 'remark', `${name.slice(7)}.json`) : join(LIVE, '..', 'data', 'mishkat-dev', `pool-${name}.json`);
   const pool = JSON.parse(readFileSync(file, 'utf8')) as { id: string; stem: string; type: 'short_answer' | 'essay'; answer: string; lang?: 'en' | 'ar' }[];
   const langOf = (a: { lang?: 'en' | 'ar' }) => (a.lang ?? (name.endsWith('ar') ? 'ar' : 'en')) as 'en' | 'ar';
   const rows: Record<string, unknown>[] = []; let i = 0; const calls0 = relayCalls;
