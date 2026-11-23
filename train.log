@@ -1,0 +1,48 @@
+[12:23:19 +0.0 min] laila: loading data
+[12:23:22 +0.1 min] laila: 6511 train / 1348 test essays, 8 traits
+[12:23:22 +0.1 min] laila: model A (text features) building
+[12:23:36 +0.3 min] laila: model A features ready
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[12:23:44 +0.4 min] laila encoder CAMeL-Lab/bert-base-arabic-camelbert-msa: reading 6511 train essays
+[12:25:54 +2.6 min] laila encoder train: 400/6511 essays (6%), 2.2 min so far, ~33.2 min left
+[12:28:05 +4.8 min] laila encoder train: 800/6511 essays (12%), 4.3 min so far, ~31.0 min left
+[12:30:14 +6.9 min] laila encoder train: 1200/6511 essays (18%), 6.5 min so far, ~28.8 min left
+[12:32:24 +9.1 min] laila encoder train: 1600/6511 essays (24%), 8.7 min so far, ~26.6 min left
+[12:34:34 +11.2 min] laila encoder train: 2000/6511 essays (30%), 10.8 min so far, ~24.4 min left
+[12:36:43 +13.4 min] laila encoder train: 2400/6511 essays (36%), 13.0 min so far, ~22.3 min left
+[12:38:53 +15.6 min] laila encoder train: 2800/6511 essays (43%), 15.2 min so far, ~20.1 min left
+[12:41:03 +17.7 min] laila encoder train: 3200/6511 essays (49%), 17.3 min so far, ~17.9 min left
+[12:43:12 +19.9 min] laila encoder train: 3600/6511 essays (55%), 19.5 min so far, ~15.7 min left
+[12:45:21 +22.0 min] laila encoder train: 4000/6511 essays (61%), 21.6 min so far, ~13.6 min left
+[12:47:31 +24.2 min] laila encoder train: 4400/6511 essays (67%), 23.8 min so far, ~11.4 min left
+[12:49:40 +26.3 min] laila encoder train: 4800/6511 essays (73%), 25.9 min so far, ~9.2 min left
+[12:51:49 +28.5 min] laila encoder train: 5200/6511 essays (79%), 28.1 min so far, ~7.1 min left
+[12:53:58 +30.7 min] laila encoder train: 5600/6511 essays (86%), 30.2 min so far, ~4.9 min left
+[12:56:07 +32.8 min] laila encoder train: 6000/6511 essays (92%), 32.4 min so far, ~2.8 min left
+[12:58:16 +35.0 min] laila encoder train: 6400/6511 essays (98%), 34.5 min so far, ~0.6 min left
+[12:58:52 +35.6 min] laila encoder train: 6511/6511 essays (100%), 35.1 min so far, ~0.0 min left
+[12:58:52 +35.6 min] laila encoder CAMeL-Lab/bert-base-arabic-camelbert-msa: reading 1348 test essays
+[13:01:01 +37.7 min] laila encoder test: 400/1348 essays (29%), 2.2 min so far, ~5.1 min left
+[13:03:10 +39.9 min] laila encoder test: 800/1348 essays (59%), 4.3 min so far, ~2.9 min left
+[13:05:19 +42.0 min] laila encoder test: 1200/1348 essays (89%), 6.4 min so far, ~0.8 min left
+[13:06:07 +42.8 min] laila encoder test: 1348/1348 essays (100%), 7.2 min so far, ~0.0 min left
+[13:06:16 +43.0 min] laila A_features_ridge relevance: done (1/8)
+[13:06:27 +43.1 min] laila A_features_ridge organization: done (2/8)
+[13:06:36 +43.3 min] laila A_features_ridge vocabulary: done (3/8)
+[13:06:46 +43.4 min] laila A_features_ridge style: done (4/8)
+[13:06:55 +43.6 min] laila A_features_ridge development: done (5/8)
+[13:07:05 +43.8 min] laila A_features_ridge mechanics: done (6/8)
+[13:07:14 +43.9 min] laila A_features_ridge grammar: done (7/8)
+[13:07:24 +44.1 min] laila A_features_ridge holistic: done (8/8)
+laila A_features_ridge {"relevance": {"rmse": 0.482, "qwkNative": 0.489, "enaraExact": 0.832, "enaraWithin1": 0.976, "enaraQwk": 0.489}, "organization": {"rmse": 0.819, "qwkNative": 0.726, "enaraExact": 0.742, "enaraWithin1": 0.996, "enaraQwk": 0.655}, "vocabulary": {"rmse": 0.766, "qwkNative": 0.737, "enaraExact": 0.746, "enaraWithin1": 0.997, "enaraQwk": 0.646}, "style": {"rmse": 0.838, "qwkNative": 0.731, "enaraExact": 0.724, "enaraWithin1": 0.996, "enaraQwk": 0.646}, "development": {"rmse": 0.801, "qwkNative": 0.68, "enaraExact": 0.726, "enaraWithin1": 0.998, "enaraQwk": 0.571}, "mechanics": {"rmse": 0.799, "qwkNative": 0.68, "enaraExact": 0.737, "enaraWithin1": 0.999, "enaraQwk": 0.585}, "grammar": {"rmse": 0.782, "qwkNative": 0.707, "enaraExact": 0.737, "enaraWithin1": 0.998, "enaraQwk": 0.608}, "holistic": {"rmse": 4.541, "qwkNative": 0.765}}
+[13:07:25 +44.1 min] laila B_CAMeL-Lab/bert-base-arabic-camelbert-msa_ridge relevance: done (1/8)
+[13:07:26 +44.1 min] laila B_CAMeL-Lab/bert-base-arabic-camelbert-msa_ridge organization: done (2/8)
+[13:07:27 +44.1 min] laila B_CAMeL-Lab/bert-base-arabic-camelbert-msa_ridge vocabulary: done (3/8)
+[13:07:28 +44.1 min] laila B_CAMeL-Lab/bert-base-arabic-camelbert-msa_ridge style: done (4/8)
+[13:07:28 +44.2 min] laila B_CAMeL-Lab/bert-base-arabic-camelbert-msa_ridge development: done (5/8)
+[13:07:30 +44.2 min] laila B_CAMeL-Lab/bert-base-arabic-camelbert-msa_ridge mechanics: done (6/8)
+[13:07:31 +44.2 min] laila B_CAMeL-Lab/bert-base-arabic-camelbert-msa_ridge grammar: done (7/8)
+[13:07:32 +44.2 min] laila B_CAMeL-Lab/bert-base-arabic-camelbert-msa_ridge holistic: done (8/8)
+laila B_CAMeL-Lab/bert-base-arabic-camelbert-msa_ridge {"relevance": {"rmse": 0.464, "qwkNative": 0.547, "enaraExact": 0.842, "enaraWithin1": 0.977, "enaraQwk": 0.547}, "organization": {"rmse": 0.861, "qwkNative": 0.701, "enaraExact": 0.696, "enaraWithin1": 0.998, "enaraQwk": 0.595}, "vocabulary": {"rmse": 0.812, "qwkNative": 0.717, "enaraExact": 0.699, "enaraWithin1": 0.999, "enaraQwk": 0.581}, "style": {"rmse": 0.867, "qwkNative": 0.716, "enaraExact": 0.688, "enaraWithin1": 0.996, "enaraQwk": 0.612}, "development": {"rmse": 0.821, "qwkNative": 0.681, "enaraExact": 0.7, "enaraWithin1": 0.999, "enaraQwk": 0.525}, "mechanics": {"rmse": 0.815, "qwkNative": 0.676, "enaraExact": 0.727, "enaraWithin1": 0.999, "enaraQwk": 0.549}, "grammar": {"rmse": 0.812, "qwkNative": 0.689, "enaraExact": 0.715, "enaraWithin1": 0.998, "enaraQwk": 0.558}, "holistic": {"rmse": 4.726, "qwkNative": 0.754}}
+[13:07:32 +44.2 min] laila: 200 of the grader-baseline essays are in the test set
+[13:07:32 +44.2 min] done

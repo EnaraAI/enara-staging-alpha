@@ -1,0 +1,294 @@
+{
+ "note": "numbers only; data downloaded at run time; LAILA used for training by owner decision (23 Nov 2026), written confirmation from the authors pending",
+ "datasets": {
+  "laila": {
+   "train": 6511,
+   "test": 1348,
+   "models": {
+    "A_features_ridge": {
+     "relevance": {
+      "alpha": 3,
+      "test": {
+       "rmse": 0.482,
+       "qwkNative": 0.489,
+       "enaraExact": 0.832,
+       "enaraWithin1": 0.976,
+       "enaraQwk": 0.489
+      },
+      "baselineEssays": {
+       "rmse": 0.457,
+       "qwkNative": 0.564,
+       "enaraExact": 0.86,
+       "enaraWithin1": 0.98,
+       "enaraQwk": 0.564
+      },
+      "msPer100Predict": 1.2
+     },
+     "organization": {
+      "alpha": 1,
+      "test": {
+       "rmse": 0.819,
+       "qwkNative": 0.726,
+       "enaraExact": 0.742,
+       "enaraWithin1": 0.996,
+       "enaraQwk": 0.655
+      },
+      "baselineEssays": {
+       "rmse": 0.796,
+       "qwkNative": 0.734,
+       "enaraExact": 0.745,
+       "enaraWithin1": 0.995,
+       "enaraQwk": 0.651
+      },
+      "msPer100Predict": 1.2
+     },
+     "vocabulary": {
+      "alpha": 3,
+      "test": {
+       "rmse": 0.766,
+       "qwkNative": 0.737,
+       "enaraExact": 0.746,
+       "enaraWithin1": 0.997,
+       "enaraQwk": 0.646
+      },
+      "baselineEssays": {
+       "rmse": 0.741,
+       "qwkNative": 0.752,
+       "enaraExact": 0.77,
+       "enaraWithin1": 1.0,
+       "enaraQwk": 0.677
+      },
+      "msPer100Predict": 1.1
+     },
+     "style": {
+      "alpha": 3,
+      "test": {
+       "rmse": 0.838,
+       "qwkNative": 0.731,
+       "enaraExact": 0.724,
+       "enaraWithin1": 0.996,
+       "enaraQwk": 0.646
+      },
+      "baselineEssays": {
+       "rmse": 0.797,
+       "qwkNative": 0.755,
+       "enaraExact": 0.74,
+       "enaraWithin1": 1.0,
+       "enaraQwk": 0.68
+      },
+      "msPer100Predict": 1.1
+     },
+     "development": {
+      "alpha": 3,
+      "test": {
+       "rmse": 0.801,
+       "qwkNative": 0.68,
+       "enaraExact": 0.726,
+       "enaraWithin1": 0.998,
+       "enaraQwk": 0.571
+      },
+      "baselineEssays": {
+       "rmse": 0.684,
+       "qwkNative": 0.741,
+       "enaraExact": 0.765,
+       "enaraWithin1": 1.0,
+       "enaraQwk": 0.616
+      },
+      "msPer100Predict": 1.2
+     },
+     "mechanics": {
+      "alpha": 3,
+      "test": {
+       "rmse": 0.799,
+       "qwkNative": 0.68,
+       "enaraExact": 0.737,
+       "enaraWithin1": 0.999,
+       "enaraQwk": 0.585
+      },
+      "baselineEssays": {
+       "rmse": 0.738,
+       "qwkNative": 0.705,
+       "enaraExact": 0.805,
+       "enaraWithin1": 1.0,
+       "enaraQwk": 0.672
+      },
+      "msPer100Predict": 1.2
+     },
+     "grammar": {
+      "alpha": 3,
+      "test": {
+       "rmse": 0.782,
+       "qwkNative": 0.707,
+       "enaraExact": 0.737,
+       "enaraWithin1": 0.998,
+       "enaraQwk": 0.608
+      },
+      "baselineEssays": {
+       "rmse": 0.731,
+       "qwkNative": 0.738,
+       "enaraExact": 0.74,
+       "enaraWithin1": 1.0,
+       "enaraQwk": 0.618
+      },
+      "msPer100Predict": 1.2
+     },
+     "holistic": {
+      "alpha": 3,
+      "test": {
+       "rmse": 4.541,
+       "qwkNative": 0.765
+      },
+      "baselineEssays": {
+       "rmse": 4.132,
+       "qwkNative": 0.802
+      },
+      "msPer100Predict": 1.1
+     }
+    },
+    "B_CAMeL-Lab/bert-base-arabic-camelbert-msa_ridge": {
+     "relevance": {
+      "alpha": 30,
+      "test": {
+       "rmse": 0.464,
+       "qwkNative": 0.547,
+       "enaraExact": 0.842,
+       "enaraWithin1": 0.977,
+       "enaraQwk": 0.547
+      },
+      "baselineEssays": {
+       "rmse": 0.42,
+       "qwkNative": 0.655,
+       "enaraExact": 0.87,
+       "enaraWithin1": 0.98,
+       "enaraQwk": 0.655
+      },
+      "msPer100Predict": 0.3
+     },
+     "organization": {
+      "alpha": 10,
+      "test": {
+       "rmse": 0.861,
+       "qwkNative": 0.701,
+       "enaraExact": 0.696,
+       "enaraWithin1": 0.998,
+       "enaraQwk": 0.595
+      },
+      "baselineEssays": {
+       "rmse": 0.807,
+       "qwkNative": 0.763,
+       "enaraExact": 0.75,
+       "enaraWithin1": 1.0,
+       "enaraQwk": 0.678
+      },
+      "msPer100Predict": 0.3
+     },
+     "vocabulary": {
+      "alpha": 10,
+      "test": {
+       "rmse": 0.812,
+       "qwkNative": 0.717,
+       "enaraExact": 0.699,
+       "enaraWithin1": 0.999,
+       "enaraQwk": 0.581
+      },
+      "baselineEssays": {
+       "rmse": 0.76,
+       "qwkNative": 0.746,
+       "enaraExact": 0.72,
+       "enaraWithin1": 1.0,
+       "enaraQwk": 0.591
+      },
+      "msPer100Predict": 0.3
+     },
+     "style": {
+      "alpha": 30,
+      "test": {
+       "rmse": 0.867,
+       "qwkNative": 0.716,
+       "enaraExact": 0.688,
+       "enaraWithin1": 0.996,
+       "enaraQwk": 0.612
+      },
+      "baselineEssays": {
+       "rmse": 0.803,
+       "qwkNative": 0.764,
+       "enaraExact": 0.73,
+       "enaraWithin1": 1.0,
+       "enaraQwk": 0.675
+      },
+      "msPer100Predict": 0.3
+     },
+     "development": {
+      "alpha": 30,
+      "test": {
+       "rmse": 0.821,
+       "qwkNative": 0.681,
+       "enaraExact": 0.7,
+       "enaraWithin1": 0.999,
+       "enaraQwk": 0.525
+      },
+      "baselineEssays": {
+       "rmse": 0.698,
+       "qwkNative": 0.761,
+       "enaraExact": 0.74,
+       "enaraWithin1": 1.0,
+       "enaraQwk": 0.578
+      },
+      "msPer100Predict": 0.3
+     },
+     "mechanics": {
+      "alpha": 30,
+      "test": {
+       "rmse": 0.815,
+       "qwkNative": 0.676,
+       "enaraExact": 0.727,
+       "enaraWithin1": 0.999,
+       "enaraQwk": 0.549
+      },
+      "baselineEssays": {
+       "rmse": 0.731,
+       "qwkNative": 0.714,
+       "enaraExact": 0.77,
+       "enaraWithin1": 1.0,
+       "enaraQwk": 0.58
+      },
+      "msPer100Predict": 0.3
+     },
+     "grammar": {
+      "alpha": 30,
+      "test": {
+       "rmse": 0.812,
+       "qwkNative": 0.689,
+       "enaraExact": 0.715,
+       "enaraWithin1": 0.998,
+       "enaraQwk": 0.558
+      },
+      "baselineEssays": {
+       "rmse": 0.752,
+       "qwkNative": 0.734,
+       "enaraExact": 0.72,
+       "enaraWithin1": 1.0,
+       "enaraQwk": 0.576
+      },
+      "msPer100Predict": 0.3
+     },
+     "holistic": {
+      "alpha": 30,
+      "test": {
+       "rmse": 4.726,
+       "qwkNative": 0.754
+      },
+      "baselineEssays": {
+       "rmse": 4.185,
+       "qwkNative": 0.812
+      },
+      "msPer100Predict": 0.3
+     }
+    }
+   },
+   "encoderMsPerEssayCpu": 323.5,
+   "baselineEssaysInTest": 200
+  }
+ },
+ "maxLength": 256
+}
