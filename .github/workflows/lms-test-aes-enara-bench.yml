@@ -1,6 +1,7 @@
 # Evaluation 4.4 (owner, 23 Nov 2026: "Go on evaluation 4.4"): the trained essay scorers and today's DeepSeek grader on ENARA's own
 # language benchmark (data/assessment-bench, synthetic answers in the repo), side by side. No switch, no fine-tuning, nothing stored on lms-test.
 name: lms-test essay scoring on ENARA benchmark
+# Run 2: trained scorers only, encoder threads capped at the job's real CPUs.
 on:
   push:
     branches: ['claude/tutor-lms-dscompare-run']
@@ -40,33 +41,4 @@ jobs:
           git config user.name github-actions && git config user.email github-actions@users.noreply.github.com
           git add -A && git commit -qm "enara bench, trained ${{ matrix.dataset }} ${GITHUB_SHA::8}"
           git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" "$B"
-  deepseek:
-    if: github.repository == 'EnaraAI/enara-staging-alpha'
-    runs-on: ubuntu-latest
-    timeout-minutes: 90
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: 22 }
-      - name: Today's grader (lms-test-live)
-        run: |
-          git fetch -q origin lms-test-live && git worktree add -q live FETCH_HEAD
-          cd live/backend && npm ci --silent
-      - name: Grade ENARA benchmark
-        working-directory: deploy/lms-test/ellipse
-        env:
-          LMSTEST_MAINTENANCE_TOKEN: ${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}
-          LIVE_BACKEND: ${{ github.workspace }}/live/backend
-          BASELINE_CONFIG: '{"datasets":["bench-en","bench-ar"],"concurrency":4}'
-        run: |
-          export TUTOR_LLM_MODEL="$(node -e "const f=require('${{ github.workspace }}/live/deploy/lms-test.flags.json');console.log(f.features.find(x=>x.flags.TUTOR_LLM_MODEL).flags.TUTOR_LLM_MODEL)")"
-          ${{ github.workspace }}/live/backend/node_modules/.bin/tsx baseline.mts 2>&1 | tee run.log
-      - name: Publish (numbers only)
-        if: always()
-        working-directory: deploy/lms-test/ellipse
-        run: |
-          mkdir -p out && cp run.log out/ 2>/dev/null || true
-          cd out && git init -q && git checkout -q -b claude/tutor-lms-aes-enara-ds
-          git config user.name github-actions && git config user.email github-actions@users.noreply.github.com
-          git add -A && git commit -qm "enara bench, DeepSeek ${GITHUB_SHA::8}"
-          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" claude/tutor-lms-aes-enara-ds
+# deepseek job: done in run 45182276974 (claude/tutor-lms-aes-enara-ds); not repeated.
