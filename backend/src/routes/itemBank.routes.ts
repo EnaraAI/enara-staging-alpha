@@ -24,6 +24,11 @@ router.get('/', asyncHandler(async (req: AuthRequest, res: Response) => {
   res.json({ items: await listBank({ schoolId: school(req), status: typeof q.status === 'string' ? q.status : undefined, subject: typeof q.subject === 'string' ? q.subject : undefined, language: typeof q.language === 'string' ? q.language : undefined }) });
 }));
 
+router.get('/stats', asyncHandler(async (req: AuthRequest, res: Response) => {
+  const { bankStats } = await import('../assessment/generate/bank');
+  res.json(await bankStats(school(req)));
+}));
+
 router.post('/generate', asyncHandler(async (req: AuthRequest, res: Response) => {
   const b = ensurePlainObject(req.body); rejectMongoOperators(b);
   const { GEN_DOMAINS, GEN_TYPES } = await import('../assessment/generate/generator');

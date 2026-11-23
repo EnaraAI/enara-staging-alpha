@@ -78,3 +78,34 @@ export async function questionFor(id: string, schoolId: string | null) {
   if (item.review_status !== 'approved') throw new AppError('Only approved items can be added to an assessment', 409, 'ITEM_NOT_APPROVED');
   return { ...questionOf(genOf(item as never), `bank-${item.id.slice(3, 11)}-v${item.version}`), itemId: item.id, itemVersion: item.version };
 }
+
+/** P5: the Item bank card (school view): items by subject, language and status; the judge's pass rate; review reasons; the share of
+ * engine-graded answers flagged for the teacher (last 30 days); the last bench run on this deployment. */
+export async function bankStats(schoolId: string | null) {
+  const latestRows = await BankItem.aggregate([
+    { $match: { $or: [{ school_id: schoolId }, { school_id: null }] } },
+    { $sort: { version: -1 } }, { $group: { _id: '$id', doc: { $first: '$$ROOT' } } }, { $replaceRoot: { newRoot: '$doc' } },
+    { $project: { subject: 1, language: 1, review_status: 1, source: 1, pass: '$judge_report.pass' } },
+  ]);
+  const count = (key: 'subject' | 'language' | 'review_status') => latestRows.reduce((m: Record<string, number>, r: Record<string, string>) => { m[r[key]] = (m[r[key]] ?? 0) + 1; return m; }, {});
+  const judged = latestRows.filter((r: { pass?: boolean }) => typeof r.pass === 'boolean');
+  const reasons = await ReviewDecision.aggregate([{ $match: { school_id: schoolId, decision: 'reject' } }, { $group: { _id: '$reason_code', n: { $sum: 1 } } }]);
+  const { AssessmentAttempt } = await import('../../models/AssessmentAttempt');
+  const since = new Date(Date.now() - 30 * 86_400_000);
+  const flags = schoolId ? await AssessmentAttempt.aggregate([
+    { $match: { institutionId: schoolId, submittedAt: { $gte: since } } },
+    { $unwind: '$answers' },
+    { $match: { 'answers.grader': { $exists: true, $ne: null } } },
+    { $group: { _id: null, n: { $sum: 1 }, flagged: { $sum: { $cond: ['$answers.flagged', 1, 0] } }, byModel: { $sum: { $cond: [{ $regexMatch: { input: { $ifNull: ['$answers.grader', ''] }, regex: '^model:' } }, 1, 0] } } } },
+  ]) : [];
+  const { AssessmentBenchRun } = await import('../../models/AssessmentBenchResult');
+  const bench = await AssessmentBenchRun.findOne({ finishedAt: { $ne: null } }).sort({ finishedAt: -1 }).lean();
+  const f = flags[0] as { n: number; flagged: number; byModel: number } | undefined;
+  return {
+    items: { total: latestRows.length, bySubject: count('subject'), byLanguage: count('language'), byStatus: count('review_status') },
+    judgePassRate: judged.length ? Math.round((judged.filter((r: { pass?: boolean }) => r.pass).length / judged.length) * 1000) / 1000 : null,
+    rejectReasons: Object.fromEntries(reasons.map((r: { _id: string; n: number }) => [r._id, r.n])),
+    grading30d: f ? { answers: f.n, byModel: f.byModel, flagRate: f.n ? Math.round((f.flagged / f.n) * 1000) / 1000 : 0 } : { answers: 0, byModel: 0, flagRate: 0 },
+    lastBench: bench ? { runId: bench.runId, finishedAt: bench.finishedAt, failures: bench.failures ?? [], sets: ((bench.summary ?? []) as { set: string; within1: number; flagRate: number; latencyP50: number; latencyP95: number; n: number }[]).map((s) => ({ set: s.set, within1: s.within1, flagRate: s.flagRate, p50: s.latencyP50, p95: s.latencyP95, n: s.n })) } : null,
+  };
+}
