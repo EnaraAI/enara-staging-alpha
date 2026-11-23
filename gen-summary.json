@@ -1,0 +1,185 @@
+[
+ {
+  "set": "language/en",
+  "n": 10,
+  "schemaOk": 10,
+  "checksOk": 10,
+  "passed": 8,
+  "regenerated": 2,
+  "problems": [
+   {
+    "type": "essay",
+    "problems": [
+     "judge: The task is open-ended with many valid answers, so the 'model answer' cannot serve as an answer key; replace it with a scoring rubric specifying exactly how many past simple verbs (regular vs irregular) earn full credit, and note that a 5-sentence essay is hard to score unambiguously at A2."
+    ]
+   },
+   {
+    "type": "short_answer",
+    "problems": [
+     "judge: The task is open-ended, so the model answer is only one of many valid responses; provide an explicit rubric (e.g., sentence uses at least one correct past simple verb, regular or irregular, and identifies/underlines it) so scoring is defensible, and note that 'underline' cannot be shown in typed short answers—allow identifying the verb another way."
+    ]
+   }
+  ],
+  "judge": "provisional (deepseek-ai/DeepSeek-V4.1-Flash-1017)",
+  "schemaRate": 1,
+  "judgePassRate": 0.8
+ },
+ {
+  "set": "language/ar",
+  "n": 10,
+  "schemaOk": 10,
+  "checksOk": 9,
+  "passed": 8,
+  "regenerated": 3,
+  "problems": [
+   {
+    "type": "fill_blank",
+    "problems": [
+     "the stem gives the answer away"
+    ]
+   },
+   {
+    "type": "short_answer",
+    "problems": [
+     "judge: The stem asks students to classify each imperative verb as ماضٍ/مضارع/أمر, which is trivially answerable (both are أمر) and mixes two tasks; instead ask about the three verb types across a sentence containing all three, and specify that the reformulation need only keep the two actions. The clause 'واذكر حكمه الإعرابي (مبني)' gives away the answer and should be removed or turned into a separate check."
+    ]
+   }
+  ],
+  "judge": "provisional (deepseek-ai/DeepSeek-V4.1-Flash-1017)",
+  "schemaRate": 1,
+  "judgePassRate": 0.8
+ },
+ {
+  "set": "math/en",
+  "n": 10,
+  "schemaOk": 7,
+  "checksOk": 7,
+  "passed": 6,
+  "regenerated": 2,
+  "problems": [
+   {
+    "type": "numeric",
+    "problems": [
+     "schema: item: a non-number key needs accept_equivalent_expression"
+    ]
+   },
+   {
+    "type": "numeric",
+    "problems": [
+     "schema: item: a non-number key needs accept_equivalent_expression"
+    ]
+   },
+   {
+    "type": "numeric",
+    "problems": [
+     "schema: item: a non-number key needs accept_equivalent_expression"
+    ]
+   },
+   {
+    "type": "numeric",
+    "problems": [
+     "judge: The stem is self-contradictory: it asks for a fraction in simplest form but then requires a decimal, and the exact sum 11/12 (0.9166...) is a repeating decimal that cannot be entered exactly. Also, requiring a decimal undercuts the stated objective (fraction addition); rewrite as 'Give your answer as a fraction in its simplest form' with key \"11/12\", and note the answer key's decimal is a rounded value, not exact."
+    ]
+   }
+  ],
+  "judge": "provisional (deepseek-ai/DeepSeek-V4.1-Flash-1017)",
+  "schemaRate": 0.7,
+  "judgePassRate": 0.6
+ },
+ {
+  "set": "math/ar",
+  "n": 10,
+  "schemaOk": 10,
+  "checksOk": 9,
+  "passed": 9,
+  "regenerated": 4,
+  "problems": [
+   {
+    "type": "mcq",
+    "problems": [
+     "options a and b are the same or nearly",
+     "options a and c are the same or nearly",
+     "options a and d are the same or nearly"
+    ]
+   }
+  ],
+  "judge": "provisional (deepseek-ai/DeepSeek-V4.1-Flash-1017)",
+  "schemaRate": 1,
+  "judgePassRate": 0.9
+ },
+ {
+  "set": "science/en",
+  "n": 10,
+  "schemaOk": 10,
+  "checksOk": 10,
+  "passed": 9,
+  "regenerated": 1,
+  "problems": [
+   {
+    "type": "mcq",
+    "problems": [
+     "judge: The science is solid, but the vocabulary (photosynthesis, inputs/outputs) and the abstract 'compared with the same plant' framing may be a stretch for A2/grade 6—consider simpler wording such as 'How does a plant's food-making change...' and keeping 'photosynthesis' defined in the stem."
+    ]
+   }
+  ],
+  "judge": "provisional (deepseek-ai/DeepSeek-V4.1-Flash-1017)",
+  "schemaRate": 1,
+  "judgePassRate": 0.9
+ },
+ {
+  "set": "science/ar",
+  "n": 10,
+  "schemaOk": 10,
+  "checksOk": 10,
+  "passed": 9,
+  "regenerated": 1,
+  "problems": [
+   {
+    "type": "short_answer",
+    "problems": [
+     "judge: المفردات (تماسك القوام، الاتصالُّب) قد تكون دقيقة أكثر من اللازم لمستوى الصف السادس، فبسّط الصياغة واذكر صراحة أن التبريد حالة من التبريد/فقدان الحرارة بدل الخوض في تمييز دقيق بين التصلب والتجمد. أعد صياغة المفتاح بلغة أقرب إلى عمر المتعلم مع الإبقاء على نقاط المحتوى الثلاث."
+    ]
+   }
+  ],
+  "judge": "provisional (deepseek-ai/DeepSeek-V4.1-Flash-1017)",
+  "schemaRate": 1,
+  "judgePassRate": 0.9
+ },
+ {
+  "set": "humanities/en",
+  "n": 10,
+  "schemaOk": 10,
+  "checksOk": 10,
+  "passed": 8,
+  "regenerated": 6,
+  "problems": [
+   {
+    "type": "mcq",
+    "problems": [
+     "judge: The stem says \"According to the source,\" but no source is provided, so the item cannot test source-based explanation; include the source text or reference, and ensure distractors (b, c) are clearly unsupported by it."
+    ]
+   },
+   {
+    "type": "true_false",
+    "problems": [
+     "judge: The item tests a fact about the Suez Canal but does not use or interpret a source, so it doesn't meet the stated objective of explaining importance from a source; rewrite it to refer to a short source excerpt (e.g. quote or map) that students must use. Also tighten the wording, e.g. 'Because the Suez Canal links the Mediterranean Sea and the Red Sea, ships travelling between Europe and Asia save time and money.'"
+    ]
+   }
+  ],
+  "judge": "provisional (deepseek-ai/DeepSeek-V4.1-Flash-1017)",
+  "schemaRate": 1,
+  "judgePassRate": 0.8
+ },
+ {
+  "set": "humanities/ar",
+  "n": 10,
+  "schemaOk": 10,
+  "checksOk": 10,
+  "passed": 10,
+  "regenerated": 2,
+  "problems": [],
+  "judge": "provisional (deepseek-ai/DeepSeek-V4.1-Flash-1017)",
+  "schemaRate": 1,
+  "judgePassRate": 1
+ }
+]
