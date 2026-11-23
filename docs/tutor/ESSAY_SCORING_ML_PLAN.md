@@ -2,11 +2,11 @@
 
 _23 Nov 2026. lms-test only. No product code changed. No secrets asked for or printed. Essays are downloaded at run time on GitHub runners and never written to the repo, the results or the logs: only numbers are published._
 
-> **Status:** baseline done; training run in progress ([run 45137743990](https://github.com/EnaraAI/enara-staging-alpha/actions/runs/45137743990)). §3 is filled in when it finishes. **The trained model replaces nothing until it matches or beats today's grader, and after your go.**
+> **Status (3:10 PM Cairo):** baseline and training done. **Our trained model beats today's grader on every criterion in both languages**, on the same 200 essays per language (§3). **It replaces nothing until it is checked on ENARA's own answers and you say go.**
 
 ## In three lines
 1. **Today's grader (DeepSeek) is much harsher than human markers on grammar and spelling/punctuation** in both English and Arabic; its agreement with people per criterion is weak (QWK 0.09–0.32), except Arabic organisation and vocabulary (0.62 / 0.49).
-2. **We are training our own scorer** on ~10,400 human-scored essays (English ELLIPSE, Arabic LAILA) and testing it on essays it never saw, including the same 200 per language.
+2. **Our own trained model beats it everywhere:** on the same 200 essays per language it matches the human markers 65–87% of the time (today's grader 24–68%), at 0.1–0.3 s per essay with no model calls.
 3. **Licences:** ELLIPSE allows commercial use; LAILA does not (used by your decision, the authors' written OK pending); QAES, AR-AES and laila-baselines are not usable today.
 
 ## 1. Licences
@@ -46,7 +46,29 @@ _23 Nov 2026. lms-test only. No product code changed. No secrets asked for or pr
 **Reading:** the grader is close on structure but scores grammar and mechanics about half a point too low out of 2. Part of this is our rubric being stricter than these datasets' markers (and their learners are older), so the gap is partly calibration, not only error.
 
 ## 3. Training results
-_Pending: filled in from `claude/tutor-lms-aes-results` when the run finishes._
+Fast run: the language models read the first 256 tokens of each essay, English and Arabic as parallel jobs on GitHub CPUs (English 15 min, Arabic 45 min). Runs [45167740391](https://github.com/EnaraAI/enara-staging-alpha/actions/runs/45167740391) (English) and [45173613828](https://github.com/EnaraAI/enara-staging-alpha/actions/runs/45173613828) (Arabic). The slower 512-token run was stopped at 2:27 PM without results.
+
+![Results](assessment-engine/aes/essay-scoring-results.png)
+
+**Same 200 essays as today's grader**: "same score" = exact match with the human marker on the 0–2 scale; QWK = agreement beyond chance.
+
+| Language | Criterion | Today's grader: same / QWK | Ours: same / QWK | Best model |
+|---|---|---|---|---|
+| English | Grammar | 0.47 / 0.20 | **0.68 / 0.60** | B (DeBERTa) |
+| English | Vocabulary | 0.60 / 0.24 | **0.69 / 0.43** | B (DeBERTa) |
+| English | Organisation | 0.47 / 0.32 | **0.65 / 0.45** | B (DeBERTa) |
+| English | Spelling/punctuation | 0.38 / 0.11 | **0.70 / 0.54** | B (DeBERTa) |
+| Arabic | Task completion | 0.43 / 0.28 | **0.87 / 0.66** | B (CAMeLBERT) |
+| Arabic | Grammar | 0.31 / 0.13 | **0.74 / 0.62** | A (text patterns) |
+| Arabic | Vocabulary | 0.67 / 0.49 | **0.77 / 0.68** | A (text patterns) |
+| Arabic | Organisation | 0.68 / 0.62 | **0.75 / 0.68** | B (CAMeLBERT) |
+| Arabic | Spelling/punctuation | 0.25 / 0.09 | **0.81 / 0.67** | A (text patterns) |
+
+- **All held-out essays** (English 2,571, Arabic 1,348) give the same picture: QWK 0.48–0.62 (English, B) and 0.59–0.66 (Arabic, A); on the native 1–5 / 0–5 scales 0.61–0.77. English detail: `ESSAY_SCORING_ENGLISH_RESULTS.md`.
+- **Arabic:** the simple text-pattern model is as good as or better than CAMeLBERT on most traits, and needs no language model at all (< 1 ms per essay).
+- **Speed:** ours 0.13 s (English) / 0.32 s (Arabic, CAMeLBERT) / < 1 ms (text patterns) per essay on CPU; today's grader 3.7 s / 5.2 s and 2 DeepSeek calls.
+- **Bug found and fixed:** LAILA ids start with zeros and were first read as numbers, so the 200 baseline essays were not held out. The Arabic run was repeated with the fix; the numbers above are from the corrected run.
+- **Read with care:** ours learned these markers' scale; today's grader follows ENARA's stricter rubric. Neither dataset is our learners. See §4.5.
 
 ## 4. Plan
 
