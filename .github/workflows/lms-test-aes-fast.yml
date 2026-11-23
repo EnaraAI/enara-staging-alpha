@@ -1,0 +1,40 @@
+# Fast essay-scoring run (owner, 23 Nov 2026: "start the fast run"). Same train.py, encoders read the first 256 tokens,
+# English and Arabic in parallel jobs. CPU, no secrets. Numbers only, to claude/tutor-lms-aes-fast-<dataset>.
+name: lms-test essay scoring training (fast)
+on:
+  push:
+    branches: ['claude/tutor-lms-dscompare-run']
+    paths: ['.github/workflows/lms-test-aes-fast.yml']
+permissions:
+  contents: write
+jobs:
+  train:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    strategy:
+      fail-fast: false
+      matrix:
+        dataset: [ellipse, laila]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - name: Libraries
+        run: |
+          pip install -q torch --index-url https://download.pytorch.org/whl/cpu
+          pip install -q numpy pandas scipy scikit-learn transformers sentencepiece protobuf tiktoken
+      - name: Train and evaluate
+        working-directory: deploy/lms-test/aes
+        env: { HF_HUB_DISABLE_PROGRESS_BARS: '1', TRANSFORMERS_VERBOSITY: error, AES_MAX_LEN: '256', AES_DATASETS: '${{ matrix.dataset }}' }
+        run: python train.py 2>&1 | tee train.log
+      - name: Publish (numbers only)
+        if: always()
+        working-directory: deploy/lms-test/aes
+        run: |
+          B=claude/tutor-lms-aes-fast-${{ matrix.dataset }}
+          mkdir -p results && cp train.log results/ 2>/dev/null || true
+          cd results && git init -q && git checkout -q -b "$B"
+          git config user.name github-actions && git config user.email github-actions@users.noreply.github.com
+          git add -A && git commit -qm "essay scoring fast ${{ matrix.dataset }} ${GITHUB_SHA::8}"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" "$B"
