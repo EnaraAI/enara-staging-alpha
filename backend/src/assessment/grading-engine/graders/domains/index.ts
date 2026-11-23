@@ -19,6 +19,7 @@ import type { RulesResult } from '../../rules';
 
 // engine-v2 (P2b bench, 22 Nov 2026): level anchors for language (the model kept to the middle level: too kind to weak answers,
 // too strict with good ones; Arabic colloquial passed as MSA).
+// engine-v3c (owner, 23 Nov 2026): an Arabic answer written mostly in colloquial gets the lowest grammar level, even when clear.
 // engine-v3 (owner, 23 Nov 2026: adopt the human markers' scale of ELLIPSE / LAILA): grammar and spelling are judged by whether the
 // meaning stays clear, not by counting errors; organisation's top level needs developed ideas; task completion's top level is the main point.
 const SPOKEN_DROPPED = ['spelling', 'punctuation', 'capitalisation', 'hamza_spelling'];
@@ -28,7 +29,7 @@ export const SPOKEN_NOTE =
   'letters or how words are written, and do not penalise transcription artifacts (missing punctuation, fillers such as um, false starts, ' +
   'repeated words, homophones, run-on sentences). Never judge pronunciation, accent, intonation or the sound of the speech: there is no ' +
   'audio evidence, only the transcript. Judge what the learner said: task completion, grammar, vocabulary and how ideas are organised. ';
-export const PROMPT_VERSION = 'engine-v3b';
+export const PROMPT_VERSION = 'engine-v3c';
 export const ERROR_CODES: Record<'language' | 'math' | 'science' | 'humanities' | 'listening', string[]> = {
   language: [
     // English
@@ -59,7 +60,8 @@ const SYSTEM: Record<'language' | 'math' | 'science' | 'humanities' | 'listening
     'list of ideas joined only by and/then (و، ثم); the top level when the ideas follow a clear order with varied linking words and each ' +
     'idea is developed, even without a formal conclusion. task_completion: the top level when the main point of the task is answered, ' +
     'even if one detail is thin; the middle level when only part of the task is answered; the lowest level when it is off the task. ' +
-    (itemLang === 'Arabic' ? 'In Arabic, Egyptian colloquial words or structures used instead of Modern Standard Arabic (e.g. بحب، عشان، مش، هنروح) count as grammar errors. ' : '') +
+    (itemLang === 'Arabic' ? 'In Arabic, Egyptian colloquial words or structures used instead of Modern Standard Arabic (e.g. بحب، عشان، مش، هنروح) count as grammar errors. ' +
+      'An answer written mostly in colloquial gets the lowest grammar_accuracy level even when it is easy to understand; one or two colloquial words in an otherwise Modern Standard Arabic answer do not by themselves lower a two-level (0 or 1) grammar score. ' : '') +
     'A very short answer is scored on what it shows: the little it contains cannot earn the top level for range or organisation. ' +
     'For each criterion choose exactly one level id. For every level above zero points, quote at least one short exact phrase from the answer as evidence (copy it exactly). ' +
     `errorCodes: the language errors you see, only from this list: ${ERROR_CODES.language.join(', ')}. ` +
