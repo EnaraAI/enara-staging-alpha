@@ -64,7 +64,7 @@ Fast run: the language models read the first 256 tokens of each essay, English a
 | Arabic | Organisation | 0.68 / 0.62 | **0.75 / 0.68** | B (CAMeLBERT) |
 | Arabic | Spelling/punctuation | 0.25 / 0.09 | **0.81 / 0.67** | A (text patterns) |
 
-- **All held-out essays** (English 2,571, Arabic 1,348) give the same picture: QWK 0.48–0.62 (English, B) and 0.59–0.66 (Arabic, A); on the native 1–5 / 0–5 scales 0.61–0.77. English detail: `ESSAY_SCORING_ENGLISH_RESULTS.md`.
+- **All held-out essays** (English 2,571, Arabic 1,348) give the same picture: QWK 0.48–0.62 (English, B) and 0.49–0.66 (Arabic, A). English detail: `ESSAY_SCORING_ENGLISH_RESULTS.md`.
 - **Arabic:** the simple text-pattern model is as good as or better than CAMeLBERT on most traits, and needs no language model at all (< 1 ms per essay).
 - **Speed:** ours 0.13 s (English) / 0.32 s (Arabic, CAMeLBERT) / < 1 ms (text patterns) per essay on CPU; today's grader 3.7 s / 5.2 s and 2 DeepSeek calls.
 - **Bug found and fixed:** LAILA ids start with zeros and were first read as numbers, so the 200 baseline essays were not held out. The Arabic run was repeated with the fix; the numbers above are from the corrected run.
