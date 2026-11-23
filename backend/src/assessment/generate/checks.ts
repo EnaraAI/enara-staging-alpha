@@ -7,7 +7,7 @@ import { checkEngineQuestion } from '../questionBridge';
 import { editDistance, normalizeAnswer, scriptOf } from '../text/ar';
 
 export interface GenItem {
-  type: string; domain?: string; language: 'ar' | 'en'; stem: string; options?: unknown; answer_key: unknown; difficulty: number;
+  type: string; domain?: string; subject?: string; language: 'ar' | 'en'; stem: string; options?: unknown; answer_key: unknown; difficulty: number;
   objective_code: string; source?: string; flags?: Record<string, boolean>; level?: string;
 }
 
@@ -46,9 +46,11 @@ export function checkGenerated(item: GenItem, ctx: { recentStems?: string[]; kid
     const key = item.answer_key as { correct?: string[]; multi?: boolean };
     if (opts.length < 3 || opts.length > 5) p.push('a choice item needs 3-5 options');
     if (!key.multi && key.correct?.length !== 1) p.push('a single-answer choice item needs exactly one correct option');
+    // Language items: distractors one letter apart are the point (go / goes / went), so only exact repeats are refused there.
+    const near = item.domain !== 'language' && item.subject !== 'language';
     for (let i = 0; i < opts.length; i++) for (let j = i + 1; j < opts.length; j++) {
       const a = normalizeAnswer(opts[i].text); const b = normalizeAnswer(opts[j].text);
-      if (a === b || (a.length > 4 && editDistance(a, b) <= 1)) p.push(`options ${opts[i].id} and ${opts[j].id} are the same or nearly`);
+      if (a === b || (near && a.length > 4 && editDistance(a, b) <= 1)) p.push(`options ${opts[i].id} and ${opts[j].id} are the same or nearly`);
     }
     const right = opts.filter((o) => key.correct?.includes(o.id)).map((o) => normalizeAnswer(o.text));
     if (right.some((r) => r.length >= 4 && normalizeAnswer(item.stem).includes(r))) p.push('the stem gives the answer away');

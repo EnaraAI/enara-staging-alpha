@@ -19,6 +19,7 @@ vi.mock('../../src/models/BankItem', () => ({ BankItem: { find: () => ({ select:
 const { checkGenerated, similarity } = await import('../../src/assessment/generate/checks');
 const { judgePass } = await import('../../src/assessment/generate/judge');
 const { runGeneration } = await import('../../src/assessment/generate/pipeline');
+const { tidyKey } = await import('../../src/assessment/generate/generator');
 
 const mcq = (over: Record<string, unknown> = {}) => ({
   type: 'mcq', language: 'en' as const, stem: 'Which word is a verb?', difficulty: 2, objective_code: 'EN-A2-GR-1',
@@ -57,6 +58,21 @@ describe('code checks', () => {
     expect(judgePass(all5)).toBe(true);
     expect(judgePass({ ...all5, clarity: 3 })).toBe(false);
     expect(judgePass({ ...all5, safety: 4 })).toBe(false);
+  });
+});
+
+describe('generation bench findings (23 Nov 2026)', () => {
+  it('open keys are tidied to what the subject allows', () => {
+    expect(tidyKey('language', 'essay', { model_answer: 'x', content_points: ['a'], rubric: {} })).toEqual({ model_answer: 'x' });
+    expect(tidyKey('science', 'short_answer', { required_points: ['a', 'b'] })).toEqual({ content_points: ['a', 'b'] });
+    expect(tidyKey('humanities', 'essay', { points: ['a'], model_answer: 'm' })).toEqual({ required_points: ['a'], model_answer: 'm' });
+    expect(tidyKey('language', 'mcq', { correct: ['a'], multi: false })).toEqual({ correct: ['a'], multi: false });
+  });
+  it('language choice items may have options one letter apart (go / goes); other subjects may not', () => {
+    const verbs = { options: [{ id: 'a', text: 'walks' }, { id: 'b', text: 'walk' }, { id: 'c', text: 'walked' }], answer_key: { correct: ['c'], multi: false } };
+    expect(checkGenerated(mcq({ ...verbs, subject: 'language' })).join()).not.toMatch(/nearly/);
+    expect(checkGenerated(mcq({ ...verbs, subject: 'science' })).join()).toMatch(/nearly/);
+    expect(checkGenerated(mcq({ options: [{ id: 'a', text: 'walk' }, { id: 'b', text: 'Walk' }, { id: 'c', text: 'run' }], subject: 'language' })).join()).toMatch(/same/);
   });
 });
 

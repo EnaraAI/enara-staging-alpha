@@ -394,13 +394,13 @@ router.post('/assessment-bench', async (req, res, next) => {
 // schema, the code checks and the judge (judge: provisional, same provider). No fallback provider.
 router.post('/assessment-gen-bench', async (req, res, next) => {
   try {
-    const b = (req.body ?? {}) as { domain?: string; lang?: string; count?: number; level?: string; objective?: string; source?: string; types?: string[] };
+    const b = (req.body ?? {}) as { domain?: string; lang?: string; count?: number; level?: string; objective?: string; objectiveTitle?: string; source?: string; types?: string[] };
     const { GEN_DOMAINS, GEN_TYPES } = await import('../assessment/generate/generator');
     const domain = String(b.domain) as (typeof GEN_DOMAINS)[number];
     if (!(GEN_DOMAINS as readonly string[]).includes(domain) || !['en', 'ar'].includes(String(b.lang))) { res.status(400).json({ error: 'domain language|math|science|humanities and lang en|ar' }); return; }
     const { runGeneration } = await import('../assessment/generate/pipeline');
     const t0 = Date.now();
-    const out = await runGeneration({ domain, language: b.lang as 'en' | 'ar', level: b.level ?? 'grade 6', objective_code: b.objective ?? `${domain}-bench`, types: (b.types ?? GEN_TYPES[domain]).filter((t) => GEN_TYPES[domain].includes(t)), count: Math.min(5, Number(b.count) || 5), difficulty: [2, 3], source_text: b.source }, { teacherId: 'bench', schoolId: null, store: false, deadlineMs: 45_000 });
+    const out = await runGeneration({ domain, language: b.lang as 'en' | 'ar', level: b.level ?? 'grade 6', objective_code: b.objective ?? `${domain}-bench`, objective_title: b.objectiveTitle, types: (b.types ?? GEN_TYPES[domain]).filter((t) => GEN_TYPES[domain].includes(t)), count: Math.min(5, Number(b.count) || 5), difficulty: [2, 3], source_text: b.source }, { teacherId: 'bench', schoolId: null, store: false, deadlineMs: 45_000 });
     const n = out.length;
     const schemaOk = out.filter((o) => !o.problems.some((x) => x.startsWith('schema:'))).length;
     const checksOk = out.filter((o) => !o.problems.some((x) => !x.startsWith('judge:'))).length;
