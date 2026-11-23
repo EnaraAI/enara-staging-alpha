@@ -1,5 +1,7 @@
 # Code grader and speaking: what was done and what it changes
 
+> **Update, 23 Nov 2026:** the programming-question grader (§1) was a misunderstanding; the owner did not ask for it. **`assessCode` is switched OFF** on lms-test and in E2E, and nothing more will be built on it. Speaking (§2) stays.
+
 _23 Nov 2026. lms-test only; test.enara.app untouched. Your decisions this morning: "Run the code grader here" (in a sandbox inside lms-test) and "yes to speaking"._
 
 ## In three lines
