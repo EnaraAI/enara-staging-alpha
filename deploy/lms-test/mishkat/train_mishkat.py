@@ -139,8 +139,19 @@ def stats(p, g, k):
 log(f'{LANG}: encoder {ENC}, max {MAXLEN} tokens, stage-1 sample {PRE_N}')
 pre_texts, pre_Y = stage1(); log(f'stage 1 data: {len(pre_texts)} essays')
 rows, n_corr = enara(); log(f'ENARA model-marked: {len(rows)} labelled answers, owner corrections applied: {n_corr}')
-Xpre = X_of(pre_texts, 'stage-1 essays')
-Xen = X_of([r['answer'] for r in rows], 'ENARA answers')
+# Cache of the slow part (encoder + features), keyed by the workflow on the data and this feature version; a later crash or a retrain
+# after owner corrections reuses it. Labels are not cached (corrections must always apply).
+CACHE = os.environ.get('MK_CACHE', 'cache'); os.makedirs(CACHE, exist_ok=True)
+def cached(name, texts, part):
+    f = f'{CACHE}/{LANG}-{name}.npz'
+    if os.path.exists(f):
+        d = np.load(f, allow_pickle=True)
+        if list(d['keys']) == [str(hash_t(t)) for t in texts]: log(f'{part}: from cache'); return d['X']
+    X = X_of(texts, part); np.savez(f, X=X, keys=np.array([str(hash_t(t)) for t in texts])); return X
+import hashlib
+def hash_t(t): return hashlib.sha1(t.encode('utf-8')).hexdigest()[:16]
+Xpre = cached('stage1', pre_texts, 'stage-1 essays')
+Xen = cached('enara', [r['answer'] for r in rows], 'ENARA answers')
 mu, sd = np.vstack([Xpre, Xen]).mean(0), np.vstack([Xpre, Xen]).std(0) + 1e-6
 Z = lambda X: ((X - mu) / sd).astype(np.float32)
 Xpre, Xen = Z(Xpre), Z(Xen)
@@ -157,7 +168,6 @@ for typ in ['essay', 'short_answer']:
     test_g = set(groups[:max(1, len(groups) // 5)]); val_g = set(groups[len(test_g):len(test_g) + max(1, len(groups) // 8)])
     sel = lambda gs: [i for i, r in enumerate(rows) if r['type'] == typ and r['group'] in gs]
     te, va = sel(test_g), sel(val_g); tr = [i for i, r in enumerate(rows) if r['type'] == typ and r['group'] not in test_g | val_g]
-    Yen = np.array([[rows[i]['label'][c] for c in crit] for i in range(len(rows))], dtype=object)
     Y_of = lambda idx: np.array([[rows[i]['label'][c] for c in crit] for i in idx], dtype=np.float32)
     d = Xpre.shape[1]
     torch.manual_seed(SEED); s1 = fit(Head(d, len(crit)), Xpre, Ypre, 15, 1e-3)

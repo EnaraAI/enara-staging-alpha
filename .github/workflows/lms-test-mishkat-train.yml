@@ -31,6 +31,11 @@ jobs:
         run: |
           pip install -q torch --index-url https://download.pytorch.org/whl/cpu
           pip install -q numpy pandas scipy transformers sentencepiece protobuf tiktoken
+      - name: Feature cache (encoder readings; feature version v1)
+        uses: actions/cache@v4
+        with:
+          path: deploy/lms-test/mishkat/cache
+          key: mishkat-feat-v1-${{ matrix.lang }}-${{ hashFiles('mk/data/mishkat-dev/pool-*.json') }}
       - name: Train and evaluate
         working-directory: deploy/lms-test/mishkat
         env: { HF_HUB_DISABLE_PROGRESS_BARS: '1', TRANSFORMERS_VERBOSITY: error, MK_LANG: '${{ matrix.lang }}', MK_DATA: '${{ github.workspace }}/mk/data/mishkat-dev' }
