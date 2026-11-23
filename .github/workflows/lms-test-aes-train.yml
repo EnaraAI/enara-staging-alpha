@@ -1,0 +1,36 @@
+# Essay trait scoring training and evaluation (owner, 23 Nov 2026: train now on LAILA + ELLIPSE). CPU, no secrets.
+# Data is downloaded at run time from the official repositories; only numbers are published (claude/tutor-lms-aes-results).
+name: lms-test essay scoring training
+on:
+  push:
+    branches: ['claude/tutor-lms-dscompare-run']
+    paths: ['deploy/lms-test/aes/**', '.github/workflows/lms-test-aes-train.yml']
+permissions:
+  contents: write
+jobs:
+  train:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - name: Libraries
+        run: |
+          pip install -q torch --index-url https://download.pytorch.org/whl/cpu
+          pip install -q numpy pandas scipy scikit-learn transformers sentencepiece protobuf tiktoken
+        run: git fetch -q origin claude/tutor-lms-ellipse-results && git show FETCH_HEAD:summary.json > baseline_summary.json || echo '{}' > baseline_summary.json
+      - name: Train and evaluate
+        working-directory: deploy/lms-test/aes
+        env: { HF_HUB_DISABLE_PROGRESS_BARS: '1', TRANSFORMERS_VERBOSITY: error }
+        run: python train.py 2>&1 | tee train.log
+      - name: Publish (numbers only)
+        if: always()
+        working-directory: deploy/lms-test/aes
+        run: |
+          mkdir -p results && cp train.log results/ 2>/dev/null || true
+          cd results && git init -q && git checkout -q -b claude/tutor-lms-aes-results
+          git config user.name github-actions && git config user.email github-actions@users.noreply.github.com
+          git add -A && git commit -qm "essay scoring ${GITHUB_SHA::8}"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" claude/tutor-lms-aes-results
