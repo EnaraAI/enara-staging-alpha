@@ -67,6 +67,10 @@ describe('generation bench findings (23 Nov 2026)', () => {
     expect(tidyKey('science', 'short_answer', { required_points: ['a', 'b'] })).toEqual({ content_points: ['a', 'b'] });
     expect(tidyKey('humanities', 'essay', { points: ['a'], model_answer: 'm' })).toEqual({ required_points: ['a'], model_answer: 'm' });
     expect(tidyKey('language', 'mcq', { correct: ['a'], multi: false })).toEqual({ correct: ['a'], multi: false });
+    // Fractions as text (maths, bench run 2): an expression key; plain numbers unchanged.
+    expect(tidyKey('math', 'numeric', { value: '11/12' })).toEqual({ value: '11/12', accept_equivalent_expression: true });
+    expect(tidyKey('math', 'numeric', { value: 24, unit: 'cm^2' })).toEqual({ value: 24, unit: 'cm^2' });
+    expect(checkGenerated({ type: 'numeric', language: 'en', stem: 'What is 3/4 + 1/6? Give a fraction in simplest form.', difficulty: 2, objective_code: 'MA-6', answer_key: tidyKey('math', 'numeric', { value: '11/12' }) })).toEqual([]);
   });
   it('language choice items may have options one letter apart (go / goes); other subjects may not', () => {
     const verbs = { options: [{ id: 'a', text: 'walks' }, { id: 'b', text: 'walk' }, { id: 'c', text: 'walked' }], answer_key: { correct: ['c'], multi: false } };
