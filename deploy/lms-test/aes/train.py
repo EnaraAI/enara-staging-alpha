@@ -15,6 +15,10 @@ cfg = json.load(open('config.json'))
 rng = random.Random(cfg['seed'])
 summary = {'note': 'numbers only; data downloaded at run time; LAILA used for training by owner decision (23 Nov 2026), written confirmation from the authors pending', 'datasets': {}}
 
+T0 = time.time()
+def log(*a):  # progress lines: counts and timings only, never essay text
+    print(f"[{time.strftime('%H:%M:%S')} +{(time.time() - T0) / 60:.1f} min]", *a, flush=True)
+
 def sh(cmd): subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 # ---------- data ----------
@@ -90,15 +94,20 @@ def model_B(tr, te, name):
     import torch
     from transformers import AutoTokenizer, AutoModel
     tok = AutoTokenizer.from_pretrained(name); enc = AutoModel.from_pretrained(name).eval(); torch.set_num_threads(os.cpu_count() or 4)
-    def emb(texts):
-        out = []
+    def emb(texts, part):
+        out = []; t1 = time.time(); n = len(texts); every = 25
+        log(f'{LABEL} encoder {name}: reading {n} {part} essays')
         with torch.no_grad():
             for i in range(0, len(texts), 16):
                 b = tok(list(texts[i:i + 16]), truncation=True, max_length=512, padding=True, return_tensors='pt')
                 h = enc(**b).last_hidden_state; m = b['attention_mask'].unsqueeze(-1).float()
                 out.append(((h * m).sum(1) / m.sum(1)).numpy())
+                done = min(i + 16, n); b_i = i // 16 + 1
+                if b_i % every == 0 or done == n:
+                    el = time.time() - t1; left = el / done * (n - done)
+                    log(f'{LABEL} encoder {part}: {done}/{n} essays ({100 * done // n}%), {el / 60:.1f} min so far, ~{left / 60:.1f} min left')
         return np.vstack(out)
-    t0 = time.time(); Etr = emb(tr.text.tolist()); Ete = emb(te.text.tolist())
+    t0 = time.time(); Etr = emb(tr.text.tolist(), 'train'); Ete = emb(te.text.tolist(), 'test')
     return Etr, Ete, round((time.time() - t0) / (len(tr) + len(te)) * 1000, 1)
 
 def baseline_now(need):
@@ -113,14 +122,19 @@ def baseline_now(need):
 for ds in ['ellipse', 'laila']:
     baseline = baseline_now('laila' if ds == 'laila' else None)
     base_ids = [str(x) for x in (baseline.get('results', {}).get('laila', {}).get('sampledIds') or [])]
+    LABEL = ds
+    log(f'{ds}: loading data')
     tr, te, traits, lang = ellipse() if ds == 'ellipse' else laila(base_ids)
+    log(f'{ds}: {len(tr)} train / {len(te)} test essays, {len(traits)} traits')
     res = {'train': int(len(tr)), 'test': int(len(te)), 'models': {}}
+    log(f'{ds}: model A (text features) building')
     feats = {'A_features_ridge': model_A(tr, te)}
+    log(f'{ds}: model A features ready')
     enc_name = cfg['encoders'][lang]
     try:
         Etr, Ete, ms = model_B(tr, te, enc_name); feats[f'B_{enc_name}_ridge'] = (Etr, Ete); res['encoderMsPerEssayCpu'] = ms
     except Exception as e:
-        res['encoderError'] = str(e)[:200]
+        res['encoderError'] = str(e)[:200]; log(f'{ds}: encoder failed: {type(e).__name__}')
     bid = set(base_ids) if ds == 'laila' else set(str(x) for x in (baseline.get('results', {}).get('ellipse', {}).get('sampledIds') or []))
     mask_base = te['id'].astype(str).isin(bid).values
     for mname, (Xtr, Xte) in feats.items():
@@ -135,6 +149,7 @@ for ds in ['ellipse', 'laila']:
                 if best is None or e < best[0]: best = (e, alpha)
             r = Ridge(alpha=best[1]).fit(Xtr, y_tr); p = r.predict(Xte)
             per[t] = {'alpha': best[1], 'test': metrics(ds, t, y_te, p)}
+            log(f'{ds} {mname} {t}: done ({traits.index(t) + 1}/{len(traits)})')
             if mask_base.any(): per[t]['baselineEssays'] = metrics(ds, t, y_te[mask_base], p[mask_base])
             t0 = time.time(); r.predict(Xte[:100]); per[t]['msPer100Predict'] = round((time.time() - t0) * 1000, 1)
         res['models'][mname] = per
@@ -142,4 +157,4 @@ for ds in ['ellipse', 'laila']:
     res['baselineEssaysInTest'] = int(mask_base.sum())
     summary['datasets'][ds] = res
 json.dump(summary, open(f'{OUT}/summary.json', 'w'), indent=1)
-print('done')
+log('done')
