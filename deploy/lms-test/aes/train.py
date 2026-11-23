@@ -12,6 +12,8 @@ from scipy.sparse import hstack, csr_matrix
 
 OUT = 'results'; os.makedirs(OUT, exist_ok=True); os.makedirs('models', exist_ok=True)
 cfg = json.load(open('config.json'))
+MAX_LEN = int(os.environ.get('AES_MAX_LEN', '512'))  # fast run: 256
+DATASETS = [d for d in os.environ.get('AES_DATASETS', 'ellipse,laila').split(',') if d]
 rng = random.Random(cfg['seed'])
 summary = {'note': 'numbers only; data downloaded at run time; LAILA used for training by owner decision (23 Nov 2026), written confirmation from the authors pending', 'datasets': {}}
 
@@ -99,7 +101,7 @@ def model_B(tr, te, name):
         log(f'{LABEL} encoder {name}: reading {n} {part} essays')
         with torch.no_grad():
             for i in range(0, len(texts), 16):
-                b = tok(list(texts[i:i + 16]), truncation=True, max_length=512, padding=True, return_tensors='pt')
+                b = tok(list(texts[i:i + 16]), truncation=True, max_length=MAX_LEN, padding=True, return_tensors='pt')
                 h = enc(**b).last_hidden_state; m = b['attention_mask'].unsqueeze(-1).float()
                 out.append(((h * m).sum(1) / m.sum(1)).numpy())
                 done = min(i + 16, n); b_i = i // 16 + 1
@@ -119,7 +121,8 @@ def baseline_now(need):
         if not need or (b.get('results', {}).get(need, {}).get('sampledIds')): return b
         print('waiting for the grader baseline ids', need, flush=True); time.sleep(120)
     raise SystemExit('baseline ids not available')
-for ds in ['ellipse', 'laila']:
+summary['maxLength'] = MAX_LEN
+for ds in DATASETS:
     baseline = baseline_now('laila' if ds == 'laila' else None)
     base_ids = [str(x) for x in (baseline.get('results', {}).get('laila', {}).get('sampledIds') or [])]
     LABEL = ds
