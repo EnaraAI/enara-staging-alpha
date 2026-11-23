@@ -1,0 +1,52 @@
+[13:47:40 +0.0 min] laila: loading data
+[13:47:45 +0.1 min] laila: 6511 train / 1348 test essays, 8 traits
+[13:47:45 +0.1 min] laila: model A (text features) building
+[13:47:45 +0.1 min] laila: will also score 90 ENARA benchmark answers (ar)
+[13:47:56 +0.3 min] laila: model A features ready
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[13:48:05 +0.4 min] encoder threads: 4 (cpu_count 4, usable 4)
+[13:48:05 +0.4 min] laila encoder CAMeL-Lab/bert-base-arabic-camelbert-msa: reading 6511 train essays
+[13:49:13 +1.6 min] laila encoder train: 400/6511 essays (6%), 1.1 min so far, ~17.4 min left
+[13:50:22 +2.7 min] laila encoder train: 800/6511 essays (12%), 2.3 min so far, ~16.3 min left
+[13:51:31 +3.9 min] laila encoder train: 1200/6511 essays (18%), 3.4 min so far, ~15.2 min left
+[13:52:39 +5.0 min] laila encoder train: 1600/6511 essays (24%), 4.6 min so far, ~14.0 min left
+[13:53:47 +6.1 min] laila encoder train: 2000/6511 essays (30%), 5.7 min so far, ~12.9 min left
+[13:54:55 +7.3 min] laila encoder train: 2400/6511 essays (36%), 6.8 min so far, ~11.7 min left
+[13:56:03 +8.4 min] laila encoder train: 2800/6511 essays (43%), 8.0 min so far, ~10.6 min left
+[13:57:08 +9.5 min] laila encoder train: 3200/6511 essays (49%), 9.1 min so far, ~9.4 min left
+[13:58:15 +10.6 min] laila encoder train: 3600/6511 essays (55%), 10.2 min so far, ~8.2 min left
+[13:59:21 +11.7 min] laila encoder train: 4000/6511 essays (61%), 11.3 min so far, ~7.1 min left
+[14:00:28 +12.8 min] laila encoder train: 4400/6511 essays (67%), 12.4 min so far, ~5.9 min left
+[14:01:35 +13.9 min] laila encoder train: 4800/6511 essays (73%), 13.5 min so far, ~4.8 min left
+[14:02:44 +15.1 min] laila encoder train: 5200/6511 essays (79%), 14.6 min so far, ~3.7 min left
+[14:03:51 +16.2 min] laila encoder train: 5600/6511 essays (86%), 15.8 min so far, ~2.6 min left
+[14:04:58 +17.3 min] laila encoder train: 6000/6511 essays (92%), 16.9 min so far, ~1.4 min left
+[14:06:05 +18.4 min] laila encoder train: 6400/6511 essays (98%), 18.0 min so far, ~0.3 min left
+[14:06:24 +18.7 min] laila encoder train: 6511/6511 essays (100%), 18.3 min so far, ~0.0 min left
+[14:06:24 +18.7 min] laila encoder CAMeL-Lab/bert-base-arabic-camelbert-msa: reading 1348 test essays
+[14:07:31 +19.9 min] laila encoder test: 400/1348 essays (29%), 1.1 min so far, ~2.7 min left
+[14:08:38 +21.0 min] laila encoder test: 800/1348 essays (59%), 2.2 min so far, ~1.5 min left
+[14:09:44 +22.1 min] laila encoder test: 1200/1348 essays (89%), 3.3 min so far, ~0.4 min left
+[14:10:09 +22.5 min] laila encoder test: 1348/1348 essays (100%), 3.7 min so far, ~0.0 min left
+[14:10:09 +22.5 min] laila encoder CAMeL-Lab/bert-base-arabic-camelbert-msa: reading 90 ENARA benchmark essays
+[14:10:13 +22.6 min] laila encoder ENARA benchmark: 90/90 essays (100%), 0.1 min so far, ~0.0 min left
+[14:10:25 +22.8 min] laila A_features_ridge relevance: done (1/8)
+[14:10:38 +23.0 min] laila A_features_ridge organization: done (2/8)
+[14:10:50 +23.2 min] laila A_features_ridge vocabulary: done (3/8)
+[14:11:01 +23.4 min] laila A_features_ridge style: done (4/8)
+[14:11:13 +23.6 min] laila A_features_ridge development: done (5/8)
+[14:11:24 +23.7 min] laila A_features_ridge mechanics: done (6/8)
+[14:11:36 +23.9 min] laila A_features_ridge grammar: done (7/8)
+[14:11:47 +24.1 min] laila A_features_ridge holistic: done (8/8)
+laila A_features_ridge {"relevance": {"rmse": 0.483, "qwkNative": 0.488, "enaraExact": 0.832, "enaraWithin1": 0.976, "enaraQwk": 0.488}, "organization": {"rmse": 0.819, "qwkNative": 0.728, "enaraExact": 0.743, "enaraWithin1": 0.996, "enaraQwk": 0.656}, "vocabulary": {"rmse": 0.766, "qwkNative": 0.735, "enaraExact": 0.746, "enaraWithin1": 0.997, "enaraQwk": 0.645}, "style": {"rmse": 0.838, "qwkNative": 0.73, "enaraExact": 0.726, "enaraWithin1": 0.996, "enaraQwk": 0.649}, "development": {"rmse": 0.8, "qwkNative": 0.675, "enaraExact": 0.722, "enaraWithin1": 0.998, "enaraQwk": 0.564}, "mechanics": {"rmse": 0.799, "qwkNative": 0.68, "enaraExact": 0.737, "enaraWithin1": 0.999, "enaraQwk": 0.585}, "grammar": {"rmse": 0.782, "qwkNative": 0.707, "enaraExact": 0.737, "enaraWithin1": 0.998, "enaraQwk": 0.608}, "holistic": {"rmse": 4.541, "qwkNative": 0.766}}
+[14:11:48 +24.1 min] laila B_CAMeL-Lab/bert-base-arabic-camelbert-msa_ridge relevance: done (1/8)
+[14:11:49 +24.1 min] laila B_CAMeL-Lab/bert-base-arabic-camelbert-msa_ridge organization: done (2/8)
+[14:11:49 +24.2 min] laila B_CAMeL-Lab/bert-base-arabic-camelbert-msa_ridge vocabulary: done (3/8)
+[14:11:50 +24.2 min] laila B_CAMeL-Lab/bert-base-arabic-camelbert-msa_ridge style: done (4/8)
+[14:11:51 +24.2 min] laila B_CAMeL-Lab/bert-base-arabic-camelbert-msa_ridge development: done (5/8)
+[14:11:52 +24.2 min] laila B_CAMeL-Lab/bert-base-arabic-camelbert-msa_ridge mechanics: done (6/8)
+[14:11:53 +24.2 min] laila B_CAMeL-Lab/bert-base-arabic-camelbert-msa_ridge grammar: done (7/8)
+[14:11:54 +24.2 min] laila B_CAMeL-Lab/bert-base-arabic-camelbert-msa_ridge holistic: done (8/8)
+laila B_CAMeL-Lab/bert-base-arabic-camelbert-msa_ridge {"relevance": {"rmse": 0.464, "qwkNative": 0.547, "enaraExact": 0.842, "enaraWithin1": 0.977, "enaraQwk": 0.547}, "organization": {"rmse": 0.861, "qwkNative": 0.701, "enaraExact": 0.696, "enaraWithin1": 0.998, "enaraQwk": 0.595}, "vocabulary": {"rmse": 0.812, "qwkNative": 0.717, "enaraExact": 0.699, "enaraWithin1": 0.999, "enaraQwk": 0.581}, "style": {"rmse": 0.867, "qwkNative": 0.716, "enaraExact": 0.688, "enaraWithin1": 0.996, "enaraQwk": 0.612}, "development": {"rmse": 0.821, "qwkNative": 0.681, "enaraExact": 0.7, "enaraWithin1": 0.999, "enaraQwk": 0.525}, "mechanics": {"rmse": 0.815, "qwkNative": 0.676, "enaraExact": 0.727, "enaraWithin1": 0.999, "enaraQwk": 0.549}, "grammar": {"rmse": 0.812, "qwkNative": 0.689, "enaraExact": 0.715, "enaraWithin1": 0.998, "enaraQwk": 0.558}, "holistic": {"rmse": 4.726, "qwkNative": 0.754}}
+[14:11:54 +24.2 min] laila: 200 of the grader-baseline essays are in the test set
+[14:11:54 +24.2 min] done
