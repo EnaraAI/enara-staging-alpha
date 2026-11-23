@@ -5,7 +5,7 @@ _Overnight work on the assessment engine. lms-test only; test.enara.app untouche
 ## In three lines
 1. **Every phase of the assessment-engine plan (P1a to P5) is built, tested in E2E and live on lms-test.** That covers 8 PRs tonight (#90 to #97). Two items still need your decision: speaking and the code grader.
 2. **The grader agrees with the reference scores in every subject.** Language, maths, science, humanities and listening, in Arabic and English, all score above the 0.85 bar (0.89 to 0.99). Every grading call went to DeepSeek; none went to Anthropic.
-3. **Teachers can now generate questions, review them and add them to assessments** (the Question bank page). After two rounds of fixes, 7 of 8 subject sets pass the 0.80 quality bar, and the eighth (English maths) has a fix in CI.
+3. **Teachers can now generate questions, review them and add them to assessments** (the Question bank page). After two rounds of fixes, 7 of 8 subject sets pass the 0.80 quality bar, and the fix for the eighth (English maths) is merged.
 
 ## What was built tonight
 | Phase | What it does | PR | State |
@@ -17,7 +17,7 @@ _Overnight work on the assessment engine. lms-test only; test.enara.app untouche
 | P4 | Question generation: generator, code checks, reviewer model, item bank, teacher review, Question bank page | [#94](https://github.com/EnaraAI/enara-staging-alpha/pull/94) | live |
 | P5 | Benchmark baseline for all sets (blocks regressions), Item bank card, speed and cost figures | [#95](https://github.com/EnaraAI/enara-staging-alpha/pull/95) | live |
 | P4 fixes | Generation fixes from benchmark run 1 | [#96](https://github.com/EnaraAI/enara-staging-alpha/pull/96) | live |
-| P4 fixes | Fraction answers in generated maths | [#97](https://github.com/EnaraAI/enara-staging-alpha/pull/97) | _in CI_ |
+| P4 fixes | Fraction answers in generated maths | [#97](https://github.com/EnaraAI/enara-staging-alpha/pull/97) | merged (deploying) |
 
 ## Pictures
 **Question bank:** a real Arabic question generated on lms-test from the Suez Canal source text. It shows the reviewer model's scores, and the Item bank card at the top:
