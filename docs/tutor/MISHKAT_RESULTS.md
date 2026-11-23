@@ -2,6 +2,37 @@
 
 _23 Nov 2026, 6:45 PM Cairo. **MODEL-MARKED: development only, not for claims, never for a real school.** Nothing is switched; v3b stays the grader on lms-test._
 
+## Latest run (10:00 PM): Arabic length tests pass. **Development only, model-marked**
+_Changes since run 2: your padding option (b), Arabic trained on shortened and padded copies, and a bug fix in the validation split. Cross-validated: every ENARA answer tested once._
+
+### In three lines
+1. **All Arabic length tests now pass** with the recipe we would use (ENARA answers only, no LAILA):
+   - short correct answers not marked down: **96%** (bar 90%);
+   - truncation: **0.04** (bar 0.3);
+   - padding with same-kind sentences: **0.02** (bar 0.1).
+
+   English passes all three (95%, −0.02, −0.12).
+2. **On human-scored essays, Mishkat ranks grammar far better than v3b:**
+   - English **0.42** against 0.11 (the open item);
+   - Arabic **0.72** against 0.16.
+
+   Spelling is also better: 0.42 against 0.13 in English, 0.61 against 0.30 in Arabic.
+3. **On ENARA answers (against the Sonnet–Opus marks), Mishkat leads on grammar, spelling and vocabulary in both languages, and on Arabic short-answer grammar.** v3b leads on task completion and organisation, as the split plan expects.
+
+### QWK, Mishkat / v3b, against the Sonnet–Opus marks
+| Criterion | English essays | Arabic essays | Arabic short answers |
+|---|---|---|---|
+| Grammar | **0.80** / 0.78 | **0.77** / 0.72 | **0.78** / 0.55 |
+| Spelling/punctuation | **0.52** / 0.34 | **0.86** / 0.75 | no spread |
+| Vocabulary | **0.88** / 0.80 | **0.88** / 0.84 | none |
+| Organisation | 0.78 / **0.80** | 0.77 / **0.85** | none |
+| Task completion | 0.55 / **0.83** | 0.52 / **0.75** | 0.37 / **0.71** |
+
+- **Within 1 point:** 0.99–1.00 everywhere.
+- **Against the median labels** (which include DeepSeek's own marks): v3b stays slightly ahead on English grammar (0.81 against 0.78) and Arabic grammar (0.81 against 0.78); Mishkat leads on spelling and Arabic vocabulary.
+- **English model bundle exported:** `mishkat-en-20261123-aed03162`, a 30-day Actions artifact, never in the repo. The Arabic bundle is exported once you say go.
+- **Not yet included:** DeepSeek's part of the colloquial re-mark, which goes through lms-test and is blocked by Vercel. The current labels are the earlier ones; Sonnet and Opus have re-marked.
+
 ## Run 2 (7:05 PM): every answer tested, plus human-scored essays
 _Cross-validation (5 folds by question): every ENARA answer is tested once and never trained on in its own fold. English has 233 essays and 262 short answers; Arabic has 222 and 260. The re-check uses the same 200 human-scored essays per language as v3b's measurement._
 
