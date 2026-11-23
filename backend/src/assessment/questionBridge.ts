@@ -38,8 +38,11 @@ const OpenContent = z.union([
 export function rubricExtrasOf(e: { domain?: string; answer_key?: unknown; flags?: Record<string, boolean> } | null | undefined) {
   const k = (e?.answer_key ?? {}) as { content_points?: string[]; required_points?: string[] };
   const points = e?.domain === 'science' ? k.content_points : e?.domain === 'humanities' || e?.domain === 'listening' ? k.required_points : undefined;
-  return { points, units: e?.flags?.units === true };
+  return { points, units: e?.flags?.units === true, spoken: e?.domain === 'language' && e?.flags?.spoken === true };
 }
+/** A spoken language question (speaking exams): an English language short answer or essay with flags.spoken. */
+export const isSpokenEngine = (q: { type?: string; engine?: { type?: string; domain?: string; language?: string; flags?: Record<string, boolean> } | null }): boolean =>
+  q.type === 'engine' && q.engine?.domain === 'language' && ['short_answer', 'essay'].includes(String(q.engine?.type)) && q.engine?.flags?.spoken === true && String(q.engine?.language ?? '').startsWith('en');
 export const isCodeEngine = (q: { type?: string; engine?: { type?: string } | null }): boolean => q.type === 'engine' && q.engine?.type === 'code';
 /** A code question's rubric: one 0-1 criterion per test (the learner sees only "Test N"; the teacher sees the test names). */
 export function codeRubric(tests: { name: string }[], lang: string) {

@@ -1,6 +1,7 @@
 import { randomUUID } from 'crypto';
 import { ElevenLabsClient } from '@elevenlabs/elevenlabs-js';
 import { AppError } from '../middleware/errorHandler';
+import { isSpokenEngine } from '../assessment/questionBridge';
 import { getConfig } from '../config/env';
 import type { IQuestion } from '../models/Assessment';
 import type { IConversationTurn, ISpeakingAttempt } from '../models/AssessmentAttempt';
@@ -117,9 +118,10 @@ export function voiceConfigured() {
 
 // The assessment behind a speaking exam: open-response questions with a
 // teacher rubric, and no criterion that would need audio-derived evidence.
-export function checkSpeakingQuestions(questions: { type: string; rubric?: { criteria?: { title?: string; description?: string }[] } }[]) {
+export function checkSpeakingQuestions(questions: { type: string; engine?: { type?: string; domain?: string; language?: string; flags?: Record<string, boolean> } | null; rubric?: { criteria?: { title?: string; description?: string }[] } }[]) {
   if (!questions.length) throw new AppError('A speaking exam needs at least one question', 400, 'VALIDATION_ERROR');
-  if (questions.some((q) => q.type !== 'open-response')) throw new AppError('A speaking exam can only have open-response questions', 400, 'VALIDATION_ERROR');
+  // Open-response questions, or (owner, 23 Nov 2026) the assessment engine's spoken English language questions, graded on the transcript.
+  if (questions.some((q) => q.type !== 'open-response' && !isSpokenEngine(q))) throw new AppError('A speaking exam can only have open-response questions or spoken English language questions', 400, 'VALIDATION_ERROR');
   if (questions.some((q) => !q.rubric?.criteria?.length)) throw new AppError('Every speaking exam question needs a rubric', 400, 'VALIDATION_ERROR');
   const bad = questions.flatMap((q) => q.rubric!.criteria!).find((c) => PRONUNCIATION.test(`${c.title ?? ''} ${c.description ?? ''}`));
   if (bad) {
@@ -199,7 +201,8 @@ export function safeFollowUp(followUp: string | null, q: IQuestion, s: ISpeaking
   const said = new Set(studentSoFar.toLowerCase().match(/[a-z']{4,}/g) ?? []);
   // Content words only (6+ letters), so ordinary words like "about" don't count.
   const words = (t?: string) => new Set((t ?? '').toLowerCase().match(/[a-z']{6,}/g) ?? []);
-  const secret = new Set([...words(q.modelAnswer), ...((q.rubric?.criteria ?? []) as { levels?: { description?: string }[] }[]).flatMap((c) => (c.levels ?? []).flatMap((l) => [...words(l.description)]))]);
+  const engineModel = ((q as { engine?: { answer_key?: { model_answer?: string } } }).engine?.answer_key?.model_answer) ?? '';
+  const secret = new Set([...words(q.modelAnswer), ...words(engineModel), ...((q.rubric?.criteria ?? []) as { levels?: { description?: string }[] }[]).flatMap((c) => (c.levels ?? []).flatMap((l) => [...words(l.description)]))]);
   for (const w of words(q.text)) secret.delete(w);
   const leaked = [...words(followUp)].filter((w) => secret.has(w) && !said.has(w));
   if (leaked.length) return null;

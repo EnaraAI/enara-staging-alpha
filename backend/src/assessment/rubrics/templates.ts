@@ -8,7 +8,8 @@ export type Domain = 'language' | 'math' | 'science' | 'humanities' | 'listening
 export type OpenType = 'short_answer' | 'essay' | 'math_steps';
 interface RubricTemplate { domain: Domain; type: OpenType; criteria: CriterionTemplate[]; checklist?: boolean }
 /** Per item (science and humanities): the content points of the answer key, and whether units are marked. */
-export interface RubricExtras { points?: string[]; units?: boolean }
+// spoken (language): the answer is a speech-to-text transcript, so spelling and punctuation (mechanics) are not marked.
+export interface RubricExtras { points?: string[]; units?: boolean; spoken?: boolean }
 
 const L = (ar: string, en: string): Bi => ({ ar, en });
 
@@ -68,7 +69,7 @@ const POINT_LEVELS: Bi[] = [L('ناقصة أو خاطئة', 'Missing or wrong'),
 
 /** The criteria of an item: the template's, with the checklist points first (science, humanities) and units only when asked. */
 function criteriaOf(t: RubricTemplate, extras: RubricExtras = {}): CriterionTemplate[] {
-  if (!t.checklist) return t.criteria;
+  if (!t.checklist) return extras.spoken ? t.criteria.filter((c) => c.code !== 'mechanics') : t.criteria;
   const points = (extras.points ?? []).map((p, i): CriterionTemplate => ({ code: `point_${i + 1}`, title: L(p, p), levels: POINT_LEVELS }));
   return [...points, ...t.criteria.filter((c) => c.code !== 'units' || extras.units === true)];
 }

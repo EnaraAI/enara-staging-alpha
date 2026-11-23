@@ -1,3 +1,4 @@
+import { isSpokenEngine } from '../assessment/questionBridge';
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { asyncHandler, AppError } from '../middleware/errorHandler';
@@ -163,7 +164,7 @@ export const previewSpeaking = asyncHandler(async (req: AuthRequest & { file?: E
   await requireSpeakingSchool(user.institutionId!);
   const assessment = await Assessment.findOne({ id: getRequiredId(body, 'assessmentId'), institutionId: user.institutionId }).lean();
   if (!assessment || (user.role === 'teacher' && assessment.createdBy !== user.id)) throw new AppError('Assessment not found', 404);
-  const questions = (assessment.questions as IQuestion[]).filter((q) => q.type === 'open-response');
+  const questions = (assessment.questions as IQuestion[]).filter((q) => q.type === 'open-response' || isSpokenEngine(q as never));
   checkSpeakingQuestions(assessment.questions as never);
   const parse = (v: unknown) => (typeof v === 'string' ? JSON.parse(v) : v);
   const settings = parseSpeakingSettings(parse(body.speaking) ?? {}, []);

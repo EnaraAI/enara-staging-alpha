@@ -229,3 +229,30 @@ describe('P3b: listening (a recording; answers judged against its transcript)', 
     expect(JSON.parse(calls[0].user).item.source).toContain('main gate');
   });
 });
+
+describe('speaking through the engine (owner, 23 Nov 2026): spoken transcripts, pronunciation never scored', () => {
+  it('a spoken language question drops spelling/punctuation from its rubric (essay 8, short answer 3)', () => {
+    const c = checkEngineQuestion({ id: 'q', type: 'engine', text: 'Talk about your weekend.', engine: { type: 'essay', domain: 'language', language: 'en', flags: { spoken: true } } as never });
+    expect(c.ok && c.points).toBe(8);
+    if (c.ok) expect(c.rubric!.criteria.map((x) => x.id)).not.toContain('mechanics');
+    expect(totalPoints('language', 'short_answer', { spoken: true })).toBe(3);
+  });
+  it('the grader is told it is a speech transcript; spelling codes are dropped, not refused; pronunciation is never judged', async () => {
+    replies = [{ criteria: ['task_completion', 'grammar_accuracy', 'vocabulary_range', 'organisation'].map((c) => ({ criterionId: c, levelId: 'p1', evidence: ['i went to the park'], rationale: 'ok' })), errorCodes: ['verb_tense', 'spelling', 'punctuation'], confidence: 0.8, scoreExplanation: 'ok', strengths: [], improvements: [], feedback: 'Good. Next time use the past tense every time.', flags: [] }];
+    const r = await gradeOpenRun({ attempt, item: { ...essayItem, spoken: true }, answer: 'um i went to the park and i play football with my friend', uiLanguage: 'en', run: 1 });
+    expect(r.status).toBe('proposed');
+    expect(r.points).toBe(4);
+    expect(r.errorCodes).toEqual(['verb_tense']);
+    expect(calls[0].system).toMatch(/speech-to-text transcript/);
+    expect(calls[0].system).toMatch(/Never judge pronunciation/);
+    expect(JSON.parse(calls[0].user).rubric.map((c: { criterionId: string }) => c.criterionId)).not.toContain('mechanics');
+  });
+  it('speaking exams accept spoken English engine questions, and no other engine questions', async () => {
+    const { checkSpeakingQuestions } = await import('../../src/services/speakingExam');
+    const spoken = checkEngineQuestion({ id: 'q', type: 'engine', text: 'Describe your school.', engine: { type: 'short_answer', domain: 'language', language: 'en', flags: { spoken: true } } as never });
+    if (!spoken.ok) throw new Error('not ok');
+    expect(() => checkSpeakingQuestions([{ type: 'engine', engine: spoken.engine as never, rubric: spoken.rubric as never }])).not.toThrow();
+    expect(() => checkSpeakingQuestions([{ type: 'engine', engine: { type: 'short_answer', domain: 'language', language: 'en' }, rubric: spoken.rubric as never }])).toThrow(/spoken English/);
+    expect(() => checkSpeakingQuestions([{ type: 'engine', engine: { type: 'essay', domain: 'language', language: 'ar', flags: { spoken: true } }, rubric: spoken.rubric as never }])).toThrow();
+  });
+});

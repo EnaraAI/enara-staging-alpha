@@ -292,6 +292,7 @@ function openItemOf(q: IQuestion): OpenItem {
     questionId: q.id, stem: q.text, type: e.type, domain: e.domain, language: e.language,
     ...(e.answer_key?.final ? { final: e.answer_key.final } : {}), ...(e.answer_key?.solution ? { solution: e.answer_key.solution } : {}),
     ...(extras.points ? { points: extras.points, units: extras.units } : {}), ...(e.source ? { source: e.source } : {}),
+    ...(extras.spoken ? { spoken: true } : {}),
     // Listening: the recording's transcript is the source the answer is judged against.
     ...(e.audio?.transcript ? { source: e.audio.transcript } : {}),
   };
