@@ -20,7 +20,6 @@ jobs:
         run: |
           pip install -q torch --index-url https://download.pytorch.org/whl/cpu
           pip install -q numpy pandas scipy scikit-learn transformers sentencepiece protobuf tiktoken
-        run: git fetch -q origin claude/tutor-lms-ellipse-results && git show FETCH_HEAD:summary.json > baseline_summary.json || echo '{}' > baseline_summary.json
       - name: Train and evaluate
         working-directory: deploy/lms-test/aes
         env: { HF_HUB_DISABLE_PROGRESS_BARS: '1', TRANSFORMERS_VERBOSITY: error }
