@@ -28,7 +28,8 @@ export interface IAttemptAnswer {
   // Assessment engine (docs/tutor/ASSESSMENT_ENGINE_PLAN.md §3-§4): the grading engine's result for this answer.
   // feedbackText is the only stored model free text (deleted with the learner, studentErasure).
   // scoredBy/rule/reason: rules-first (who scored the criterion: code rules or the model, and code's short reason).
-  criteria?: { code: string; points: number; max: number; reasonCode: string; scoredBy?: 'code' | 'model'; rule?: string; reason?: string }[];
+  // Mishkat split: scoredBy 'mishkat', rule 'mishkat@<version>', and modelPoints = v3b's own score (teacher view only).
+  criteria?: { code: string; points: number; max: number; reasonCode: string; scoredBy?: 'code' | 'model' | 'mishkat'; rule?: string; reason?: string; modelPoints?: number }[];
   errorCodes?: string[];
   confidence?: number;
   flagged?: boolean;
@@ -172,7 +173,7 @@ const attemptAnswerSchema = new Schema<IAttemptAnswer>(
     criterionScores: { type: [{ criterionId: String, levelId: String, points: Number, _id: false }], default: undefined },
     needsReview: Boolean,
     proposalId: String,
-    criteria: { type: [{ code: String, points: Number, max: Number, reasonCode: String, scoredBy: { type: String, enum: ['code', 'model'] }, rule: String, reason: String, _id: false }], default: undefined },
+    criteria: { type: [{ code: String, points: Number, max: Number, reasonCode: String, scoredBy: { type: String, enum: ['code', 'model', 'mishkat'] }, rule: String, reason: String, modelPoints: Number, _id: false }], default: undefined },
     errorCodes: { type: [String], default: undefined },
     confidence: { type: Number, min: 0, max: 1 },
     flagged: Boolean,

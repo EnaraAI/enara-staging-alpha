@@ -124,9 +124,11 @@ function AnswerReview({ item, attemptId, mode, onChanged, conversation }: { item
           {ev.criteria?.map((c: any) => {
             const crit = q.rubric?.criteria?.find((x: any) => x.id === c.criterionId);
             const level = crit?.levels?.find((l: any) => l.id === c.levelId);
+            // Mishkat split: on a criterion Mishkat scored, this is v3b's view only (its rationale is never shown to the learner).
+            const byMishkat = (a.criteria || []).find((x: any) => x.code === c.criterionId && x.scoredBy === 'mishkat');
             return (
               <div key={c.criterionId}>
-                <p className="text-slate-800"><b>{crit?.title}:</b> {level?.label} ({c.points}). {c.rationale}</p>
+                <p className="text-slate-800"><b>{crit?.title}:</b> {byMishkat && <span className="text-slate-500" data-testid="v3b-view">v3b's view (final score by Mishkat: {byMishkat.points}; not shown to the student): </span>}{level?.label} ({c.points}). {c.rationale}</p>
                 {c.evidence?.length > 0 && <p className="text-xs text-slate-600">Evidence from the answer: {c.evidence.map((e: string) => `“${e}”`).join(' · ')}</p>}
               </div>
             );
@@ -142,7 +144,7 @@ function AnswerReview({ item, attemptId, mode, onChanged, conversation }: { item
       )}
       {a.flagged && (
         <p className="text-xs font-semibold text-amber-800 bg-amber-50 border border-amber-200 rounded px-2 py-1" data-testid="engine-flag">
-          Needs your check: {(a.flagReasons || []).map((r: string) => ({ low_confidence: 'the grader was not sure', runs_disagree: 'two grading runs disagreed', near_pass_mark: 'close to the pass mark', model_unavailable: 'the grader was not available', model_error: 'a grading run failed', integrity: 'the answer may contain instructions to the grader' } as Record<string, string>)[r] ?? r).join(' · ')}
+          Needs your check: {(a.flagReasons || []).map((r: string) => ({ low_confidence: 'the grader was not sure', runs_disagree: 'two grading runs disagreed', near_pass_mark: 'close to the pass mark', model_unavailable: 'the grader was not available', model_error: 'a grading run failed', integrity: 'the answer may contain instructions to the grader', graders_disagree: 'Mishkat and the model disagree by 2 or more levels' } as Record<string, string>)[r] ?? r).join(' · ')}
           {typeof a.confidence === 'number' && a.grader !== 'none' ? ` · confidence ${Math.round(a.confidence * 100)}%` : ''}
         </p>
       )}
@@ -152,7 +154,8 @@ function AnswerReview({ item, attemptId, mode, onChanged, conversation }: { item
             <b>{(q.rubric?.criteria || []).find((x: any) => x.id === c.code)?.title ?? c.code}:</b> {c.points} / {c.max}
             {/* Rules-first: who scored the criterion (only on answers graded with the rulesFirst switch). */}
             {c.scoredBy === 'code' && <span className="text-slate-500" data-testid="scored-by-code" dir="auto"> · scored by code{c.reason ? `: ${c.reason}` : ''}</span>}
-            {c.scoredBy === 'model' && <span className="text-slate-500" data-testid="scored-by-model"> · scored by the model</span>}
+            {c.scoredBy === 'model' && <span className="text-slate-500" data-testid="scored-by-model"> · scored by the model{c.reason === 'mishkat_boundary' ? ' (Mishkat was unsure)' : ''}</span>}
+            {c.scoredBy === 'mishkat' && <span className="text-slate-500" data-testid="scored-by-mishkat"> · scored by Mishkat{c.rule ? ` (${String(c.rule).replace(/^mishkat@/, 'model ')})` : ''}{typeof c.modelPoints === 'number' ? ` · v3b gave ${c.modelPoints}` : ''}</span>}
           </li>
         ))}</ul>
       )}

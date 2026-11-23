@@ -115,8 +115,8 @@ const LANG_NAME = (l: string) => (l.startsWith('ar') ? 'Arabic' : 'English');
 const AR = /[؀-ۿ]/;
 
 export interface OpenItem { questionId: string; stem: string; type: 'short_answer' | 'essay' | 'math_steps'; domain: 'language' | 'math' | 'science' | 'humanities' | 'listening'; language: string; solution?: string; points?: string[]; units?: boolean; source?: string; spoken?: boolean; final?: { value: number | string; tolerance_abs?: number; tolerance_rel?: number; unit?: string | null } }
-/** One criterion's score. scoredBy/rule/reason only with rulesFirst (absent otherwise: the shape stays as before). */
-export interface CriterionScore { criterionId: string; levelId: string; points: number; scoredBy?: 'code' | 'model'; rule?: string; reason?: string }
+/** One criterion's score. scoredBy/rule/reason only with rulesFirst or mishkatSplit (absent otherwise: the shape stays as before). */
+export interface CriterionScore { criterionId: string; levelId: string; points: number; scoredBy?: 'code' | 'model' | 'mishkat'; rule?: string; reason?: string }
 export interface RunResult {
   proposalId: string;
   status: 'proposed' | 'invalid' | 'failed';
