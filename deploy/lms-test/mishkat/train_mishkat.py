@@ -167,9 +167,27 @@ import hashlib
 def hash_t(t): return hashlib.sha1(t.encode('utf-8')).hexdigest()[:16]
 Xpre = cached('stage1', pre_texts, 'stage-1 essays')
 Xen = cached('enara', [r['answer'] for r in rows], 'ENARA answers')
+# Length augmentation (owner, 23 Nov 2026, Arabic): shortened and padded copies of every ENARA answer. They keep the answer's grammar and
+# spelling labels (a shorter or longer answer with the same quality of language must get the same marks); the other criteria are left
+# unlabelled for the copies. The padding sentences used here are different from the ones in the padding TEST.
+AUG = os.environ.get('MK_AUG') == '1'
+PAD_TRAIN = {'en': ['We go to the park on Fridays.', 'My brother likes football.', 'The weather is nice today.', 'I read a book every week.', 'Our teacher is very kind.', 'We eat dinner together.'],
+             'ar': ['نذهب إلى الحديقة يوم الجمعة.', 'يحب أخي كرة القدم.', 'الجو جميل اليوم.', 'أقرأ كتابًا كل أسبوع.', 'معلمنا لطيف جدًا.', 'نتناول العشاء معًا.']}[LANG]
+SPLIT = lambda t: [x for x in re.split(r'(?<=[.!?؟])\s+', t.strip()) if x]
+aug_src, aug_texts = [], []
+if AUG:
+    rr = random.Random(SEED)
+    for i, r in enumerate(rows):
+        ss = SPLIT(r['answer']); keep = 2 if r['type'] == 'essay' else 1
+        if len(ss) > keep: aug_src.append(i); aug_texts.append(' '.join(ss[:keep]))
+        aug_src.append(i); aug_texts.append(r['answer'] + ' ' + ' '.join(rr.sample(PAD_TRAIN, 2)))
+    Xaug = cached('aug', aug_texts, 'length-augmented copies')
+    log(f'length augmentation: {len(aug_texts)} copies')
+aug_src = np.array(aug_src, dtype=int)
 mu, sd = np.vstack([Xpre, Xen]).mean(0), np.vstack([Xpre, Xen]).std(0) + 1e-6
 Z = lambda X: ((X - mu) / sd).astype(np.float32)
 Xpre, Xen = Z(Xpre), Z(Xen)
+if AUG: Xaug = Z(Xaug)
 
 # Keep the human re-check essays out of stage 1 (the cached stage-1 sample stays the same; overlapping rows are dropped here).
 h_texts, h_Y, h_ids = human(); hset = set(h_ids)
@@ -194,27 +212,38 @@ for typ in ['essay', 'short_answer']:
     d = Xpre.shape[1]
     torch.manual_seed(SEED); s1 = fit(Head(d, len(crit)), Xpre, Ypre, 15, 1e-3)
     oof = {'two_stage': np.zeros((len(rows), len(crit))), 'stage2_only': np.zeros((len(rows), len(crit))), 'stage1_only': predict(s1, Xen)}
-    tests_acc = {'short': [], 'trunc': [], 'pad': []}
+    tests_acc = {r_: {'short': [], 'trunc': [], 'pad': []} for r_ in ('two_stage', 'stage2_only')}
     for k in range(K):
         te = [i for i in T if fold_of[rows[i]['group']] == k]
         trg = [g for g in groups if fold_of[g] != k]; val_g = set(trg[:max(1, len(trg) // 8)])
         va = [i for i in T if rows[i]['group'] in val_g]; tr = [i for i in T if fold_of[rows[i]['group']] != k and rows[i]['group'] not in val_g]
-        s2 = fit(copy.deepcopy(s1), Xen[tr], Y_of(tr), 80, 3e-4, Xen[va], Y_of(va))
-        torch.manual_seed(SEED + k); s2o = fit(Head(d, len(crit)), Xen[tr], Y_of(tr), 80, 1e-3, Xen[va], Y_of(va))
+        Xtr, Ytr = Xen[tr], Y_of(tr)
+        if AUG:  # copies of the training answers only (never of test answers)
+            sel_a = [n for n, i in enumerate(aug_src) if i in set(tr)]
+            Ya = np.full((len(sel_a), len(crit)), np.nan, dtype=np.float32)
+            for m_, n in enumerate(sel_a):
+                for j, c in enumerate(crit):
+                    if c in ('grammar_accuracy', 'mechanics'): Ya[m_, j] = rows[aug_src[n]]['label'][c]
+            Xtr, Ytr = np.vstack([Xtr, Xaug[sel_a]]), np.vstack([Ytr, Ya])
+        s2 = fit(copy.deepcopy(s1), Xtr, Ytr, 80, 3e-4, Xen[va], Y_of(va))
+        torch.manual_seed(SEED + k); s2o = fit(Head(d, len(crit)), Xtr, Ytr, 80, 1e-3, Xen[va], Y_of(va))
         P = predict(s2, Xen[te]); oof['two_stage'][te] = P; oof['stage2_only'][te] = predict(s2o, Xen[te])
         gi, mi = crit.index('grammar_accuracy'), crit.index('mechanics')
-        if typ == 'short_answer':
-            for n, i in enumerate(te):
-                L = rows[i]['label']
-                if L['grammar_accuracy'] == 1 and L['mechanics'] == 1 and L['task_completion'] == 2: tests_acc['short'].append(bool(P[n, gi] >= 0.5 and P[n, mi] >= 0.5))
-        else:
+        Xc = Xp = None
+        if typ == 'essay':
             strong = [n for n, i in enumerate(te) if rows[i]['label']['grammar_accuracy'] == 2 and len(re.split(r'(?<=[.!?؟])\s+', rows[i]['answer'])) >= 4]
-            if strong:
-                Pc = predict(s2, Z(X_of([' '.join(re.split(r'(?<=[.!?؟])\s+', rows[te[n]]['answer'])[:3]) for n in strong], f'truncation test fold {k + 1}')))
-                tests_acc['trunc'] += list(np.r_[P[strong, gi] - Pc[:, gi], P[strong, mi] - Pc[:, mi]])
+            if strong: Xc = Z(X_of([' '.join(re.split(r'(?<=[.!?؟])\s+', rows[te[n]]['answer'])[:3]) for n in strong], f'truncation test fold {k + 1}'))
             PAD = {'en': ' I like my school. My school is big. We learn many things there.', 'ar': ' أحب مدرستي. مدرستي كبيرة. نتعلم فيها أشياء كثيرة.'}[LANG]
-            Pp = predict(s2, Z(X_of([rows[i]['answer'] + PAD for i in te], f'padding test fold {k + 1}')))
-            tests_acc['pad'] += list(np.r_[Pp[:, gi] - P[:, gi], Pp[:, mi] - P[:, mi]])
+            Xp = Z(X_of([rows[i]['answer'] + PAD for i in te], f'padding test fold {k + 1}'))
+        for rname, mdl in (('two_stage', s2), ('stage2_only', s2o)):
+            P_ = predict(mdl, Xen[te]); acc = tests_acc[rname]
+            if typ == 'short_answer':
+                for n, i in enumerate(te):
+                    L = rows[i]['label']
+                    if L['grammar_accuracy'] == 1 and L['mechanics'] == 1 and L['task_completion'] == 2: acc['short'].append(bool(P_[n, gi] >= 0.5 and P_[n, mi] >= 0.5))
+            else:
+                if Xc is not None: Pc = predict(mdl, Xc); acc['trunc'] += list(np.r_[P_[strong, gi] - Pc[:, gi], P_[strong, mi] - Pc[:, mi]])
+                Pp = predict(mdl, Xp); acc['pad'] += list(np.r_[Pp[:, gi] - P_[:, gi], Pp[:, mi] - P_[:, mi]])
         log(f'{typ} fold {k + 1}/{K}: train {len(tr)}, val {len(va)}, test {len(te)}')
     gold = Y_of(T).astype(int); v3b = np.array([[rows[i]['marks']['deepseek'][c] for c in crit] for i in T])
     so_mask = np.array([[rows[i]['marks']['sonnet'][c] == rows[i]['marks']['opus'][c] for c in crit] for i in T]); so_gold = np.array([[rows[i]['marks']['sonnet'][c] for c in crit] for i in T])
@@ -225,12 +254,15 @@ for typ in ['essay', 'short_answer']:
         per[c] = {'vsMedian': {**{n: stats(P[:, j], gold[:, j], kk) for n, P in preds.items()}, 'v3b_deepseek': stats(v3b[:, j], gold[:, j], kk)},
                   'vsSonnetOpusAgreed': {**{n: stats(P[m, j], so_gold[m, j], kk) for n, P in preds.items()}, 'v3b_deepseek': stats(v3b[m, j], so_gold[m, j], kk)},
                   'labelSpread': {str(v): int((gold[:, j] == v).sum()) for v in range(kk)}}
-    tests = {}
-    if tests_acc['short']: sh_ = float(np.mean(tests_acc['short'])); tests['shortCorrectNotScoredDown'] = {'n': len(tests_acc['short']), 'share': round(sh_, 3), 'pass': sh_ >= 0.9}
-    if tests_acc['trunc']: dr = float(np.mean(tests_acc['trunc'])); tests['truncation'] = {'n': len(tests_acc['trunc']) // 2, 'meanDropGrammarSpelling': round(dr, 3), 'pass': dr <= 0.3}
-    if tests_acc['pad']: ri = float(np.mean(tests_acc['pad'])); tests['padding'] = {'n': len(tests_acc['pad']) // 2, 'meanRiseGrammarSpelling': round(ri, 3), 'pass': ri <= 0.1}
+    def tests_of(acc):
+        t = {}
+        if acc['short']: v = float(np.mean(acc['short'])); t['shortCorrectNotScoredDown'] = {'n': len(acc['short']), 'share': round(v, 3), 'pass': v >= 0.9}
+        if acc['trunc']: v = float(np.mean(acc['trunc'])); t['truncation'] = {'n': len(acc['trunc']) // 2, 'meanDropGrammarSpelling': round(v, 3), 'pass': v <= 0.3}
+        if acc['pad']: v = float(np.mean(acc['pad'])); t['padding'] = {'n': len(acc['pad']) // 2, 'meanRiseGrammarSpelling': round(v, 3), 'pass': v <= 0.1}
+        return t
+    tests = tests_of(tests_acc['two_stage']); tests_s2 = tests_of(tests_acc['stage2_only'])
     bar = {c: bool(per[c]['vsMedian']['two_stage']['within1'] >= 0.85 and (per[c]['vsMedian']['two_stage']['qwk'] or 0) >= (per[c]['vsMedian']['v3b_deepseek']['qwk'] or 0)) for c in crit}
-    entry = {'answers': len(T), 'questions': len(groups), 'perCriterion': per, 'lengthTests': tests, 'passesBar': bar}
+    entry = {'answers': len(T), 'questions': len(groups), 'perCriterion': per, 'lengthTests': tests, 'lengthTests_stage2only': tests_s2, 'lengthAugmentation': AUG, 'passesBar': bar}
     if typ == 'essay':  # final essay model on all ENARA essays -> the 200 human-scored essays (v3b's numbers from today's measurement)
         trg = groups; val_g = set(trg[:max(1, len(trg) // 8)])
         va = [i for i in T if rows[i]['group'] in val_g]; tr = [i for i in T if rows[i]['group'] not in val_g]
@@ -240,6 +272,6 @@ for typ in ['essay', 'short_answer']:
             entry.setdefault('humanRecheck', {})[name] = {c: stats(Ph[:, j], np.asarray(h_Y[c], int), 3) for j, c in enumerate(crit) if c in h_Y}
         entry['humanRecheck']['v3b_deepseek'] = {c: {'n': 200, 'exact': V3B[c]['exact'], 'within1': V3B[c]['within1'], 'qwk': V3B[c]['qwk']} for c in crit if c in h_Y and c in V3B}
     report['types'][typ] = entry
-    log(typ, json.dumps({c: (per[c]['vsMedian']['two_stage']['qwk'], per[c]['vsMedian']['v3b_deepseek']['qwk']) for c in crit}), json.dumps(tests))
+    log(typ, json.dumps({c: (per[c]['vsMedian']['two_stage']['qwk'], per[c]['vsMedian']['stage2_only']['qwk'], per[c]['vsMedian']['v3b_deepseek']['qwk']) for c in crit}), json.dumps(tests), json.dumps(tests_s2))
 json.dump(report, open('results/report.json', 'w'), indent=1)
 log('done')
