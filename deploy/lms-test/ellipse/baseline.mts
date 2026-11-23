@@ -94,7 +94,7 @@ const spearman = (a: number[], b: number[]) => { const ra = rank(a); const rb = 
 const r3 = (x: number) => Math.round(x * 1000) / 1000;
 
 const results: Record<string, unknown> = {};
-for (const ds of (cfg.datasets ?? ['ellipse']).filter((d) => !d.startsWith('bench-'))) {
+for (const ds of (cfg.datasets ?? ['ellipse']).filter((d) => !d.startsWith('bench-') && !d.startsWith('mishkat-'))) {
   const essays = ds === 'laila' ? loadLaila() : loadEllipse();
   const lang = essays[0]?.lang ?? 'en';
   const rubric = rubricFor('language', 'essay', lang)!;
@@ -151,6 +151,26 @@ for (const ds of (cfg.datasets ?? []).filter((d) => d.startsWith('bench-'))) {
   const okRows = rows.filter((r) => r.ds);
   results[ds] = { n: rows.length, graded: okRows.length, flagRate: r3(rows.filter((r) => r.flagged).length / rows.length), modelCalls: relayCalls - calls0, perAnswer: rows };
   console.log(ds, 'done', okRows.length, 'of', rows.length);
+}
+// ---- Mishkat marker (a): DeepSeek marks the model-marked dev pool with the live v3b language rubric, ONE run per answer ----
+for (const ds of (cfg.datasets ?? []).filter((d) => d.startsWith('mishkat-'))) {
+  const lang = ds.slice(8) as 'en' | 'ar';
+  const { gradeOpenRun } = await import(join(LIVE, 'src/assessment/grading-engine/graders/domains/index.ts'));
+  const pool = JSON.parse(readFileSync(join(LIVE, '..', 'data', 'mishkat-dev', `pool-${lang}.json`), 'utf8')) as { id: string; stem: string; type: 'short_answer' | 'essay'; answer: string }[];
+  const rows: Record<string, unknown>[] = []; let i = 0; const calls0 = relayCalls;
+  const worker = async () => {
+    while (i < pool.length) {
+      const a = pool[i++];
+      const r = await gradeOpenRun({ attempt: { id: `mishkat-${a.id}` }, item: { questionId: a.id, stem: a.stem, type: a.type, domain: 'language', language: lang }, answer: a.answer, uiLanguage: lang, run: 1, options: { store: false, allowFallback: false } }).catch(() => null);
+      const ok = r && r.status === 'proposed';
+      rows.push({ id: a.id, marks: ok ? Object.fromEntries(r!.criterionScores.map((c: { criterionId: string; points: number }) => [c.criterionId, c.points])) : null, status: r?.status ?? 'error' });
+      if (rows.length % 50 === 0) console.log(ds, 'marked', rows.length, 'of', pool.length);
+    }
+  };
+  await Promise.all(Array.from({ length: cfg.concurrency }, worker));
+  rows.sort((x, y) => String(x.id).localeCompare(String(y.id)));
+  results[ds] = { n: rows.length, marked: rows.filter((r) => r.marks).length, modelCalls: relayCalls - calls0, perAnswer: rows };
+  console.log(ds, 'done', (results[ds] as { marked: number }).marked, 'of', rows.length);
 }
 const summary = { grader: "today's engine language essay grader (engine-v2), DeepSeek on lms-test via llm-compare; no fallback", relayErrors, results };
 mkdirSync('out', { recursive: true });
