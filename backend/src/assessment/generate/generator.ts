@@ -33,6 +33,12 @@ const Reply = z.object({ items: z.array(z.object({ type: z.string(), stem: z.str
 /** Open items: keep only the key fields the subject's schema allows (the model sometimes adds points or a rubric to a language item, or
  * names a science item's points 'required_points'); found by the generation bench. Closed items are left as they are. */
 export function tidyKey(domain: string, type: string, key: unknown): unknown {
+  // Numeric keys written as a fraction or expression ("11/12"): mark them as expressions, so 11/12 and 0.91666… both match.
+  if (type === 'numeric' && key && typeof key === 'object') {
+    const k = key as Record<string, unknown>;
+    if (typeof k.value === 'string' && Number.isNaN(Number(k.value))) return { ...k, accept_equivalent_expression: true };
+    return key;
+  }
   if (!['short_answer', 'essay'].includes(type) || !key || typeof key !== 'object') return key;
   const k = key as Record<string, unknown>;
   const points = (Array.isArray(k.content_points) ? k.content_points : Array.isArray(k.required_points) ? k.required_points : Array.isArray(k.points) ? k.points : undefined) as unknown[] | undefined;
