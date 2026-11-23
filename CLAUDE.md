@@ -18,6 +18,7 @@ These rules apply to every session, on every account, until Mohamed changes them
 - **Secrets:** never ask for them in chat, and never print, log or commit them.
 - **Simulations and judging** run through the Anthropic API with the real ENARA engine, never with agents standing in.
 - **Reports** are short, in plain words.
+- **Times:** give every time in Cairo time, 12-hour format (e.g. 4:05 PM).
 
 ## Two parallel sessions: never work on the other track's branches
 | Track | Branches | Scope |
