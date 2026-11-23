@@ -5,7 +5,7 @@ _23 Nov 2026. lms-test only; test.enara.app untouched. Your decisions this morni
 ## In three lines
 1. **Code questions are graded automatically.** Learners' JavaScript runs in a locked sandbox inside lms-test, against tests the teacher writes. It needs no model and has no cost.
 2. **Speaking exams can use the new language grader.** It knows it is reading a speech transcript, never marks spelling or punctuation, and never scores pronunciation.
-3. **Both passed the full E2E suite.** The code grader is live ([#98](https://github.com/EnaraAI/enara-staging-alpha/pull/98)). Speaking ([#99](https://github.com/EnaraAI/enara-staging-alpha/pull/99)) is merged and deploying.
+3. **Both passed the full E2E suite and are live on lms-test:** code grader ([#98](https://github.com/EnaraAI/enara-staging-alpha/pull/98)) and speaking ([#99](https://github.com/EnaraAI/enara-staging-alpha/pull/99)).
 
 ---
 
