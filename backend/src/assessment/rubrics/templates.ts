@@ -16,18 +16,18 @@ const L = (ar: string, en: string): Bi => ({ ar, en });
 export const TEMPLATES: RubricTemplate[] = [
   {
     domain: 'language', type: 'short_answer', criteria: [
-      { code: 'task_completion', title: L('إنجاز المطلوب', 'Task completion'), levels: [L('لا يجيب عن المطلوب', 'Does not answer the task'), L('يجيب عن جزء من المطلوب', 'Answers part of the task'), L('يجيب عن المطلوب كاملًا', 'Answers the whole task')] },
-      { code: 'grammar_accuracy', title: L('صحة القواعد', 'Grammar accuracy'), levels: [L('أخطاء تعيق الفهم', 'Errors that block understanding'), L('قواعد صحيحة في الغالب', 'Mostly accurate grammar')] },
-      { code: 'mechanics', title: L('الإملاء وعلامات الترقيم', 'Spelling and punctuation'), levels: [L('أخطاء كثيرة', 'Many errors'), L('أخطاء قليلة أو لا أخطاء', 'Few or no errors')] },
+      { code: 'task_completion', title: L('إنجاز المطلوب', 'Task completion'), levels: [L('لا يجيب عن المطلوب', 'Does not answer the task'), L('يجيب عن جزء من المطلوب', 'Answers part of the task'), L('يجيب عن الفكرة الرئيسة للمطلوب', 'Answers the main point of the task')] },
+      { code: 'grammar_accuracy', title: L('صحة القواعد', 'Grammar accuracy'), levels: [L('أخطاء تعيق الفهم', 'Errors that block the meaning'), L('المعنى واضح رغم بعض الأخطاء', 'Meaning clear, even with some errors')] },
+      { code: 'mechanics', title: L('الإملاء وعلامات الترقيم', 'Spelling and punctuation'), levels: [L('أخطاء تجعل القراءة صعبة', 'Errors make it hard to read'), L('القراءة سهلة رغم بعض الأخطاء', 'Easy to read, even with some errors')] },
     ],
   },
   {
     domain: 'language', type: 'essay', criteria: [
-      { code: 'task_completion', title: L('إنجاز المطلوب', 'Task completion'), levels: [L('لا يتناول الموضوع', 'Off the task'), L('يتناول بعض المطلوب', 'Covers part of the task'), L('يتناول المطلوب كاملًا وبوضوح', 'Covers the whole task clearly')] },
-      { code: 'grammar_accuracy', title: L('صحة القواعد', 'Grammar accuracy'), levels: [L('أخطاء كثيرة تعيق الفهم', 'Frequent errors that block understanding'), L('بعض الأخطاء لا تعيق الفهم', 'Some errors that do not block understanding'), L('قواعد صحيحة في الغالب', 'Mostly accurate grammar')] },
-      { code: 'vocabulary_range', title: L('ثراء المفردات', 'Vocabulary range'), levels: [L('مفردات محدودة جدًا أو مكررة', 'Very limited or repeated words'), L('مفردات مناسبة', 'Adequate vocabulary'), L('مفردات متنوعة ودقيقة', 'Varied and precise vocabulary')] },
-      { code: 'organisation', title: L('التنظيم والترابط', 'Organisation'), levels: [L('أفكار غير مرتبة', 'Ideas not organised'), L('ترتيب مقبول وبعض أدوات الربط', 'Some order and linking words'), L('تنظيم واضح وأدوات ربط مناسبة', 'Clear order and good linking')] },
-      { code: 'mechanics', title: L('الإملاء وعلامات الترقيم', 'Spelling and punctuation'), levels: [L('أخطاء كثيرة', 'Many errors'), L('بعض الأخطاء', 'Some errors'), L('أخطاء قليلة أو لا أخطاء', 'Few or no errors')] },
+      { code: 'task_completion', title: L('إنجاز المطلوب', 'Task completion'), levels: [L('لا يتناول الموضوع', 'Off the task'), L('يتناول جزءًا من المطلوب', 'Covers part of the task'), L('يجيب عن الفكرة الرئيسة للمطلوب ولو كانت تفصيلة ضعيفة', 'Answers the main point of the task, even if one detail is thin')] },
+      { code: 'grammar_accuracy', title: L('صحة القواعد', 'Grammar accuracy'), levels: [L('معظم الجمل فيها أخطاء تجعلها صعبة الفهم', 'Most sentences have errors that make them hard to understand'), L('أخطاء في جمل كثيرة لكن كل جملة مفهومة', 'Errors in many sentences, but each one can be understood'), L('معظم الجمل صحيحة', 'Most sentences are correct')] },
+      { code: 'vocabulary_range', title: L('ثراء المفردات', 'Vocabulary range'), levels: [L('مفردات بسيطة جدًا أو مكررة، أو كلمات خاطئة تشوش المعنى', 'Very basic or repeated words, or wrong words blur the meaning'), L('مفردات مناسبة', 'Adequate vocabulary'), L('مفردات متنوعة تناسب الموضوع والمستوى ولو كانت بسيطة', 'Varied words that fit the topic and level, even if simple')] },
+      { code: 'organisation', title: L('التنظيم والترابط', 'Organisation'), levels: [L('لا ترتيب واضح للأفكار', 'No clear order'), L('قائمة أفكار تربطها و/ثم فقط', 'A list of ideas joined only by and/then'), L('ترتيب واضح وأدوات ربط متنوعة وكل فكرة مطورة', 'Clear order, varied linking, each idea developed')] },
+      { code: 'mechanics', title: L('الإملاء وعلامات الترقيم', 'Spelling and punctuation'), levels: [L('أخطاء في معظم الجمل وبعض الكلمات صعبة التعرف', 'Errors in most sentences; some words hard to recognise'), L('أخطاء في عدة جمل', 'Errors in several sentences'), L('أخطاء في جمل قليلة فقط', 'Errors in only a few sentences')] },
     ],
   },
   {
