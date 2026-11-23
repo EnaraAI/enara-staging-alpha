@@ -36,7 +36,7 @@ def ellipse():
 
 def laila(baseline_ids):
     if not os.path.exists('/tmp/laila'): sh('git clone -q --depth 1 https://gitlab.com/bigirqu/laila.git /tmp/laila')
-    df = pd.read_csv('/tmp/laila/essays_and_scores/all_essays_with_indivdual_rater_scores.csv')
+    df = pd.read_csv('/tmp/laila/essays_and_scores/all_essays_with_indivdual_rater_scores.csv', dtype={'essay_id': str})  # keep leading zeros (ids match the grader baseline)
     traits = ['relevance', 'organization', 'vocabulary', 'style', 'development', 'mechanics', 'grammar', 'holistic']
     df = df[['essay_id', 'prompt_id', 'essay'] + traits].rename(columns={'essay_id': 'id', 'essay': 'text'})
     df['id'] = df['id'].astype(str)
@@ -158,6 +158,7 @@ for ds in DATASETS:
         res['models'][mname] = per
         print(ds, mname, json.dumps({t: per[t]['test'] for t in traits}), flush=True)
     res['baselineEssaysInTest'] = int(mask_base.sum())
+    log(f'{ds}: {int(mask_base.sum())} of the grader-baseline essays are in the test set')
     summary['datasets'][ds] = res
 json.dump(summary, open(f'{OUT}/summary.json', 'w'), indent=1)
 log('done')
