@@ -1,0 +1,258 @@
+{
+ "note": "numbers only; data downloaded at run time; LAILA used for training by owner decision (23 Nov 2026), written confirmation from the authors pending",
+ "datasets": {
+  "ellipse": {
+   "train": 3911,
+   "test": 2571,
+   "models": {
+    "A_features_ridge": {
+     "Cohesion": {
+      "alpha": 3,
+      "test": {
+       "rmse": 0.523,
+       "qwkNative": 0.495,
+       "enaraExact": 0.617,
+       "enaraWithin1": 0.998,
+       "enaraQwk": 0.386
+      },
+      "baselineEssays": {
+       "rmse": 0.492,
+       "qwkNative": 0.518,
+       "enaraExact": 0.635,
+       "enaraWithin1": 1.0,
+       "enaraQwk": 0.398
+      },
+      "msPer100Predict": 1.8
+     },
+     "Syntax": {
+      "alpha": 3,
+      "test": {
+       "rmse": 0.513,
+       "qwkNative": 0.501,
+       "enaraExact": 0.649,
+       "enaraWithin1": 0.999,
+       "enaraQwk": 0.438
+      },
+      "baselineEssays": {
+       "rmse": 0.477,
+       "qwkNative": 0.495,
+       "enaraExact": 0.695,
+       "enaraWithin1": 1.0,
+       "enaraQwk": 0.461
+      },
+      "msPer100Predict": 1.8
+     },
+     "Vocabulary": {
+      "alpha": 3,
+      "test": {
+       "rmse": 0.444,
+       "qwkNative": 0.53,
+       "enaraExact": 0.682,
+       "enaraWithin1": 0.998,
+       "enaraQwk": 0.363
+      },
+      "baselineEssays": {
+       "rmse": 0.428,
+       "qwkNative": 0.47,
+       "enaraExact": 0.645,
+       "enaraWithin1": 1.0,
+       "enaraQwk": 0.172
+      },
+      "msPer100Predict": 1.9
+     },
+     "Phraseology": {
+      "alpha": 3,
+      "test": {
+       "rmse": 0.498,
+       "qwkNative": 0.537,
+       "enaraExact": 0.633,
+       "enaraWithin1": 0.999,
+       "enaraQwk": 0.415
+      },
+      "baselineEssays": {
+       "rmse": 0.485,
+       "qwkNative": 0.495,
+       "enaraExact": 0.625,
+       "enaraWithin1": 1.0,
+       "enaraQwk": 0.374
+      },
+      "msPer100Predict": 1.8
+     },
+     "Grammar": {
+      "alpha": 1,
+      "test": {
+       "rmse": 0.539,
+       "qwkNative": 0.531,
+       "enaraExact": 0.643,
+       "enaraWithin1": 0.997,
+       "enaraQwk": 0.465
+      },
+      "baselineEssays": {
+       "rmse": 0.505,
+       "qwkNative": 0.523,
+       "enaraExact": 0.635,
+       "enaraWithin1": 1.0,
+       "enaraQwk": 0.455
+      },
+      "msPer100Predict": 2.1
+     },
+     "Conventions": {
+      "alpha": 3,
+      "test": {
+       "rmse": 0.527,
+       "qwkNative": 0.5,
+       "enaraExact": 0.628,
+       "enaraWithin1": 0.998,
+       "enaraQwk": 0.4
+      },
+      "baselineEssays": {
+       "rmse": 0.492,
+       "qwkNative": 0.485,
+       "enaraExact": 0.665,
+       "enaraWithin1": 1.0,
+       "enaraQwk": 0.386
+      },
+      "msPer100Predict": 1.9
+     },
+     "Overall": {
+      "alpha": 1,
+      "test": {
+       "rmse": 0.464,
+       "qwkNative": 0.608
+      },
+      "baselineEssays": {
+       "rmse": 0.437,
+       "qwkNative": 0.605
+      },
+      "msPer100Predict": 1.9
+     }
+    },
+    "B_microsoft/deberta-v3-base_ridge": {
+     "Cohesion": {
+      "alpha": 30,
+      "test": {
+       "rmse": 0.48,
+       "qwkNative": 0.607,
+       "enaraExact": 0.653,
+       "enaraWithin1": 0.997,
+       "enaraQwk": 0.495
+      },
+      "baselineEssays": {
+       "rmse": 0.446,
+       "qwkNative": 0.645,
+       "enaraExact": 0.645,
+       "enaraWithin1": 0.995,
+       "enaraQwk": 0.445
+      },
+      "msPer100Predict": 0.3
+     },
+     "Syntax": {
+      "alpha": 30,
+      "test": {
+       "rmse": 0.454,
+       "qwkNative": 0.645,
+       "enaraExact": 0.686,
+       "enaraWithin1": 0.998,
+       "enaraQwk": 0.551
+      },
+      "baselineEssays": {
+       "rmse": 0.414,
+       "qwkNative": 0.66,
+       "enaraExact": 0.72,
+       "enaraWithin1": 1.0,
+       "enaraQwk": 0.569
+      },
+      "msPer100Predict": 0.3
+     },
+     "Vocabulary": {
+      "alpha": 30,
+      "test": {
+       "rmse": 0.411,
+       "qwkNative": 0.63,
+       "enaraExact": 0.695,
+       "enaraWithin1": 1.0,
+       "enaraQwk": 0.478
+      },
+      "baselineEssays": {
+       "rmse": 0.393,
+       "qwkNative": 0.605,
+       "enaraExact": 0.69,
+       "enaraWithin1": 1.0,
+       "enaraQwk": 0.425
+      },
+      "msPer100Predict": 0.4
+     },
+     "Phraseology": {
+      "alpha": 30,
+      "test": {
+       "rmse": 0.448,
+       "qwkNative": 0.672,
+       "enaraExact": 0.673,
+       "enaraWithin1": 0.998,
+       "enaraQwk": 0.557
+      },
+      "baselineEssays": {
+       "rmse": 0.461,
+       "qwkNative": 0.608,
+       "enaraExact": 0.68,
+       "enaraWithin1": 0.995,
+       "enaraQwk": 0.536
+      },
+      "msPer100Predict": 0.3
+     },
+     "Grammar": {
+      "alpha": 30,
+      "test": {
+       "rmse": 0.451,
+       "qwkNative": 0.708,
+       "enaraExact": 0.697,
+       "enaraWithin1": 0.999,
+       "enaraQwk": 0.616
+      },
+      "baselineEssays": {
+       "rmse": 0.458,
+       "qwkNative": 0.653,
+       "enaraExact": 0.675,
+       "enaraWithin1": 1.0,
+       "enaraQwk": 0.596
+      },
+      "msPer100Predict": 0.3
+     },
+     "Conventions": {
+      "alpha": 30,
+      "test": {
+       "rmse": 0.456,
+       "qwkNative": 0.677,
+       "enaraExact": 0.683,
+       "enaraWithin1": 0.998,
+       "enaraQwk": 0.568
+      },
+      "baselineEssays": {
+       "rmse": 0.444,
+       "qwkNative": 0.68,
+       "enaraExact": 0.7,
+       "enaraWithin1": 1.0,
+       "enaraQwk": 0.542
+      },
+      "msPer100Predict": 0.3
+     },
+     "Overall": {
+      "alpha": 30,
+      "test": {
+       "rmse": 0.392,
+       "qwkNative": 0.731
+      },
+      "baselineEssays": {
+       "rmse": 0.39,
+       "qwkNative": 0.716
+      },
+      "msPer100Predict": 0.3
+     }
+    }
+   },
+   "encoderMsPerEssayCpu": 125.4,
+   "baselineEssaysInTest": 200
+  }
+ },
+ "maxLength": 256
+}

@@ -1,0 +1,41 @@
+[11:44:42 +0.0 min] ellipse: loading data
+[11:44:44 +0.0 min] ellipse: 3911 train / 2571 test essays, 7 traits
+[11:44:44 +0.0 min] ellipse: model A (text features) building
+[11:44:57 +0.3 min] ellipse: model A features ready
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[11:45:05 +0.4 min] ellipse encoder microsoft/deberta-v3-base: reading 3911 train essays
+[11:45:56 +1.2 min] ellipse encoder train: 400/3911 essays (10%), 0.9 min so far, ~7.5 min left
+[11:46:46 +2.1 min] ellipse encoder train: 800/3911 essays (20%), 1.7 min so far, ~6.6 min left
+[11:47:36 +2.9 min] ellipse encoder train: 1200/3911 essays (30%), 2.5 min so far, ~5.7 min left
+[11:48:26 +3.7 min] ellipse encoder train: 1600/3911 essays (40%), 3.4 min so far, ~4.8 min left
+[11:49:15 +4.6 min] ellipse encoder train: 2000/3911 essays (51%), 4.2 min so far, ~4.0 min left
+[11:50:06 +5.4 min] ellipse encoder train: 2400/3911 essays (61%), 5.0 min so far, ~3.2 min left
+[11:50:58 +6.3 min] ellipse encoder train: 2800/3911 essays (71%), 5.9 min so far, ~2.3 min left
+[11:51:50 +7.1 min] ellipse encoder train: 3200/3911 essays (81%), 6.8 min so far, ~1.5 min left
+[11:52:42 +8.0 min] ellipse encoder train: 3600/3911 essays (92%), 7.6 min so far, ~0.7 min left
+[11:53:22 +8.7 min] ellipse encoder train: 3911/3911 essays (100%), 8.3 min so far, ~0.0 min left
+[11:53:22 +8.7 min] ellipse encoder microsoft/deberta-v3-base: reading 2571 test essays
+[11:54:11 +9.5 min] ellipse encoder test: 400/2571 essays (15%), 0.8 min so far, ~4.5 min left
+[11:55:01 +10.3 min] ellipse encoder test: 800/2571 essays (31%), 1.7 min so far, ~3.7 min left
+[11:55:50 +11.1 min] ellipse encoder test: 1200/2571 essays (46%), 2.5 min so far, ~2.8 min left
+[11:56:40 +12.0 min] ellipse encoder test: 1600/2571 essays (62%), 3.3 min so far, ~2.0 min left
+[11:57:28 +12.8 min] ellipse encoder test: 2000/2571 essays (77%), 4.1 min so far, ~1.2 min left
+[11:58:17 +13.6 min] ellipse encoder test: 2400/2571 essays (93%), 4.9 min so far, ~0.4 min left
+[11:58:37 +13.9 min] ellipse encoder test: 2571/2571 essays (100%), 5.3 min so far, ~0.0 min left
+[11:58:42 +14.0 min] ellipse A_features_ridge Cohesion: done (1/7)
+[11:58:48 +14.1 min] ellipse A_features_ridge Syntax: done (2/7)
+[11:58:53 +14.2 min] ellipse A_features_ridge Vocabulary: done (3/7)
+[11:58:59 +14.3 min] ellipse A_features_ridge Phraseology: done (4/7)
+[11:59:06 +14.4 min] ellipse A_features_ridge Grammar: done (5/7)
+[11:59:12 +14.5 min] ellipse A_features_ridge Conventions: done (6/7)
+[11:59:18 +14.6 min] ellipse A_features_ridge Overall: done (7/7)
+ellipse A_features_ridge {"Cohesion": {"rmse": 0.523, "qwkNative": 0.495, "enaraExact": 0.617, "enaraWithin1": 0.998, "enaraQwk": 0.386}, "Syntax": {"rmse": 0.513, "qwkNative": 0.501, "enaraExact": 0.649, "enaraWithin1": 0.999, "enaraQwk": 0.438}, "Vocabulary": {"rmse": 0.444, "qwkNative": 0.53, "enaraExact": 0.682, "enaraWithin1": 0.998, "enaraQwk": 0.363}, "Phraseology": {"rmse": 0.498, "qwkNative": 0.537, "enaraExact": 0.633, "enaraWithin1": 0.999, "enaraQwk": 0.415}, "Grammar": {"rmse": 0.539, "qwkNative": 0.531, "enaraExact": 0.643, "enaraWithin1": 0.997, "enaraQwk": 0.465}, "Conventions": {"rmse": 0.527, "qwkNative": 0.5, "enaraExact": 0.628, "enaraWithin1": 0.998, "enaraQwk": 0.4}, "Overall": {"rmse": 0.464, "qwkNative": 0.608}}
+[11:59:19 +14.6 min] ellipse B_microsoft/deberta-v3-base_ridge Cohesion: done (1/7)
+[11:59:20 +14.6 min] ellipse B_microsoft/deberta-v3-base_ridge Syntax: done (2/7)
+[11:59:21 +14.7 min] ellipse B_microsoft/deberta-v3-base_ridge Vocabulary: done (3/7)
+[11:59:21 +14.7 min] ellipse B_microsoft/deberta-v3-base_ridge Phraseology: done (4/7)
+[11:59:22 +14.7 min] ellipse B_microsoft/deberta-v3-base_ridge Grammar: done (5/7)
+[11:59:23 +14.7 min] ellipse B_microsoft/deberta-v3-base_ridge Conventions: done (6/7)
+[11:59:24 +14.7 min] ellipse B_microsoft/deberta-v3-base_ridge Overall: done (7/7)
+ellipse B_microsoft/deberta-v3-base_ridge {"Cohesion": {"rmse": 0.48, "qwkNative": 0.607, "enaraExact": 0.653, "enaraWithin1": 0.997, "enaraQwk": 0.495}, "Syntax": {"rmse": 0.454, "qwkNative": 0.645, "enaraExact": 0.686, "enaraWithin1": 0.998, "enaraQwk": 0.551}, "Vocabulary": {"rmse": 0.411, "qwkNative": 0.63, "enaraExact": 0.695, "enaraWithin1": 1.0, "enaraQwk": 0.478}, "Phraseology": {"rmse": 0.448, "qwkNative": 0.672, "enaraExact": 0.673, "enaraWithin1": 0.998, "enaraQwk": 0.557}, "Grammar": {"rmse": 0.451, "qwkNative": 0.708, "enaraExact": 0.697, "enaraWithin1": 0.999, "enaraQwk": 0.616}, "Conventions": {"rmse": 0.456, "qwkNative": 0.677, "enaraExact": 0.683, "enaraWithin1": 0.998, "enaraQwk": 0.568}, "Overall": {"rmse": 0.392, "qwkNative": 0.731}}
+[11:59:24 +14.7 min] done
