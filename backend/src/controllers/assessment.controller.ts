@@ -146,6 +146,8 @@ function engineQuestion(q: Record<string, unknown>, index: number) {
     difficulty: getOptionalNumber(q, 'difficulty', { min: 1, max: 5 }),
     points: getOptionalNumber(q, 'points', { min: 0, max: 100 }),
     source: q.source === 'ai' ? ('ai' as const) : ('manual' as const),
+    // P4: a question taken from the item bank keeps its bank item and version.
+    ...(typeof q.itemId === 'string' && /^bi-[0-9a-f-]{36}$/.test(q.itemId) && Number.isInteger(q.itemVersion) && (q.itemVersion as number) >= 1 ? { itemId: q.itemId, itemVersion: q.itemVersion as number } : {}),
   };
   const engine = ensurePlainObject(q.engine, `questions[${index}].engine`);
   if (isOpenEngine({ type: 'engine', engine: engine as never }) && !engineV2('assessGrading')) throw new AppError('Open answers graded by the engine are not switched on', 400, 'VALIDATION_ERROR');

@@ -23,6 +23,7 @@ import { StudyPlan } from './pages/StudyPlan';
 import { AssessmentBuilder } from './pages/teaching/AssessmentBuilder';
 import { ClassAssignments } from './pages/teaching/ClassAssignments';
 import { GradingReview } from './pages/teaching/GradingReview';
+import { QuestionBank } from './pages/teaching/QuestionBank';
 import { TeachingDashboard } from './pages/teaching/TeachingDashboard';
 import { LessonPlanner } from './pages/teaching/LessonPlanner';
 import { AssessmentInterface } from './pages/AssessmentInterface';
@@ -680,6 +681,7 @@ const App: React.FC = () => {
           {state.page === 'assessment-builder' && <AssessmentBuilder />}
           {state.page === 'class-assignments' && <ClassAssignments initialClassId={state.lmsTarget?.classId ?? undefined} initialAssignmentId={state.lmsTarget?.assignmentId} />}
           {state.page === 'grading' && <GradingReview />}
+          {state.page === 'question-bank' && <QuestionBank />}
           {state.page === 'teaching' && <TeachingDashboard initialClassId={state.lmsTarget?.classId ?? undefined} />}
           {/* LMS Phase 8: a teacher's view of a tutor, live avatar or diagnostic activity for the course's class. */}
           {lmsActivityOfPage(state.page) && <LmsActivityOverview key={state.page} kind={lmsActivityOfPage(state.page)!} classId={state.lmsTarget?.classId ?? lmsSessionClassId()} />}

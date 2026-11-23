@@ -12,7 +12,7 @@ Status: **go given (22 Nov 2026). P2b in progress.** Branch `claude/tutor-assess
 | P3a science + humanities graders (checklist rubrics per item; humanities judged only against the source), bench ar + en | PR open | – |
 | P3b listening (recording + hidden transcript; answers judged against the transcript), bench ar + en | PR open | – |
 | P3c speaking through the engine; code grader (sandbox) | owner decisions (MORNING_SUMMARY) | – |
-| P4 generation, checks, judge, teacher review, generation bench | not started | – |
+| P4 generation, code checks, judge (provisional: DeepSeek), teacher review (Question bank page), generation bench | PR open | – |
 | P5 CI regression gate, admin card, cost/latency report | not started | – |
 
 ## 0. Reuse what exists
@@ -205,6 +205,17 @@ Switch: `assessGen`.
   added to GitHub (then $5 hard stop per run).
 - **Baseline:** `data/assessment-bench/baseline.json` holds the last within-1 per set on lms-test-live (the 0.03 regression rule).
 - **Data path:** `data/assessment-bench/<domain>/<lang>/` (served with the backend like `data/curricula`).
+
+## 6a. P4 as built (22-23 Nov 2026, overnight, owner's go)
+- `backend/src/assessment/generate/`: `generator.ts` (≤5 items per request, one prompt with the JSON shapes of every type, language and
+  level as parameters), `checks.ts` (the §6.2 list), `judge.ts` (1-5 per criterion, pass = all ≥4 and safety 5), `pipeline.ts`
+  (one regeneration with the reasons, then the bank as `judged`, or refused), `bank.ts` (versions, review decisions, approved → question).
+- Judge and generator both run on the configured provider (DeepSeek on lms-test), **never on the fallback provider**; every report says
+  `judge: provisional`. The Anthropic judge (§6.3) waits for the owner's credits.
+- `/api/item-bank` (switch `assessGen`): list, generate, teacher item, review (approve / edit → new version / reject + reason code),
+  approved item → question with `itemId` + `itemVersion`. "Add to assessment" goes through the normal assessment update.
+- UI: a "Question bank" page in the teacher's menu (not yet a tab inside AssessmentBuilder).
+- Generation bench: `POST /api/maintenance/assessment-gen-bench` per subject × language (schema, checks, judge pass rates).
 
 ## 8. UI (existing apps, ar + en, RTL, phone first)
 - **Teacher:** a "Question bank" tab in AssessmentBuilder; GradingReview extended with per-criterion model scores, reasons and override.
