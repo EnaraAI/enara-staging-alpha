@@ -180,7 +180,7 @@ if AUG:
     for i, r in enumerate(rows):
         ss = SPLIT(r['answer']); keep = 2 if r['type'] == 'essay' else 1
         if len(ss) > keep: aug_src.append(i); aug_texts.append(' '.join(ss[:keep]))
-        for kpad in (1, 2, 4):  # several padding amounts, so adding correct sentences never moves grammar or spelling
+        for kpad in (1, 2, 3, 4, 6):  # several padding amounts, so adding correct sentences never moves grammar or spelling
             aug_src.append(i); aug_texts.append(r['answer'] + ' ' + ' '.join(rr.sample(PAD_TRAIN, kpad)))
     Xaug = cached('aug', aug_texts, 'length-augmented copies')
     log(f'length augmentation: {len(aug_texts)} copies')
@@ -200,6 +200,12 @@ log(f'stage 1 after removing re-check essays: {len(Xpre)}; human re-check essays
 report = {'label': 'MODEL-MARKED: development only, not for claims, never for a real school', 'lang': LANG, 'encoder': ENC, 'maxTokens': MAXLEN,
           'stage1Essays': int(len(Xpre)), 'enaraLabelled': len(rows), 'ownerCorrections': n_corr, 'evaluation': '5-fold cross-validation by question (every answer tested once, never trained on in its fold)', 'types': {}}
 K = 5
+RECIPE = 'two_stage' if LANG == 'en' else 'stage2_only'  # run 2-3: the better recipe per language
+CMP = None
+if os.environ.get('MK_COMPARE') and os.path.exists(os.environ['MK_COMPARE']):  # answers Claude graded earlier
+    CMP = json.load(open(os.environ['MK_COMPARE']))
+    Xcmp = Z(cached('compare', [c['answer'] for c in CMP], 'Claude comparison answers')) if CMP else None
+report['recipe'] = RECIPE; report['oof'] = {}; report['compareScores'] = {}
 rnd_of = lambda P, crit, mx: np.stack([np.clip(np.rint(P[:, j]), 0, mx[c]) for j, c in enumerate(crit)], 1).astype(int)
 for typ in ['essay', 'short_answer']:
     crit = CR if typ == 'essay' else SHORT_CR; ix = [CR.index(c) for c in crit]; mx = MAX[typ]
@@ -264,6 +270,24 @@ for typ in ['essay', 'short_answer']:
     tests = tests_of(tests_acc['two_stage']); tests_s2 = tests_of(tests_acc['stage2_only'])
     bar = {c: bool(per[c]['vsMedian']['two_stage']['within1'] >= 0.85 and (per[c]['vsMedian']['two_stage']['qwk'] or 0) >= (per[c]['vsMedian']['v3b_deepseek']['qwk'] or 0)) for c in crit}
     entry = {'answers': len(T), 'questions': len(groups), 'perCriterion': per, 'lengthTests': tests, 'lengthTests_stage2only': tests_s2, 'lengthAugmentation': AUG, 'passesBar': bar}
+    report['oof'][typ] = {rows[i]['id']: {c: int(preds[RECIPE][n, j]) for j, c in enumerate(crit)} for n, i in enumerate(T)}
+    # final model of the chosen recipe on all ENARA answers of this type (+ length copies), for scoring other answers
+    trg = groups; val_g = set(trg[:max(1, len(trg) // 8)])
+    va = [i for i in T if rows[i]['group'] in val_g]; tr = [i for i in T if rows[i]['group'] not in val_g]
+    Xtr, Ytr = Xen[tr], Y_of(tr)
+    if AUG:
+        sel_a = [n for n, i in enumerate(aug_src) if i in set(tr)]
+        Ya = np.full((len(sel_a), len(crit)), np.nan, dtype=np.float32)
+        for m_, n in enumerate(sel_a):
+            for j, c in enumerate(crit):
+                if c in ('grammar_accuracy', 'mechanics'): Ya[m_, j] = rows[aug_src[n]]['label'][c]
+        Xtr, Ytr = np.vstack([Xtr, Xaug[sel_a]]), np.vstack([Ytr, Ya])
+    torch.manual_seed(SEED); final = fit(copy.deepcopy(s1) if RECIPE == 'two_stage' else Head(d, len(crit)), Xtr, Ytr, 80, 3e-4 if RECIPE == 'two_stage' else 1e-3, Xen[va], Y_of(va))
+    if CMP:
+        ci = [n for n, c in enumerate(CMP) if c['type'] == typ]
+        if ci:
+            Pc = rnd_of(predict(final, Xcmp[ci]), crit, mx)
+            for m_, n in enumerate(ci): report['compareScores'][CMP[n]['id']] = {c: int(Pc[m_, j]) for j, c in enumerate(crit)}
     if typ == 'essay':  # final essay model on all ENARA essays -> the 200 human-scored essays (v3b's numbers from today's measurement)
         trg = groups; val_g = set(trg[:max(1, len(trg) // 8)])
         va = [i for i in T if rows[i]['group'] in val_g]; tr = [i for i in T if rows[i]['group'] not in val_g]
