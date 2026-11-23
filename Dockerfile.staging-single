@@ -24,6 +24,8 @@ WORKDIR /app
 COPY --from=api /api/package.json ./
 COPY --from=api /api/node_modules ./node_modules
 COPY --from=api /api/dist ./dist
+# Spelling dictionaries for rules-first grading (Hunspell files with their licences; see backend/assets/dictionaries/NOTICE.md).
+COPY backend/assets ./assets
 COPY --from=web /web/dist ./public
 # Staging-only switches (ignored unless ENARA_STAGING=true). NODE_ENV and all
 # secrets are set on the Railway service, never baked in.

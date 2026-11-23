@@ -66,7 +66,7 @@ export function codeGrade(rules: RulesResult, maxByCriterion: Record<string, num
   const points = scores.reduce((n, c) => n + c.points, 0);
   return {
     points, maxPoints: Object.values(maxByCriterion).reduce((n, m) => n + m, 0), criterionScores: scores, criteria: scores.map(criterionOf(maxByCriterion)),
-    errorCodes: [], confidence: 1, flagged: false, flagReasons: [], feedback: fb[ui], scoreExplanation: fb[ui], strengths: [], improvements: [], grader: 'code', runs: [],
+    errorCodes: rules.errorCodes ?? [], confidence: 1, flagged: false, flagReasons: [], feedback: fb[ui], scoreExplanation: fb[ui], strengths: [], improvements: [], grader: 'code', runs: [],
   };
 }
 

@@ -1,5 +1,14 @@
 // Rules-first coverage on the assessment bench, offline (no model, no database): npm run bench:rules [-- --misses]
 import { rulesCoverage, coverageLine } from '../assessment/bench/rulesCoverage';
+import { spellChecker, loadStats } from '../assessment/text/dictionaries';
+
+// Spelling dictionaries: load time (first use in a process) and the heap they take.
+for (const lang of ['en', 'ar']) {
+  const before = process.memoryUsage().heapUsed;
+  const ok = spellChecker(lang) !== null;
+  const mb = (process.memoryUsage().heapUsed - before) / 1e6;
+  console.log(ok ? `dictionary ${lang}: ${loadStats[lang].entries} entries, loaded in ${loadStats[lang].ms} ms, ~${Math.round(mb)} MB heap` : `dictionary ${lang}: NOT FOUND (spelling rules off)`);
+}
 
 const rows = rulesCoverage();
 for (const r of rows) {

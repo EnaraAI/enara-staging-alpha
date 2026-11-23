@@ -18,6 +18,8 @@ COPY package*.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 
 COPY --from=build /app/dist ./dist
+# Spelling dictionaries for rules-first grading (Hunspell files with their licences; see assets/dictionaries/NOTICE.md).
+COPY assets ./assets
 
 USER node
 EXPOSE 3001
