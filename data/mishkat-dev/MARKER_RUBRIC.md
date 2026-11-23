@@ -19,6 +19,7 @@ Judge as an experienced language teacher, not a proofreader. Use the whole scale
 
 ## Arabic only
 - Arabic is graded as Modern Standard Arabic. Egyptian or any colloquial words or structures used instead of MSA (e.g. بحب، عشان، مش، هنروح، ده) count as grammar errors.
+- **Owner rule (23 Nov 2026):** an answer written MOSTLY in colloquial gets the lowest grammar level (0), even when it is easy to understand. One or two colloquial words in an otherwise Modern Standard Arabic answer do not by themselves lower a short answer's grammar (0/1) to 0; in essays they count as ordinary grammar errors.
 - Spelling variants of ة/ه, ى/ي and hamza seats are spelling (mechanics) matters, not grammar.
 
 ## Very short answers
