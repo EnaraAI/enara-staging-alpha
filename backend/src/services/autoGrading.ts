@@ -1,4 +1,5 @@
-import { gradeEngineQuestion, isOpenEngine, rubricExtrasOf } from '../assessment/questionBridge';
+import { gradeEngineQuestion, isOpenEngine, isCodeEngine, rubricExtrasOf } from '../assessment/questionBridge';
+import { gradeCode } from '../assessment/grading-engine/graders/code';
 import { gradeOpenAnswer, nearPassMark } from '../assessment/grading-engine/open';
 import type { OpenItem } from '../assessment/grading-engine/graders/domains';
 import { engineV2 } from './engineV2';
@@ -191,6 +192,15 @@ export function validateGrading(params: { attempt: AttemptDoc; assignment: Pick<
     const max = questionPoints(q);
     if (a.maxPoints !== max) fail('bad_max_points', `Question ${q.id} has the wrong maximum`);
     if (typeof a.points !== 'number' || !Number.isFinite(a.points) || a.points < 0 || a.points > max) fail('bad_points', `Question ${q.id} has points out of range`);
+    // Code answers: graded by the sandbox tests (method rule); one 0-1 criterion per test, summing to the points.
+    if (isCodeEngine(q)) {
+      if (!hasText(a.studentAnswer)) { if (a.points !== 0) fail('bad_points', `Unanswered question ${q.id} has points`); continue; }
+      const crit = q.rubric?.criteria || [];
+      const scores = a.criterionScores || [];
+      if (a.method !== 'rule' || a.grader !== 'code') fail('bad_method', `Code question ${q.id} was not graded by its tests`);
+      if (scores.length !== crit.length || scores.some((x) => x.points !== 0 && x.points !== 1) || scores.reduce((n, x) => n + x.points, 0) !== a.points) fail('bad_criteria', `Code question ${q.id} test results don't add up`);
+      continue;
+    }
     if (a.method === 'rule') {
       const tf = graderV2On() && hasText(a.studentAnswer) ? targetFormPoints(q, String(a.studentAnswer), max) : null;
       if (tf !== null) {
@@ -206,6 +216,7 @@ export function validateGrading(params: { attempt: AttemptDoc; assignment: Pick<
     }
     // A flagged engine answer with no model grade (model unavailable): 0 points until the teacher scores it.
     if (isOpenEngine(q) && a.flagged && a.grader === 'none') { if (a.points !== 0) fail('bad_points', `Question ${q.id} has points without a grade`); continue; }
+
     if (a.method !== 'ai') fail('bad_method', `Question ${q.id} was not graded by the grader`);
     const e = evaluations.get(q.id);
     if (!e || e.attemptId !== attempt.id || e.questionId !== q.id || !usable(e)) fail('missing_evaluation', `Question ${q.id} has no valid evaluation`);
@@ -329,6 +340,18 @@ export async function processAttempt(attemptId: string, now = new Date()): Promi
         continue;
       }
       const text = String(a.studentAnswer);
+      if (isCodeEngine(q)) {
+        // Code: the teacher's tests in the sandbox; no model, so it runs whether or not a model is ready.
+        const e = q.engine as { answer_key: { tests: { name: string; call: string; expected: unknown }[] } };
+        const g = await gradeCode({ code: text, tests: e.answer_key.tests, uiLanguage });
+        answers.push({
+          ...a, points: g.points, method: 'rule', needsReview: g.flagged, isCorrect: g.points === g.maxPoints,
+          criterionScores: g.criterionScores, feedback: g.feedback, scoreExplanation: g.scoreExplanation,
+          criteria: g.criteria, errorCodes: g.errorCodes, confidence: 1, flagged: g.flagged, flagReasons: g.flagReasons as never, grader: 'code', feedbackText: g.feedback,
+        } as IAttemptAnswer);
+        history.push({ at: now, by: GRADER, action: g.flagged ? 'engine_flagged' : 'engine_evaluated', questionId: q.id, to: g.points, reason: `tests ${g.points}/${g.maxPoints}` });
+        continue;
+      }
       if (isOpenEngine(q)) {
         const maxByCriterion = Object.fromEntries((q.rubric?.criteria || []).map((c) => [c.id, c.maxPoints]));
         const g = await gradeOpenAnswer({ attempt, item: openItemOf(q), answer: a.studentAnswer, uiLanguage, maxByCriterion, modelReady: engineModelReady });
@@ -374,7 +397,7 @@ export async function processAttempt(attemptId: string, now = new Date()): Promi
     // Result validation.
     const t = validateGrading({ attempt, assignment, version, questions, answers, evaluations });
     // Assessment engine: a model-graded attempt within 1 point of the pass mark (the assignment's own, else the app's 60 %) goes to the teacher.
-    const modelGraded = answers.filter((a) => isOpenEngine(byId.get(a.questionId) ?? {}) && a.grader && a.grader !== 'none');
+    const modelGraded = answers.filter((a) => isOpenEngine(byId.get(a.questionId) ?? {}) && String(a.grader ?? '').startsWith('model:'));
     if (modelGraded.length && nearPassMark(t.totalPoints, t.maxPoints, assignment.speaking?.passThreshold ?? 60)) {
       for (const a of modelGraded) { a.flagged = true; a.needsReview = true; a.flagReasons = [...new Set([...(a.flagReasons ?? []), 'near_pass_mark'])]; }
     }

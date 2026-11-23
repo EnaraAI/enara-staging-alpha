@@ -7,7 +7,7 @@ import React from 'react';
 
 export type UiLang = 'ar' | 'en';
 type Opt = { id: string; text: string };
-export interface EngineQ { id: string; text: string; engine: { type: string; options?: unknown; language: string; source?: string; audio?: { url: string } } }
+export interface EngineQ { id: string; text: string; engine: { type: string; options?: unknown; language: string; source?: string; audio?: { url: string }; starter?: string; code_language?: string } }
 
 const T = {
   en: { yourAnswer: 'Your answer', steps: 'Your working (steps)', final: 'Final answer', chooseAll: 'Choose all that apply', chooseOne: 'Choose one', true: 'True', false: 'False', blank: 'Blank', choose: 'Choose…', number: 'Number', unit: 'Unit', up: 'Move up', down: 'Move down', matchWith: 'matches', orderHint: 'Put these in the right order', matchHint: 'Match each item on the start with one on the end', numberHint: 'Write a number (and its unit if needed)' },
@@ -164,6 +164,16 @@ const EngineAnswer: React.FC<{ q: EngineQ; value: string; onChange: (v: string) 
           )}
           <textarea aria-label={label(t.yourAnswer)} dir="auto" value={value}
             className={`w-full border border-slate-300 rounded-lg p-3 text-base ${e.type === 'essay' ? 'min-h-[180px]' : 'min-h-[80px]'}`}
+            onChange={(ev) => onChange(ev.target.value)} />
+        </div>
+      );
+    case 'code':
+      // Code (JavaScript): the teacher's starter code until the learner types; graded by hidden tests after submission.
+      return (
+        <div className="mt-3" dir="ltr" data-testid={`eq-${q.id}`}>
+          <p className="text-xs text-slate-500 mb-1">{lang === 'ar' ? 'اكتب الكود بلغة JavaScript' : 'Write your code in JavaScript'}</p>
+          <textarea aria-label={label(t.yourAnswer)} dir="ltr" spellCheck={false} value={value || e.starter || ''}
+            className="w-full border border-slate-300 rounded-lg p-3 text-sm font-mono min-h-[200px] bg-slate-50"
             onChange={(ev) => onChange(ev.target.value)} />
         </div>
       );

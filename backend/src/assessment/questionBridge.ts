@@ -11,7 +11,8 @@ import { z } from 'zod';
 
 export const ENGINE_TYPE = 'engine' as const;
 // Open types graded by a domain grader (P2a, switch assessGrading): language short answer and essay, maths worked steps.
-export const OPEN_ENGINE_TYPES = ['short_answer', 'essay', 'math_steps'] as const;
+// 'code' (switch assessCode): graded by tests in the sandbox, not by a model, but after submission like the open types.
+export const OPEN_ENGINE_TYPES = ['short_answer', 'essay', 'math_steps', 'code'] as const;
 export type OpenEngineType = (typeof OPEN_ENGINE_TYPES)[number];
 export const isOpenEngine = (q: { type?: string; engine?: { type?: string } | null }): boolean => q.type === 'engine' && (OPEN_ENGINE_TYPES as readonly string[]).includes(String(q.engine?.type));
 const LANG = z.string().regex(/^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$/);
@@ -25,6 +26,11 @@ const OpenContent = z.union([
   z.object({ type: z.literal('essay'), domain: z.literal('language'), language: LANG, answer_key: z.object({ model_answer: z.string().max(4000).optional() }).strict().optional(), flags: z.record(z.boolean()).optional() }).strict(),
   z.object({ type: z.literal('math_steps'), domain: z.literal('math'), language: LANG, answer_key: z.object({ final: z.object({ value: z.union([z.number(), z.string().min(1).max(100)]), tolerance_abs: z.number().nonnegative().optional(), tolerance_rel: z.number().nonnegative().max(1).optional(), unit: z.string().max(32).nullable().optional() }).strict(), solution: z.string().max(4000).optional() }).strict(), flags: z.record(z.boolean()).optional() }).strict(),
   z.object({ type: z.enum(['short_answer', 'essay']), domain: z.literal('science'), language: LANG, answer_key: z.object({ content_points: POINTS, model_answer: z.string().max(4000).optional() }).strict(), flags: z.record(z.boolean()).optional() }).strict(),
+  z.object({
+    type: z.literal('code'), domain: z.literal('code'), language: LANG, code_language: z.literal('javascript'), starter: z.string().max(4000).optional(),
+    answer_key: z.object({ tests: z.array(z.object({ name: z.string().trim().min(1).max(120), call: z.string().trim().min(1).max(500), expected: z.unknown() }).strict()).min(1).max(20) }).strict(),
+    flags: z.record(z.boolean()).optional(),
+  }).strict(),
   z.object({ type: z.literal('short_answer'), domain: z.literal('listening'), language: LANG, audio: AUDIO, answer_key: z.object({ required_points: POINTS, model_answer: z.string().max(2000).optional() }).strict(), flags: z.record(z.boolean()).optional() }).strict(),
   z.object({ type: z.enum(['short_answer', 'essay']), domain: z.literal('humanities'), language: LANG, source: z.string().trim().min(40).max(8000), answer_key: z.object({ required_points: POINTS, model_answer: z.string().max(4000).optional() }).strict(), flags: z.record(z.boolean()).optional() }).strict(),
 ]);
@@ -34,10 +40,16 @@ export function rubricExtrasOf(e: { domain?: string; answer_key?: unknown; flags
   const points = e?.domain === 'science' ? k.content_points : e?.domain === 'humanities' || e?.domain === 'listening' ? k.required_points : undefined;
   return { points, units: e?.flags?.units === true };
 }
+export const isCodeEngine = (q: { type?: string; engine?: { type?: string } | null }): boolean => q.type === 'engine' && q.engine?.type === 'code';
+/** A code question's rubric: one 0-1 criterion per test (the learner sees only "Test N"; the teacher sees the test names). */
+export function codeRubric(tests: { name: string }[], lang: string) {
+  const ar = lang.startsWith('ar');
+  return { criteria: tests.map((t, i) => ({ id: `test_${i + 1}`, title: t.name, maxPoints: 1, levels: [{ id: 'p0', label: '0', points: 0, description: ar ? 'لم ينجح' : 'Fails' }, { id: 'p1', label: '1', points: 1, description: ar ? 'نجح' : 'Passes' }], objectiveIds: undefined as string[] | undefined })) };
+}
 export const isSubjectEngine = (e: { domain?: string } | null | undefined): boolean => e?.domain === 'science' || e?.domain === 'humanities';
 /** A recording (any engine item) or a listening question needs the switch assessMedia. */
 export const isMediaEngine = (e: { domain?: string; audio?: unknown } | null | undefined): boolean => !!e?.audio || e?.domain === 'listening';
-export interface EngineContent { type: ClosedType | OpenEngineType; domain?: 'language' | 'math' | 'science' | 'humanities' | 'listening'; source?: string; audio?: { url: string; transcript?: string }; options?: unknown; answer_key: unknown; flags?: Record<string, boolean>; language: string; error_codes?: string[] }
+export interface EngineContent { type: ClosedType | OpenEngineType; domain?: 'language' | 'math' | 'science' | 'humanities' | 'listening' | 'code'; source?: string; code_language?: string; starter?: string; audio?: { url: string; transcript?: string }; options?: unknown; answer_key: unknown; flags?: Record<string, boolean>; language: string; error_codes?: string[] }
 type Q = { id: string; type: string; text: string; points?: number; difficulty?: number; engine?: EngineContent | null };
 
 /** The engine item of a question, in the schema the graders check. */
@@ -59,6 +71,7 @@ export function checkEngineQuestion(q: Q): { ok: true; engine: EngineContent; ru
     const c = parsed.data;
     // The rubric and points are the engine's template for (domain, type) in the item's language; science and humanities add the
     // item's own content points as a checklist.
+    if (c.type === 'code') { const tests = (c.answer_key as { tests: { name: string }[] }).tests; return { ok: true, engine: c as unknown as EngineContent, rubric: codeRubric(tests, c.language) as ReturnType<typeof rubricFor>, points: tests.length }; }
     const extras = rubricExtrasOf(c);
     return { ok: true, engine: c as EngineContent, rubric: rubricFor(c.domain, c.type, c.language, extras), points: totalPoints(c.domain, c.type, extras) };
   }
@@ -102,6 +115,7 @@ export function describeKey(q: Q): string {
     case 'math_steps': { const f = (k as { final?: { value: unknown; unit?: string | null } } | undefined)?.final; return f ? `${String(f.value)}${f.unit ? ` ${f.unit}` : ''}` : ''; }
     // Science and humanities: the points the answer should state (the teacher's view; never sent to a learner).
     case 'short_answer': case 'essay': return (rubricExtrasOf(e).points ?? []).join(' · ');
+    case 'code': return ((k as { tests?: { name: string }[] }).tests ?? []).map((t) => t.name).join(' · ');
     default: return '';
   }
 }
@@ -153,8 +167,8 @@ export function forLearner<T extends Q>(q: T): T {
   // Science, humanities, listening: the checklist criteria are titled with the answer's points; the learner sees "Required point N".
   const rubric = (q as { rubric?: { criteria?: { id: string; title?: string; levels?: { description?: string }[] }[] } }).rubric;
   const ar = String(rest.language ?? '').startsWith('ar');
-  const safeRubric = rubric?.criteria?.some((c) => /^point_\d+$/.test(c.id))
-    ? { ...rubric, criteria: rubric.criteria.map((c) => { const m = /^point_(\d+)$/.exec(c.id); return m ? { ...c, title: ar ? `النقطة المطلوبة ${m[1]}` : `Required point ${m[1]}`, levels: (c.levels ?? []).map((l) => ({ ...l, description: '' })) } : c; }) }
+  const safeRubric = rubric?.criteria?.some((c) => /^(point|test)_\d+$/.test(c.id))
+    ? { ...rubric, criteria: rubric.criteria.map((c) => { const m = /^(point|test)_(\d+)$/.exec(c.id); return m ? { ...c, title: m[1] === 'test' ? (ar ? `اختبار ${m[2]}` : `Test ${m[2]}`) : ar ? `النقطة المطلوبة ${m[2]}` : `Required point ${m[2]}`, levels: (c.levels ?? []).map((l) => ({ ...l, description: '' })) } : c; }) }
     : undefined;
   return { ...q, ...(safeRubric ? { rubric: safeRubric } : {}), engine: { ...rest, options, ...(multi ? { multi: true } : {}), ...(audio ? { audio } : {}) } };
 }

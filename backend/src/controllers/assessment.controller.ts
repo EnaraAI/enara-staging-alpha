@@ -152,6 +152,7 @@ function engineQuestion(q: Record<string, unknown>, index: number) {
   const engine = ensurePlainObject(q.engine, `questions[${index}].engine`);
   if (isOpenEngine({ type: 'engine', engine: engine as never }) && !engineV2('assessGrading')) throw new AppError('Open answers graded by the engine are not switched on', 400, 'VALIDATION_ERROR');
   if (isSubjectEngine(engine as never) && !engineV2('assessSubjects')) throw new AppError('Science and humanities answers graded by the engine are not switched on', 400, 'VALIDATION_ERROR');
+  if ((engine as { type?: string }).type === 'code' && !engineV2('assessCode')) throw new AppError('Code questions are not switched on', 400, 'VALIDATION_ERROR');
   if (isMediaEngine(engine as never) && !engineV2('assessMedia')) throw new AppError('Listening questions (recordings) are not switched on', 400, 'VALIDATION_ERROR');
   const checked = checkEngineQuestion({ ...base, engine: engine as never });
   if (!checked.ok) throw new AppError(`Question ${index + 1}: ${checked.problems.slice(0, 3).join('; ')}`, 400, 'VALIDATION_ERROR');

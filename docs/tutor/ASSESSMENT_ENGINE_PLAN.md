@@ -11,7 +11,8 @@ Status: **go given (22 Nov 2026). P2b in progress.** Branch `claude/tutor-assess
 | P2b language + math bench (ar + en), open within-1 ≥ 0.85 (no Anthropic spending, §7a) | done: run 1 maths 0.91/0.97; language calibrated (engine-v2) → run 2 0.89/0.91 | #91, #93 |
 | P3a science + humanities graders (checklist rubrics per item; humanities judged only against the source), bench ar + en | done: science 0.97/0.93, humanities 0.96/0.89 | #92 |
 | P3b listening (recording + hidden transcript; answers judged against the transcript), bench ar + en | done: 0.99/0.98 | #93 |
-| P3c speaking through the engine; code grader (sandbox) | owner decisions (MORNING_SUMMARY) | – |
+| P3c code grader: JavaScript in a WebAssembly sandbox inside ENARA (owner's choice, 23 Nov 2026) | PR open | – |
+| P3d speaking through the engine language grader; pronunciation never scored (owner: yes, 23 Nov 2026) | next | – |
 | P4 generation, code checks, judge (provisional: DeepSeek), teacher review (Question bank page), generation bench | PR open | #94 |
 | P5 baseline (all 10 sets) for the regression rule, Item bank card (bank, judge pass rate, flag rate, last bench, speed), cost/latency in baseline.json | PR open (after P4) | – |
 
@@ -216,6 +217,14 @@ Switch: `assessGen`.
   approved item → question with `itemId` + `itemVersion`. "Add to assessment" goes through the normal assessment update.
 - UI: a "Question bank" page in the teacher's menu (not yet a tab inside AssessmentBuilder).
 - Generation bench: `POST /api/maintenance/assessment-gen-bench` per subject × language (schema, checks, judge pass rates).
+
+## 6b. Code grader (owner's choice 23 Nov 2026: a sandbox inside lms-test)
+- Learners' JavaScript runs in QuickJS compiled to WebAssembly inside our server (`graders/code/sandbox.ts`): no require, process,
+  files, network or timers; 16 MB heap, 256 KB stack, 500 ms per test, 2 s per answer; code ≤ 20 000 characters; a fresh WASM module
+  per answer, dropped after any error (a crash can't reach the server process).
+- A code question (`engine.type: 'code'`, switch `assessCode`): the teacher's tests (`call` + `expected` JSON), hidden from learners;
+  one point per passing test; feedback names failing tests ("test 2: too slow") without revealing them. No model involved.
+- Python later only if a sandbox as strict as this one is available (e.g. a WASM Python with no host bridge).
 
 ## 8. UI (existing apps, ar + en, RTL, phone first)
 - **Teacher:** a "Question bank" tab in AssessmentBuilder; GradingReview extended with per-criterion model scores, reasons and override.
