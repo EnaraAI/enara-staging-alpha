@@ -1,0 +1,46 @@
+[13:47:41 +0.0 min] ellipse: loading data
+[13:47:43 +0.0 min] ellipse: 3911 train / 2571 test essays, 7 traits
+[13:47:43 +0.0 min] ellipse: model A (text features) building
+[13:47:43 +0.0 min] ellipse: will also score 90 ENARA benchmark answers (en)
+[13:47:54 +0.2 min] ellipse: model A features ready
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[13:48:02 +0.4 min] encoder threads: 4 (cpu_count 4, usable 4)
+[13:48:02 +0.4 min] ellipse encoder microsoft/deberta-v3-base: reading 3911 train essays
+[13:57:04 +9.4 min] ellipse encoder train: 400/3911 essays (10%), 9.0 min so far, ~79.2 min left
+[14:05:55 +18.2 min] ellipse encoder train: 800/3911 essays (20%), 17.9 min so far, ~69.5 min left
+[14:14:47 +27.1 min] ellipse encoder train: 1200/3911 essays (30%), 26.7 min so far, ~60.4 min left
+[14:23:41 +36.0 min] ellipse encoder train: 1600/3911 essays (40%), 35.6 min so far, ~51.5 min left
+[14:32:41 +45.0 min] ellipse encoder train: 2000/3911 essays (51%), 44.6 min so far, ~42.7 min left
+[14:41:43 +54.0 min] ellipse encoder train: 2400/3911 essays (61%), 53.7 min so far, ~33.8 min left
+[14:50:34 +62.9 min] ellipse encoder train: 2800/3911 essays (71%), 62.5 min so far, ~24.8 min left
+[14:59:37 +71.9 min] ellipse encoder train: 3200/3911 essays (81%), 71.6 min so far, ~15.9 min left
+[15:08:41 +81.0 min] ellipse encoder train: 3600/3911 essays (92%), 80.6 min so far, ~7.0 min left
+[15:15:47 +88.1 min] ellipse encoder train: 3911/3911 essays (100%), 87.7 min so far, ~0.0 min left
+[15:15:47 +88.1 min] ellipse encoder microsoft/deberta-v3-base: reading 2571 test essays
+[15:24:49 +97.1 min] ellipse encoder test: 400/2571 essays (15%), 9.0 min so far, ~49.0 min left
+[15:33:50 +106.2 min] ellipse encoder test: 800/2571 essays (31%), 18.1 min so far, ~40.0 min left
+[15:42:53 +115.2 min] ellipse encoder test: 1200/2571 essays (46%), 27.1 min so far, ~31.0 min left
+[15:51:46 +124.1 min] ellipse encoder test: 1600/2571 essays (62%), 36.0 min so far, ~21.8 min left
+[16:00:33 +132.9 min] ellipse encoder test: 2000/2571 essays (77%), 44.8 min so far, ~12.8 min left
+[16:09:35 +141.9 min] ellipse encoder test: 2400/2571 essays (93%), 53.8 min so far, ~3.8 min left
+[16:13:27 +145.8 min] ellipse encoder test: 2571/2571 essays (100%), 57.7 min so far, ~0.0 min left
+[16:13:27 +145.8 min] ellipse encoder microsoft/deberta-v3-base: reading 90 ENARA benchmark essays
+[16:14:03 +146.4 min] ellipse encoder ENARA benchmark: 90/90 essays (100%), 0.6 min so far, ~0.0 min left
+[16:14:06 +146.4 min] ellipse A_features_ridge Cohesion: done (1/7)
+[16:14:09 +146.5 min] ellipse A_features_ridge Syntax: done (2/7)
+[16:14:13 +146.5 min] ellipse A_features_ridge Vocabulary: done (3/7)
+[16:14:16 +146.6 min] ellipse A_features_ridge Phraseology: done (4/7)
+[16:14:20 +146.7 min] ellipse A_features_ridge Grammar: done (5/7)
+[16:14:23 +146.7 min] ellipse A_features_ridge Conventions: done (6/7)
+[16:14:26 +146.8 min] ellipse A_features_ridge Overall: done (7/7)
+ellipse A_features_ridge {"Cohesion": {"rmse": 0.523, "qwkNative": 0.495, "enaraExact": 0.617, "enaraWithin1": 0.998, "enaraQwk": 0.386}, "Syntax": {"rmse": 0.513, "qwkNative": 0.501, "enaraExact": 0.649, "enaraWithin1": 0.999, "enaraQwk": 0.438}, "Vocabulary": {"rmse": 0.444, "qwkNative": 0.53, "enaraExact": 0.682, "enaraWithin1": 0.998, "enaraQwk": 0.363}, "Phraseology": {"rmse": 0.498, "qwkNative": 0.537, "enaraExact": 0.633, "enaraWithin1": 0.999, "enaraQwk": 0.415}, "Grammar": {"rmse": 0.539, "qwkNative": 0.531, "enaraExact": 0.643, "enaraWithin1": 0.997, "enaraQwk": 0.465}, "Conventions": {"rmse": 0.527, "qwkNative": 0.5, "enaraExact": 0.628, "enaraWithin1": 0.998, "enaraQwk": 0.4}, "Overall": {"rmse": 0.464, "qwkNative": 0.608}}
+[16:14:27 +146.8 min] ellipse B_microsoft/deberta-v3-base_ridge Cohesion: done (1/7)
+[16:14:28 +146.8 min] ellipse B_microsoft/deberta-v3-base_ridge Syntax: done (2/7)
+[16:14:29 +146.8 min] ellipse B_microsoft/deberta-v3-base_ridge Vocabulary: done (3/7)
+[16:14:30 +146.8 min] ellipse B_microsoft/deberta-v3-base_ridge Phraseology: done (4/7)
+[16:14:30 +146.8 min] ellipse B_microsoft/deberta-v3-base_ridge Grammar: done (5/7)
+[16:14:31 +146.8 min] ellipse B_microsoft/deberta-v3-base_ridge Conventions: done (6/7)
+[16:14:32 +146.9 min] ellipse B_microsoft/deberta-v3-base_ridge Overall: done (7/7)
+ellipse B_microsoft/deberta-v3-base_ridge {"Cohesion": {"rmse": 0.48, "qwkNative": 0.607, "enaraExact": 0.654, "enaraWithin1": 0.997, "enaraQwk": 0.496}, "Syntax": {"rmse": 0.454, "qwkNative": 0.645, "enaraExact": 0.686, "enaraWithin1": 0.998, "enaraQwk": 0.551}, "Vocabulary": {"rmse": 0.411, "qwkNative": 0.63, "enaraExact": 0.695, "enaraWithin1": 1.0, "enaraQwk": 0.478}, "Phraseology": {"rmse": 0.448, "qwkNative": 0.672, "enaraExact": 0.673, "enaraWithin1": 0.998, "enaraQwk": 0.557}, "Grammar": {"rmse": 0.451, "qwkNative": 0.708, "enaraExact": 0.697, "enaraWithin1": 0.999, "enaraQwk": 0.616}, "Conventions": {"rmse": 0.456, "qwkNative": 0.677, "enaraExact": 0.683, "enaraWithin1": 0.998, "enaraQwk": 0.568}, "Overall": {"rmse": 0.392, "qwkNative": 0.731}}
+[16:14:32 +146.9 min] ellipse: 200 of the grader-baseline essays are in the test set
+[16:14:32 +146.9 min] done
