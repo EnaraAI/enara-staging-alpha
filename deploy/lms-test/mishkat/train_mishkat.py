@@ -186,7 +186,8 @@ for typ in ['essay', 'short_answer']:
         for j, c in enumerate(crit):
             if mx[c] == 1: Ypre[:, j] = np.where(np.isnan(Ypre[:, j]), np.nan, (Ypre[:, j] >= 1).astype(np.float32))
     T = [i for i, r in enumerate(rows) if r['type'] == typ]
-    groups = sorted({rows[i]['group'] for i in T}); fold_of = {rows[i]['group']: rows[i]['fold'] for i in T}
+    groups = sorted({rows[i]['group'] for i in T}); random.Random(SEED).shuffle(groups)  # shuffled, so validation groups mix subjects
+    fold_of = {rows[i]['group']: rows[i]['fold'] for i in T}
     Y_of = lambda idx: np.array([[rows[i]['label'][c] for c in crit] for i in idx], dtype=np.float32)
     d = Xpre.shape[1]
     torch.manual_seed(SEED); s1 = fit(Head(d, len(crit)), Xpre, Ypre, 15, 1e-3)
