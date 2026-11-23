@@ -1,0 +1,39 @@
+# Baseline of today's engine language grader on ELLIPSE (CC BY 4.0; downloaded at run time from the official repository, never stored).
+# Model calls go to DeepSeek on lms-test through the maintenance route llm-compare. Numbers only to claude/tutor-lms-ellipse-results.
+name: lms-test ELLIPSE baseline
+on:
+  push:
+    branches: ['claude/tutor-lms-dscompare-run']
+    paths: ['deploy/lms-test/ellipse/**', '.github/workflows/lms-test-ellipse.yml']
+permissions:
+  contents: write
+jobs:
+  baseline:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Today's grader (lms-test-live)
+        run: |
+          git fetch -q origin lms-test-live && git worktree add -q live FETCH_HEAD
+          cd live/backend && npm ci --silent
+      - name: Baseline
+        working-directory: deploy/lms-test/ellipse
+        env:
+          LMSTEST_MAINTENANCE_TOKEN: ${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}
+          LIVE_BACKEND: ${{ github.workspace }}/live/backend
+        run: |
+          export TUTOR_LLM_MODEL="$(node -e "const f=require('${{ github.workspace }}/live/deploy/lms-test.flags.json');console.log(f.features.find(x=>x.flags.TUTOR_LLM_MODEL).flags.TUTOR_LLM_MODEL)")"
+          ${{ github.workspace }}/live/backend/node_modules/.bin/tsx baseline.ts 2>&1 | grep -vE "full_text|essay text" | tee run.log
+      - name: Publish (numbers only)
+        if: always()
+        working-directory: deploy/lms-test/ellipse
+        run: |
+          mkdir -p out && cp run.log out/ 2>/dev/null || true
+          cd out && git init -q && git checkout -q -b claude/tutor-lms-ellipse-results
+          git config user.name github-actions && git config user.email github-actions@users.noreply.github.com
+          git add -A && git commit -qm "ELLIPSE baseline ${GITHUB_SHA::8}"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" claude/tutor-lms-ellipse-results
