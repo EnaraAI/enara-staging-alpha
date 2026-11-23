@@ -27,7 +27,8 @@ export interface IAttemptAnswer {
   proposalId?: string;
   // Assessment engine (docs/tutor/ASSESSMENT_ENGINE_PLAN.md §3-§4): the grading engine's result for this answer.
   // feedbackText is the only stored model free text (deleted with the learner, studentErasure).
-  criteria?: { code: string; points: number; max: number; reasonCode: string }[];
+  // scoredBy/rule/reason: rules-first (who scored the criterion: code rules or the model, and code's short reason).
+  criteria?: { code: string; points: number; max: number; reasonCode: string; scoredBy?: 'code' | 'model'; rule?: string; reason?: string }[];
   errorCodes?: string[];
   confidence?: number;
   flagged?: boolean;
@@ -171,7 +172,7 @@ const attemptAnswerSchema = new Schema<IAttemptAnswer>(
     criterionScores: { type: [{ criterionId: String, levelId: String, points: Number, _id: false }], default: undefined },
     needsReview: Boolean,
     proposalId: String,
-    criteria: { type: [{ code: String, points: Number, max: Number, reasonCode: String, _id: false }], default: undefined },
+    criteria: { type: [{ code: String, points: Number, max: Number, reasonCode: String, scoredBy: { type: String, enum: ['code', 'model'] }, rule: String, reason: String, _id: false }], default: undefined },
     errorCodes: { type: [String], default: undefined },
     confidence: { type: Number, min: 0, max: 1 },
     flagged: Boolean,

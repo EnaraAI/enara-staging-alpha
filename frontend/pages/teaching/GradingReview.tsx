@@ -115,7 +115,7 @@ function AnswerReview({ item, attemptId, mode, onChanged, conversation }: { item
         )}
         {q.type === 'engine' ? (item.keyText ? <p className="text-xs text-slate-600 mt-1">Answer key: <b>{String(item.keyText)}</b></p> : null) : q.type !== 'open-response' && <p className="text-xs text-slate-600 mt-1">Answer key: <b>{String(q.correctAnswer)}</b></p>}
         {q.modelAnswer && <p className="text-xs text-slate-600 mt-1" dir="auto">Model answer (never shown to students): {q.modelAnswer}</p>}
-        {a.method && <p className="text-xs text-slate-600 mt-1">Graded by {METHOD[a.method] ?? a.method}</p>}
+        {a.method && <p className="text-xs text-slate-600 mt-1">Graded by {a.grader === 'code' && (a.criteria || []).some((c: any) => c.scoredBy === 'code') ? 'code rules (no model call)' : METHOD[a.method] ?? a.method}</p>}
       </div>
 
       {a.method === 'ai' && ev?.status === 'proposed' && (
@@ -147,7 +147,14 @@ function AnswerReview({ item, attemptId, mode, onChanged, conversation }: { item
         </p>
       )}
       {q.type === 'engine' && Array.isArray(a.criteria) && a.criteria.length > 0 && (
-        <ul className="text-xs text-slate-700 space-y-0.5">{a.criteria.map((c: any) => <li key={c.code}><b>{(q.rubric?.criteria || []).find((x: any) => x.id === c.code)?.title ?? c.code}:</b> {c.points} / {c.max}</li>)}</ul>
+        <ul className="text-xs text-slate-700 space-y-0.5">{a.criteria.map((c: any) => (
+          <li key={c.code}>
+            <b>{(q.rubric?.criteria || []).find((x: any) => x.id === c.code)?.title ?? c.code}:</b> {c.points} / {c.max}
+            {/* Rules-first: who scored the criterion (only on answers graded with the rulesFirst switch). */}
+            {c.scoredBy === 'code' && <span className="text-slate-500" data-testid="scored-by-code" dir="auto"> · scored by code{c.reason ? `: ${c.reason}` : ''}</span>}
+            {c.scoredBy === 'model' && <span className="text-slate-500" data-testid="scored-by-model"> · scored by the model</span>}
+          </li>
+        ))}</ul>
       )}
       {a.feedback && !editing && <p className="text-sm text-slate-700" dir="auto"><b>Feedback the student sees:</b> {a.feedback}</p>}
 

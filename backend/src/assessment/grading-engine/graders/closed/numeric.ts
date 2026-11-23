@@ -44,7 +44,7 @@ export function splitUnit(text: string): { num: string; unit: string | null } {
   return { num: text.trim(), unit: null };
 }
 
-const unitName = (u: string): string => UNIT_ALIASES[u.toLowerCase()] ?? UNIT_ALIASES[u] ?? u;
+export const unitName = (u: string): string => UNIT_ALIASES[u.toLowerCase()] ?? UNIT_ALIASES[u] ?? u;
 
 /** The value of `amount` expressed in `target` units; null when either is not a known unit or they do not convert. */
 export function convert(amount: number, from: string, target: string): number | null {

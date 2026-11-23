@@ -1,6 +1,6 @@
 import { gradeEngineQuestion, isOpenEngine, isCodeEngine, rubricExtrasOf } from '../assessment/questionBridge';
 import { gradeCode } from '../assessment/grading-engine/graders/code';
-import { gradeOpenAnswer, nearPassMark } from '../assessment/grading-engine/open';
+import { gradeOpenAnswer, nearPassMark, rulesFor } from '../assessment/grading-engine/open';
 import type { OpenItem } from '../assessment/grading-engine/graders/domains';
 import { engineV2 } from './engineV2';
 import { recordAlert } from './auditTrail';
@@ -201,6 +201,15 @@ export function validateGrading(params: { attempt: AttemptDoc; assignment: Pick<
       if (scores.length !== crit.length || scores.some((x) => x.points !== 0 && x.points !== 1) || scores.reduce((n, x) => n + x.points, 0) !== a.points) fail('bad_criteria', `Code question ${q.id} test results don't add up`);
       continue;
     }
+    // Rules-first: an open engine answer decided wholly by code rules (no model call) must be exactly what the rules give.
+    if (isOpenEngine(q) && a.grader === 'code') {
+      const crit = q.rubric?.criteria || [];
+      const r = rulesFor(openItemOf(q), a.studentAnswer, Object.fromEntries(crit.map((c) => [c.id, c.maxPoints])));
+      const scores = a.criterionScores || [];
+      const sum = crit.reduce((n, c) => n + (r.decided[c.id]?.points ?? NaN), 0);
+      if (a.method !== 'rule' || !r.allDecided || a.points !== sum || scores.length !== crit.length || scores.some((x) => r.decided[x.criterionId]?.points !== x.points)) fail('rule_mismatch', `Question ${q.id} does not match its code rules`);
+      continue;
+    }
     if (a.method === 'rule') {
       const tf = graderV2On() && hasText(a.studentAnswer) ? targetFormPoints(q, String(a.studentAnswer), max) : null;
       if (tf !== null) {
@@ -359,7 +368,7 @@ export async function processAttempt(attemptId: string, now = new Date()): Promi
         if (g.proposalId) evaluations.set(q.id, { id: g.proposalId, attemptId: attempt.id, questionId: q.id, status: 'proposed', objectiveIds: [] } as unknown as Evaluation);
         const blank = g.grader === 'none';
         answers.push({
-          ...a, points: g.points, method: 'ai', needsReview: g.flagged, proposalId: g.proposalId,
+          ...a, points: g.points, method: g.grader === 'code' ? 'rule' : 'ai', needsReview: g.flagged, proposalId: g.proposalId,
           criterionScores: g.criterionScores,
           feedback: blank ? 'Your teacher will check this answer.' : g.feedback,
           scoreExplanation: blank ? 'Waiting for your teacher.' : g.scoreExplanation,
@@ -367,7 +376,7 @@ export async function processAttempt(attemptId: string, now = new Date()): Promi
           criteria: g.criteria, errorCodes: g.errorCodes, confidence: g.confidence, flagged: g.flagged, flagReasons: g.flagReasons, grader: g.grader,
           ...(blank ? {} : { feedbackText: g.feedback }),
         } as IAttemptAnswer);
-        history.push({ at: now, by: GRADER, action: g.flagged ? 'engine_flagged' : 'engine_evaluated', questionId: q.id, to: g.points, reason: g.flagged ? g.flagReasons.join(', ') : `runs: ${g.runs.map((r) => r.points).join(', ')}` });
+        history.push({ at: now, by: GRADER, action: g.flagged ? 'engine_flagged' : 'engine_evaluated', questionId: q.id, to: g.points, reason: g.flagged ? g.flagReasons.join(', ') : g.grader === 'code' ? `code: ${g.criteria[0]?.rule ?? ''}` : `runs: ${g.runs.map((r) => r.points).join(', ')}` });
         continue;
       }
       if (q.type === 'open-response') {
