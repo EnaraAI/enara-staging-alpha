@@ -10,7 +10,7 @@ import { checkGenerated, questionOf, type GenItem } from './checks';
 import { judgeItem } from './judge';
 
 const genOf = (b: Pick<IBankItem, 'type' | 'subject' | 'language' | 'stem' | 'options' | 'answer_key' | 'difficulty' | 'objective_code' | 'flags' | 'level'> & { passage?: string | null }): GenItem => ({
-  type: b.type, domain: ['short_answer', 'essay', 'math_steps'].includes(b.type) ? b.subject : undefined, language: b.language === 'ar' ? 'ar' : 'en',
+  type: b.type, domain: ['short_answer', 'essay', 'math_steps'].includes(b.type) ? b.subject : undefined, subject: b.subject, language: b.language === 'ar' ? 'ar' : 'en',
   stem: b.stem, options: b.options ?? undefined, answer_key: b.answer_key, difficulty: b.difficulty, objective_code: b.objective_code,
   level: b.level, flags: Object.fromEntries(Object.entries(b.flags ?? {}).filter(([k]) => k !== 'kids')), ...(b.passage ? { source: b.passage } : {}),
 });
@@ -37,7 +37,7 @@ export async function listBank(p: { schoolId: string | null; status?: string; su
 
 /** A teacher's own item (source 'teacher'): checked by code, judged when a model is available, then waits for review. */
 export async function createTeacherItem(p: { item: Omit<GenItem, 'language'> & { language: string; subject: string; level: string }; teacherId: string; schoolId: string | null; judge: boolean }) {
-  const gen: GenItem = { ...p.item, language: p.item.language === 'ar' ? 'ar' : 'en', domain: ['short_answer', 'essay', 'math_steps'].includes(p.item.type) ? p.item.subject : undefined };
+  const gen: GenItem = { ...p.item, subject: p.item.subject, language: p.item.language === 'ar' ? 'ar' : 'en', domain: ['short_answer', 'essay', 'math_steps'].includes(p.item.type) ? p.item.subject : undefined };
   const problems = checkGenerated(gen);
   if (problems.length) throw new AppError(`The item was refused: ${problems.join('; ')}`, 400, 'ITEM_REFUSED');
   const report = p.judge ? await judgeItem(gen, {}).catch(() => null) : null;

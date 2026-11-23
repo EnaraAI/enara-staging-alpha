@@ -30,6 +30,19 @@ Every item also has "difficulty" (1-5).`;
 
 const Reply = z.object({ items: z.array(z.object({ type: z.string(), stem: z.string().min(3), options: z.unknown().optional(), answer_key: z.unknown(), difficulty: z.number().int().min(1).max(5) }).passthrough()).min(1).max(5) });
 
+/** Open items: keep only the key fields the subject's schema allows (the model sometimes adds points or a rubric to a language item, or
+ * names a science item's points 'required_points'); found by the generation bench. Closed items are left as they are. */
+export function tidyKey(domain: string, type: string, key: unknown): unknown {
+  if (!['short_answer', 'essay'].includes(type) || !key || typeof key !== 'object') return key;
+  const k = key as Record<string, unknown>;
+  const points = (Array.isArray(k.content_points) ? k.content_points : Array.isArray(k.required_points) ? k.required_points : Array.isArray(k.points) ? k.points : undefined) as unknown[] | undefined;
+  const model = typeof k.model_answer === 'string' ? { model_answer: k.model_answer } : {};
+  if (domain === 'language') return model;
+  if (domain === 'science') return { ...(points ? { content_points: points.map(String) } : {}), ...model };
+  if (domain === 'humanities') return { ...(points ? { required_points: points.map(String) } : {}), ...model };
+  return key;
+}
+
 export async function generateItems(req: GenRequest, ctx: { institutionId?: string }): Promise<GenItem[]> {
   const lang = req.language === 'ar' ? 'Modern Standard Arabic (never dialect)' : 'English';
   const system =
@@ -50,8 +63,8 @@ export async function generateItems(req: GenRequest, ctx: { institutionId?: stri
     system, user, validate: (raw) => Reply.parse(raw),
   });
   return value.items.slice(0, Math.min(5, req.count)).map((it) => ({
-    type: it.type, domain: ['short_answer', 'essay', 'math_steps'].includes(it.type) ? req.domain : undefined, language: req.language,
-    stem: it.stem, options: it.options, answer_key: it.answer_key, difficulty: it.difficulty, objective_code: req.objective_code,
+    type: it.type, domain: ['short_answer', 'essay', 'math_steps'].includes(it.type) ? req.domain : undefined, subject: req.domain, language: req.language,
+    stem: it.stem, options: it.options, answer_key: tidyKey(req.domain, it.type, it.answer_key), difficulty: it.difficulty, objective_code: req.objective_code,
     level: req.level, ...(req.domain === 'humanities' && req.source_text && ['short_answer', 'essay'].includes(it.type) ? { source: req.source_text } : {}),
   }));
 }
