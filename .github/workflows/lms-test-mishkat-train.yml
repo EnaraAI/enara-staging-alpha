@@ -1,0 +1,47 @@
+# Mishkat (owner go, 23 Nov 2026): two-stage training (LAILA/ELLIPSE, then ENARA MODEL-MARKED labels; owner corrections win) and the
+# held-out evaluation next to v3b. Development only. CPU, no secrets. Numbers only to claude/tutor-lms-mishkat-results-<lang>.
+name: lms-test Mishkat training
+on:
+  push:
+    branches: ['claude/tutor-lms-dscompare-run']
+    paths: ['deploy/lms-test/mishkat/train_mishkat.py', '.github/workflows/lms-test-mishkat-train.yml']
+permissions:
+  contents: write
+jobs:
+  train:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      matrix:
+        lang: [en, ar]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - name: Mishkat data (model-marked)
+        run: git fetch -q --depth 1 origin claude/tutor-lms-mishkat && git worktree add -q mk FETCH_HEAD
+      - name: Word lists (SCOWL en_US, Ayaspell ar) and a check
+        run: |
+          sudo apt-get install -y -q hunspell hunspell-en-us hunspell-ar >/dev/null
+          printf '^This sentense has a mistake\n^هذه جمله فيها خطا\n' | hunspell -a -d en_US | grep -c '^&' 
+          printf '^هذه جمله فيها خطا\n' | hunspell -a -d ar | head -5
+      - name: Libraries
+        run: |
+          pip install -q torch --index-url https://download.pytorch.org/whl/cpu
+          pip install -q numpy pandas scipy transformers sentencepiece protobuf tiktoken
+      - name: Train and evaluate
+        working-directory: deploy/lms-test/mishkat
+        env: { HF_HUB_DISABLE_PROGRESS_BARS: '1', TRANSFORMERS_VERBOSITY: error, MK_LANG: '${{ matrix.lang }}', MK_DATA: '${{ github.workspace }}/mk/data/mishkat-dev' }
+        run: python train_mishkat.py 2>&1 | tee train.log
+      - name: Publish (numbers only)
+        if: always()
+        working-directory: deploy/lms-test/mishkat
+        run: |
+          B=claude/tutor-lms-mishkat-results-${{ matrix.lang }}
+          mkdir -p results && cp train.log results/ 2>/dev/null || true
+          cd results && git init -q && git checkout -q -b "$B"
+          git config user.name github-actions && git config user.email github-actions@users.noreply.github.com
+          git add -A && git commit -qm "Mishkat training ${{ matrix.lang }} ${GITHUB_SHA::8}"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" "$B"
