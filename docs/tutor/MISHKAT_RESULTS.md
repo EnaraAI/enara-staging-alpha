@@ -2,7 +2,57 @@
 
 _23 Nov 2026, 6:45 PM Cairo. **MODEL-MARKED: development only, not for claims, never for a real school.** Nothing is switched; v3b stays the grader on lms-test._
 
-## In three lines
+## Run 2 (7:05 PM): every answer tested, plus human-scored essays
+_Cross-validation (5 folds by question): every ENARA answer is tested once and never trained on in its own fold. English has 233 essays and 262 short answers; Arabic has 222 and 260. The re-check uses the same 200 human-scored essays per language as v3b's measurement._
+
+### In three lines
+1. **On human-scored essays, Mishkat ranks grammar and spelling far better than v3b in both languages.**
+   - English grammar QWK: 0.39 against 0.11. This is the open item.
+   - Arabic grammar: 0.61 against 0.16.
+   - Caveat: Mishkat was pre-trained on other essays from the same two datasets, which gives it a home advantage on this check.
+2. **On ENARA's own answers, Mishkat matches v3b on grammar and vocabulary, and beats it on spelling in English** (0.58 against 0.44). v3b stays clearly better on organisation and task completion everywhere.
+3. **English passes all three length tests. Arabic still fails two**, so it needs one more fix before any switch.
+
+### Human-scored essays (200 per language; QWK: Mishkat two-stage / v3b)
+| Criterion | English (ELLIPSE) | Arabic (LAILA) |
+|---|---|---|
+| Grammar | **0.39** / 0.11 | **0.61** / 0.16 |
+| Spelling/punctuation | **0.40** / 0.13 | **0.60** / 0.30 |
+| Vocabulary | **0.30** / 0.21 | **0.58** / 0.46 |
+| Organisation | **0.37** / 0.33 | 0.60 / 0.59 |
+| Task completion | none in ELLIPSE | 0.40 / **0.53** |
+
+### ENARA answers, cross-validated (QWK against the Sonnet–Opus marks, so DeepSeek is not checking itself; Mishkat best recipe / v3b)
+| Criterion | English essays | Arabic essays | Short answers |
+|---|---|---|---|
+| Grammar | **0.80** / 0.78 | **0.75** / 0.72 | Arabic **0.76** / 0.55; English: no spread in the labels |
+| Spelling/punctuation | **0.54** / 0.34 | 0.75 / 0.75 | No spread in the labels |
+| Vocabulary | **0.89** / 0.80 | 0.84 / 0.84 | none |
+| Organisation | 0.73 / **0.80** | 0.72 / **0.85** | none |
+| Task completion | 0.58 / **0.83** | 0.55 / **0.75** | 0.42 / **0.76** (English), 0.34 / **0.71** (Arabic) |
+
+**Best recipe:** English two-stage; Arabic stage 2 only, since LAILA pre-training hurts on our answers.
+
+### Length tests
+| Test | English | Arabic |
+|---|---|---|
+| A short correct answer is not marked down (bar 90%) | **95%** ✅ | 79% ❌ |
+| Cutting a strong essay to 3 sentences (drop ≤ 0.3) | −0.02 ✅ | 0.21 ✅ |
+| Adding 3 correct sentences (rise ≤ 0.1) | −0.02 ✅ | 0.22 ❌ |
+
+### What it points to (no switch yet)
+- **A split by criterion:** Mishkat for grammar and spelling (English, and Arabic once its length tests pass), v3b for task completion, organisation and all feedback text.
+- **The formal bar** (QWK ≥ v3b against the median, which includes DeepSeek's own marks) is passed only by English spelling. Against the Sonnet–Opus marks, Mishkat ties or wins on grammar, spelling and vocabulary.
+- **Next:**
+  1. Fix Arabic length robustness: train with shortened and padded copies of answers, then re-test.
+  2. Apply your review-sheet corrections and retrain (minutes, from the cache).
+  3. Teacher marks, as the only labels that can confirm any of this.
+
+---
+
+# Run 1 (6:45 PM, a single 20% hold-out; kept for the record)
+
+### In three lines
 1. **Mishkat already matches or beats v3b on the "form" criteria:** grammar and spelling in both languages, and vocabulary in Arabic. v3b stays much better on task completion and organisation, which need the meaning of the answer.
 2. **Pre-training on LAILA and ELLIPSE (stage 1) helps English grammar a little but hurts Arabic.** The Arabic model trained on ENARA answers alone (stage 2 only) is better on almost every criterion.
 3. **Not ready for a switch.** The test sets are small (42–54 answers per type), and 3 of the 5 length tests pass. Run 2 is already going (since 6:43 PM): every answer is tested once by cross-validation, with a re-check on the 200 human-scored essays per language.
