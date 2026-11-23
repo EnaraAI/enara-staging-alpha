@@ -154,14 +154,16 @@ for (const ds of (cfg.datasets ?? []).filter((d) => d.startsWith('bench-'))) {
 }
 // ---- Mishkat marker (a): DeepSeek marks the model-marked dev pool with the live v3b language rubric, ONE run per answer ----
 for (const ds of (cfg.datasets ?? []).filter((d) => d.startsWith('mishkat-'))) {
-  const lang = ds.slice(8) as 'en' | 'ar';
+  const name = ds.slice(8); // 'en' | 'ar' (the dev pool) or 'compare-en' | 'compare-ar' (answers Claude graded earlier)
   const { gradeOpenRun } = await import(join(LIVE, 'src/assessment/grading-engine/graders/domains/index.ts'));
-  const pool = JSON.parse(readFileSync(join(LIVE, '..', 'data', 'mishkat-dev', `pool-${lang}.json`), 'utf8')) as { id: string; stem: string; type: 'short_answer' | 'essay'; answer: string }[];
+  const file = name.startsWith('compare-') ? join(LIVE, '..', 'data', 'mishkat-dev', 'claude-compare', `${name}.json`) : join(LIVE, '..', 'data', 'mishkat-dev', `pool-${name}.json`);
+  const pool = JSON.parse(readFileSync(file, 'utf8')) as { id: string; stem: string; type: 'short_answer' | 'essay'; answer: string; lang?: 'en' | 'ar' }[];
+  const langOf = (a: { lang?: 'en' | 'ar' }) => (a.lang ?? (name.endsWith('ar') ? 'ar' : 'en')) as 'en' | 'ar';
   const rows: Record<string, unknown>[] = []; let i = 0; const calls0 = relayCalls;
   const worker = async () => {
     while (i < pool.length) {
       const a = pool[i++];
-      const r = await gradeOpenRun({ attempt: { id: `mishkat-${a.id}` }, item: { questionId: a.id, stem: a.stem, type: a.type, domain: 'language', language: lang }, answer: a.answer, uiLanguage: lang, run: 1, options: { store: false, allowFallback: false } }).catch(() => null);
+      const r = await gradeOpenRun({ attempt: { id: `mishkat-${a.id}` }, item: { questionId: a.id, stem: a.stem, type: a.type, domain: 'language', language: langOf(a) }, answer: a.answer, uiLanguage: langOf(a), run: 1, options: { store: false, allowFallback: false } }).catch(() => null);
       const ok = r && r.status === 'proposed';
       rows.push({ id: a.id, marks: ok ? Object.fromEntries(r!.criterionScores.map((c: { criterionId: string; points: number }) => [c.criterionId, c.points])) : null, status: r?.status ?? 'error' });
       if (rows.length % 50 === 0) console.log(ds, 'marked', rows.length, 'of', pool.length);
