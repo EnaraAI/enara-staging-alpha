@@ -75,15 +75,30 @@ def stage1():
         b = lambda v: np.where(v <= 2.5, 0, np.where(v <= 3.5, 1, 2))
         Y = np.full((len(df), 5), np.nan, dtype=np.float32)
         Y[:, 1] = b((df.Grammar + df.Syntax) / 2); Y[:, 2] = b((df.Vocabulary + df.Phraseology) / 2); Y[:, 3] = b(df.Cohesion); Y[:, 4] = b(df.Conventions)
-        texts = df.full_text.tolist()
+        texts = df.full_text.tolist(); ids = df.text_id_kaggle.astype(str).tolist()
     else:
         sh('git clone -q --depth 1 https://gitlab.com/bigirqu/laila.git /tmp/laila')
         df = pd.read_csv('/tmp/laila/essays_and_scores/all_essays_with_indivdual_rater_scores.csv', dtype={'essay_id': str})
         b = lambda v: np.where(v <= 1, 0, np.where(v <= 3, 1, 2))
         Y = np.stack([np.clip(np.rint(df.relevance), 0, 2), b(df.grammar), b(df.vocabulary), b(df.organization), b(df.mechanics)], 1).astype(np.float32)
-        texts = df.essay.tolist()
+        texts = df.essay.tolist(); ids = df.essay_id.astype(str).tolist()
     idx = rng.permutation(len(texts))[:PRE_N]
-    return [texts[i] for i in idx], Y[idx]
+    return [texts[i] for i in idx], Y[idx], [ids[i] for i in idx]
+
+# ---------------- human re-check: the same 200 human-scored essays as this morning's v3b measurement ----------------
+def human():
+    ids = [str(x) for x in json.load(open(os.environ['MK_BASELINE']))['results']['ellipse' if LANG == 'en' else 'laila']['sampledIds']]
+    if LANG == 'en':
+        pw = re.search(r'password for the zip file is \*\*(\S+?)\*\*', open('/tmp/ellipse/README.md').read()).group(1)  # public; never printed
+        z = zipfile.ZipFile('/tmp/ellipse/ELLIPSE_Final_github_test.zip'); df = pd.read_csv(io.BytesIO(z.read(z.namelist()[0], pwd=pw.encode())), encoding_errors='replace')
+        df = df.set_index(df.text_id_kaggle.astype(str)).loc[ids]
+        b = lambda v: np.where(v <= 2.5, 0, np.where(v <= 3.5, 1, 2))
+        Y = {'grammar_accuracy': b((df.Grammar + df.Syntax) / 2), 'vocabulary_range': b((df.Vocabulary + df.Phraseology) / 2), 'organisation': b(df.Cohesion), 'mechanics': b(df.Conventions)}
+        return df.full_text.tolist(), Y, ids
+    df = pd.read_csv('/tmp/laila/essays_and_scores/all_essays_with_indivdual_rater_scores.csv', dtype={'essay_id': str}).set_index('essay_id').loc[ids]
+    b = lambda v: np.where(v <= 1, 0, np.where(v <= 3, 1, 2))
+    Y = {'task_completion': np.clip(np.rint(df.relevance), 0, 2).astype(int), 'grammar_accuracy': b(df.grammar), 'vocabulary_range': b(df.vocabulary), 'organisation': b(df.organization), 'mechanics': b(df.mechanics)}
+    return df.essay.tolist(), Y, ids
 
 # ---------------- ENARA model-marked data ----------------
 def enara():
@@ -137,7 +152,7 @@ def stats(p, g, k):
 
 # ---------------- run ----------------
 log(f'{LANG}: encoder {ENC}, max {MAXLEN} tokens, stage-1 sample {PRE_N}')
-pre_texts, pre_Y = stage1(); log(f'stage 1 data: {len(pre_texts)} essays')
+pre_texts, pre_Y, pre_ids = stage1(); log(f'stage 1 data: {len(pre_texts)} essays')
 rows, n_corr = enara(); log(f'ENARA model-marked: {len(rows)} labelled answers, owner corrections applied: {n_corr}')
 # Cache of the slow part (encoder + features), keyed by the workflow on the data and this feature version; a later crash or a retrain
 # after owner corrections reuses it. Labels are not cached (corrections must always apply).
@@ -156,56 +171,75 @@ mu, sd = np.vstack([Xpre, Xen]).mean(0), np.vstack([Xpre, Xen]).std(0) + 1e-6
 Z = lambda X: ((X - mu) / sd).astype(np.float32)
 Xpre, Xen = Z(Xpre), Z(Xen)
 
+# Keep the human re-check essays out of stage 1 (the cached stage-1 sample stays the same; overlapping rows are dropped here).
+h_texts, h_Y, h_ids = human(); hset = set(h_ids)
+keep = np.array([pid not in hset for pid in pre_ids]); Xpre, pre_Y = Xpre[keep], pre_Y[keep]
+Xh = Z(cached('human', h_texts, 'human re-check essays'))
+V3B = json.load(open(os.environ['MK_V3B']))['results']['ellipse' if LANG == 'en' else 'laila']['perCriterion']
+log(f'stage 1 after removing re-check essays: {len(Xpre)}; human re-check essays: {len(h_texts)}')
+
 report = {'label': 'MODEL-MARKED: development only, not for claims, never for a real school', 'lang': LANG, 'encoder': ENC, 'maxTokens': MAXLEN,
-          'stage1Essays': len(pre_texts), 'enaraLabelled': len(rows), 'ownerCorrections': n_corr, 'types': {}}
+          'stage1Essays': int(len(Xpre)), 'enaraLabelled': len(rows), 'ownerCorrections': n_corr, 'evaluation': '5-fold cross-validation by question (every answer tested once, never trained on in its fold)', 'types': {}}
+K = 5
+rnd_of = lambda P, crit, mx: np.stack([np.clip(np.rint(P[:, j]), 0, mx[c]) for j, c in enumerate(crit)], 1).astype(int)
 for typ in ['essay', 'short_answer']:
     crit = CR if typ == 'essay' else SHORT_CR; ix = [CR.index(c) for c in crit]; mx = MAX[typ]
     Ypre = pre_Y[:, ix].copy()
     if typ == 'short_answer':  # short answers: grammar and spelling are 0-1 (1 unless the meaning is blocked)
         for j, c in enumerate(crit):
             if mx[c] == 1: Ypre[:, j] = np.where(np.isnan(Ypre[:, j]), np.nan, (Ypre[:, j] >= 1).astype(np.float32))
-    R = [r for r in rows if r['type'] == typ]; groups = sorted({r['group'] for r in R}); random.Random(SEED).shuffle(groups)
-    test_g = set(groups[:max(1, len(groups) // 5)]); val_g = set(groups[len(test_g):len(test_g) + max(1, len(groups) // 8)])
-    sel = lambda gs: [i for i, r in enumerate(rows) if r['type'] == typ and r['group'] in gs]
-    te, va = sel(test_g), sel(val_g); tr = [i for i, r in enumerate(rows) if r['type'] == typ and r['group'] not in test_g | val_g]
+    T = [i for i, r in enumerate(rows) if r['type'] == typ]
+    groups = sorted({rows[i]['group'] for i in T}); random.Random(SEED).shuffle(groups); fold_of = {g: n % K for n, g in enumerate(groups)}
     Y_of = lambda idx: np.array([[rows[i]['label'][c] for c in crit] for i in idx], dtype=np.float32)
     d = Xpre.shape[1]
     torch.manual_seed(SEED); s1 = fit(Head(d, len(crit)), Xpre, Ypre, 15, 1e-3)
-    s2 = fit(copy.deepcopy(s1), Xen[tr], Y_of(tr), 80, 3e-4, Xen[va], Y_of(va))
-    torch.manual_seed(SEED); s2only = fit(Head(d, len(crit)), Xen[tr], Y_of(tr), 80, 1e-3, Xen[va], Y_of(va))
-    rnd = lambda P: np.stack([np.clip(np.rint(P[:, j]), 0, mx[c]) for j, c in enumerate(crit)], 1).astype(int)
-    preds = {'two_stage': rnd(predict(s2, Xen[te])), 'stage1_only': rnd(predict(s1, Xen[te])), 'stage2_only': rnd(predict(s2only, Xen[te]))}
-    v3b = np.array([[rows[i]['marks']['deepseek'][c] for c in crit] for i in te]); gold = Y_of(te).astype(int)
-    so_mask = np.array([[rows[i]['marks']['sonnet'][c] == rows[i]['marks']['opus'][c] for c in crit] for i in te])
-    so_gold = np.array([[rows[i]['marks']['sonnet'][c] for c in crit] for i in te])
+    oof = {'two_stage': np.zeros((len(rows), len(crit))), 'stage2_only': np.zeros((len(rows), len(crit))), 'stage1_only': predict(s1, Xen)}
+    tests_acc = {'short': [], 'trunc': [], 'pad': []}
+    for k in range(K):
+        te = [i for i in T if fold_of[rows[i]['group']] == k]
+        trg = [g for g in groups if fold_of[g] != k]; val_g = set(trg[:max(1, len(trg) // 8)])
+        va = [i for i in T if rows[i]['group'] in val_g]; tr = [i for i in T if fold_of[rows[i]['group']] != k and rows[i]['group'] not in val_g]
+        s2 = fit(copy.deepcopy(s1), Xen[tr], Y_of(tr), 80, 3e-4, Xen[va], Y_of(va))
+        torch.manual_seed(SEED + k); s2o = fit(Head(d, len(crit)), Xen[tr], Y_of(tr), 80, 1e-3, Xen[va], Y_of(va))
+        P = predict(s2, Xen[te]); oof['two_stage'][te] = P; oof['stage2_only'][te] = predict(s2o, Xen[te])
+        gi, mi = crit.index('grammar_accuracy'), crit.index('mechanics')
+        if typ == 'short_answer':
+            for n, i in enumerate(te):
+                L = rows[i]['label']
+                if L['grammar_accuracy'] == 1 and L['mechanics'] == 1 and L['task_completion'] == 2: tests_acc['short'].append(bool(P[n, gi] >= 0.5 and P[n, mi] >= 0.5))
+        else:
+            strong = [n for n, i in enumerate(te) if rows[i]['label']['grammar_accuracy'] == 2 and len(re.split(r'(?<=[.!?؟])\s+', rows[i]['answer'])) >= 4]
+            if strong:
+                Pc = predict(s2, Z(X_of([' '.join(re.split(r'(?<=[.!?؟])\s+', rows[te[n]]['answer'])[:3]) for n in strong], f'truncation test fold {k + 1}')))
+                tests_acc['trunc'] += list(np.r_[P[strong, gi] - Pc[:, gi], P[strong, mi] - Pc[:, mi]])
+            PAD = {'en': ' I like my school. My school is big. We learn many things there.', 'ar': ' أحب مدرستي. مدرستي كبيرة. نتعلم فيها أشياء كثيرة.'}[LANG]
+            Pp = predict(s2, Z(X_of([rows[i]['answer'] + PAD for i in te], f'padding test fold {k + 1}')))
+            tests_acc['pad'] += list(np.r_[Pp[:, gi] - P[:, gi], Pp[:, mi] - P[:, mi]])
+        log(f'{typ} fold {k + 1}/{K}: train {len(tr)}, val {len(va)}, test {len(te)}')
+    gold = Y_of(T).astype(int); v3b = np.array([[rows[i]['marks']['deepseek'][c] for c in crit] for i in T])
+    so_mask = np.array([[rows[i]['marks']['sonnet'][c] == rows[i]['marks']['opus'][c] for c in crit] for i in T]); so_gold = np.array([[rows[i]['marks']['sonnet'][c] for c in crit] for i in T])
+    preds = {name: rnd_of(P[T], crit, mx) for name, P in oof.items()}
     per = {}
     for j, c in enumerate(crit):
-        k = mx[c] + 1; m = so_mask[:, j]
-        per[c] = {'vsMedian': {**{name: stats(P[:, j], gold[:, j], k) for name, P in preds.items()}, 'v3b_deepseek': stats(v3b[:, j], gold[:, j], k)},
-                  'vsSonnetOpusAgreed': {**{name: stats(P[m, j], so_gold[m, j], k) for name, P in preds.items()}, 'v3b_deepseek': stats(v3b[m, j], so_gold[m, j], k)}}
-    # length tests (on held-out answers)
+        kk = mx[c] + 1; m = so_mask[:, j]
+        per[c] = {'vsMedian': {**{n: stats(P[:, j], gold[:, j], kk) for n, P in preds.items()}, 'v3b_deepseek': stats(v3b[:, j], gold[:, j], kk)},
+                  'vsSonnetOpusAgreed': {**{n: stats(P[m, j], so_gold[m, j], kk) for n, P in preds.items()}, 'v3b_deepseek': stats(v3b[m, j], so_gold[m, j], kk)},
+                  'labelSpread': {str(v): int((gold[:, j] == v).sum()) for v in range(kk)}}
     tests = {}
-    gi, mi = crit.index('grammar_accuracy'), crit.index('mechanics')
-    P2 = predict(s2, Xen[te])
-    if typ == 'short_answer':
-        ok = [n for n, i in enumerate(te) if rows[i]['label']['grammar_accuracy'] == 1 and rows[i]['label']['mechanics'] == 1 and rows[i]['label']['task_completion'] == 2]
-        if ok:
-            hit = float(np.mean([(P2[n, gi] >= 0.5) and (P2[n, mi] >= 0.5) for n in ok]))
-            tests['shortCorrectNotScoredDown'] = {'n': len(ok), 'share': round(hit, 3), 'pass': hit >= 0.9}
-    else:
-        strong = [n for n, i in enumerate(te) if rows[i]['label']['grammar_accuracy'] == 2 and len(re.split(r'(?<=[.!?؟])\s+', rows[i]['answer'])) >= 4]
-        if strong:
-            cut = [' '.join(re.split(r'(?<=[.!?؟])\s+', rows[te[n]]['answer'])[:3]) for n in strong]
-            Pc = predict(s2, Z(X_of(cut, 'truncation test')))
-            drop = float(np.mean(np.r_[P2[strong, gi] - Pc[:, gi], P2[strong, mi] - Pc[:, mi]]))
-            tests['truncation'] = {'n': len(strong), 'meanDropGrammarSpelling': round(drop, 3), 'pass': drop <= 0.3}
-        PAD = {'en': ' I like my school. My school is big. We learn many things there.', 'ar': ' أحب مدرستي. مدرستي كبيرة. نتعلم فيها أشياء كثيرة.'}[LANG]
-        allx = list(range(len(te)))
-        Pp = predict(s2, Z(X_of([rows[te[n]]['answer'] + PAD for n in allx], 'padding test')))
-        rise = float(np.mean(np.r_[Pp[:, gi] - P2[:, gi], Pp[:, mi] - P2[:, mi]]))
-        tests['padding'] = {'n': len(allx), 'meanRiseGrammarSpelling': round(rise, 3), 'pass': rise <= 0.1}
+    if tests_acc['short']: sh_ = float(np.mean(tests_acc['short'])); tests['shortCorrectNotScoredDown'] = {'n': len(tests_acc['short']), 'share': round(sh_, 3), 'pass': sh_ >= 0.9}
+    if tests_acc['trunc']: dr = float(np.mean(tests_acc['trunc'])); tests['truncation'] = {'n': len(tests_acc['trunc']) // 2, 'meanDropGrammarSpelling': round(dr, 3), 'pass': dr <= 0.3}
+    if tests_acc['pad']: ri = float(np.mean(tests_acc['pad'])); tests['padding'] = {'n': len(tests_acc['pad']) // 2, 'meanRiseGrammarSpelling': round(ri, 3), 'pass': ri <= 0.1}
     bar = {c: bool(per[c]['vsMedian']['two_stage']['within1'] >= 0.85 and (per[c]['vsMedian']['two_stage']['qwk'] or 0) >= (per[c]['vsMedian']['v3b_deepseek']['qwk'] or 0)) for c in crit}
-    report['types'][typ] = {'train': len(tr), 'val': len(va), 'heldOut': len(te), 'heldOutQuestions': len(test_g), 'perCriterion': per, 'lengthTests': tests, 'passesBar': bar}
+    entry = {'answers': len(T), 'questions': len(groups), 'perCriterion': per, 'lengthTests': tests, 'passesBar': bar}
+    if typ == 'essay':  # final essay model on all ENARA essays -> the 200 human-scored essays (v3b's numbers from today's measurement)
+        trg = groups; val_g = set(trg[:max(1, len(trg) // 8)])
+        va = [i for i in T if rows[i]['group'] in val_g]; tr = [i for i in T if rows[i]['group'] not in val_g]
+        s2f = fit(copy.deepcopy(s1), Xen[tr], Y_of(tr), 80, 3e-4, Xen[va], Y_of(va))
+        for name, mdl in [('two_stage', s2f), ('stage1_only', s1)]:
+            Ph = rnd_of(predict(mdl, Xh), crit, mx)
+            entry.setdefault('humanRecheck', {})[name] = {c: stats(Ph[:, j], np.asarray(h_Y[c], int), 3) for j, c in enumerate(crit) if c in h_Y}
+        entry['humanRecheck']['v3b_deepseek'] = {c: {'n': 200, 'exact': V3B[c]['exact'], 'within1': V3B[c]['within1'], 'qwk': V3B[c]['qwk']} for c in crit if c in h_Y and c in V3B}
+    report['types'][typ] = entry
     log(typ, json.dumps({c: (per[c]['vsMedian']['two_stage']['qwk'], per[c]['vsMedian']['v3b_deepseek']['qwk']) for c in crit}), json.dumps(tests))
 json.dump(report, open('results/report.json', 'w'), indent=1)
 log('done')

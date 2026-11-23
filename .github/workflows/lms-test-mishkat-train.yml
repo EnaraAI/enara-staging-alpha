@@ -20,8 +20,10 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: '3.11' }
-      - name: Mishkat data (model-marked)
-        run: git fetch -q --depth 1 origin claude/tutor-lms-mishkat && git worktree add -q mk FETCH_HEAD
+      - name: Mishkat data (model-marked) and today's v3b numbers on the human-scored essays
+        run: |
+          git fetch -q --depth 1 origin claude/tutor-lms-mishkat && git worktree add -q mk FETCH_HEAD
+          git fetch -q --depth 1 origin claude/tutor-lms-recal-results && git show FETCH_HEAD:summary.json > v3b-human.json
       - name: Word lists (SCOWL en_US, Ayaspell ar) and a check
         run: |
           sudo apt-get install -y -q hunspell hunspell-en-us hunspell-ar >/dev/null
@@ -39,7 +41,7 @@ jobs:
           restore-keys: mishkat-feat-v1-${{ matrix.lang }}-${{ hashFiles('mk/data/mishkat-dev/pool-*.json') }}-
       - name: Train and evaluate
         working-directory: deploy/lms-test/mishkat
-        env: { HF_HUB_DISABLE_PROGRESS_BARS: '1', TRANSFORMERS_VERBOSITY: error, MK_LANG: '${{ matrix.lang }}', MK_DATA: '${{ github.workspace }}/mk/data/mishkat-dev' }
+        env: { HF_HUB_DISABLE_PROGRESS_BARS: '1', TRANSFORMERS_VERBOSITY: error, MK_LANG: '${{ matrix.lang }}', MK_DATA: '${{ github.workspace }}/mk/data/mishkat-dev', MK_BASELINE: '${{ github.workspace }}/v3b-human.json', MK_V3B: '${{ github.workspace }}/v3b-human.json' }
         run: python train_mishkat.py 2>&1 | tee train.log
       - name: Save feature cache (also after a crash)
         if: always()
