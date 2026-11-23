@@ -11,8 +11,8 @@ Status: **go given (22 Nov 2026). P2b in progress.** Branch `claude/tutor-assess
 | P2b language + math bench (ar + en), open within-1 ≥ 0.85 (no Anthropic spending, §7a) | done: run 1 maths 0.91/0.97; language calibrated (engine-v2) → run 2 0.89/0.91 | #91, #93 |
 | P3a science + humanities graders (checklist rubrics per item; humanities judged only against the source), bench ar + en | done: science 0.97/0.93, humanities 0.96/0.89 | #92 |
 | P3b listening (recording + hidden transcript; answers judged against the transcript), bench ar + en | done: 0.99/0.98 | #93 |
-| P3c code grader: JavaScript in a WebAssembly sandbox inside ENARA (owner's choice, 23 Nov 2026) | PR open | – |
-| P3d speaking through the engine language grader (spoken flag: no spelling/punctuation criterion, transcript-aware prompt); pronunciation never scored (owner: yes, 23 Nov 2026) | PR open | – |
+| P3c programming-question grader (#98) | **switched OFF** (owner, 23 Nov 2026: a misunderstanding; nothing more is built on it) | #98, off in the next PR |
+| P3d speaking through the engine language grader (spoken flag: no spelling/punctuation criterion, transcript-aware prompt); pronunciation never scored (owner: yes, 23 Nov 2026) | done | #99 |
 | P4 generation, code checks, judge (provisional: DeepSeek), teacher review (Question bank page), generation bench | PR open | #94 |
 | P5 baseline (all 10 sets) for the regression rule, Item bank card (bank, judge pass rate, flag rate, last bench, speed), cost/latency in baseline.json | PR open (after P4) | – |
 
@@ -218,7 +218,10 @@ Switch: `assessGen`.
 - UI: a "Question bank" page in the teacher's menu (not yet a tab inside AssessmentBuilder).
 - Generation bench: `POST /api/maintenance/assessment-gen-bench` per subject × language (schema, checks, judge pass rates).
 
-## 6b. Code grader (owner's choice 23 Nov 2026: a sandbox inside lms-test)
+## 6b. Programming-question grader — SWITCHED OFF (owner, 23 Nov 2026)
+**The owner did not ask for this** ("code grader" meant the rule-based grader written in code, with no model: §3 Closed). `assessCode` is off on
+lms-test and in E2E; no authoring form, no Python, nothing more is built on it. The code below stays dormant behind the switch.
+
 - Learners' JavaScript runs in QuickJS compiled to WebAssembly inside our server (`graders/code/sandbox.ts`): no require, process,
   files, network or timers; 16 MB heap, 256 KB stack, 500 ms per test, 2 s per answer; code ≤ 20 000 characters; a fresh WASM module
   per answer, dropped after any error (a crash can't reach the server process).
