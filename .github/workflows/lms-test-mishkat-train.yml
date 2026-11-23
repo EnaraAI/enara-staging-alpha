@@ -4,7 +4,7 @@ name: lms-test Mishkat training
 on:
   push:
     branches: ['claude/tutor-lms-dscompare-run']
-    paths: ['deploy/lms-test/mishkat/train_mishkat.py', '.github/workflows/lms-test-mishkat-train.yml']
+    paths: ['deploy/lms-test/mishkat/train_mishkat.py', 'deploy/lms-test/mishkat/mishkat_features.py', '.github/workflows/lms-test-mishkat-train.yml']
 permissions:
   contents: write
 jobs:
@@ -41,7 +41,7 @@ jobs:
           restore-keys: mishkat-feat-v1-${{ matrix.lang }}-${{ hashFiles('mk/data/mishkat-dev/pool-*.json') }}-
       - name: Train and evaluate
         working-directory: deploy/lms-test/mishkat
-        env: { HF_HUB_DISABLE_PROGRESS_BARS: '1', TRANSFORMERS_VERBOSITY: error, MK_LANG: '${{ matrix.lang }}', MK_AUG: "${{ matrix.lang == 'ar' && '1' || '0' }}", MK_DATA: '${{ github.workspace }}/mk/data/mishkat-dev', MK_BASELINE: '${{ github.workspace }}/v3b-human.json', MK_V3B: '${{ github.workspace }}/v3b-human.json', MK_COMPARE: '${{ github.workspace }}/mk/data/mishkat-dev/claude-compare/compare-${{ matrix.lang }}.json' }
+        env: { HF_HUB_DISABLE_PROGRESS_BARS: '1', TRANSFORMERS_VERBOSITY: error, MK_LANG: '${{ matrix.lang }}', MK_AUG: "${{ matrix.lang == 'ar' && '1' || '0' }}", MK_DATA: '${{ github.workspace }}/mk/data/mishkat-dev', MK_BASELINE: '${{ github.workspace }}/v3b-human.json', MK_V3B: '${{ github.workspace }}/v3b-human.json', MK_COMPARE: '${{ github.workspace }}/mk/data/mishkat-dev/claude-compare/compare-${{ matrix.lang }}.json', MK_EXPORT: '1', MK_EXPORT_LANGS: 'en' }
         run: python train_mishkat.py 2>&1 | tee train.log
       - name: Save feature cache (also after a crash)
         if: always()
@@ -49,12 +49,23 @@ jobs:
         with:
           path: deploy/lms-test/mishkat/cache
           key: mishkat-feat-v1-${{ matrix.lang }}-${{ hashFiles('mk/data/mishkat-dev/pool-*.json') }}-${{ github.run_id }}
+      # Service bundle (deploy/modal/mishkat): an Actions artifact only, never committed. Arabic is exported only after the owner adds
+      # 'ar' to MK_EXPORT_LANGS (after its length tests pass); until then no Arabic artifact exists.
+      - name: Upload service bundle (artifact, 30 days)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mishkat-bundle-${{ matrix.lang }}
+          path: deploy/lms-test/mishkat/results/bundle-${{ matrix.lang }}/
+          retention-days: 30
+          if-no-files-found: ignore
       - name: Publish (numbers only)
         if: always()
         working-directory: deploy/lms-test/mishkat
         run: |
           B=claude/tutor-lms-mishkat-results-${{ matrix.lang }}
           mkdir -p results && cp train.log results/ 2>/dev/null || true
+          rm -rf results/bundle-*  # the model bundle goes to the artifact above, never to a branch
           cd results && git init -q && git checkout -q -b "$B"
           git config user.name github-actions && git config user.email github-actions@users.noreply.github.com
           git add -A && git commit -qm "Mishkat training ${{ matrix.lang }} ${GITHUB_SHA::8}"
