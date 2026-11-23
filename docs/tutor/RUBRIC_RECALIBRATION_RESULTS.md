@@ -59,3 +59,8 @@ Within 1 point is 0.97–1.00 on every criterion in both versions, so the existi
   - Language essay grades rise, mostly in grammar and spelling.
   - English organisation is still a little generous.
   - Error codes ("errors to work on") are unchanged.
+
+## Open items
+- **English grammar ranking is weak** (QWK 0.11 on human-scored essays). The owner's decision (23 Nov 2026): Mishkat covers it once its benchmark results pass.
+- **English organisation is still a little generous** (average 1.30 against the markers' 0.92).
+- **v3b shipped** to lms-test in [PR #101](https://github.com/EnaraAI/enara-staging-alpha/pull/101), by the owner's decision of 23 Nov 2026.
