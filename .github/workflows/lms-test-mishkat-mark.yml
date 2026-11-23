@@ -1,0 +1,40 @@
+# Mishkat marker (a): DeepSeek (lms-test, llm-compare) marks the model-marked dev pool with the live v3b language rubric, one run per
+# answer, nothing stored. Per-answer marks to claude/tutor-lms-mishkat-ds (synthetic data; model-marked, development only).
+name: lms-test Mishkat marker DeepSeek
+on:
+  push:
+    branches: ['claude/tutor-lms-dscompare-run']
+    paths: ['.github/workflows/lms-test-mishkat-mark.yml']
+permissions:
+  contents: write
+jobs:
+  baseline:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Today's grader (lms-test-live)
+        run: |
+          git fetch -q origin claude/tutor-lms-mishkat && git worktree add -q live FETCH_HEAD
+          cd live/backend && npm ci --silent
+      - name: Baseline
+        working-directory: deploy/lms-test/ellipse
+        env:
+          LMSTEST_MAINTENANCE_TOKEN: ${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}
+          LIVE_BACKEND: ${{ github.workspace }}/live/backend
+          BASELINE_CONFIG: '{"datasets":["mishkat-en","mishkat-ar"],"concurrency":4}'
+        run: |
+          export TUTOR_LLM_MODEL="$(node -e "const f=require('${{ github.workspace }}/live/deploy/lms-test.flags.json');console.log(f.features.find(x=>x.flags.TUTOR_LLM_MODEL).flags.TUTOR_LLM_MODEL)")"
+          ${{ github.workspace }}/live/backend/node_modules/.bin/tsx baseline.mts 2>&1 | grep -vE "full_text|essay text" | tee run.log
+      - name: Publish (numbers only)
+        if: always()
+        working-directory: deploy/lms-test/ellipse
+        run: |
+          mkdir -p out && cp run.log out/ 2>/dev/null || true
+          cd out && git init -q && git checkout -q -b claude/tutor-lms-mishkat-ds
+          git config user.name github-actions && git config user.email github-actions@users.noreply.github.com
+          git add -A && git commit -qm "mishkat marker ds ${GITHUB_SHA::8}"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" claude/tutor-lms-mishkat-ds
