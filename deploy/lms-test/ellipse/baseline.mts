@@ -11,7 +11,8 @@ import { join } from 'node:path';
 const LIVE = process.env.LIVE_BACKEND!; // path to lms-test-live backend
 const SITE = 'https://lms-test.enara.app';
 const TOKEN = process.env.LMSTEST_MAINTENANCE_TOKEN!;
-const cfg = JSON.parse(readFileSync(new URL('./config.json', import.meta.url), 'utf8')) as { sample: number; seed: number; concurrency: number; split: 'test' | 'train'; datasets: ('ellipse' | 'laila')[] };
+const cfg = JSON.parse(readFileSync(new URL('./config.json', import.meta.url), 'utf8')) as { sample: number; seed: number; concurrency: number; split: 'test' | 'train'; datasets: string[] };
+if (process.env.BASELINE_CONFIG) Object.assign(cfg, JSON.parse(process.env.BASELINE_CONFIG)); // e.g. {"datasets":["bench-en","bench-ar"]}
 
 // ---- relay: OpenAI chat completions -> lms-test llm-compare ----
 let relayCalls = 0; let relayErrors = 0;
@@ -93,7 +94,7 @@ const spearman = (a: number[], b: number[]) => { const ra = rank(a); const rb = 
 const r3 = (x: number) => Math.round(x * 1000) / 1000;
 
 const results: Record<string, unknown> = {};
-for (const ds of cfg.datasets ?? ['ellipse']) {
+for (const ds of (cfg.datasets ?? ['ellipse']).filter((d) => !d.startsWith('bench-'))) {
   const essays = ds === 'laila' ? loadLaila() : loadEllipse();
   const lang = essays[0]?.lang ?? 'en';
   const rubric = rubricFor('language', 'essay', lang)!;
@@ -126,6 +127,30 @@ for (const ds of cfg.datasets ?? ['ellipse']) {
     sampledIds: essays.map((e) => e.id), // ids only (to keep them out of any later training split)
   };
   console.log(ds, JSON.stringify({ ...(results[ds] as object), sampledIds: undefined }));
+}
+// ---- ENARA's own language benchmark (data/assessment-bench, in the repo; synthetic answers, so per-answer scores may be published) ----
+for (const ds of (cfg.datasets ?? []).filter((d) => d.startsWith('bench-'))) {
+  const lang = ds.slice(6) as 'en' | 'ar';
+  const dset = await import(join(LIVE, 'src/assessment/bench/dataset.ts'));
+  const set = dset.loadSet('language', lang, join(LIVE, '..', 'data', 'assessment-bench'));
+  const items = new Map(set.items.map((it: { id: string }) => [it.id, it]));
+  const rows: Record<string, unknown>[] = []; let i = 0; const calls0 = relayCalls;
+  const worker = async () => {
+    while (i < set.answers.length) {
+      const a = set.answers[i++]; const it = items.get(a.itemId) as { id: string; domain: string; type: string; language: 'en' | 'ar'; points?: number; units?: string };
+      const rubric = rubricFor(it.domain, it.type, it.language, { points: it.points, units: it.units })!;
+      const maxByCriterion = Object.fromEntries(rubric.criteria.map((c: { id: string; maxPoints: number }) => [c.id, c.maxPoints]));
+      const t0 = Date.now();
+      const g = await gradeOpenAnswer({ attempt: { id: `aesbench-${a.id}` }, item: dset.openItemOf(it), answer: dset.answerTextOf ? dset.answerTextOf(a) : a.answer, uiLanguage: it.language, maxByCriterion, modelReady: true, options: { store: false, allowFallback: false } }).catch(() => null);
+      const ok = g && g.grader !== 'none';
+      rows.push({ id: a.id, itemId: it.id, type: it.type, band: a.band, gold: a.gold, max: maxByCriterion, ds: ok ? Object.fromEntries(g!.criterionScores.map((c: { criterionId: string; points: number }) => [c.criterionId, c.points])) : null, flagged: !!g?.flagged, ms: Date.now() - t0 });
+      if (rows.length % 15 === 0) console.log(ds, 'graded', rows.length, 'of', set.answers.length);
+    }
+  };
+  await Promise.all(Array.from({ length: cfg.concurrency }, worker));
+  const okRows = rows.filter((r) => r.ds);
+  results[ds] = { n: rows.length, graded: okRows.length, flagRate: r3(rows.filter((r) => r.flagged).length / rows.length), modelCalls: relayCalls - calls0, perAnswer: rows };
+  console.log(ds, 'done', okRows.length, 'of', rows.length);
 }
 const summary = { grader: "today's engine language essay grader (engine-v2), DeepSeek on lms-test via llm-compare; no fallback", relayErrors, results };
 mkdirSync('out', { recursive: true });

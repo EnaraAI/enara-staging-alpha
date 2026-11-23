@@ -85,14 +85,15 @@ def counts(texts):
         rows.append([len(t), len(w), len(s), len(set(w)) / max(1, len(w)), np.mean([len(x) for x in w]) if w else 0, t.count(',') + t.count('،'), t.count('\n\n')])
     a = np.array(rows, float); return csr_matrix((a - a.mean(0)) / (a.std(0) + 1e-9))
 
-def model_A(tr, te):
+def model_A(tr, te, extra=None):
     wv = TfidfVectorizer(ngram_range=(1, 2), min_df=2, max_features=50000, sublinear_tf=True)
     cv = TfidfVectorizer(analyzer='char_wb', ngram_range=(2, 5), min_df=3, max_features=80000, sublinear_tf=True)
     Xtr = hstack([wv.fit_transform(tr.text), cv.fit_transform(tr.text), counts(tr.text)]).tocsr()
     Xte = hstack([wv.transform(te.text), cv.transform(te.text), counts(te.text)]).tocsr()
-    return Xtr, Xte
+    Xb = hstack([wv.transform(extra), cv.transform(extra), counts(extra)]).tocsr() if extra is not None else None
+    return Xtr, Xte, Xb
 
-def model_B(tr, te, name):
+def model_B(tr, te, name, extra=None):
     import torch
     from transformers import AutoTokenizer, AutoModel
     tok = AutoTokenizer.from_pretrained(name); enc = AutoModel.from_pretrained(name).eval(); torch.set_num_threads(os.cpu_count() or 4)
@@ -110,7 +111,9 @@ def model_B(tr, te, name):
                     log(f'{LABEL} encoder {part}: {done}/{n} essays ({100 * done // n}%), {el / 60:.1f} min so far, ~{left / 60:.1f} min left')
         return np.vstack(out)
     t0 = time.time(); Etr = emb(tr.text.tolist(), 'train'); Ete = emb(te.text.tolist(), 'test')
-    return Etr, Ete, round((time.time() - t0) / (len(tr) + len(te)) * 1000, 1)
+    ms = round((time.time() - t0) / (len(tr) + len(te)) * 1000, 1)
+    Eb = emb(list(extra), 'ENARA benchmark') if extra is not None else None
+    return Etr, Ete, Eb, ms
 
 def baseline_now(need):
     # The grader baseline's held-out ids (results branch). LAILA waits up to 90 min for them, so they are never trained on.
@@ -131,16 +134,24 @@ for ds in DATASETS:
     log(f'{ds}: {len(tr)} train / {len(te)} test essays, {len(traits)} traits')
     res = {'train': int(len(tr)), 'test': int(len(te)), 'models': {}}
     log(f'{ds}: model A (text features) building')
-    feats = {'A_features_ridge': model_A(tr, te)}
+    # ENARA's own benchmark answers (in the repo; synthetic): scored by the same trained models, numbers only
+    bench = None
+    if os.environ.get('AES_BENCH_DIR'):
+        bl = 'en' if ds == 'ellipse' else 'ar'
+        bench = json.load(open(os.path.join(os.environ['AES_BENCH_DIR'], 'language', bl, 'answers.json')))
+        log(f'{ds}: will also score {len(bench)} ENARA benchmark answers ({bl})')
+    btexts = [a['answer'] if isinstance(a['answer'], str) else json.dumps(a['answer'], ensure_ascii=False) for a in bench] if bench else None
+    feats = {'A_features_ridge': model_A(tr, te, btexts)}
     log(f'{ds}: model A features ready')
     enc_name = cfg['encoders'][lang]
     try:
-        Etr, Ete, ms = model_B(tr, te, enc_name); feats[f'B_{enc_name}_ridge'] = (Etr, Ete); res['encoderMsPerEssayCpu'] = ms
+        Etr, Ete, Eb, ms = model_B(tr, te, enc_name, btexts); feats[f'B_{enc_name}_ridge'] = (Etr, Ete, Eb); res['encoderMsPerEssayCpu'] = ms
     except Exception as e:
         res['encoderError'] = str(e)[:200]; log(f'{ds}: encoder failed: {type(e).__name__}')
     bid = set(base_ids) if ds == 'laila' else set(str(x) for x in (baseline.get('results', {}).get('ellipse', {}).get('sampledIds') or []))
     mask_base = te['id'].astype(str).isin(bid).values
-    for mname, (Xtr, Xte) in feats.items():
+    bench_preds = {}
+    for mname, (Xtr, Xte, Xb) in feats.items():
         per = {}
         for t in traits:
             y_tr, y_te = tr[t].values.astype(float), te[t].values.astype(float)
@@ -151,6 +162,7 @@ for ds in DATASETS:
                 r = Ridge(alpha=alpha).fit(Xtr[f], y_tr[f]); e = np.sqrt(np.mean((r.predict(Xtr[v]) - y_tr[v]) ** 2))
                 if best is None or e < best[0]: best = (e, alpha)
             r = Ridge(alpha=best[1]).fit(Xtr, y_tr); p = r.predict(Xte)
+            if Xb is not None: bench_preds.setdefault(mname, {})[t] = [round(float(x), 3) for x in r.predict(Xb)]
             per[t] = {'alpha': best[1], 'test': metrics(ds, t, y_te, p)}
             log(f'{ds} {mname} {t}: done ({traits.index(t) + 1}/{len(traits)})')
             if mask_base.any(): per[t]['baselineEssays'] = metrics(ds, t, y_te[mask_base], p[mask_base])
@@ -158,6 +170,7 @@ for ds in DATASETS:
         res['models'][mname] = per
         print(ds, mname, json.dumps({t: per[t]['test'] for t in traits}), flush=True)
     res['baselineEssaysInTest'] = int(mask_base.sum())
+    if bench: res['enaraBench'] = {'ids': [a['id'] for a in bench], 'nativePredictions': bench_preds}
     log(f'{ds}: {int(mask_base.sum())} of the grader-baseline essays are in the test set')
     summary['datasets'][ds] = res
 json.dump(summary, open(f'{OUT}/summary.json', 'w'), indent=1)
