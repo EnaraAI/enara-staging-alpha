@@ -96,7 +96,8 @@ def model_A(tr, te, extra=None):
 def model_B(tr, te, name, extra=None):
     import torch
     from transformers import AutoTokenizer, AutoModel
-    tok = AutoTokenizer.from_pretrained(name); enc = AutoModel.from_pretrained(name).eval(); torch.set_num_threads(os.cpu_count() or 4)
+    tok = AutoTokenizer.from_pretrained(name); enc = AutoModel.from_pretrained(name).eval(); nthreads = max(1, min(4, len(os.sched_getaffinity(0)))); torch.set_num_threads(nthreads)  # cpu_count() can exceed the job's real CPUs and make threads thrash
+    log(f'encoder threads: {nthreads} (cpu_count {os.cpu_count()}, usable {len(os.sched_getaffinity(0))})')
     def emb(texts, part):
         out = []; t1 = time.time(); n = len(texts); every = 25
         log(f'{LABEL} encoder {name}: reading {n} {part} essays')
