@@ -1,0 +1,32 @@
+# Mishkat (owner go, 23 Nov 2026): write 140 new synthetic learner answers per language (DeepSeek on lms-test via llm-compare).
+# Synthetic, model-marked dev data only. Published to claude/tutor-lms-mishkat-gen.
+name: lms-test Mishkat new answers
+on:
+  push:
+    branches: ['claude/tutor-lms-dscompare-run']
+    paths: ['deploy/lms-test/mishkat/gen.mjs', '.github/workflows/lms-test-mishkat-gen.yml']
+permissions:
+  contents: write
+jobs:
+  gen:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Write new answers
+        working-directory: deploy/lms-test/mishkat
+        env:
+          LMSTEST_MAINTENANCE_TOKEN: ${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}
+        run: node gen.mjs 2>&1 | tee gen.log
+      - name: Publish
+        if: always()
+        working-directory: deploy/lms-test/mishkat
+        run: |
+          mkdir -p out && cp gen.log out/ 2>/dev/null || true
+          cd out && git init -q && git checkout -q -b claude/tutor-lms-mishkat-gen
+          git config user.name github-actions && git config user.email github-actions@users.noreply.github.com
+          git add -A && git commit -qm "Mishkat new answers ${GITHUB_SHA::8}"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" claude/tutor-lms-mishkat-gen
