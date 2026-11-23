@@ -12,7 +12,7 @@ Status: **go given (22 Nov 2026). P2b in progress.** Branch `claude/tutor-assess
 | P3a science + humanities graders (checklist rubrics per item; humanities judged only against the source), bench ar + en | done: science 0.97/0.93, humanities 0.96/0.89 | #92 |
 | P3b listening (recording + hidden transcript; answers judged against the transcript), bench ar + en | done: 0.99/0.98 | #93 |
 | P3c code grader: JavaScript in a WebAssembly sandbox inside ENARA (owner's choice, 23 Nov 2026) | PR open | – |
-| P3d speaking through the engine language grader; pronunciation never scored (owner: yes, 23 Nov 2026) | next | – |
+| P3d speaking through the engine language grader (spoken flag: no spelling/punctuation criterion, transcript-aware prompt); pronunciation never scored (owner: yes, 23 Nov 2026) | PR open | – |
 | P4 generation, code checks, judge (provisional: DeepSeek), teacher review (Question bank page), generation bench | PR open | #94 |
 | P5 baseline (all 10 sets) for the regression rule, Item bank card (bank, judge pass rate, flag rate, last bench, speed), cost/latency in baseline.json | PR open (after P4) | – |
 

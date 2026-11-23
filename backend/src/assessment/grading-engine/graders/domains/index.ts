@@ -18,6 +18,13 @@ import { gradeClosed } from '../closed';
 
 // engine-v2 (P2b bench, 22 Nov 2026): level anchors for language (the model kept to the middle level: too kind to weak answers,
 // too strict with good ones; Arabic colloquial passed as MSA).
+const SPOKEN_DROPPED = ['spelling', 'punctuation', 'capitalisation', 'hamza_spelling'];
+/** Speaking exams (owner, 23 Nov 2026): the answer is a speech-to-text transcript; pronunciation is never judged. */
+export const SPOKEN_NOTE =
+  'This answer is an automatic speech-to-text transcript of the learner SPEAKING, not writing. Do not judge spelling, punctuation, capital ' +
+  'letters or how words are written, and do not penalise transcription artifacts (missing punctuation, fillers such as um, false starts, ' +
+  'repeated words, homophones, run-on sentences). Never judge pronunciation, accent, intonation or the sound of the speech: there is no ' +
+  'audio evidence, only the transcript. Judge what the learner said: task completion, grammar, vocabulary and how ideas are organised. ';
 export const PROMPT_VERSION = 'engine-v2';
 export const ERROR_CODES: Record<'language' | 'math' | 'science' | 'humanities' | 'listening', string[]> = {
   language: [
@@ -94,7 +101,7 @@ const FORMAT = 'Reply with JSON only: {"criteria":[{"criterionId":"...","levelId
 const LANG_NAME = (l: string) => (l.startsWith('ar') ? 'Arabic' : 'English');
 const AR = /[؀-ۿ]/;
 
-export interface OpenItem { questionId: string; stem: string; type: 'short_answer' | 'essay' | 'math_steps'; domain: 'language' | 'math' | 'science' | 'humanities' | 'listening'; language: string; solution?: string; points?: string[]; units?: boolean; source?: string; final?: { value: number | string; tolerance_abs?: number; tolerance_rel?: number; unit?: string | null } }
+export interface OpenItem { questionId: string; stem: string; type: 'short_answer' | 'essay' | 'math_steps'; domain: 'language' | 'math' | 'science' | 'humanities' | 'listening'; language: string; solution?: string; points?: string[]; units?: boolean; source?: string; spoken?: boolean; final?: { value: number | string; tolerance_abs?: number; tolerance_rel?: number; unit?: string | null } }
 export interface RunResult {
   proposalId: string;
   status: 'proposed' | 'invalid' | 'failed';
@@ -128,11 +135,12 @@ export function finalAnswerPoints(item: OpenItem, final: string): { points: numb
 }
 
 /** Checks the model's extra fields (on top of the rubric rules). Throws to make askForJson retry once. */
-export function checkExtras(raw: unknown, domain: OpenItem['domain'], ui: 'ar' | 'en'): { confidence: number; errorCodes: string[] } {
+export function checkExtras(raw: unknown, domain: OpenItem['domain'], ui: 'ar' | 'en', spoken = false): { confidence: number; errorCodes: string[] } {
   const r = (raw ?? {}) as Record<string, unknown>;
   const confidence = typeof r.confidence === 'number' && r.confidence >= 0 && r.confidence <= 1 ? r.confidence : NaN;
   if (Number.isNaN(confidence)) throw new Error('confidence must be a number from 0 to 1');
-  const codes = (Array.isArray(r.errorCodes) ? r.errorCodes : []).filter((c): c is string => typeof c === 'string');
+  // Spoken answers: writing codes (spelling, punctuation, capitals) are dropped, not refused: the transcript is not the learner's writing.
+  const codes = (Array.isArray(r.errorCodes) ? r.errorCodes : []).filter((c): c is string => typeof c === 'string').filter((c) => !(spoken && SPOKEN_DROPPED.includes(c)));
   const bad = codes.filter((c) => !ERROR_CODES[domain].includes(c));
   if (bad.length) throw new Error(`unknown error codes: ${bad.join(', ')}`);
   const fb = typeof r.feedback === 'string' ? r.feedback : '';
@@ -149,7 +157,7 @@ export interface RunOptions { store?: boolean; allowFallback?: boolean }
 export async function gradeOpenRun(p: { attempt: { id: string; institutionId?: string; assignmentId?: string }; item: OpenItem; answer: unknown; uiLanguage: 'ar' | 'en'; run: number; options?: RunOptions }): Promise<RunResult> {
   const store = p.options?.store !== false;
   const { item } = p;
-  const rubricExtras = { points: item.points, units: item.units };
+  const rubricExtras = { points: item.points, units: item.units, spoken: item.spoken === true };
   const rubric = rubricFor(item.domain, item.type, item.language, rubricExtras)!;
   const scored = new Set(modelCriteria(item.domain, item.type, rubricExtras));
   const modelRubric = rubric.criteria.filter((c) => scored.has(c.id));
@@ -169,9 +177,9 @@ export async function gradeOpenRun(p: { attempt: { id: string; institutionId?: s
   try {
     const { value, model } = await askForJson({
       feature: 'ai_grading', institutionId: p.attempt.institutionId, refs: { attemptId: p.attempt.id }, maxTokens: 2500, ...(p.options?.allowFallback === false ? { allowFallback: false } : {}),
-      system: `${SYSTEM[item.domain](LANG_NAME(p.uiLanguage), LANG_NAME(item.language))} ${FORMAT}`,
+      system: `${item.spoken ? SPOKEN_NOTE : ''}${SYSTEM[item.domain](LANG_NAME(p.uiLanguage), LANG_NAME(item.language))} ${FORMAT}`,
       user,
-      validate: (raw) => { extras = checkExtras(raw, item.domain, p.uiLanguage); return validateProposal(raw, modelRubric as never, answerText); },
+      validate: (raw) => { extras = checkExtras(raw, item.domain, p.uiLanguage, item.spoken === true); return validateProposal(raw, modelRubric as never, answerText); },
     });
     const criteria = [...value.criteria, ...(final && finalCrit ? [{ criterionId: 'final_answer', levelId: `p${final.points}`, points: final.points, evidence: [], rationale: 'scored by code' }] : [])];
     const errorCodes = [...new Set([...extras.errorCodes, ...(final?.unitIssue ? ['units'] : [])])];
