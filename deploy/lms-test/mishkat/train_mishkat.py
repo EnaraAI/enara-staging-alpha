@@ -221,13 +221,15 @@ report['recipe'] = RECIPE; report['oof'] = {}; report['compareScores'] = {}; rep
 EGY = None
 if os.environ.get('MK_EGYPT') == '1' and LANG == 'ar':
     try:
-        meta = json.loads(subprocess.run(['curl', '-sSfL', 'https://zenodo.org/api/records/18630360'], capture_output=True, text=True, check=True).stdout)
+        import urllib.request
+        _ua = lambda u: urllib.request.urlopen(urllib.request.Request(u, headers={'User-Agent': 'research-probe'}), timeout=180).read()
+        meta = json.loads(_ua('https://zenodo.org/api/records/18630360'))
         f_ = [f for f in meta['files'] if f['key'].endswith('.csv')][0]
-        EGY = pd.read_csv(io.StringIO(subprocess.run(['curl', '-sSfL', f_['links']['self']], capture_output=True, text=True, check=True).stdout))
+        EGY = pd.read_csv(io.BytesIO(_ua(f_['links']['self'])))
         EGY = EGY[(EGY.degree >= 0) & (EGY.degree <= 5)].dropna(subset=['StudentAnswer']).reset_index(drop=True)
         report['egyptLicence'] = meta['metadata'].get('license'); log(f'Egyptian test set: {len(EGY)} answers, licence {report["egyptLicence"]}')
         Xegy = Z(cached('egypt', EGY.StudentAnswer.astype(str).tolist(), 'Egyptian test answers'))
-    except Exception as e: log(f'Egyptian test set unavailable: {type(e).__name__}'); EGY = None
+    except Exception as e: log(f'Egyptian test set unavailable: {type(e).__name__}: {str(e)[:120]}'); EGY = None
 EXPORT_TYPES = {}  # final model per type, for the service bundle (MK_EXPORT=1)
 rnd_of = lambda P, crit, mx: np.stack([np.clip(np.rint(P[:, j]), 0, mx[c]) for j, c in enumerate(crit)], 1).astype(int)
 for typ in ['essay', 'short_answer']:
