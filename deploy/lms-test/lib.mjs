@@ -7,7 +7,10 @@
 // and its domains are exactly what we expect.
 
 export const PROJECT_ID = 'prj_tuRpwEJLz1dEQOj6RSEk2xUpqtIn';
-export const TEAM_ID = 'team_xbSucLT1roYt4njeB4tRPfKQ';
+// The new Vercel team since the 24 Nov 2026 move (Vercel project transfer: same project id, domains, variables and deployments).
+export const TEAM_ID = 'team_fHEDYVPWJ218PaXEBwnBMFvk';
+/** The old team, blocked by Vercel; never deployed to again. */
+export const OLD_TEAM_ID = 'team_xbSucLT1roYt4njeB4tRPfKQ';
 export const PROJECT_NAME = 'enara-lms-test';
 export const SITE_HOST = 'lms-test.enara.app';
 export const SITE = `https://${SITE_HOST}`;

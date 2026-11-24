@@ -30,7 +30,8 @@ on:
         required: true
         type: string
     secrets:
-      VERCEL_TOKEN:
+      # The new Vercel team (24 Nov 2026 move); the old team's token is no longer used here.
+      VERCEL_TOKEN_NEW:
         required: true
       LMSTEST_MAINTENANCE_TOKEN:
         required: true
@@ -69,7 +70,7 @@ jobs:
       - name: Check the Vercel project
         id: guard
         env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN_NEW }}
         run: node deploy/lms-test/cli.mjs guard
 
   merge:
@@ -131,10 +132,10 @@ jobs:
       cancel-in-progress: false
     env:
       # Constants (not secret): the enara-lms-test project only.
-      VERCEL_ORG_ID: team_xbSucLT1roYt4njeB4tRPfKQ
+      VERCEL_ORG_ID: team_fHEDYVPWJ218PaXEBwnBMFvk
       VERCEL_PROJECT_ID: prj_tuRpwEJLz1dEQOj6RSEk2xUpqtIn
       VERCEL_TELEMETRY_DISABLED: '1'
-      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN_NEW }}
       LMSTEST_MAINTENANCE_TOKEN: ${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}
     outputs:
       outcome: ${{ steps.result.outputs.outcome }}
