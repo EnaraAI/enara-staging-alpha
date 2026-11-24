@@ -120,6 +120,8 @@ router.get('/daily', async (req: Request, res: Response, next: NextFunction) => 
     if (parentEmailsEnabled()) await run('parentWeekly', () => runWeeklySummaries({ budgetMs: Math.max(2_000, Math.min(10_000, 58_000 - (Date.now() - startedAt))) }));
     // Parents school app: delete rows older than each data type's retention setting (inert unless a SCHOOL_APP switch is on).
     if ((await import('../schoolApp/flags')).anySiteSectionOn()) await run('schoolAppRetention', async () => (await import('../schoolApp/retention')).runRetention());
+    // Parents school app: the Moodle connector, once a day for schools that turned it on (inert unless SCHOOL_APP_MOODLE_ENABLED).
+    if ((await import('../schoolApp/moodleSync')).moodleSyncOn()) await run('schoolAppMoodle', async () => (await import('../schoolApp/moodleSync')).runMoodleSyncDaily());
     // Parents school app (b): fee reminders 7 days and 1 day before a due date (inert unless SCHOOL_APP_FEES_ENABLED).
     if ((await import('../schoolApp/flags')).siteSectionOn('fees')) await run('schoolFeeReminders', async () => (await import('../schoolApp/fees')).runFeeReminders());
     // Learner memory phase 3 (learnerProfile switch): yesterday's study habits per learner.

@@ -51,7 +51,7 @@ export type Audience = (typeof AUDIENCES)[number];
 export interface ISchoolAnnouncement extends Document {
   id: string; institutionId: string; audience: Audience; audienceValue?: string; audienceKey?: string;
   title: string; body: string; lang: 'ar' | 'en' | 'both'; titleAr?: string; bodyAr?: string;
-  publishAt: Date; expiresAt?: Date; createdBy?: string; source: Source; withdrawnAt?: Date;
+  publishAt: Date; expiresAt?: Date; createdBy?: string; source: Source; withdrawnAt?: Date; externalId?: string;
 }
 const announcementSchema = new Schema<ISchoolAnnouncement>({
   id: { type: String, required: true, unique: true },
@@ -65,9 +65,11 @@ const announcementSchema = new Schema<ISchoolAnnouncement>({
   titleAr: { type: String, maxlength: 160 }, bodyAr: { type: String, maxlength: 4000 },
   publishAt: { type: Date, required: true, index: true }, expiresAt: { type: Date },
   createdBy: String, withdrawnAt: Date,
+  externalId: String, // a connector's own id for the post (for example a Moodle discussion): the same post updates, never duplicates
   source: { type: sourceSchema, required: true },
 }, { timestamps: true });
 announcementSchema.index({ institutionId: 1, publishAt: -1 });
+announcementSchema.index({ institutionId: 1, externalId: 1 }, { unique: true, partialFilterExpression: { externalId: { $type: 'string' } } });
 export const SchoolAnnouncement = model<ISchoolAnnouncement>('SchoolAnnouncement', announcementSchema, 'school_announcements');
 
 // ---- fees (step b): one row per instalment of a student's fee plan. ENARA only shows fees; the school marks them paid (or waived).
@@ -229,6 +231,23 @@ const chatLogSchema = new Schema<ISchoolChatLog>({
 chatLogSchema.index({ createdAt: 1 });
 chatLogSchema.index({ parentUserId: 1, createdAt: -1 });
 export const SchoolChatLog = model<ISchoolChatLog>('SchoolChatLog', chatLogSchema, 'school_chat_logs');
+
+// ---- the Moodle connector (client answer 1): per LMS connection, a read-only web service token (encrypted, never returned) and the
+// school's on/off. Announcements and attendance come in through ingest(), the same path as the Excel import.
+export interface ISchoolMoodleSync extends Document {
+  platformId: string; institutionId: string; tokenEnc?: string; enabled: boolean;
+  lastCheck?: { at: Date; ok: boolean; code: string; attendance: boolean };
+  lastRun?: { at: Date; code: string; announcements: number; attendance: number; problems: number; courses: number };
+}
+const moodleSyncSchema = new Schema<ISchoolMoodleSync>({
+  platformId: { type: String, required: true, unique: true },
+  institutionId: { type: String, required: true, index: true },
+  tokenEnc: { type: String, select: false },
+  enabled: { type: Boolean, default: false },
+  lastCheck: { type: { at: Date, ok: Boolean, code: String, attendance: Boolean, _id: false } },
+  lastRun: { type: { at: Date, code: String, announcements: Number, attendance: Number, problems: Number, courses: Number, _id: false } },
+}, { timestamps: true });
+export const SchoolMoodleSync = model<ISchoolMoodleSync>('SchoolMoodleSync', moodleSyncSchema, 'school_moodle_sync');
 
 // ---- imports (preview, confirm, undo)
 export interface ISchoolImport extends Document {

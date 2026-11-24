@@ -24,6 +24,7 @@ const TEXT = {
   en: {
     title: 'School app for parents', sub: 'Information the school shares with parents. ENARA only shows it; the school is the source.',
     sections: 'Sections parents see', section: { timetable: 'Timetable', attendance: 'Attendance', announcements: 'Announcements', notifications: 'In-app notifications (absence, lateness, announcements, fee reminders)', fees: 'Fees (display only: the school records payments)', buses: 'Buses (stop times; no live tracking)', requests: 'Requests from parents', consents: 'Consent forms (tap-to-sign record)', chat: 'Assistant for parents (answers only from the sections above; never acts on money or records)', bus_routes: 'Bus routes and stops', bus_assignments: 'Bus: each child’s route and stop' } as Record<string, string>,
+    moodle: { title: 'Moodle connector', help: 'Announcements from each linked course’s Announcements forum, and attendance from the Moodle Attendance plugin when you use it, come in automatically every day. Timetables stay with the Excel file. In Moodle, create a web service with only these functions and paste its token here:', token: 'Web service token', save: 'Save and check', saved: 'Token saved.', on: 'Bring Moodle data in every day', run: 'Sync now', lastRun: (a: string, n1: number, n2: number) => `Last sync ${a}: ${n1} new announcements, ${n2} attendance records`, check: (ok: boolean, code: string, att: boolean) => (ok ? `Connected. Attendance plugin: ${att ? 'found' : 'not found'}.` : `Not connected (${code}).`), none: 'No Moodle connection for this school yet.' },
     req: { title: 'Requests from parents', filter: { new: 'New', in_progress: 'In progress', done: 'Done', refused: 'Refused', all: 'All' } as Record<string, string>, type: { certificate: 'Enrolment certificate', early_leave: 'Early leave', teacher_meeting: 'Meeting with a teacher', other: 'Other' } as Record<string, string>, reply: 'Reply to the parent', setStatus: 'Set status', save: 'Save', none: 'No requests here.', refusedNeedsReply: 'Write the reason before refusing.' },
     cons: { title: 'Consent forms', newForm: 'New consent form', formTitle: 'Title', body: 'Text parents read before answering', deadline: 'Answer by', audience: 'For', publish: 'Publish', published: 'Published; parents are notified.', list: 'Forms', open: 'Open', signed: 'answers', pending: 'pending', export: 'Export CSV', withdraw: 'Withdraw', withdrawn: 'Withdrawn', student: 'Student', klass: 'Class', answer: 'Answer', at: 'Answered at', notAnswered: 'Not answered', changedText: '(answered an older text)', none: 'No forms yet.' },
     bus: { title: 'Buses today', phones: 'Supervisors agreed to share their phone numbers with parents', route: 'Route', kind: 'Notice', delay: 'Delay', cancel: 'Cancelled', direction: 'Trip', morning: 'Morning', afternoon: 'Afternoon', minutes: 'Minutes late', message: 'Message (optional)', send: 'Send to parents', sent: (n: string) => `Sent to the parents of ${n} children.`, routes: 'Routes', stops: 'stops', students: 'children', noRoutes: 'Import the routes sheet first.', today: 'Notices today', withdraw: 'Withdraw', withdrawn: 'Withdrawn', none: 'No notices today.' },
@@ -42,6 +43,7 @@ const TEXT = {
   ar: {
     title: 'تطبيق المدرسة لأولياء الأمور', sub: 'معلومات تشاركها المدرسة مع أولياء الأمور. إنارة تعرضها فقط؛ والمدرسة هي المصدر.',
     sections: 'الأقسام التي يراها أولياء الأمور', section: { timetable: 'الجدول', attendance: 'الحضور', announcements: 'الإعلانات', notifications: 'الإشعارات داخل التطبيق (الغياب والتأخر والإعلانات وتذكير الأقساط)', fees: 'الرسوم (عرض فقط: المدرسة تسجّل المدفوعات)', buses: 'الحافلات (مواعيد المحطات؛ دون تتبع مباشر)', requests: 'طلبات أولياء الأمور', consents: 'نماذج الموافقة (سجل توقيع بالنقر)', chat: 'مساعد لأولياء الأمور (يجيب من الأقسام أعلاه فقط؛ لا يتصرف في المال أو السجلات)', bus_routes: 'خطوط الحافلات ومحطاتها', bus_assignments: 'الحافلات: خط كل طفل ومحطته' } as Record<string, string>,
+    moodle: { title: 'ربط Moodle', help: 'تصل تلقائيًا كل يوم إعلانات منتدى الإعلانات في كل مقرر مرتبط، والحضور من إضافة الحضور في Moodle إن كنتم تستخدمونها. أما الجداول فتبقى بملف Excel. أنشئوا في Moodle خدمة ويب بهذه الدوال فقط والصقوا رمزها هنا:', token: 'رمز خدمة الويب', save: 'حفظ وفحص', saved: 'حُفظ الرمز.', on: 'جلب بيانات Moodle يوميًا', run: 'مزامنة الآن', lastRun: (a: string, n1: number, n2: number) => `آخر مزامنة ${a}: ${n1} إعلانات جديدة، ${n2} سجلات حضور`, check: (ok: boolean, code: string, att: boolean) => (ok ? `متصل. إضافة الحضور: ${att ? 'موجودة' : 'غير موجودة'}.` : `غير متصل (${code}).`), none: 'لا يوجد ربط Moodle لهذه المدرسة بعد.' },
     req: { title: 'طلبات أولياء الأمور', filter: { new: 'جديد', in_progress: 'قيد التنفيذ', done: 'تم', refused: 'مرفوض', all: 'الكل' } as Record<string, string>, type: { certificate: 'شهادة قيد', early_leave: 'انصراف مبكر', teacher_meeting: 'مقابلة معلم', other: 'أخرى' } as Record<string, string>, reply: 'الرد على ولي الأمر', setStatus: 'تغيير الحالة', save: 'حفظ', none: 'لا طلبات هنا.', refusedNeedsReply: 'اكتب السبب قبل الرفض.' },
     cons: { title: 'نماذج الموافقة', newForm: 'نموذج موافقة جديد', formTitle: 'العنوان', body: 'النص الذي يقرؤه ولي الأمر قبل الإجابة', deadline: 'الرد قبل', audience: 'إلى', publish: 'نشر', published: 'نُشر؛ وأُخطر أولياء الأمور.', list: 'النماذج', open: 'فتح', signed: 'إجابات', pending: 'بانتظار الرد', export: 'تصدير CSV', withdraw: 'سحب', withdrawn: 'مسحوب', student: 'الطالب', klass: 'الفصل', answer: 'الإجابة', at: 'وقت الإجابة', notAnswered: 'لم يُجب', changedText: '(أجاب على نص أقدم)', none: 'لا نماذج بعد.' },
     bus: { title: 'الحافلات اليوم', phones: 'وافق المشرفون على مشاركة أرقام هواتفهم مع أولياء الأمور', route: 'الخط', kind: 'الإشعار', delay: 'تأخير', cancel: 'إلغاء', direction: 'الرحلة', morning: 'الذهاب', afternoon: 'العودة', minutes: 'دقائق التأخير', message: 'رسالة (اختيارية)', send: 'إرسال إلى أولياء الأمور', sent: (n: string) => `أُرسل إلى أولياء أمور ${n} من الأطفال.`, routes: 'الخطوط', stops: 'محطات', students: 'أطفال', noRoutes: 'استورد كشف الخطوط أولًا.', today: 'إشعارات اليوم', withdraw: 'سحب', withdrawn: 'مسحوب', none: 'لا إشعارات اليوم.' },
@@ -128,6 +130,7 @@ export const SchoolAppAdmin: React.FC<{ lang: Lang }> = ({ lang }) => {
       </fieldset>
 
       {IMPORTS.filter((s) => status.templates[s] && status.available[SECTION_OF[s]]).map((s) => <ImportCard key={s} lang={lang} section={s} on={!!status.sections[SECTION_OF[s]]} template={status.templates[s]!} roster={roster} onDone={reloadImports} />)}
+      <MoodleAdmin lang={lang} />
       {status.sections.requests && <RequestsAdmin lang={lang} />}
       {status.sections.consents && <ConsentsAdmin lang={lang} roster={roster} />}
       {status.sections.buses && <BusesAdmin lang={lang} />}
@@ -511,6 +514,41 @@ const ConsentsAdmin: React.FC<{ lang: Lang; roster: Roster | null }> = ({ lang, 
             <tbody>{dash.rows.map((r) => <tr key={r.studentId} className="border-t border-slate-100"><td className="py-1 pe-3" dir="auto">{r.studentName}</td><td className="py-1 pe-3" dir="auto">{r.className}</td><td className="py-1 pe-3">{r.choice ? dash.form.options.find((o) => o.key === r.choice)?.label ?? r.choice : t.notAnswered}{r.sameText === false ? ` ${t.changedText}` : ''}</td><td className="py-1">{r.at ? new Date(r.at).toLocaleString(lang === 'ar' ? 'ar-EG' : 'en-GB', { timeZone: 'Africa/Cairo', hour12: true }) : ''}</td></tr>)}</tbody></table></div>
         </div>
       )}
+    </div>
+  );
+};
+
+interface MoodleConn { platformId: string; site: string; hasToken: boolean; enabled: boolean; lastCheck: { at: string; ok: boolean; code: string; attendance: boolean } | null; lastRun: { at: string; code: string; announcements: number; attendance: number } | null; functions: string[] }
+/** The Moodle connector: a read-only token per connection (write-only), the school's on/off and "Sync now". Hidden when the site switch is off. */
+const MoodleAdmin: React.FC<{ lang: Lang }> = ({ lang }) => {
+  const t = TEXT[lang].moodle;
+  const [data, setData] = useState<{ switchOn: boolean; connections: MoodleConn[] } | null>(null);
+  const [tok, setTok] = useState<Record<string, string>>({});
+  const [msg, setMsg] = useState<string | null>(null);
+  const load = useCallback(() => apiRequest<{ switchOn: boolean; connections: MoodleConn[] }>('GET', '/api/school-app/moodle').then(setData).catch(() => setData(null)), []);
+  useEffect(() => { void load(); }, [load]);
+  if (!data?.switchOn) return null;
+  const act = async (fn: () => Promise<unknown>, ok?: string) => { setMsg(null); try { await fn(); if (ok) setMsg(ok); void load(); } catch (e) { setMsg(errText(e, TEXT[lang].failed)); } };
+  const when = (iso: string) => new Date(iso).toLocaleString(lang === 'ar' ? 'ar-EG' : 'en-GB', { timeZone: 'Africa/Cairo', hour12: true, dateStyle: 'medium', timeStyle: 'short' });
+  return (
+    <div className="rounded-lg border border-slate-200 p-4 space-y-3" data-testid="sa-moodle">
+      <h3 className="text-base font-semibold text-slate-900">{t.title}</h3>
+      <p className="text-xs text-slate-600">{t.help}</p>
+      {data.connections[0] && <p className="text-xs font-mono text-slate-500" dir="ltr">{data.connections[0].functions.join(', ')}</p>}
+      {!data.connections.length ? <p className="text-sm text-slate-500">{t.none}</p> : data.connections.map((c) => (
+        <div key={c.platformId} className="space-y-2 border-t border-slate-100 pt-2" data-testid="sa-moodle-conn">
+          <p className="text-sm font-medium" dir="ltr">{c.site}</p>
+          <div className="flex flex-wrap gap-2">
+            <input type="password" autoComplete="off" aria-label={t.token} placeholder={c.hasToken ? '••••••••' : t.token} className="min-w-0 flex-1 rounded border border-slate-300 px-2 py-1 text-sm" value={tok[c.platformId] ?? ''} onChange={(e) => setTok({ ...tok, [c.platformId]: e.target.value })} />
+            <button type="button" className={btn} disabled={!tok[c.platformId]} onClick={() => void act(async () => { await apiRequest('PUT', `/api/school-app/moodle/${encodeURIComponent(c.platformId)}/token`, { token: tok[c.platformId] }); setTok({ ...tok, [c.platformId]: '' }); }, t.saved)}>{t.save}</button>
+          </div>
+          {c.lastCheck && <p className="text-sm text-slate-700">{t.check(c.lastCheck.ok, c.lastCheck.code, c.lastCheck.attendance)}</p>}
+          <label className="flex items-center gap-3 text-sm"><input type="checkbox" className="h-5 w-5" checked={c.enabled} disabled={!c.hasToken} onChange={(e) => void act(() => apiRequest('PUT', `/api/school-app/moodle/${encodeURIComponent(c.platformId)}`, { enabled: e.target.checked }))} />{t.on}</label>
+          <button type="button" className={primary} disabled={!c.hasToken} onClick={() => void act(() => apiRequest('POST', `/api/school-app/moodle/${encodeURIComponent(c.platformId)}/run`, {}))}>{t.run}</button>
+          {c.lastRun && <p className="text-sm text-slate-700">{t.lastRun(when(c.lastRun.at), c.lastRun.announcements, c.lastRun.attendance)}{c.lastRun.code !== 'ok' ? ` (${c.lastRun.code})` : ''}</p>}
+        </div>
+      ))}
+      {msg && <p className="text-sm text-slate-700" role="status">{msg}</p>}
     </div>
   );
 };
