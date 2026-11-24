@@ -266,3 +266,13 @@
 /* Parents school app (d): simple form fields */
 .pp-field { display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500; color: var(--text-2); }
 .pp-field select, .pp-field textarea, .pp-field input { font: inherit; font-weight: 400; min-block-size: 44px; border: 1px solid var(--line-2); border-radius: 8px; padding: 8px 12px; background: var(--card); color: var(--text); inline-size: 100%; box-sizing: border-box; }
+
+/* Parents school app (e): the assistant */
+.pp-chat-fab { position: fixed; inset-inline-end: 16px; inset-block-end: 88px; inline-size: 56px; block-size: 56px; border-radius: 9999px; border: 0; background: var(--navy); color: #fff; box-shadow: 0 6px 16px rgba(11,32,60,.25); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; z-index: 20; }
+@media (min-width: 900px) { .pp-chat-fab { inset-block-end: 24px; } }
+.pp-chat { display: flex; flex-direction: column; gap: 10px; max-block-size: 55vh; overflow-y: auto; }
+.pp-chat-msg { max-inline-size: 88%; padding: 10px 12px; border-radius: 12px; font-size: 14px; line-height: 21px; }
+.pp-chat-msg--you { align-self: flex-end; background: var(--blue-50); }
+.pp-chat-msg--enara { align-self: flex-start; background: var(--track); }
+.pp-chat-form { display: flex; gap: 8px; margin-block-start: 8px; }
+.pp-chat-form input { flex: 1; min-inline-size: 0; min-block-size: 44px; border: 1px solid var(--line-2); border-radius: 8px; padding: 8px 12px; font: inherit; }

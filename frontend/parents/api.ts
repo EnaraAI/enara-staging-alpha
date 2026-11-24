@@ -70,7 +70,7 @@ export const parentsApi = {
 
 // Parents school app (a): /api/parents/school. 404 while every SCHOOL_APP_* switch is off (the tab is then hidden);
 // a section the school has off answers 404 SECTION_OFF.
-export type SchoolSection = 'timetable' | 'announcements' | 'attendance' | 'notifications' | 'fees' | 'buses' | 'requests' | 'consents';
+export type SchoolSection = 'timetable' | 'announcements' | 'attendance' | 'notifications' | 'fees' | 'buses' | 'requests' | 'consents' | 'chat';
 export interface SchoolSource { label: string; updatedAt: string | null; kind: string | null }
 export type AttendanceStatus = 'present' | 'absent' | 'late' | 'excused';
 export interface SchoolOverview { sections: Record<SchoolSection, boolean>; today: string; attendanceToday?: AttendanceStatus | null; todayClasses?: { period: number; start: string; end: string; subject: string }[]; announcementsCount?: number; unreadNotifications?: number; fees?: { next: { amount: number; dueDate: string; status: FeeStatus } | null; overdueCount: number; currency: string }; bus?: { trips: { direction: 'morning' | 'afternoon'; time: string | null; stop: string; notice: BusNotice | null }[] }; openRequests?: number; consentsPending?: number }
@@ -84,6 +84,7 @@ export interface SchoolBus { today: string; trips: BusTrip[]; source: SchoolSour
 export type RequestType = 'certificate' | 'early_leave' | 'teacher_meeting' | 'other';
 export interface SchoolRequestItem { id: string; type: RequestType; details: string; preferredDate: string | null; status: 'new' | 'in_progress' | 'done' | 'refused'; reply: string | null; history: { at: string; by: 'parent' | 'school'; status: string; note: string | null }[]; createdAt: string; via: string }
 export interface ConsentFormItem { id: string; textHash: string; title: string; body: string; titleAr: string | null; bodyAr: string | null; options: { key: string; label: string; labelAr: string | null }[]; deadline: string; open: boolean; answer: { choice: string; at: string; byYou: boolean; sameText: boolean } | null; history: { choice: string; at: string; byYou: boolean }[] }
+export interface ChatReply { answer: string; lang: 'en' | 'ar'; sources: { source: string; updatedAt: string | null }[]; offerRequest: { type: RequestType; details: string } | null; engine: 'code' | 'model' }
 export type FeeStatus = 'due' | 'overdue' | 'paid' | 'waived';
 export interface FeeTotals { total: number; paid: number; waived: number; remaining: number; overdue: number }
 export interface SchoolFees { currency: string; totals: FeeTotals; next: { id: string; planName: string; number: number; amount: number; dueDate: string; status: FeeStatus } | null; plans: { name: string; academicYear: string | null; totals: FeeTotals; instalments: { id: string; number: number; amount: number; dueDate: string; status: FeeStatus; paidDate: string | null; receiptRef: string | null; hasReceipt: boolean; note: string | null }[] }[]; source: SchoolSource }
@@ -96,6 +97,8 @@ export const schoolApi = {
   announcements: (id: string) => apiRequest<SchoolAnnouncements>('GET', `${S(id)}/announcements`),
   fees: (id: string) => apiRequest<SchoolFees>('GET', `${S(id)}/fees`),
   bus: (id: string) => apiRequest<SchoolBus>('GET', `${S(id)}/bus`),
+  chat: (id: string, message: string) => apiRequest<ChatReply>('POST', `${S(id)}/chat`, { message }),
+  chatRequest: (id: string, offer: { type: RequestType; details: string }) => apiRequest<SchoolRequestItem>('POST', `${S(id)}/chat/request`, { ...offer, confirmed: true }),
   requests: (id: string) => apiRequest<{ requests: SchoolRequestItem[]; canCreate: boolean; types: RequestType[] }>('GET', `${S(id)}/requests`),
   createRequest: (id: string, body: { type: RequestType; details: string; preferredDate?: string }) => apiRequest<SchoolRequestItem>('POST', `${S(id)}/requests`, body),
   consents: (id: string) => apiRequest<{ canSign: boolean; forms: ConsentFormItem[] }>('GET', `${S(id)}/consents`),

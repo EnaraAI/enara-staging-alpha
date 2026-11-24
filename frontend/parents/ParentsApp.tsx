@@ -15,6 +15,7 @@ import { ShareSheet } from './screens/ShareSheet';
 import { AddEmail } from './screens/AddEmail';
 import { ALL, SubjectChips } from './screens/Subjects';
 import { School, SchoolHomeCard, type SchoolView } from './screens/School';
+import { SchoolChat } from './screens/SchoolChat';
 
 // ENARA Parents Portal: a parent mode inside the ENARA app, under /parents.
 // Mobile-first; English and Arabic with full RTL; week starts Saturday;
@@ -201,6 +202,7 @@ const ParentsApp: React.FC<{ userName?: string; onSignOut: () => void }> = ({ on
           )}
         </main>
         {!showLink && learner && nav}
+        {!showLink && learner && school.data?.sections.chat && <SchoolChat learner={learner} />}
         {sharing && learner && <ShareSheet learner={learner} onClose={() => setSharing(false)} />}
       </div>
     </ParentsCtx.Provider>
