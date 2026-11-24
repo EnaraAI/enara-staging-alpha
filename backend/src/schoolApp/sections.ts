@@ -27,7 +27,7 @@ export async function setSchoolSections(actor: { id: string; role: string; insti
     if (v && !siteSectionOn(k)) throw new AppError(`${k} is not available yet`, 409, 'SECTION_NOT_AVAILABLE');
     next[k] = v;
   }
-  school.schoolApp = { sections: next, updatedAt: new Date(), updatedBy: actor.id };
+  school.schoolApp = { ...(school.schoolApp ?? {}), sections: next, updatedAt: new Date(), updatedBy: actor.id };
   school.markModified('schoolApp');
   await school.save();
   await recordAudit('school_app_sections_changed', actor, { institutionId, type: 'institution', id: institutionId }, { from: before, to: next });
@@ -35,3 +35,22 @@ export async function setSchoolSections(actor: { id: string; role: string; insti
 }
 
 export const newId = (prefix: string) => `${prefix}_${randomUUID().replace(/-/g, '').slice(0, 20)}`;
+
+/** Step (b): who in a family sees fees. 'all' (default): every linked guardian; 'owner': the main guardian only (the payer). */
+export async function feesVisibleTo(institutionId: string | undefined): Promise<'all' | 'owner'> {
+  if (!institutionId) return 'all';
+  const doc = await Institution.findOne({ id: institutionId }).select('schoolApp.feesVisibleTo').lean();
+  return doc?.schoolApp?.feesVisibleTo === 'owner' ? 'owner' : 'all';
+}
+export async function setFeesVisibleTo(actor: { id: string; role: string; institutionId?: string }, institutionId: string, value: unknown) {
+  if (actor.role !== 'enara-admin' && !(actor.role === 'admin' && actor.institutionId === institutionId)) throw new AppError('Access denied', 403, 'FORBIDDEN');
+  if (value !== 'all' && value !== 'owner') throw new AppError("feesVisibleTo must be 'all' or 'owner'", 400, 'VALIDATION_ERROR');
+  const school = await Institution.findOne({ id: institutionId });
+  if (!school) throw new AppError('Institution not found', 404, 'NOT_FOUND');
+  const before = school.schoolApp?.feesVisibleTo ?? 'all';
+  school.schoolApp = { ...(school.schoolApp ?? {}), feesVisibleTo: value, updatedAt: new Date(), updatedBy: actor.id };
+  school.markModified('schoolApp');
+  await school.save();
+  await recordAudit('school_app_fees_visibility_changed', actor, { institutionId, type: 'institution', id: institutionId }, { from: before, to: value });
+  return { institutionId, feesVisibleTo: value };
+}

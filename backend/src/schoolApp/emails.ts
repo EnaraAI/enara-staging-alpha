@@ -11,16 +11,18 @@ import { parentRecipient, sendParentEmailOnce } from '../parents/parentEmails';
 // ceiling, never twice per key). Needs the school's notifications section on (checked by the caller) and the parent's own setting:
 //   emailPrefs.schoolAttendance     absence and lateness (default on)
 //   emailPrefs.schoolAnnouncements  announcements (default on)
+//   emailPrefs.schoolFees           fee reminders (step b; default on)
 // Only parents with a usable address get one (code-only accounts have none). SMS and WhatsApp: later.
-export interface NoticeDoc { parentUserId: string; studentId: string; institutionId: string; kind: 'absence' | 'late' | 'announcement'; refId: string; date?: string; title: string; body: string }
+export interface NoticeDoc { parentUserId: string; studentId: string; institutionId: string; kind: 'absence' | 'late' | 'announcement' | 'fee_due'; refId: string; date?: string; title: string; body: string; amount?: number; planName?: string; daysBefore?: number }
 
 const firstName = (name?: string | null) => String(name ?? '').trim().split(/\s+/)[0] || '';
 const dayLabel = (day: string, lang: 'en' | 'ar') => new Intl.DateTimeFormat(lang === 'ar' ? 'ar-EG' : 'en-GB', { timeZone: 'UTC', weekday: 'long', day: 'numeric', month: 'short' }).format(new Date(`${day}T12:00:00Z`));
 const MAX_PER_CALL = 1000;
 
-export function headline(kind: NoticeDoc['kind'], lang: 'en' | 'ar', child: string, date: string | undefined, title: string): string {
+export function headline(kind: NoticeDoc['kind'], lang: 'en' | 'ar', child: string, date: string | undefined, title: string, amount?: number): string {
   if (kind === 'announcement') return title.slice(0, 200);
   const d = date ? dayLabel(date, lang) : '';
+  if (kind === 'fee_due') return lang === 'ar' ? `قسط رسوم ${child} مستحق يوم ${d}: ${amount ?? ''} جنيه` : `${child}'s fee instalment is due on ${d}: ${amount ?? ''} EGP`;
   if (lang === 'ar') return kind === 'late' ? `تأخّر ${child} يوم ${d}` : `تغيّب ${child} يوم ${d}`;
   return kind === 'late' ? `${child} was late on ${d}` : `${child} was absent on ${d}`;
 }
@@ -38,7 +40,7 @@ export async function emailSchoolNotices(docs: NoticeDoc[]): Promise<{ sent: num
     const recipients = new Map<string, Awaited<ReturnType<typeof parentRecipient>>>();
     for (const d of list) {
       const prefs = profiles.get(d.parentUserId);
-      const wanted = d.kind === 'announcement' ? prefs?.schoolAnnouncements !== false : prefs?.schoolAttendance !== false;
+      const wanted = d.kind === 'announcement' ? prefs?.schoolAnnouncements !== false : d.kind === 'fee_due' ? prefs?.schoolFees !== false : prefs?.schoolAttendance !== false;
       if (!wanted) { skipped++; continue; }
       if (!recipients.has(d.parentUserId)) recipients.set(d.parentUserId, await parentRecipient(d.parentUserId));
       const to = recipients.get(d.parentUserId);
@@ -49,8 +51,10 @@ export async function emailSchoolNotices(docs: NoticeDoc[]): Promise<{ sent: num
         parentUserId: d.parentUserId, studentId: d.studentId, institutionId: d.institutionId,
         vars: {
           NAME: to.name, CHILD_NAME: child, SCHOOL_NAME: schools.get(d.institutionId) || (to.lang === 'ar' ? 'المدرسة' : 'the school'),
-          HEADLINE: headline(d.kind, to.lang, child, d.date, d.title),
-          MESSAGE: d.kind === 'announcement' ? (d.body || d.title) : to.lang === 'ar' ? 'من سجل الحضور في المدرسة.' : "From the school's attendance register.",
+          HEADLINE: headline(d.kind, to.lang, child, d.date, d.title, d.amount),
+          MESSAGE: d.kind === 'announcement' ? (d.body || d.title)
+            : d.kind === 'fee_due' ? (to.lang === 'ar' ? `${d.planName ?? ''}. يتم الدفع في المدرسة؛ إنارة تعرض سجل الرسوم كما سجّلته المدرسة فقط.` : `${d.planName ?? ''}. Payment is made at the school; ENARA only shows the school's fee record.`)
+            : to.lang === 'ar' ? 'من سجل الحضور في المدرسة.' : "From the school's attendance register.",
           ACTION_URL: `${getAppUrl()}/parents/school`,
         },
       });

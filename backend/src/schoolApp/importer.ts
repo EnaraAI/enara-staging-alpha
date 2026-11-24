@@ -3,7 +3,7 @@ import { Batch } from '../models/Batch';
 import { Student } from '../models/Student';
 import { recordAudit } from '../services/auditTrail';
 import { parseCsv } from '../parents/csvInvites';
-import { SchoolAnnouncement, SchoolDailyAttendance, SchoolImport, SchoolTimetableEntry, type Source } from './models';
+import { SchoolAnnouncement, SchoolDailyAttendance, SchoolImport, SchoolInstalment, SchoolTimetableEntry, type Source } from './models';
 import { COLUMNS, MAX_ROWS, checkRow, mapHeaders, norm, type ImportSection } from './importSpec';
 import { sectionOn, newId } from './sections';
 import { notifyAbsences, notifyAnnouncements } from './notifications';
@@ -13,7 +13,7 @@ import { notifyAbsences, notifyAnnouncements } from './notifications';
 // row objects and gets the same checks and the same writes, with source.kind = 'connector'.
 type Actor = { id: string; role: string; institutionId?: string };
 const UNDO_MS = 24 * 3600_000;
-export const IMPORT_SECTIONS: ImportSection[] = ['timetable', 'attendance', 'announcements'];
+export const IMPORT_SECTIONS: ImportSection[] = ['timetable', 'attendance', 'announcements', 'fees'];
 const isImportSection = (x: unknown): x is ImportSection => typeof x === 'string' && (IMPORT_SECTIONS as string[]).includes(x);
 
 function scopeOf(actor: Actor, institutionId?: string): string {
@@ -50,7 +50,7 @@ async function resolve(section: ImportSection, institutionId: string, raw: Recor
       const g = groupByKey.get(norm(row.class));
       if (!g) { problems.push({ row: line, message: `class "${row.class}" is not a class of this school in ENARA` }); return; }
       row.groupKey = norm(g.name); row.groupName = g.name;
-    } else if (section === 'attendance') {
+    } else if (section === 'attendance' || section === 'fees') {
       const s = findStudent(row.student);
       if (!s) { problems.push({ row: line, message: (byName.get(norm(row.student)) ?? []).length > 1 ? `two students are called "${row.student}"; use the student ID` : `student "${row.student}" not found in this school` }); return; }
       row.studentId = s.id;
@@ -68,6 +68,15 @@ async function resolve(section: ImportSection, institutionId: string, raw: Recor
 async function diff(section: ImportSection, institutionId: string, rows: Record<string, string>[]) {
   const counts: Record<string, number> = { new: 0, changed: 0, unchanged: 0, removed: 0 };
   if (section === 'announcements') { counts.new = rows.length; return counts; }
+  if (section === 'fees') {
+    const existing = await SchoolInstalment.find({ institutionId, studentId: { $in: [...new Set(rows.map((r) => r.studentId))] } }).lean();
+    const ex = new Map(existing.map((e) => [`${e.studentId}|${e.planKey}|${e.number}`, e]));
+    for (const r of rows) {
+      const e = ex.get(`${r.studentId}|${norm(r.plan)}|${r.number}`);
+      if (!e) counts.new++; else if (e.amount === Number(r.amount) && e.dueDate === r.due_date && e.status === r.status && (e.paidDate ?? '') === (r.paid_date ?? '') && (e.receiptRef ?? '') === (r.receipt_ref ?? '')) counts.unchanged++; else counts.changed++;
+    }
+    return counts;
+  }
   if (section === 'timetable') {
     const keys = [...new Set(rows.map((r) => r.groupKey))];
     const existing = await SchoolTimetableEntry.find({ institutionId, groupKey: { $in: keys } }).lean();
@@ -89,7 +98,7 @@ async function diff(section: ImportSection, institutionId: string, rows: Record<
 /** Step 1: check and preview. Nothing is written except the preview itself. */
 export async function previewImport(actor: Actor, body: { section?: unknown; csv?: unknown; fileName?: unknown; institutionId?: unknown }) {
   const institutionId = scopeOf(actor, typeof body.institutionId === 'string' ? body.institutionId : undefined);
-  if (!isImportSection(body.section)) throw new AppError('section must be timetable, attendance or announcements', 400, 'VALIDATION_ERROR');
+  if (!isImportSection(body.section)) throw new AppError('section must be timetable, attendance, announcements or fees', 400, 'VALIDATION_ERROR');
   if (!(await sectionOn(institutionId, body.section))) throw new AppError(`The ${body.section} section is off for this school`, 409, 'SECTION_OFF');
   if (typeof body.csv !== 'string' || !body.csv.trim()) throw new AppError('Upload a CSV file (Excel: Save as CSV UTF-8)', 400, 'VALIDATION_ERROR');
   if (body.csv.length > 3_000_000) throw new AppError('File too large (max 3 MB)', 413, 'TOO_LARGE');
@@ -146,7 +155,7 @@ export async function ingest(section: ImportSection, institutionId: string, raw:
 }
 
 function modelOf(section: ImportSection) {
-  return section === 'timetable' ? SchoolTimetableEntry : section === 'attendance' ? SchoolDailyAttendance : SchoolAnnouncement;
+  return section === 'timetable' ? SchoolTimetableEntry : section === 'attendance' ? SchoolDailyAttendance : section === 'fees' ? SchoolInstalment : SchoolAnnouncement;
 }
 
 /** The one write path for imports and connectors. Returns inserted ids and the previous versions of replaced or removed rows. */
@@ -180,6 +189,21 @@ async function write(section: ImportSection, institutionId: string, rows: Record
       }
     }
     await notifyAbsences(institutionId, newAbsences);
+  } else if (section === 'fees') {
+    // Upsert per student, plan and instalment number. An instalment not in the file is left as it is.
+    for (const r of rows) {
+      const key = { institutionId, studentId: r.studentId, planKey: norm(r.plan), number: Number(r.number) };
+      const old = await SchoolInstalment.findOne(key).lean();
+      const doc = { ...key, planName: r.plan, academicYear: r.academic_year || undefined, amount: Number(r.amount), currency: 'EGP', dueDate: r.due_date, status: r.status,
+        paidDate: r.status === 'paid' ? r.paid_date : undefined, receiptRef: r.receipt_ref || undefined, note: r.note || undefined, source };
+      if (old) {
+        if (old.amount === doc.amount && old.dueDate === doc.dueDate && old.status === doc.status && (old.paidDate ?? '') === (doc.paidDate ?? '') && (old.receiptRef ?? '') === (doc.receiptRef ?? '') && (old.note ?? '') === (doc.note ?? '') && old.planName === doc.planName) continue;
+        replaced.push(old as unknown as Record<string, unknown>);
+        await SchoolInstalment.replaceOne({ id: old.id }, { ...doc, id: old.id, receiptKey: old.receiptKey, reminders: old.dueDate === doc.dueDate ? old.reminders : undefined });
+      } else {
+        const id = newId('sin'); await SchoolInstalment.create({ ...doc, id }); inserted.push(id);
+      }
+    }
   } else {
     const docs = rows.map((r) => ({ id: newId('san'), institutionId, audience: r.audience, audienceValue: r.audience === 'school' ? undefined : r.audience_value, audienceKey: r.audience === 'school' ? undefined : norm(r.audience_value),
       title: r.title, body: r.body, lang: 'both' as const, publishAt: r.publish ? new Date(`${r.publish}T05:00:00Z`) : new Date(), expiresAt: r.expires ? new Date(`${r.expires}T21:59:59Z`) : undefined, source }));

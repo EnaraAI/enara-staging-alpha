@@ -3,7 +3,7 @@
 // section; saved column mappings per school come later). A connector produces the same row objects and goes through the same checks.
 import { SCHOOL_ATTENDANCE_STATUSES } from './models';
 
-export type ImportSection = 'timetable' | 'attendance' | 'announcements';
+export type ImportSection = 'timetable' | 'attendance' | 'announcements' | 'fees';
 export interface Column { key: string; required: boolean; aliases: string[] }
 
 export const COLUMNS: Record<ImportSection, Column[]> = {
@@ -31,6 +31,20 @@ export const COLUMNS: Record<ImportSection, Column[]> = {
     { key: 'body', required: true, aliases: ['body', 'text', 'message', 'النص', 'الرسالة'] },
     { key: 'publish', required: false, aliases: ['publish', 'publish date', 'date', 'تاريخ النشر', 'النشر'] },
     { key: 'expires', required: false, aliases: ['expires', 'expiry', 'until', 'ينتهي', 'تاريخ الانتهاء'] },
+  ],
+  // Step (b): one row per instalment. The plan is named per student (for example "Tuition 2026-2027"); its total is the sum of its rows.
+  fees: [
+    { key: 'student', required: true, aliases: ['student id', 'student', 'student email', 'id', 'رقم الطالب', 'الطالب', 'كود الطالب'] },
+    { key: 'student_name', required: false, aliases: ['student name', 'name', 'اسم الطالب', 'الاسم'] },
+    { key: 'plan', required: true, aliases: ['plan', 'fee plan', 'fees', 'الخطة', 'البند', 'نوع الرسوم'] },
+    { key: 'academic_year', required: false, aliases: ['academic year', 'year', 'العام الدراسي', 'السنة الدراسية'] },
+    { key: 'number', required: true, aliases: ['instalment no.', 'instalment no', 'instalment', 'installment', 'installment no.', 'no.', 'رقم القسط', 'القسط'] },
+    { key: 'amount', required: true, aliases: ['amount', 'amount (egp)', 'value', 'المبلغ', 'القيمة'] },
+    { key: 'due_date', required: true, aliases: ['due date', 'due', 'تاريخ الاستحقاق', 'الاستحقاق'] },
+    { key: 'status', required: false, aliases: ['status', 'الحالة'] },
+    { key: 'paid_date', required: false, aliases: ['paid date', 'payment date', 'تاريخ الدفع', 'تاريخ السداد'] },
+    { key: 'receipt_ref', required: false, aliases: ['receipt ref', 'receipt', 'receipt no.', 'reference', 'رقم الإيصال', 'الإيصال'] },
+    { key: 'note', required: false, aliases: ['note', 'notes', 'ملاحظة', 'ملاحظات'] },
   ],
 };
 
@@ -76,6 +90,16 @@ export function parseStatus(v: string): string | null { const s = STATUS[norm(v)
 const AUD: Record<string, string> = { school: 'school', all: 'school', 'المدرسة': 'school', 'الكل': 'school', grade: 'grade', 'الصف': 'grade', 'المرحلة': 'grade',
   class: 'group', group: 'group', 'الفصل': 'group', student: 'student', 'طالب': 'student', 'الطالب': 'student' };
 export const parseAudience = (v: string) => AUD[norm(v)] ?? null;
+const FEE: Record<string, string> = { due: 'due', unpaid: 'due', pending: 'due', open: 'due', overdue: 'due', 'مستحق': 'due', 'غير مدفوع': 'due', 'متأخر': 'due', 'لم يدفع': 'due',
+  paid: 'paid', 'مدفوع': 'paid', 'تم الدفع': 'paid', 'مسدد': 'paid', 'تم السداد': 'paid', waived: 'waived', exempt: 'waived', 'معفى': 'waived', 'إعفاء': 'waived', 'اعفاء': 'waived' };
+/** Instalment status from a sheet; "overdue" in a sheet means due (ENARA works overdue out from the date). Empty = due. */
+export const parseFeeStatus = (v: string) => (norm(v) ? FEE[norm(v)] ?? null : 'due');
+/** "1,250.50", "1250", "١٢٥٠ ج.م", "EGP 1,250" -> "1250.5"; null when not a non-negative amount. */
+export function parseAmount(v: string): string | null {
+  const s = digits(norm(v)).replace(/[٬,\s]/g, '').replace(/٫/g, '.').replace(/^(egp|le|ج\.?م\.?|جنيه)|(egp|le|ج\.?م\.?|جنيه)$/g, '');
+  if (!/^\d+(\.\d{1,2})?$/.test(s)) return null;
+  const n = Number(s); return Number.isFinite(n) && n <= 10_000_000 ? String(n) : null;
+}
 
 /** Field checks that need no database. Returns the cleaned row, or problems. */
 export function checkRow(section: ImportSection, raw: Record<string, string>): { row?: Record<string, string>; problems: string[] } {
@@ -105,6 +129,16 @@ export function checkRow(section: ImportSection, raw: Record<string, string>): {
     if (out.body.length > 4000) p.push('text longer than 4,000 characters');
     if (out.publish) { const d = parseDate(out.publish); if (!d) p.push(`publish date "${out.publish}" not understood`); else out.publish = d; }
     if (out.expires) { const d = parseDate(out.expires); if (!d) p.push(`expiry date "${out.expires}" not understood`); else out.expires = d; }
+  } else if (section === 'fees') {
+    const n = Number(digits(out.number)); if (!Number.isInteger(n) || n < 1 || n > 60) p.push(`instalment number "${out.number}" must be 1-60`); else out.number = String(n);
+    const a = parseAmount(out.amount); if (a === null) p.push(`amount "${out.amount}" is not an amount`); else out.amount = a;
+    const d = parseDate(out.due_date); if (!d) p.push(`due date "${out.due_date}" not understood (use YYYY-MM-DD or DD/MM/YYYY)`); else out.due_date = d;
+    const st = parseFeeStatus(out.status); if (!st) p.push(`status "${out.status}" must be due, paid or waived`); else out.status = st;
+    if (out.paid_date) { const pd = parseDate(out.paid_date); if (!pd) p.push(`paid date "${out.paid_date}" not understood`); else out.paid_date = pd; }
+    if (st === 'paid' && !out.paid_date) p.push('a paid instalment needs its paid date');
+    if (out.plan.length > 120) p.push('plan name longer than 120 characters');
+    if (out.receipt_ref.length > 80) p.push('receipt reference longer than 80 characters');
+    if (out.note.length > 300) p.push('note longer than 300 characters');
   }
   return p.length ? { problems: p } : { row: out, problems: [] };
 }

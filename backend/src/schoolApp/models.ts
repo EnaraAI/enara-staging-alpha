@@ -70,6 +70,34 @@ const announcementSchema = new Schema<ISchoolAnnouncement>({
 announcementSchema.index({ institutionId: 1, publishAt: -1 });
 export const SchoolAnnouncement = model<ISchoolAnnouncement>('SchoolAnnouncement', announcementSchema, 'school_announcements');
 
+// ---- fees (step b): one row per instalment of a student's fee plan. ENARA only shows fees; the school marks them paid (or waived).
+// "overdue" is never stored: it is a due instalment whose due date has passed (worked out when read, Cairo date).
+export const INSTALMENT_STATUSES = ['due', 'paid', 'waived'] as const;
+export type InstalmentStatus = (typeof INSTALMENT_STATUSES)[number];
+export interface ISchoolInstalment extends Document {
+  id: string; institutionId: string; studentId: string; planName: string; planKey: string; academicYear?: string; number: number;
+  amount: number; currency: string; dueDate: string; status: InstalmentStatus; paidDate?: string; receiptRef?: string; receiptKey?: string; note?: string;
+  markedBy?: string; markedAt?: Date; reminders?: string[]; source: Source;
+}
+const instalmentSchema = new Schema<ISchoolInstalment>({
+  id: { type: String, required: true, unique: true },
+  institutionId: { type: String, required: true, index: true },
+  studentId: { type: String, required: true, index: true },
+  planName: { type: String, required: true, maxlength: 120 }, planKey: { type: String, required: true },
+  academicYear: { type: String, maxlength: 20 },
+  number: { type: Number, required: true, min: 1, max: 60 },
+  amount: { type: Number, required: true, min: 0 }, currency: { type: String, default: 'EGP' },
+  dueDate: { type: String, required: true }, // YYYY-MM-DD (Cairo)
+  status: { type: String, enum: INSTALMENT_STATUSES, required: true },
+  paidDate: String, receiptRef: { type: String, maxlength: 80 }, receiptKey: String, note: { type: String, maxlength: 300 },
+  markedBy: String, markedAt: Date,
+  reminders: { type: [String], default: undefined }, // reminder kinds already sent ('d7', 'd1')
+  source: { type: sourceSchema, required: true },
+}, { timestamps: true });
+instalmentSchema.index({ institutionId: 1, studentId: 1, planKey: 1, number: 1 }, { unique: true });
+instalmentSchema.index({ status: 1, dueDate: 1 });
+export const SchoolInstalment = model<ISchoolInstalment>('SchoolInstalment', instalmentSchema, 'school_instalments');
+
 // ---- imports (preview, confirm, undo)
 export interface ISchoolImport extends Document {
   id: string; institutionId: string; section: string; fileName?: string; status: 'preview' | 'confirmed' | 'undone' | 'expired';
@@ -94,14 +122,14 @@ export const SchoolImport = model<ISchoolImport>('SchoolImport', importSchema, '
 
 // ---- in-app notifications for parents
 export interface IParentNotification extends Document {
-  id: string; parentUserId: string; studentId?: string; institutionId?: string; kind: 'absence' | 'late' | 'announcement';
+  id: string; parentUserId: string; studentId?: string; institutionId?: string; kind: 'absence' | 'late' | 'announcement' | 'fee_due';
   title: string; body: string; refId?: string; date?: string; readAt?: Date; createdAt: Date;
 }
 const notificationSchema = new Schema<IParentNotification>({
   id: { type: String, required: true, unique: true },
   parentUserId: { type: String, required: true, index: true },
   studentId: { type: String, index: true }, institutionId: String,
-  kind: { type: String, enum: ['absence', 'late', 'announcement'], required: true },
+  kind: { type: String, enum: ['absence', 'late', 'announcement', 'fee_due'], required: true },
   title: { type: String, required: true, maxlength: 200 }, body: { type: String, maxlength: 600 },
   refId: String, date: String, readAt: Date, // date: the attendance day (YYYY-MM-DD, Cairo) for absence / late
 }, { timestamps: { createdAt: true, updatedAt: false } });

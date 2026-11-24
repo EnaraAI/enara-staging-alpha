@@ -5,6 +5,7 @@ import { ParentNotification, SchoolAnnouncement, SchoolDailyAttendance, SchoolTi
 import { schoolSections } from './sections';
 import { announcementFilter, whoIs } from './audience';
 import type { Section } from './flags';
+import { feesSummary } from './fees';
 
 // Parents school app (a): what a parent sees for ONE child. Every function takes the LearnerContext from parents/service.requireLearner
 // (active link, child still at the link's school, school parent access on), so a parent can only ever read their own child's data.
@@ -37,6 +38,7 @@ export async function schoolOverview(ctx: LearnerContext, now = new Date()) {
     out.todayClasses = rows.map((r) => ({ period: r.period, start: r.start, end: r.end, subject: r.subject }));
   }
   if (sections.announcements && who) out.announcementsCount = await SchoolAnnouncement.countDocuments(announcementFilter({ ...who, institutionId: schoolOf(ctx) }, now));
+  if (sections.fees) { const f = await feesSummary(ctx, now); if (f) out.fees = f; }
   if (sections.notifications) out.unreadNotifications = await ParentNotification.countDocuments({ parentUserId: ctx.link.parentUserId, studentId: ctx.student.id, readAt: { $exists: false } });
   return out;
 }
@@ -76,7 +78,7 @@ export async function announcements(ctx: LearnerContext, now = new Date()) {
 export async function notifications(parentUserId: string) {
   const live = (await ParentLearnerLink.find({ parentUserId, status: 'active' }).select('studentId').lean()).map((l) => l.studentId);
   const rows = await ParentNotification.find({ parentUserId, studentId: { $in: live } }).sort({ createdAt: -1 }).limit(100).lean();
-  return { notifications: rows.map((n) => ({ id: n.id, studentId: n.studentId, kind: n.kind, date: n.date ?? null, title: n.title, body: n.body, read: !!n.readAt, createdAt: n.createdAt })), unread: rows.filter((n) => !n.readAt).length };
+  return { notifications: rows.map((n) => ({ id: n.id, studentId: n.studentId, kind: n.kind, date: n.date ?? null, refId: n.refId ?? null, title: n.title, body: n.body, read: !!n.readAt, createdAt: n.createdAt })), unread: rows.filter((n) => !n.readAt).length };
 }
 export async function markRead(parentUserId: string, ids: unknown) {
   const list = Array.isArray(ids) ? ids.filter((x): x is string => typeof x === 'string').slice(0, 200) : [];

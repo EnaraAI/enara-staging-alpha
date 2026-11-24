@@ -4,10 +4,11 @@ import { AppError, asyncHandler } from '../middleware/errorHandler';
 import { ensurePlainObject, rejectMongoOperators } from '../utils/validation';
 import { requireLearner } from '../parents/service';
 import { anySiteSectionOn, SECTIONS, siteSectionOn } from './flags';
-import { schoolSections, setSchoolSections } from './sections';
+import { feesVisibleTo, schoolSections, setFeesVisibleTo, setSchoolSections } from './sections';
 import { confirmImport, listImports, previewImport, undoImport } from './importer';
 import { COLUMNS } from './importSpec';
 import * as views from './parentViews';
+import { feesForAdmin, feesForParent, markInstalment } from './fees';
 import { SchoolAnnouncement } from './models';
 import { Batch } from '../models/Batch';
 import { Student } from '../models/Student';
@@ -25,6 +26,7 @@ const child = (req: AuthRequest) => requireLearner(req.user!.id, String(req.para
 parentSchoolRoutes.get('/learners/:studentId', h(async (req, res) => { res.json(await views.schoolOverview(await child(req))); }));
 parentSchoolRoutes.get('/learners/:studentId/timetable', h(async (req, res) => { res.json(await views.timetable(await child(req))); }));
 parentSchoolRoutes.get('/learners/:studentId/attendance', h(async (req, res) => { res.json(await views.attendance(await child(req), req.query.month)); }));
+parentSchoolRoutes.get('/learners/:studentId/fees', h(async (req, res) => { res.json(await feesForParent(await child(req))); }));
 parentSchoolRoutes.get('/learners/:studentId/announcements', h(async (req, res) => { res.json(await views.announcements(await child(req))); }));
 parentSchoolRoutes.get('/notifications', h(async (req, res) => { res.json(await views.notifications(req.user!.id)); }));
 parentSchoolRoutes.post('/notifications/read', h(async (req, res) => { const b = ensurePlainObject(req.body); rejectMongoOperators(b); res.json(await views.markRead(req.user!.id, b.ids)); }));
@@ -34,7 +36,7 @@ schoolAppAdminRoutes.use(anyOn, authMiddleware, requireRole('admin', 'enara-admi
 const schoolId = (req: AuthRequest, q?: unknown) => (req.user!.role === 'enara-admin' && typeof q === 'string' ? q : req.user!.institutionId);
 schoolAppAdminRoutes.get('/status', h(async (req, res) => {
   const id = schoolId(req, req.query.institutionId);
-  res.json({ institutionId: id ?? null, available: Object.fromEntries(SECTIONS.map((s) => [s, siteSectionOn(s)])), sections: await schoolSections(id),
+  res.json({ institutionId: id ?? null, available: Object.fromEntries(SECTIONS.map((s) => [s, siteSectionOn(s)])), sections: await schoolSections(id), feesVisibleTo: await feesVisibleTo(id),
     templates: Object.fromEntries(Object.entries(COLUMNS).map(([k, cols]) => [k, cols.map((c) => ({ key: c.key, required: c.required, header: c.aliases[0], headerAr: c.aliases.find((a) => /[؀-ۿ]/.test(a)) ?? null }))])) });
 }));
 // The school's classes (ENARA groups) with their students' IDs and names: what the templates' "class" and "student" columns accept.
@@ -55,6 +57,18 @@ schoolAppAdminRoutes.post('/imports/preview', h(async (req, res) => { const b = 
 schoolAppAdminRoutes.post('/imports/:id/confirm', h(async (req, res) => { res.json(await confirmImport(actor(req), String(req.params.id))); }));
 schoolAppAdminRoutes.post('/imports/:id/undo', h(async (req, res) => { res.json(await undoImport(actor(req), String(req.params.id))); }));
 schoolAppAdminRoutes.get('/imports', h(async (req, res) => { res.json(await listImports(actor(req), typeof req.query.institutionId === 'string' ? req.query.institutionId : undefined)); }));
+
+// Step (b): fees. The school sees its instalments (filter by student or status), marks one paid / waived / due, and chooses who in a
+// family sees fees. ENARA never takes payments.
+schoolAppAdminRoutes.get('/fees', h(async (req, res) => {
+  res.json(await feesForAdmin(actor(req), { institutionId: typeof req.query.institutionId === 'string' ? req.query.institutionId : undefined, studentId: typeof req.query.studentId === 'string' ? req.query.studentId : undefined, status: typeof req.query.status === 'string' ? req.query.status : undefined }));
+}));
+schoolAppAdminRoutes.post('/fees/instalments/:id/mark', h(async (req, res) => { const b = ensurePlainObject(req.body); rejectMongoOperators(b); res.json(await markInstalment(actor(req), String(req.params.id), b)); }));
+schoolAppAdminRoutes.put('/fees/visibility', h(async (req, res) => {
+  const b = ensurePlainObject(req.body); rejectMongoOperators(b);
+  const id = schoolId(req, b.institutionId); if (!id) throw new AppError('A school is required', 400, 'VALIDATION_ERROR');
+  res.json(await setFeesVisibleTo(actor(req), id, b.feesVisibleTo));
+}));
 
 // Announcements written on the screen (no file). Audience: school, grade, group (class) or student.
 schoolAppAdminRoutes.get('/announcements', h(async (req, res) => {

@@ -276,6 +276,16 @@ router.post('/parent-weekly', async (req, res, next) => {
     next(e);
   }
 });
+// Parents school app (b) on the test database: run the fee reminders step now (optionally as of a given time).
+router.post('/school-fee-reminders', async (req, res, next) => {
+  try {
+    const at = (req.body as { at?: unknown } | undefined)?.at;
+    const { runFeeReminders } = await import('../schoolApp/fees');
+    res.json(await runFeeReminders(typeof at === 'string' && !Number.isNaN(Date.parse(at)) ? new Date(at) : new Date()));
+  } catch (e) {
+    next(e);
+  }
+});
 router.get('/parent-emails', async (req, res, next) => {
   try {
     const { ParentEmailSend } = await import('../models/ParentEmailSend');
