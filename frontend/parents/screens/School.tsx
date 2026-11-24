@@ -274,6 +274,7 @@ const Fees: React.FC<{ learner: LearnerChip; refreshKey: number }> = ({ learner,
                   <p>
                     <b>{t.sch.instalment(n(i.number))} · {t.sch.egp(money(i.amount, n))}</b>
                     <span className="pp-meta" style={{ display: 'block' }}>{i.status === 'paid' && i.paidDate ? t.sch.paidOn(cairoDate(i.paidDate, lang)) : t.sch.dueOn(cairoDate(i.dueDate, lang))}{i.receiptRef ? ` · ${t.sch.receipt(i.receiptRef)}` : ''}</span>
+                    {i.hasReceipt && <button type="button" className="pp-linkbtn" data-testid="pp-receipt" onClick={() => { schoolApi.receipt(learner.studentId, i.id).catch(() => window.alert(t.sch.receiptFailed)); }}>{t.sch.downloadReceipt}</button>}
                   </p>
                   <span className="pp-tag" style={{ color: FEE_COLOR[i.status], background: '#f6f7fa', border: `1px solid ${FEE_COLOR[i.status]}33` }}>{t.sch.feeStatus[i.status]}</span>
                 </div>

@@ -1,4 +1,4 @@
-import { apiRequest } from '../services/apiService';
+import { apiRequest, downloadFile } from '../services/apiService';
 import type { Bi } from './i18n';
 
 // Parents Portal API client (backend/src/parents/routes.ts). Every call reads
@@ -89,6 +89,7 @@ export const schoolApi = {
   attendance: (id: string, month?: string) => apiRequest<SchoolAttendance>('GET', `${S(id)}/attendance${month ? `?month=${encodeURIComponent(month)}` : ''}`),
   announcements: (id: string) => apiRequest<SchoolAnnouncements>('GET', `${S(id)}/announcements`),
   fees: (id: string) => apiRequest<SchoolFees>('GET', `${S(id)}/fees`),
+  receipt: (id: string, instalmentId: string) => downloadFile(`${S(id)}/fees/${encodeURIComponent(instalmentId)}/receipt`, 'receipt'),
   notifications: () => apiRequest<{ notifications: ParentNotificationItem[]; unread: number }>('GET', '/api/parents/school/notifications'),
   markRead: (ids?: string[]) => apiRequest<{ marked: number }>('POST', '/api/parents/school/notifications/read', { ids: ids ?? [] }),
 };

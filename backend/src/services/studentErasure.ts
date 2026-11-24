@@ -2,7 +2,7 @@ import type { Model } from 'mongoose';
 import { Invitation, PasswordReset } from '../models/AccountToken';
 import { AiCall } from '../models/AiCall';
 import { Assessment } from '../models/Assessment';
-import { ParentNotification, SchoolAnnouncement, SchoolDailyAttendance } from '../schoolApp/models';
+import { ParentNotification, SchoolAnnouncement, SchoolDailyAttendance, SchoolInstalment } from '../schoolApp/models';
 import { AssessmentAttempt } from '../models/AssessmentAttempt';
 import { Assignment } from '../models/Assignment';
 import { AttendanceRecord } from '../models/AttendanceRecord';
@@ -90,6 +90,7 @@ const DELETE_BY_STUDENT_ID: [string, Model<any>][] = [ // eslint-disable-line @t
   ['assessments_for_this_student_only', Assessment],
   ['attendance_records', AttendanceRecord],
   ['school_attendance', SchoolDailyAttendance], // parents school app (a)
+  ['school_instalments', SchoolInstalment], // parents school app (b); its receipt files are deleted with the stored files
   ['parent_notifications', ParentNotification],
   ['diagnostic_sessions', DiagnosticSession],
   ['learner_language_profiles', LearnerLanguageProfile],
@@ -251,6 +252,8 @@ export async function permanentlyDeleteStudent(s: StudentDoc, actor: Actor): Pro
   // the audit trail keeps the fact; then, as before (PDPL), the link and code
   // rows are deleted with the student's other records below.
   await endParentLinksForStudent(sid, 'deleted', actor);
+  // Parents school app (b3): the school's receipt files for this child, deleted with the files below.
+  const receiptKeys = (await SchoolInstalment.find({ studentId: sid, receiptKey: { $exists: true } }).select('receiptKey').lean()).map((r) => r.receiptKey!).filter(Boolean);
   for (const [name, model] of DELETE_BY_STUDENT_ID) removed[name] = (await model.deleteMany({ studentId: sid })).deletedCount;
   removed.school_announcements_for_this_student_only = (await SchoolAnnouncement.deleteMany({ audience: 'student', audienceValue: sid })).deletedCount;
   // P2: safety alerts are kept for safeguarding (admins only, retention purge).
@@ -298,9 +301,13 @@ export async function permanentlyDeleteStudent(s: StudentDoc, actor: Actor): Pro
 
   // Stored files (best effort; a storage failure is reported with its key, not
   // hidden). The student's photos are the only stored files linked to a
-  // student: speaking-exam and pronunciation audio is transcribed in memory and
+  // student (and the school's fee receipts, step b3): speaking-exam and pronunciation audio is transcribed in memory and
   // never stored, and tutor voice is streamed (ARCHIVE_NOTES.md, PDPL P1).
   const files = { deleted: 0, failed: 0, failedKeys: [] as string[] };
+  for (const key of receiptKeys) {
+    try { await (await import('../schoolApp/fees')).receiptStore.remove(key); files.deleted++; }
+    catch (error) { files.failed++; files.failedKeys.push(key); logger.warn('student_erasure_file_failed', { studentId: sid, key, error: serializeError(error) }); }
+  }
   for (const key of [s.photoKey, s.pendingPhotoKey].filter((k): k is string => !!k)) {
     try {
       await deleteUpload(key);

@@ -98,6 +98,13 @@ instalmentSchema.index({ institutionId: 1, studentId: 1, planKey: 1, number: 1 }
 instalmentSchema.index({ status: 1, dueDate: 1 });
 export const SchoolInstalment = model<ISchoolInstalment>('SchoolInstalment', instalmentSchema, 'school_instalments');
 
+// ---- receipt files kept in the database (only when SCHOOL_RECEIPTS_STORE=db, the E2E stack, which has no reachable R2). Elsewhere: R2.
+export interface ISchoolReceiptFile extends Document { key: string; institutionId: string; contentType: string; data: Buffer; createdAt: Date }
+const receiptFileSchema = new Schema<ISchoolReceiptFile>({
+  key: { type: String, required: true, unique: true }, institutionId: { type: String, required: true }, contentType: { type: String, required: true }, data: { type: Buffer, required: true },
+}, { timestamps: { createdAt: true, updatedAt: false } });
+export const SchoolReceiptFile = model<ISchoolReceiptFile>('SchoolReceiptFile', receiptFileSchema, 'school_receipt_files');
+
 // ---- imports (preview, confirm, undo)
 export interface ISchoolImport extends Document {
   id: string; institutionId: string; section: string; fileName?: string; status: 'preview' | 'confirmed' | 'undone' | 'expired';

@@ -491,6 +491,17 @@ export function avatarFetch(path: string, init: { method?: string; body?: unknow
   });
 }
 
+/** Downloads a file from an authenticated API route (for example a school fee receipt) and saves it on the device. */
+export async function downloadFile(path: string, fallbackName: string): Promise<void> {
+  const token = getToken();
+  const res = await fetch(toUrl(path), { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+  if (!res.ok) throw Object.assign(new Error(`Download failed (${res.status})`), { status: res.status });
+  const name = /filename="([^"]+)"/.exec(res.headers.get('Content-Disposition') ?? '')?.[1] ?? fallbackName;
+  const url = URL.createObjectURL(await res.blob());
+  const a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
 // BATCHES (admin)
 export const fetchBatches = () => request<any[]>('GET', '/api/batches');
 export const createBatch = (data: { name: string; academicYear: string; groupId?: string; curriculumId?: string }) =>

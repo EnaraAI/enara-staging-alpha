@@ -8,7 +8,7 @@ import { feesVisibleTo, schoolSections, setFeesVisibleTo, setSchoolSections } fr
 import { confirmImport, listImports, previewImport, undoImport } from './importer';
 import { COLUMNS } from './importSpec';
 import * as views from './parentViews';
-import { feesForAdmin, feesForParent, markInstalment } from './fees';
+import { attachReceipt, feesForAdmin, feesForParent, markInstalment, receiptForAdmin, receiptForParent } from './fees';
 import { SchoolAnnouncement } from './models';
 import { Batch } from '../models/Batch';
 import { Student } from '../models/Student';
@@ -27,6 +27,8 @@ parentSchoolRoutes.get('/learners/:studentId', h(async (req, res) => { res.json(
 parentSchoolRoutes.get('/learners/:studentId/timetable', h(async (req, res) => { res.json(await views.timetable(await child(req))); }));
 parentSchoolRoutes.get('/learners/:studentId/attendance', h(async (req, res) => { res.json(await views.attendance(await child(req), req.query.month)); }));
 parentSchoolRoutes.get('/learners/:studentId/fees', h(async (req, res) => { res.json(await feesForParent(await child(req))); }));
+const sendFile = (res: Response, f: { body: Buffer; contentType: string; fileName: string }) => { res.setHeader('Content-Type', f.contentType); res.setHeader('Content-Disposition', `attachment; filename="${f.fileName}"`); res.setHeader('Cache-Control', 'private, no-store'); res.setHeader('X-Content-Type-Options', 'nosniff'); res.send(f.body); };
+parentSchoolRoutes.get('/learners/:studentId/fees/:instalmentId/receipt', h(async (req, res) => { sendFile(res, await receiptForParent(await child(req), String(req.params.instalmentId))); }));
 parentSchoolRoutes.get('/learners/:studentId/announcements', h(async (req, res) => { res.json(await views.announcements(await child(req))); }));
 parentSchoolRoutes.get('/notifications', h(async (req, res) => { res.json(await views.notifications(req.user!.id)); }));
 parentSchoolRoutes.post('/notifications/read', h(async (req, res) => { const b = ensurePlainObject(req.body); rejectMongoOperators(b); res.json(await views.markRead(req.user!.id, b.ids)); }));
@@ -64,6 +66,8 @@ schoolAppAdminRoutes.get('/fees', h(async (req, res) => {
   res.json(await feesForAdmin(actor(req), { institutionId: typeof req.query.institutionId === 'string' ? req.query.institutionId : undefined, studentId: typeof req.query.studentId === 'string' ? req.query.studentId : undefined, status: typeof req.query.status === 'string' ? req.query.status : undefined }));
 }));
 schoolAppAdminRoutes.post('/fees/instalments/:id/mark', h(async (req, res) => { const b = ensurePlainObject(req.body); rejectMongoOperators(b); res.json(await markInstalment(actor(req), String(req.params.id), b)); }));
+schoolAppAdminRoutes.post('/fees/instalments/:id/receipt', h(async (req, res) => { const b = ensurePlainObject(req.body); rejectMongoOperators(b); res.json(await attachReceipt(actor(req), String(req.params.id), b)); }));
+schoolAppAdminRoutes.get('/fees/instalments/:id/receipt', h(async (req, res) => { sendFile(res, await receiptForAdmin(actor(req), String(req.params.id))); }));
 schoolAppAdminRoutes.put('/fees/visibility', h(async (req, res) => {
   const b = ensurePlainObject(req.body); rejectMongoOperators(b);
   const id = schoolId(req, b.institutionId); if (!id) throw new AppError('A school is required', 400, 'VALIDATION_ERROR');

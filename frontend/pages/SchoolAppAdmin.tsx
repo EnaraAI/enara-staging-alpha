@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { apiRequest } from '../services/apiService';
+import { apiRequest, downloadFile } from '../services/apiService';
 import { readXlsx, toCsv, writeXlsx } from './schoolApp/xlsx';
 
 // Parents school app (a3): the school admin's screens on the staff Parents page.
@@ -23,7 +23,7 @@ const TEXT = {
   en: {
     title: 'School app for parents', sub: 'Information the school shares with parents. ENARA only shows it; the school is the source.',
     sections: 'Sections parents see', section: { timetable: 'Timetable', attendance: 'Attendance', announcements: 'Announcements', notifications: 'In-app notifications (absence, lateness, announcements, fee reminders)', fees: 'Fees (display only: the school records payments)' } as Record<string, string>,
-    fees: { title: 'Fees and instalments', visibility: 'Who in a family sees fees', all: 'Every linked guardian', owner: 'The main guardian only', filter: { overdue: 'Overdue', due: 'Due', paid: 'Paid', all: 'All' } as Record<string, string>, student: 'Student', plan: 'Plan', no: 'No.', amount: 'Amount (EGP)', due: 'Due date', status: 'Status', markPaid: 'Mark paid', waive: 'Waive', reopen: 'Mark due', receiptRef: 'Receipt no.', none: 'No instalments here.', st: { due: 'Due', overdue: 'Overdue', paid: 'Paid', waived: 'Waived' } as Record<string, string>, totals: (p: string, r: string, o: string) => `Paid ${p} · Remaining ${r} · Overdue ${o} (EGP)`, note: 'ENARA never takes payments. Mark an instalment paid after the school receives the money; parents see it at once.' },
+    fees: { title: 'Fees and instalments', visibility: 'Who in a family sees fees', all: 'Every linked guardian', owner: 'The main guardian only', filter: { overdue: 'Overdue', due: 'Due', paid: 'Paid', all: 'All' } as Record<string, string>, student: 'Student', plan: 'Plan', no: 'No.', amount: 'Amount (EGP)', due: 'Due date', status: 'Status', markPaid: 'Mark paid', waive: 'Waive', reopen: 'Mark due', receiptRef: 'Receipt no.', attach: 'Attach receipt', view: 'Receipt', attachHelp: 'PDF, PNG or JPEG, up to 700 KB.', tooBig: 'The file is larger than 700 KB.', none: 'No instalments here.', st: { due: 'Due', overdue: 'Overdue', paid: 'Paid', waived: 'Waived' } as Record<string, string>, totals: (p: string, r: string, o: string) => `Paid ${p} · Remaining ${r} · Overdue ${o} (EGP)`, note: 'ENARA never takes payments. Mark an instalment paid after the school receives the money; parents see it at once.' },
     notOnSite: 'not available yet', save: 'Save', saved: 'Saved.', failed: 'Could not save. Try again.',
     upload: 'Upload a file', template: 'Excel template', templateCsv: 'CSV template', fileHelp: 'Excel (.xlsx) or CSV. The first sheet is read; the first row is the column names (English or Arabic).',
     preview: 'Preview', counts: { new: 'New', changed: 'Changed', unchanged: 'Unchanged', removed: 'Removed', rejected: 'Rejected', total: 'Rows' } as Record<string, string>,
@@ -38,7 +38,7 @@ const TEXT = {
   ar: {
     title: 'تطبيق المدرسة لأولياء الأمور', sub: 'معلومات تشاركها المدرسة مع أولياء الأمور. إنارة تعرضها فقط؛ والمدرسة هي المصدر.',
     sections: 'الأقسام التي يراها أولياء الأمور', section: { timetable: 'الجدول', attendance: 'الحضور', announcements: 'الإعلانات', notifications: 'الإشعارات داخل التطبيق (الغياب والتأخر والإعلانات وتذكير الأقساط)', fees: 'الرسوم (عرض فقط: المدرسة تسجّل المدفوعات)' } as Record<string, string>,
-    fees: { title: 'الرسوم والأقساط', visibility: 'من يرى الرسوم في الأسرة', all: 'كل أولياء الأمور المرتبطين', owner: 'ولي الأمر الأساسي فقط', filter: { overdue: 'متأخر', due: 'مستحق', paid: 'مدفوع', all: 'الكل' } as Record<string, string>, student: 'الطالب', plan: 'الخطة', no: 'رقم', amount: 'المبلغ (جنيه)', due: 'تاريخ الاستحقاق', status: 'الحالة', markPaid: 'تسجيل الدفع', waive: 'إعفاء', reopen: 'إعادة إلى مستحق', receiptRef: 'رقم الإيصال', none: 'لا أقساط هنا.', st: { due: 'مستحق', overdue: 'متأخر', paid: 'مدفوع', waived: 'معفى' } as Record<string, string>, totals: (p: string, r: string, o: string) => `المدفوع ${p} · المتبقي ${r} · المتأخر ${o} (جنيه)`, note: 'إنارة لا تستقبل أي مدفوعات. سجّل دفع القسط بعد أن تستلم المدرسة المبلغ؛ ويظهر لأولياء الأمور فورًا.' },
+    fees: { title: 'الرسوم والأقساط', visibility: 'من يرى الرسوم في الأسرة', all: 'كل أولياء الأمور المرتبطين', owner: 'ولي الأمر الأساسي فقط', filter: { overdue: 'متأخر', due: 'مستحق', paid: 'مدفوع', all: 'الكل' } as Record<string, string>, student: 'الطالب', plan: 'الخطة', no: 'رقم', amount: 'المبلغ (جنيه)', due: 'تاريخ الاستحقاق', status: 'الحالة', markPaid: 'تسجيل الدفع', waive: 'إعفاء', reopen: 'إعادة إلى مستحق', receiptRef: 'رقم الإيصال', attach: 'إرفاق الإيصال', view: 'الإيصال', attachHelp: 'PDF أو PNG أو JPEG، حتى 700 كيلوبايت.', tooBig: 'الملف أكبر من 700 كيلوبايت.', none: 'لا أقساط هنا.', st: { due: 'مستحق', overdue: 'متأخر', paid: 'مدفوع', waived: 'معفى' } as Record<string, string>, totals: (p: string, r: string, o: string) => `المدفوع ${p} · المتبقي ${r} · المتأخر ${o} (جنيه)`, note: 'إنارة لا تستقبل أي مدفوعات. سجّل دفع القسط بعد أن تستلم المدرسة المبلغ؛ ويظهر لأولياء الأمور فورًا.' },
     notOnSite: 'غير متاح بعد', save: 'حفظ', saved: 'تم الحفظ.', failed: 'تعذّر الحفظ. حاول مرة أخرى.',
     upload: 'رفع ملف', template: 'قالب Excel', templateCsv: 'قالب CSV', fileHelp: 'ملف Excel (‎.xlsx) أو CSV. تُقرأ الورقة الأولى؛ والصف الأول أسماء الأعمدة (بالعربية أو الإنجليزية).',
     preview: 'معاينة', counts: { new: 'جديد', changed: 'معدَّل', unchanged: 'دون تغيير', removed: 'محذوف', rejected: 'مرفوض', total: 'الصفوف' } as Record<string, string>,
@@ -271,7 +271,7 @@ const Announcements: React.FC<{ lang: Lang; roster: Roster | null }> = ({ lang, 
   );
 };
 
-interface Inst { id: string; studentId: string; studentName: string; planName: string; number: number; amount: number; dueDate: string; status: 'due' | 'overdue' | 'paid' | 'waived'; paidDate: string | null; receiptRef: string | null }
+interface Inst { id: string; studentId: string; studentName: string; planName: string; number: number; amount: number; dueDate: string; status: 'due' | 'overdue' | 'paid' | 'waived'; paidDate: string | null; receiptRef: string | null; hasReceipt?: boolean }
 /** Step (b): the school's fee list, "mark paid" (with the receipt number), and who in a family sees fees. ENARA never takes payments. */
 const FeesAdmin: React.FC<{ lang: Lang; visibleTo: 'all' | 'owner' }> = ({ lang, visibleTo }) => {
   const t = TEXT[lang].fees;
@@ -285,6 +285,14 @@ const FeesAdmin: React.FC<{ lang: Lang; visibleTo: 'all' | 'owner' }> = ({ lang,
   const mark = async (i: Inst, status: 'paid' | 'waived' | 'due') => {
     setMsg(null);
     try { await apiRequest('POST', `/api/school-app/fees/instalments/${encodeURIComponent(i.id)}/mark`, { status, receiptRef: refs[i.id] }); void load(); }
+    catch (e) { setMsg(errText(e, TEXT[lang].failed)); }
+  };
+  const attach = async (i: Inst, f: File) => {
+    setMsg(null);
+    if (f.size > 700 * 1024) { setMsg(t.tooBig); return; }
+    const buf = new Uint8Array(await f.arrayBuffer());
+    let bin = ''; for (let k = 0; k < buf.length; k += 0x8000) bin += String.fromCharCode(...buf.subarray(k, k + 0x8000));
+    try { await apiRequest('POST', `/api/school-app/fees/instalments/${encodeURIComponent(i.id)}/receipt`, { contentType: f.type, dataBase64: btoa(bin) }); void load(); }
     catch (e) { setMsg(errText(e, TEXT[lang].failed)); }
   };
   const saveVis = async (v: 'all' | 'owner') => { setVis(v); try { await apiRequest('PUT', '/api/school-app/fees/visibility', { feesVisibleTo: v }); setMsg(TEXT[lang].saved); } catch (e) { setMsg(errText(e, TEXT[lang].failed)); } };
@@ -322,7 +330,17 @@ const FeesAdmin: React.FC<{ lang: Lang; visibleTo: 'all' | 'owner' }> = ({ lang,
                         <button type="button" className={primary} onClick={() => void mark(i, 'paid')} data-testid="sa-fee-paid">{t.markPaid}</button>
                         <button type="button" className={btn} onClick={() => void mark(i, 'waived')}>{t.waive}</button>
                       </div>
-                    ) : <button type="button" className={btn} onClick={() => void mark(i, 'due')}>{t.reopen}</button>}
+                    ) : (
+                      <div className="flex flex-wrap items-center gap-2">
+                        <button type="button" className={btn} onClick={() => void mark(i, 'due')}>{t.reopen}</button>
+                        {i.status === 'paid' && (
+                          <label className={`${btn} cursor-pointer`} title={t.attachHelp}>{t.attach}
+                            <input type="file" accept="application/pdf,image/png,image/jpeg" className="sr-only" data-testid="sa-fee-receipt" onChange={(e) => { const f = e.target.files?.[0]; if (f) void attach(i, f); e.target.value = ''; }} />
+                          </label>
+                        )}
+                        {i.hasReceipt && <button type="button" className={btn} onClick={() => void downloadFile(`/api/school-app/fees/instalments/${encodeURIComponent(i.id)}/receipt`, 'receipt')} data-testid="sa-fee-receipt-view">{t.view}</button>}
+                      </div>
+                    )}
                   </td>
                 </tr>
               ))}
