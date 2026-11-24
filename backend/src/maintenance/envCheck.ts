@@ -12,6 +12,7 @@ import { getPostgresPool } from '../config/postgres';
 import { keyStatus, fallbackKey } from '../services/modelFallback';
 import { encryptSecret, decryptSecret } from '../integrations/lms/core/crypto';
 import { llmPing } from './llmCheck';
+import { scoreWithMishkat } from '../assessment/grading-engine/mishkat/client';
 
 export type EnvState = 'ok' | 'not_configured' | 'rejected' | 'error' | 'weak';
 export interface EnvCheck { name: string; vars: string[]; state: EnvState; required: boolean; note?: string }
@@ -95,6 +96,15 @@ export async function runEnvCheck(deps: { fetch?: Fetch; env?: NodeJS.ProcessEnv
     const p = await llmPing();
     add('tutor model (DeepSeek)', ['TUTOR_LLM_BASE_URL', 'TUTOR_LLM_API_KEY', 'TUTOR_LLM_MODEL'], p.ok ? 'ok' : (p as { status?: number }).status === 401 || (p as { status?: number }).status === 403 ? 'rejected' : 'error', false);
   } else add('tutor model (DeepSeek)', ['TUTOR_LLM_*'], 'not_configured', false);
+
+  // Mishkat scoring service: one tiny answer per language (scores nothing that is stored); proves the endpoint and the shared token.
+  if (env.MISHKAT_ENDPOINT || env.MISHKAT_TOKEN) {
+    for (const lang of ['en', 'ar'] as const) {
+      const m = await scoreWithMishkat({ lang, type: 'short_answer', text: lang === 'en' ? 'I like reading books.' : 'أحب قراءة الكتب.' }, { env, fetchImpl: f });
+      add(`Mishkat (${lang})`, ['MISHKAT_ENDPOINT', 'MISHKAT_TOKEN'], m.status === 'ok' ? 'ok' : m.reason === 'not_configured' ? 'not_configured' : m.reason === 'http_error' ? 'rejected' : 'error', false,
+        m.status === 'ok' ? `model ${m.version}` : m.reason);
+    }
+  } else add('Mishkat', ['MISHKAT_ENDPOINT', 'MISHKAT_TOKEN'], 'not_configured', false);
 
   // Presence and length only.
   add('cron caller', ['CRON_SECRET'], secret(c.cronSecret), false);

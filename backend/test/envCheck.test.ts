@@ -72,6 +72,18 @@ describe('env check (read-only, names and states only)', () => {
     expect(state(r, 'cron caller')).toBe('not_configured');
     expect(state(r, 'avatar (Anam)')).toBe('not_configured');
   });
+  it('Mishkat: reached with the endpoint and token (no value in the reply); a refused token is "rejected"', async () => {
+    const menv = { ...env, MISHKAT_ENDPOINT: 'https://mishkat.test/score', MISHKAT_TOKEN: 't'.repeat(64) } as NodeJS.ProcessEnv;
+    const okBody = { version: 'mishkat-en-1', scores: { grammar_accuracy: 1, mechanics: 1 }, criteria: ['grammar_accuracy', 'mechanics'] };
+    const f = vi.fn(async (url: string) => (String(url).includes('mishkat') ? reply(200, okBody) : okFetch(url)));
+    const r = await runEnvCheck({ fetch: f as unknown as typeof fetch, env: menv });
+    expect(state(r, 'Mishkat (en)')).toBe('ok'); expect(state(r, 'Mishkat (ar)')).toBe('ok');
+    expect(JSON.stringify(r)).not.toContain('t'.repeat(64));
+    const bad = vi.fn(async (url: string) => (String(url).includes('mishkat') ? reply(401) : okFetch(url)));
+    const r2 = await runEnvCheck({ fetch: bad as unknown as typeof fetch, env: menv });
+    expect(state(r2, 'Mishkat (en)')).toBe('rejected');
+    expect(r2.ok).toBe(true); // a provider problem only warns
+  });
   it('status mapping', () => {
     expect([200, 204, 401, 403, 404, 500].map(stateOfStatus)).toEqual(['ok', 'ok', 'rejected', 'rejected', 'error', 'error']);
   });
