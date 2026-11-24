@@ -9,10 +9,10 @@ import { readXlsx, toCsv, writeXlsx } from './schoolApp/xlsx';
 //   - Announcements written on the screen, and withdraw.
 // Hidden while every SCHOOL_APP_*_ENABLED switch is off (the status call answers 404).
 type Lang = 'en' | 'ar';
-type Section = 'timetable' | 'announcements' | 'attendance' | 'notifications' | 'fees' | 'buses';
+type Section = 'timetable' | 'announcements' | 'attendance' | 'notifications' | 'fees' | 'buses' | 'requests' | 'consents';
 type ImportSection = 'timetable' | 'attendance' | 'announcements' | 'fees' | 'bus_routes' | 'bus_assignments';
 const SECTION_OF: Record<ImportSection, Section> = { timetable: 'timetable', attendance: 'attendance', announcements: 'announcements', fees: 'fees', bus_routes: 'buses', bus_assignments: 'buses' };
-const SECTIONS: Section[] = ['timetable', 'attendance', 'announcements', 'notifications', 'fees', 'buses'];
+const SECTIONS: Section[] = ['timetable', 'attendance', 'announcements', 'notifications', 'fees', 'buses', 'requests', 'consents'];
 const IMPORTS: ImportSection[] = ['timetable', 'attendance', 'announcements', 'fees', 'bus_routes', 'bus_assignments'];
 interface Status { feesVisibleTo?: 'all' | 'owner'; institutionId: string | null; available: Record<Section, boolean>; sections: Record<Section, boolean>; templates: Partial<Record<ImportSection, { key: string; required: boolean; header: string; headerAr: string | null }[]>> }
 interface Roster { groups: { name: string; students: { id: string; name: string; grade: string | null }[] }[]; withoutGroup: { id: string; name: string; grade: string | null }[] }
@@ -23,7 +23,9 @@ interface Ann { id: string; audience: string; audienceValue: string | null; titl
 const TEXT = {
   en: {
     title: 'School app for parents', sub: 'Information the school shares with parents. ENARA only shows it; the school is the source.',
-    sections: 'Sections parents see', section: { timetable: 'Timetable', attendance: 'Attendance', announcements: 'Announcements', notifications: 'In-app notifications (absence, lateness, announcements, fee reminders)', fees: 'Fees (display only: the school records payments)', buses: 'Buses (stop times; no live tracking)', bus_routes: 'Bus routes and stops', bus_assignments: 'Bus: each child’s route and stop' } as Record<string, string>,
+    sections: 'Sections parents see', section: { timetable: 'Timetable', attendance: 'Attendance', announcements: 'Announcements', notifications: 'In-app notifications (absence, lateness, announcements, fee reminders)', fees: 'Fees (display only: the school records payments)', buses: 'Buses (stop times; no live tracking)', requests: 'Requests from parents', consents: 'Consent forms (tap-to-sign record)', bus_routes: 'Bus routes and stops', bus_assignments: 'Bus: each child’s route and stop' } as Record<string, string>,
+    req: { title: 'Requests from parents', filter: { new: 'New', in_progress: 'In progress', done: 'Done', refused: 'Refused', all: 'All' } as Record<string, string>, type: { certificate: 'Enrolment certificate', early_leave: 'Early leave', teacher_meeting: 'Meeting with a teacher', other: 'Other' } as Record<string, string>, reply: 'Reply to the parent', setStatus: 'Set status', save: 'Save', none: 'No requests here.', refusedNeedsReply: 'Write the reason before refusing.' },
+    cons: { title: 'Consent forms', newForm: 'New consent form', formTitle: 'Title', body: 'Text parents read before answering', deadline: 'Answer by', audience: 'For', publish: 'Publish', published: 'Published; parents are notified.', list: 'Forms', open: 'Open', signed: 'answers', pending: 'pending', export: 'Export CSV', withdraw: 'Withdraw', withdrawn: 'Withdrawn', student: 'Student', klass: 'Class', answer: 'Answer', at: 'Answered at', notAnswered: 'Not answered', changedText: '(answered an older text)', none: 'No forms yet.' },
     bus: { title: 'Buses today', phones: 'Supervisors agreed to share their phone numbers with parents', route: 'Route', kind: 'Notice', delay: 'Delay', cancel: 'Cancelled', direction: 'Trip', morning: 'Morning', afternoon: 'Afternoon', minutes: 'Minutes late', message: 'Message (optional)', send: 'Send to parents', sent: (n: string) => `Sent to the parents of ${n} children.`, routes: 'Routes', stops: 'stops', students: 'children', noRoutes: 'Import the routes sheet first.', today: 'Notices today', withdraw: 'Withdraw', withdrawn: 'Withdrawn', none: 'No notices today.' },
     fees: { title: 'Fees and instalments', visibility: 'Who in a family sees fees', all: 'Every linked guardian', owner: 'The main guardian only', filter: { overdue: 'Overdue', due: 'Due', paid: 'Paid', all: 'All' } as Record<string, string>, student: 'Student', plan: 'Plan', no: 'No.', amount: 'Amount (EGP)', due: 'Due date', status: 'Status', markPaid: 'Mark paid', waive: 'Waive', reopen: 'Mark due', receiptRef: 'Receipt no.', attach: 'Attach receipt', view: 'Receipt', attachHelp: 'PDF, PNG or JPEG, up to 700 KB.', tooBig: 'The file is larger than 700 KB.', none: 'No instalments here.', st: { due: 'Due', overdue: 'Overdue', paid: 'Paid', waived: 'Waived' } as Record<string, string>, totals: (p: string, r: string, o: string) => `Paid ${p} · Remaining ${r} · Overdue ${o} (EGP)`, note: 'ENARA never takes payments. Mark an instalment paid after the school receives the money; parents see it at once.' },
     notOnSite: 'not available yet', save: 'Save', saved: 'Saved.', failed: 'Could not save. Try again.',
@@ -39,7 +41,9 @@ const TEXT = {
   },
   ar: {
     title: 'تطبيق المدرسة لأولياء الأمور', sub: 'معلومات تشاركها المدرسة مع أولياء الأمور. إنارة تعرضها فقط؛ والمدرسة هي المصدر.',
-    sections: 'الأقسام التي يراها أولياء الأمور', section: { timetable: 'الجدول', attendance: 'الحضور', announcements: 'الإعلانات', notifications: 'الإشعارات داخل التطبيق (الغياب والتأخر والإعلانات وتذكير الأقساط)', fees: 'الرسوم (عرض فقط: المدرسة تسجّل المدفوعات)', buses: 'الحافلات (مواعيد المحطات؛ دون تتبع مباشر)', bus_routes: 'خطوط الحافلات ومحطاتها', bus_assignments: 'الحافلات: خط كل طفل ومحطته' } as Record<string, string>,
+    sections: 'الأقسام التي يراها أولياء الأمور', section: { timetable: 'الجدول', attendance: 'الحضور', announcements: 'الإعلانات', notifications: 'الإشعارات داخل التطبيق (الغياب والتأخر والإعلانات وتذكير الأقساط)', fees: 'الرسوم (عرض فقط: المدرسة تسجّل المدفوعات)', buses: 'الحافلات (مواعيد المحطات؛ دون تتبع مباشر)', requests: 'طلبات أولياء الأمور', consents: 'نماذج الموافقة (سجل توقيع بالنقر)', bus_routes: 'خطوط الحافلات ومحطاتها', bus_assignments: 'الحافلات: خط كل طفل ومحطته' } as Record<string, string>,
+    req: { title: 'طلبات أولياء الأمور', filter: { new: 'جديد', in_progress: 'قيد التنفيذ', done: 'تم', refused: 'مرفوض', all: 'الكل' } as Record<string, string>, type: { certificate: 'شهادة قيد', early_leave: 'انصراف مبكر', teacher_meeting: 'مقابلة معلم', other: 'أخرى' } as Record<string, string>, reply: 'الرد على ولي الأمر', setStatus: 'تغيير الحالة', save: 'حفظ', none: 'لا طلبات هنا.', refusedNeedsReply: 'اكتب السبب قبل الرفض.' },
+    cons: { title: 'نماذج الموافقة', newForm: 'نموذج موافقة جديد', formTitle: 'العنوان', body: 'النص الذي يقرؤه ولي الأمر قبل الإجابة', deadline: 'الرد قبل', audience: 'إلى', publish: 'نشر', published: 'نُشر؛ وأُخطر أولياء الأمور.', list: 'النماذج', open: 'فتح', signed: 'إجابات', pending: 'بانتظار الرد', export: 'تصدير CSV', withdraw: 'سحب', withdrawn: 'مسحوب', student: 'الطالب', klass: 'الفصل', answer: 'الإجابة', at: 'وقت الإجابة', notAnswered: 'لم يُجب', changedText: '(أجاب على نص أقدم)', none: 'لا نماذج بعد.' },
     bus: { title: 'الحافلات اليوم', phones: 'وافق المشرفون على مشاركة أرقام هواتفهم مع أولياء الأمور', route: 'الخط', kind: 'الإشعار', delay: 'تأخير', cancel: 'إلغاء', direction: 'الرحلة', morning: 'الذهاب', afternoon: 'العودة', minutes: 'دقائق التأخير', message: 'رسالة (اختيارية)', send: 'إرسال إلى أولياء الأمور', sent: (n: string) => `أُرسل إلى أولياء أمور ${n} من الأطفال.`, routes: 'الخطوط', stops: 'محطات', students: 'أطفال', noRoutes: 'استورد كشف الخطوط أولًا.', today: 'إشعارات اليوم', withdraw: 'سحب', withdrawn: 'مسحوب', none: 'لا إشعارات اليوم.' },
     fees: { title: 'الرسوم والأقساط', visibility: 'من يرى الرسوم في الأسرة', all: 'كل أولياء الأمور المرتبطين', owner: 'ولي الأمر الأساسي فقط', filter: { overdue: 'متأخر', due: 'مستحق', paid: 'مدفوع', all: 'الكل' } as Record<string, string>, student: 'الطالب', plan: 'الخطة', no: 'رقم', amount: 'المبلغ (جنيه)', due: 'تاريخ الاستحقاق', status: 'الحالة', markPaid: 'تسجيل الدفع', waive: 'إعفاء', reopen: 'إعادة إلى مستحق', receiptRef: 'رقم الإيصال', attach: 'إرفاق الإيصال', view: 'الإيصال', attachHelp: 'PDF أو PNG أو JPEG، حتى 700 كيلوبايت.', tooBig: 'الملف أكبر من 700 كيلوبايت.', none: 'لا أقساط هنا.', st: { due: 'مستحق', overdue: 'متأخر', paid: 'مدفوع', waived: 'معفى' } as Record<string, string>, totals: (p: string, r: string, o: string) => `المدفوع ${p} · المتبقي ${r} · المتأخر ${o} (جنيه)`, note: 'إنارة لا تستقبل أي مدفوعات. سجّل دفع القسط بعد أن تستلم المدرسة المبلغ؛ ويظهر لأولياء الأمور فورًا.' },
     notOnSite: 'غير متاح بعد', save: 'حفظ', saved: 'تم الحفظ.', failed: 'تعذّر الحفظ. حاول مرة أخرى.',
@@ -124,6 +128,8 @@ export const SchoolAppAdmin: React.FC<{ lang: Lang }> = ({ lang }) => {
       </fieldset>
 
       {IMPORTS.filter((s) => status.templates[s] && status.available[SECTION_OF[s]]).map((s) => <ImportCard key={s} lang={lang} section={s} on={!!status.sections[SECTION_OF[s]]} template={status.templates[s]!} roster={roster} onDone={reloadImports} />)}
+      {status.sections.requests && <RequestsAdmin lang={lang} />}
+      {status.sections.consents && <ConsentsAdmin lang={lang} roster={roster} />}
       {status.sections.buses && <BusesAdmin lang={lang} />}
       {status.sections.fees && <FeesAdmin lang={lang} visibleTo={status.feesVisibleTo ?? 'all'} />}
 
@@ -403,6 +409,108 @@ const BusesAdmin: React.FC<{ lang: Lang }> = ({ lang }) => {
           {nt.withdrawn ? <span className="text-xs text-slate-500">{t.withdrawn}</span> : <button type="button" className={btn} onClick={async () => { await apiRequest('POST', `/api/school-app/buses/notices/${encodeURIComponent(nt.id)}/withdraw`, {}).catch(() => undefined); void load(); }}>{t.withdraw}</button>}
         </div>
       )) : <p className="text-sm text-slate-500">{t.none}</p>}
+    </div>
+  );
+};
+
+interface ReqRow { id: string; type: string; details: string; preferredDate: string | null; status: 'new' | 'in_progress' | 'done' | 'refused'; reply: string | null; createdAt: string; studentName: string; via: string }
+/** Step (d): the requests inbox. The school sets the status and replies; the parent is notified. */
+const RequestsAdmin: React.FC<{ lang: Lang }> = ({ lang }) => {
+  const t = TEXT[lang].req;
+  const [filter, setFilter] = useState<'new' | 'in_progress' | 'done' | 'refused' | 'all'>('new');
+  const [data, setData] = useState<{ counts: Record<string, number>; requests: ReqRow[] } | null>(null);
+  const [edit, setEdit] = useState<Record<string, { status: string; reply: string }>>({});
+  const [msg, setMsg] = useState<string | null>(null);
+  const load = useCallback(() => apiRequest<{ counts: Record<string, number>; requests: ReqRow[] }>('GET', `/api/school-app/requests${filter === 'all' ? '' : `?status=${filter}`}`).then(setData).catch(() => setData(null)), [filter]);
+  useEffect(() => { void load(); }, [load]);
+  const save = async (r: ReqRow) => {
+    const e = edit[r.id] ?? { status: r.status, reply: r.reply ?? '' };
+    if (e.status === 'refused' && !e.reply.trim()) { setMsg(t.refusedNeedsReply); return; }
+    setMsg(null);
+    try { await apiRequest('POST', `/api/school-app/requests/${encodeURIComponent(r.id)}`, { status: e.status, reply: e.reply }); void load(); }
+    catch (err) { setMsg(errText(err, TEXT[lang].failed)); }
+  };
+  return (
+    <div className="rounded-lg border border-slate-200 p-4 space-y-3" data-testid="sa-requests">
+      <h3 className="text-base font-semibold text-slate-900">{t.title}</h3>
+      <div className="flex flex-wrap gap-2" role="group">
+        {(['new', 'in_progress', 'done', 'refused', 'all'] as const).map((f) => <button key={f} type="button" className={filter === f ? primary : btn} aria-pressed={filter === f} onClick={() => setFilter(f)} data-testid={`sa-req-filter-${f}`}>{t.filter[f]}{f !== 'all' && data ? ` (${data.counts[f] ?? 0})` : ''}</button>)}
+      </div>
+      {data && (data.requests.length ? data.requests.map((r) => {
+        const e = edit[r.id] ?? { status: r.status, reply: r.reply ?? '' };
+        return (
+          <div key={r.id} className="space-y-2 border-t border-slate-100 pt-3" data-testid="sa-request">
+            <p className="text-sm"><b dir="auto">{r.studentName}</b> · {t.type[r.type] ?? r.type} · <span className="text-slate-500">{r.createdAt.slice(0, 10)}{r.preferredDate ? ` → ${r.preferredDate}` : ''}</span></p>
+            <p className="text-sm whitespace-pre-wrap" dir="auto">{r.details}</p>
+            <div className="flex flex-wrap items-center gap-2">
+              <select aria-label={t.setStatus} className="rounded border border-slate-300 px-2 py-1 text-sm" value={e.status} onChange={(x) => setEdit({ ...edit, [r.id]: { ...e, status: x.target.value } })} data-testid="sa-req-status">
+                {(['new', 'in_progress', 'done', 'refused'] as const).map((s) => <option key={s} value={s}>{t.filter[s]}</option>)}
+              </select>
+              <input aria-label={t.reply} placeholder={t.reply} dir="auto" className="min-w-0 flex-1 rounded border border-slate-300 px-2 py-1 text-sm" value={e.reply} onChange={(x) => setEdit({ ...edit, [r.id]: { ...e, reply: x.target.value } })} data-testid="sa-req-reply" />
+              <button type="button" className={primary} onClick={() => void save(r)} data-testid="sa-req-save">{t.save}</button>
+            </div>
+          </div>
+        );
+      }) : <p className="text-sm text-slate-500">{t.none}</p>)}
+      {msg && <p className="text-sm text-slate-700" role="status">{msg}</p>}
+    </div>
+  );
+};
+
+interface FormRow { id: string; title: string; deadline: string; withdrawn: boolean; audience: string; audienceValue: string | null; options: { key: string; label: string }[] }
+interface Dash { form: FormRow; counts: Record<string, number>; rows: { studentId: string; studentName: string; className: string; choice: string | null; at: string | null; sameText: boolean | null }[] }
+/** Step (d): consent forms: publish, see who answered, export, withdraw. */
+const ConsentsAdmin: React.FC<{ lang: Lang; roster: Roster | null }> = ({ lang, roster }) => {
+  const t = TEXT[lang].cons;
+  const aud = TEXT[lang].aud;
+  const [forms, setForms] = useState<FormRow[]>([]);
+  const [dash, setDash] = useState<Dash | null>(null);
+  const [f, setF] = useState({ title: '', body: '', deadline: '', audience: 'school', audienceValue: '' });
+  const [msg, setMsg] = useState<string | null>(null);
+  const load = useCallback(() => apiRequest<{ forms: FormRow[] }>('GET', '/api/school-app/consents').then((r) => setForms(r.forms)).catch(() => setForms([])), []);
+  useEffect(() => { void load(); }, [load]);
+  const openDash = async (id: string) => { try { setDash(await apiRequest<Dash>('GET', `/api/school-app/consents/${encodeURIComponent(id)}`)); } catch (e) { setMsg(errText(e, TEXT[lang].failed)); } };
+  const publish = async (e: React.FormEvent) => {
+    e.preventDefault(); setMsg(null);
+    try { await apiRequest('POST', '/api/school-app/consents', f); setMsg(t.published); setF({ ...f, title: '', body: '' }); void load(); }
+    catch (err) { setMsg(errText(err, TEXT[lang].failed)); }
+  };
+  const field = 'mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm';
+  const groups = (roster?.groups ?? []).map((g) => g.name);
+  return (
+    <div className="rounded-lg border border-slate-200 p-4 space-y-3" data-testid="sa-consents">
+      <h3 className="text-base font-semibold text-slate-900">{t.title}</h3>
+      <form className="space-y-3" onSubmit={publish}>
+        <p className="text-sm font-semibold text-slate-800">{t.newForm}</p>
+        <label className="block text-sm">{t.formTitle}<input className={field} dir="auto" required maxLength={160} value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} data-testid="sa-cons-title" /></label>
+        <label className="block text-sm">{t.body}<textarea className={field} dir="auto" rows={4} required maxLength={6000} value={f.body} onChange={(e) => setF({ ...f, body: e.target.value })} data-testid="sa-cons-body" /></label>
+        <div className="grid gap-3 sm:grid-cols-3">
+          <label className="text-sm">{t.audience}<select className={field} value={f.audience} onChange={(e) => setF({ ...f, audience: e.target.value, audienceValue: '' })} data-testid="sa-cons-audience">{Object.entries(aud).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></label>
+          {f.audience !== 'school' && <label className="text-sm">&nbsp;<input className={field} list="sa-cons-values" required value={f.audienceValue} onChange={(e) => setF({ ...f, audienceValue: e.target.value })} data-testid="sa-cons-value" /><datalist id="sa-cons-values">{(f.audience === 'group' ? groups : []).map((g) => <option key={g} value={g} />)}</datalist></label>}
+          <label className="text-sm">{t.deadline}<input type="date" className={field} required value={f.deadline} onChange={(e) => setF({ ...f, deadline: e.target.value })} data-testid="sa-cons-deadline" /></label>
+        </div>
+        <button type="submit" className={primary} data-testid="sa-cons-publish">{t.publish}</button>
+      </form>
+      {msg && <p className="text-sm text-slate-700" role="status" data-testid="sa-cons-msg">{msg}</p>}
+      <p className="text-sm font-semibold text-slate-800">{t.list}</p>
+      {forms.length ? forms.map((x) => (
+        <div key={x.id} className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-2 text-sm" data-testid="sa-cons-row">
+          <span><b dir="auto">{x.title}</b> · {aud[x.audience] ?? x.audience}{x.audienceValue ? `: ${x.audienceValue}` : ''} · {t.deadline} {x.deadline}{x.withdrawn ? ` · ${t.withdrawn}` : ''}</span>
+          <span className="flex gap-2">
+            <button type="button" className={btn} onClick={() => void openDash(x.id)} data-testid="sa-cons-open">{t.open}</button>
+            <button type="button" className={btn} onClick={() => void downloadFile(`/api/school-app/consents/${encodeURIComponent(x.id)}/export`, 'consent.csv')}>{t.export}</button>
+            {!x.withdrawn && <button type="button" className={btn} onClick={async () => { await apiRequest('POST', `/api/school-app/consents/${encodeURIComponent(x.id)}/withdraw`, {}).catch(() => undefined); void load(); }}>{t.withdraw}</button>}
+          </span>
+        </div>
+      )) : <p className="text-sm text-slate-500">{t.none}</p>}
+      {dash && (
+        <div className="space-y-2 rounded-lg bg-slate-50 p-3" data-testid="sa-cons-dash">
+          <p className="text-sm font-semibold" dir="auto">{dash.form.title}</p>
+          <p className="text-sm" data-testid="sa-cons-counts">{dash.form.options.map((o) => `${o.label}: ${dash.counts[o.key] ?? 0}`).join(' · ')} · {t.pending}: {dash.counts.pending}</p>
+          <div className="overflow-x-auto"><table className="w-full text-sm"><thead className="text-slate-500"><tr>{[t.student, t.klass, t.answer, t.at].map((h) => <th key={h} className="py-1 pe-3 text-start">{h}</th>)}</tr></thead>
+            <tbody>{dash.rows.map((r) => <tr key={r.studentId} className="border-t border-slate-100"><td className="py-1 pe-3" dir="auto">{r.studentName}</td><td className="py-1 pe-3" dir="auto">{r.className}</td><td className="py-1 pe-3">{r.choice ? dash.form.options.find((o) => o.key === r.choice)?.label ?? r.choice : t.notAnswered}{r.sameText === false ? ` ${t.changedText}` : ''}</td><td className="py-1">{r.at ? new Date(r.at).toLocaleString(lang === 'ar' ? 'ar-EG' : 'en-GB', { timeZone: 'Africa/Cairo', hour12: true }) : ''}</td></tr>)}</tbody></table></div>
+        </div>
+      )}
     </div>
   );
 };

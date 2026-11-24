@@ -1,4 +1,5 @@
-import { createHash, createHmac } from 'crypto';
+import { createHmac } from 'crypto';
+import { consentTextHash } from './consentHash';
 import { AppError } from '../middleware/errorHandler';
 import { getConfig } from '../config/env';
 import { ParentLearnerLink } from '../models/ParentLearnerLink';
@@ -95,8 +96,7 @@ export async function answerRequest(actor: Actor, id: string, body: Record<strin
 }
 
 // ------------------------------------------------------------------ consent
-export const consentTextHash = (f: { title: string; body: string; titleAr?: string; bodyAr?: string; options: { key: string; label: string; labelAr?: string }[]; deadline: string }) =>
-  createHash('sha256').update(JSON.stringify([f.title, f.body, f.titleAr ?? '', f.bodyAr ?? '', f.options.map((o) => [o.key, o.label, o.labelAr ?? '']), f.deadline])).digest('hex');
+export { consentTextHash };
 const ipHash = (ip: string | undefined) => (ip ? createHmac('sha256', getConfig().jwtSecret).update(`consent-ip:${ip}`).digest('hex').slice(0, 32) : undefined);
 const formView = (f: { id: string; title: string; body: string; titleAr?: string; bodyAr?: string; options: { key: string; label: string; labelAr?: string }[]; deadline: string; createdAt: Date; withdrawnAt?: Date; textHash: string }) =>
   ({ id: f.id, textHash: f.textHash, title: f.title, body: f.body, titleAr: f.titleAr ?? null, bodyAr: f.bodyAr ?? null, options: f.options.map((o) => ({ key: o.key, label: o.label, labelAr: o.labelAr ?? null })), deadline: f.deadline, createdAt: f.createdAt, withdrawn: !!f.withdrawnAt });

@@ -65,3 +65,15 @@ describe('school app seed: buses (step c)', () => {
     expect(notices.map((n) => n.date)).toEqual(['2026-11-24', '2026-11-24', '2026-11-24']);
   });
 });
+
+describe('school app seed: requests and consent (step d)', () => {
+  it('requests in every status; one trip form per school with answers that match its text', () => {
+    const reqs = of('SchoolRequest'), forms = of('SchoolConsentForm'), answers = of('SchoolConsent');
+    expect(new Set(reqs.map((r) => r.status))).toEqual(new Set(['new', 'in_progress', 'done', 'refused']));
+    expect(reqs.filter((r) => r.status === 'refused').every((r) => r.reply)).toBe(true);
+    expect(forms).toHaveLength(3);
+    expect(answers.length).toBeGreaterThan(10);
+    expect(answers.every((a) => forms.some((f) => f.id === a.formId && f.textHash === a.textHash))).toBe(true);
+    expect(new Set(answers.map((a) => a.choice))).toEqual(new Set(['agree', 'decline']));
+  });
+});

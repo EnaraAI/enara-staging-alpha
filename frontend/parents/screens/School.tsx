@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import type { RequestType } from '../api';
 import { cairoDate, cairoTime, schoolApi, type AttendanceStatus, type FeeStatus, type LearnerChip, type SchoolOverview, type SchoolSection, type SchoolSource } from '../api';
 import { ErrorBox, Icon, Loading, useP } from '../ui';
 import { useLive } from '../useLive';
 
 // Parents school app (a): one child's school information, read from the school's own sheets (or, later, its system).
 // ENARA only shows it. Each part names its source and when it was last updated. A section the school has off is not shown.
-export type SchoolView = 'today' | 'timetable' | 'attendance' | 'announcements' | 'fees' | 'buses' | 'notifications';
+export type SchoolView = 'today' | 'timetable' | 'attendance' | 'announcements' | 'fees' | 'buses' | 'requests' | 'consents' | 'notifications';
 
 const STATUS_COLOR: Record<AttendanceStatus, string> = { present: '#047857', absent: '#b42318', late: '#db7706', excused: '#075985' };
 const cairoMonth = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Cairo', year: 'numeric', month: '2-digit' }).format(new Date()).slice(0, 7);
@@ -26,7 +27,7 @@ const StatusTag: React.FC<{ status: AttendanceStatus }> = ({ status }) => {
 export const School: React.FC<{ learner: LearnerChip; refreshKey: number; overview: SchoolOverview; view: SchoolView; setView: (v: SchoolView) => void; onRead: () => void; nameOf: (studentId: string) => string }> = ({ learner, refreshKey, overview, view, setView, onRead, nameOf }) => {
   const { t } = useP();
   const on = overview.sections;
-  const views: SchoolView[] = (['today', 'timetable', 'attendance', 'buses', 'fees', 'announcements', 'notifications'] as const).filter((v) => v === 'today' || on[v as SchoolSection]);
+  const views: SchoolView[] = (['today', 'timetable', 'attendance', 'buses', 'fees', 'announcements', 'consents', 'requests', 'notifications'] as const).filter((v) => v === 'today' || on[v as SchoolSection]);
   const current = views.includes(view) ? view : 'today';
   return (
     <>
@@ -35,6 +36,7 @@ export const School: React.FC<{ learner: LearnerChip; refreshKey: number; overvi
         {views.map((v) => (
           <button key={v} type="button" role="tab" aria-selected={current === v} aria-pressed={current === v} data-testid={`pp-school-${v}`} onClick={() => setView(v)}>
             {t.sch[v]}
+            {v === 'consents' && overview.consentsPending ? <span className="pp-badge" aria-hidden="true">{overview.consentsPending}</span> : null}
             {v === 'notifications' && overview.unreadNotifications ? <span className="pp-badge" aria-hidden="true">{overview.unreadNotifications}</span> : null}
           </button>
         ))}
@@ -43,6 +45,8 @@ export const School: React.FC<{ learner: LearnerChip; refreshKey: number; overvi
       {current === 'timetable' && <Timetable learner={learner} refreshKey={refreshKey} today={overview.today} />}
       {current === 'attendance' && <Attendance learner={learner} refreshKey={refreshKey} />}
       {current === 'announcements' && <Announcements learner={learner} refreshKey={refreshKey} />}
+      {current === 'requests' && <Requests learner={learner} refreshKey={refreshKey} />}
+      {current === 'consents' && <Consents learner={learner} refreshKey={refreshKey} onChanged={onRead} />}
       {current === 'buses' && <Bus learner={learner} refreshKey={refreshKey} />}
       {current === 'fees' && <Fees learner={learner} refreshKey={refreshKey} />}
       {current === 'notifications' && <Notifications refreshKey={refreshKey} onRead={onRead} nameOf={nameOf} />}
@@ -181,7 +185,7 @@ const Notifications: React.FC<{ refreshKey: number; onRead: () => void; nameOf: 
               <span className="pp-dot" style={{ background: x.read ? 'transparent' : x.kind === 'absence' ? '#b42318' : x.kind === 'late' ? '#db7706' : '#2f6bff' }} aria-hidden="true" />
               <p>
                 <b dir="auto" style={{ fontWeight: x.read ? 500 : 700 }}>{t.sch.kind[x.kind] ?? x.kind} · {nameOf(x.studentId)}</b>
-                {x.kind === 'fee_due' || x.kind === 'bus_notice' ? (
+                {x.kind === 'fee_due' || x.kind === 'bus_notice' || x.kind === 'request_update' || x.kind === 'consent' ? (
                   <span style={{ display: 'block' }} dir="auto">{x.title}</span>
                 ) : x.kind !== 'announcement' && x.date ? (
                   <>
@@ -227,6 +231,16 @@ export const SchoolHomeCard: React.FC<{ overview: SchoolOverview; open: (v: Scho
           <p>{t.sch.announcements}</p><span className="pp-meta">{o.announcementsCount ? n(o.announcementsCount) : t.sch.none}</span>
         </button>
       )}
+      {o.sections.consents && o.consentsPending ? (
+        <button type="button" className="pp-list-row pp-card--link" style={{ border: 0, background: 'none' }} onClick={() => open('consents')} data-testid="pp-school-home-consents">
+          <p>{t.sch.consents}</p><b style={{ color: '#b42318', fontSize: 13 }}>{t.sch.consentPending(n(o.consentsPending))}</b>
+        </button>
+      ) : null}
+      {o.sections.requests && o.openRequests ? (
+        <button type="button" className="pp-list-row pp-card--link" style={{ border: 0, background: 'none' }} onClick={() => open('requests')} data-testid="pp-school-home-requests">
+          <p>{t.sch.requests}</p><span className="pp-meta">{t.sch.openRequests(n(o.openRequests))}</span>
+        </button>
+      ) : null}
       {o.sections.buses && o.bus && (
         <button type="button" className="pp-list-row pp-card--link" style={{ border: 0, background: 'none' }} onClick={() => open('buses')} data-testid="pp-school-home-bus">
           <p>{t.sch.busToday}</p>
@@ -335,6 +349,107 @@ const Bus: React.FC<{ learner: LearnerChip; refreshKey: number }> = ({ learner, 
       ))}
       <p className="pp-sub">{t.sch.noGps}</p>
       <Source source={q.data.source} />
+    </>
+  );
+};
+
+const REQ_COLOR: Record<string, string> = { new: '#075985', in_progress: '#db7706', done: '#047857', refused: '#b42318' };
+
+/** Step (d): requests to the school office. Sent only by a main or full guardian; the school answers here. */
+const Requests: React.FC<{ learner: LearnerChip; refreshKey: number }> = ({ learner, refreshKey }) => {
+  const { t, lang } = useP();
+  const [bump, setBump] = useState(0);
+  const q = useLive(() => schoolApi.requests(learner.studentId), [learner.studentId, bump], refreshKey);
+  const [f, setF] = useState<{ type: RequestType; details: string; preferredDate: string }>({ type: 'certificate', details: '', preferredDate: '' });
+  const [state, setState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+  const [err, setErr] = useState('');
+  if (!q.data) return q.error ? (q.error.status === 404 ? <p className="pp-notice">{t.sch.off}</p> : <ErrorBox onRetry={q.reload} />) : <Loading />;
+  const send = async (e: React.FormEvent) => {
+    e.preventDefault(); setState('sending');
+    try { await schoolApi.createRequest(learner.studentId, { type: f.type, details: f.details, ...(f.preferredDate ? { preferredDate: f.preferredDate } : {}) }); setState('sent'); setF({ ...f, details: '', preferredDate: '' }); setBump((b) => b + 1); }
+    catch (x) { setState('error'); setErr((x as { message?: string })?.message || t.error); }
+  };
+  return (
+    <>
+      {q.data.canCreate ? (
+        <form className="pp-card" onSubmit={send} data-testid="pp-request-form">
+          <h2 className="pp-h2">{t.sch.newRequest}</h2>
+          <label className="pp-field">{t.sch.reqTypeLabel}
+            <select value={f.type} onChange={(e) => setF({ ...f, type: e.target.value as RequestType })} data-testid="pp-request-type">
+              {q.data.types.map((k) => <option key={k} value={k}>{t.sch.reqType[k]}</option>)}
+            </select>
+          </label>
+          <label className="pp-field">{t.sch.reqDetails}
+            <textarea rows={3} dir="auto" maxLength={2000} required minLength={3} placeholder={t.sch.reqDetailsPh} value={f.details} onChange={(e) => setF({ ...f, details: e.target.value })} data-testid="pp-request-details" />
+          </label>
+          <label className="pp-field">{t.sch.reqDate}<input type="date" value={f.preferredDate} onChange={(e) => setF({ ...f, preferredDate: e.target.value })} /></label>
+          <button type="submit" className="pp-btn pp-btn--primary pp-btn--block" disabled={state === 'sending'} data-testid="pp-request-send">{t.sch.send}</button>
+          {state === 'sent' && <p className="pp-sub" role="status" data-testid="pp-request-sent">{t.sch.sent}</p>}
+          {state === 'error' && <p className="pp-error" role="alert">{err}</p>}
+        </form>
+      ) : <p className="pp-notice" style={{ display: 'block', fontSize: 13 }}>{t.sch.viewOnlyNote}</p>}
+      {q.data.requests.length ? q.data.requests.map((r) => (
+        <article key={r.id} className="pp-card" data-testid="pp-request" data-status={r.status}>
+          <div className="pp-row pp-row--top">
+            <h2 className="pp-h2">{t.sch.reqType[r.type] ?? r.type}</h2>
+            <span className="pp-tag" style={{ color: REQ_COLOR[r.status], background: '#f6f7fa', border: `1px solid ${REQ_COLOR[r.status]}33` }}>{t.sch.reqStatus[r.status] ?? r.status}</span>
+          </div>
+          <p className="pp-meta">{cairoDate(r.createdAt.slice(0, 10), lang)}{r.preferredDate ? ` · ${cairoDate(r.preferredDate, lang)}` : ''}</p>
+          <p dir="auto" style={{ fontSize: 14, whiteSpace: 'pre-wrap' }}>{r.details}</p>
+          {r.reply && <div className="pp-notice" style={{ display: 'block' }}><b style={{ display: 'block', fontSize: 13 }}>{t.sch.schoolReply}</b><span dir="auto" style={{ fontSize: 14 }} data-testid="pp-request-reply">{r.reply}</span></div>}
+        </article>
+      )) : <p className="pp-notice" style={{ display: 'block' }}>{t.sch.noRequests}</p>}
+    </>
+  );
+};
+
+/** Step (d): consent forms. The parent reads the text, picks a choice, ticks "I confirm" and sends; the record keeps the exact text. */
+const Consents: React.FC<{ learner: LearnerChip; refreshKey: number; onChanged: () => void }> = ({ learner, refreshKey, onChanged }) => {
+  const { t, lang } = useP();
+  const [bump, setBump] = useState(0);
+  const q = useLive(() => schoolApi.consents(learner.studentId), [learner.studentId, bump], refreshKey);
+  const [pick, setPick] = useState<Record<string, string>>({});
+  const [ok, setOk] = useState<Record<string, boolean>>({});
+  const [editing, setEditing] = useState<Record<string, boolean>>({});
+  const [err, setErr] = useState<Record<string, string>>({});
+  if (!q.data) return q.error ? (q.error.status === 404 ? <p className="pp-notice">{t.sch.off}</p> : <ErrorBox onRetry={q.reload} />) : <Loading />;
+  const when = (iso: string) => `${cairoDate(iso.slice(0, 10), lang)} · ${cairoTime(iso, lang)}`;
+  const sign = async (formId: string, textHash: string) => {
+    setErr({ ...err, [formId]: '' });
+    try { await schoolApi.signConsent(learner.studentId, formId, { choice: pick[formId], agree: true, textHash }); setEditing({ ...editing, [formId]: false }); setBump((b) => b + 1); onChanged(); }
+    catch (x) { setErr({ ...err, [formId]: (x as { message?: string })?.message || t.error }); }
+  };
+  if (!q.data.forms.length) return <p className="pp-notice" style={{ display: 'block' }}>{t.sch.noForms}</p>;
+  return (
+    <>
+      {!q.data.canSign && <p className="pp-notice" style={{ display: 'block', fontSize: 13 }}>{t.sch.viewOnlyNote}</p>}
+      {q.data.forms.map((f) => {
+        const label = (key: string) => { const o = f.options.find((x) => x.key === key); return o ? (lang === 'ar' && o.labelAr) || o.label : key; };
+        const showForm = q.data!.canSign && f.open && (!f.answer || editing[f.id] || !f.answer.sameText);
+        return (
+          <article key={f.id} className="pp-card" data-testid="pp-consent" data-answered={f.answer ? '1' : '0'}>
+            <div className="pp-row pp-row--top"><h2 className="pp-h2" dir="auto">{(lang === 'ar' && f.titleAr) || f.title}</h2><span className="pp-meta">{f.open ? t.sch.deadline(cairoDate(f.deadline, lang)) : t.sch.closed}</span></div>
+            <p dir="auto" style={{ fontSize: 14, lineHeight: '22px', whiteSpace: 'pre-wrap' }}>{(lang === 'ar' && f.bodyAr) || f.body}</p>
+            {f.answer && !f.answer.sameText && <p className="pp-error" role="note">{t.sch.textChanged}</p>}
+            {f.answer && <p className="pp-sub" data-testid="pp-consent-answer"><b>{(f.answer.byYou ? t.sch.yourAnswer : t.sch.otherGuardian)(label(f.answer.choice), when(f.answer.at))}</b></p>}
+            {showForm ? (
+              <fieldset style={{ border: 0, padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {f.options.map((o) => (
+                  <label key={o.key} className="pp-row" style={{ justifyContent: 'flex-start', gap: 10, minBlockSize: 44, fontSize: 15 }}>
+                    <input type="radio" name={`c-${f.id}`} checked={pick[f.id] === o.key} onChange={() => setPick({ ...pick, [f.id]: o.key })} data-testid={`pp-consent-option-${o.key}`} />{(lang === 'ar' && o.labelAr) || o.label}
+                  </label>
+                ))}
+                <label className="pp-row" style={{ justifyContent: 'flex-start', gap: 10, fontSize: 13, alignItems: 'flex-start' }}>
+                  <input type="checkbox" checked={!!ok[f.id]} onChange={(e) => setOk({ ...ok, [f.id]: e.target.checked })} data-testid="pp-consent-confirm" style={{ marginBlockStart: 3 }} />{t.sch.iConfirm}
+                </label>
+                <button type="button" className="pp-btn pp-btn--primary pp-btn--block" disabled={!pick[f.id] || !ok[f.id]} onClick={() => void sign(f.id, f.textHash)} data-testid="pp-consent-sign">{t.sch.signBtn}</button>
+                <p className="pp-meta">{t.sch.signedAt}</p>
+                {err[f.id] && <p className="pp-error" role="alert">{err[f.id]}</p>}
+              </fieldset>
+            ) : f.answer && f.open && q.data!.canSign ? <button type="button" className="pp-linkbtn" onClick={() => setEditing({ ...editing, [f.id]: true })}>{t.sch.changeAnswer}</button> : null}
+          </article>
+        );
+      })}
     </>
   );
 };

@@ -32,7 +32,7 @@ import { AvatarSession } from '../../models/AvatarSession';
 import { LearningEvent } from '../../models/LearningEvent';
 import { UsageLedger } from '../../models/UsageLedger';
 import { ParentEmailSend } from '../../models/ParentEmailSend';
-import { ParentNotification, SchoolAnnouncement, SchoolBusAssignment, SchoolBusNotice, SchoolBusRoute, SchoolDailyAttendance, SchoolImport, SchoolInstalment, SchoolTimetableEntry } from '../../schoolApp/models';
+import { ParentNotification, SchoolAnnouncement, SchoolBusAssignment, SchoolBusNotice, SchoolBusRoute, SchoolConsent, SchoolConsentForm, SchoolRequest, SchoolDailyAttendance, SchoolImport, SchoolInstalment, SchoolTimetableEntry } from '../../schoolApp/models';
 import { ReminderLog } from '../../models/ReminderLog';
 import { ALL_FLAGS, forgetFeatureFlags } from '../../services/featureFlags';
 import { CURRENT_PRICE_VERSION } from '../../services/priceCatalog';
@@ -45,7 +45,7 @@ const MODELS: Record<ModelName, Model<any>> = {
   Institution, User, Student, Batch, Curriculum, CourseInstance, ClassEnrollment, LearningObjective, ParentProfile, ParentLearnerLink, ParentLinkCode,
   Invitation, LmsOnboarding, Assessment, AssessmentVersion, Assignment, AssessmentAttempt, GradeLedgerEntry, LessonProgress, ErrorToWorkOn, SessionSummary,
   LearnerProfile, StudyHabitDaily, ReviewItem, StudentObjectiveMastery, TutorSession, TutorMessage, AvatarSession, LearningEvent, UsageLedger, ParentEmailSend, ReminderLog,
-  SchoolTimetableEntry, SchoolDailyAttendance, SchoolAnnouncement, SchoolImport, ParentNotification, SchoolInstalment, SchoolBusRoute, SchoolBusAssignment, SchoolBusNotice,
+  SchoolTimetableEntry, SchoolDailyAttendance, SchoolAnnouncement, SchoolImport, ParentNotification, SchoolInstalment, SchoolBusRoute, SchoolBusAssignment, SchoolBusNotice, SchoolRequest, SchoolConsentForm, SchoolConsent,
 };
 
 export class SeedRefused extends Error {}
@@ -110,7 +110,7 @@ export async function runFullSeed(now = new Date(), env: NodeJS.ProcessEnv = pro
 
 /** Parents school app (a5): writes only the school app part of the plan (no users, no passwords touched) and turns the sections on for
  * the seeded schools with parent access. Same registry, so the full-seed remove clears it. For a database that already has the full seed. */
-export const SCHOOL_APP_MODELS: readonly ModelName[] = ['SchoolTimetableEntry', 'SchoolDailyAttendance', 'SchoolAnnouncement', 'SchoolImport', 'ParentNotification', 'SchoolInstalment', 'SchoolBusRoute', 'SchoolBusAssignment', 'SchoolBusNotice'];
+export const SCHOOL_APP_MODELS: readonly ModelName[] = ['SchoolTimetableEntry', 'SchoolDailyAttendance', 'SchoolAnnouncement', 'SchoolImport', 'ParentNotification', 'SchoolInstalment', 'SchoolBusRoute', 'SchoolBusAssignment', 'SchoolBusNotice', 'SchoolRequest', 'SchoolConsentForm', 'SchoolConsent'];
 export async function runSchoolAppSeed(now = new Date()): Promise<{ batch: string; counts: Record<string, number>; schools: string[] }> {
   const seeded = await Institution.find({ id: { $in: SCHOOLS.filter(schoolAppSeeded).map((s) => s.id) } }).select('id').lean();
   if (seeded.length !== SCHOOLS.filter(schoolAppSeeded).length) throw new SeedRefused('Run the full seed first: the seeded schools are not all here; nothing was written');
