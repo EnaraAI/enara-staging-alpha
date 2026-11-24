@@ -39,12 +39,21 @@ jobs:
         timeout-minutes: 75
         run: |
           pip install -q modal
+          # Evaluate-only (no GPU): deploy/lms-test/mishkat/ft/eval-only.txt names an encoder already on the Volume.
+          if [ -s deploy/lms-test/mishkat/ft/eval-only.txt ]; then
+            RUN_ID="$(tr -dc '0-9a-f-' < deploy/lms-test/mishkat/ft/eval-only.txt)"; echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
+            echo "evaluate only: encoder $RUN_ID (no fine-tune, no GPU)"; exit 0
+          fi
           RUN_ID="$(date -u +%Y%m%d)-${GITHUB_SHA::7}"; echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"; echo "run id $RUN_ID"
           modal run deploy/lms-test/mishkat/ft/finetune_en.py --run-id "$RUN_ID" --out "$GITHUB_WORKSPACE/ft-cost.json"
       - name: Fetch the fine-tuned encoder from the Modal Volume (runner only)
         if: steps.gate.outputs.skip == '0'
         run: |
-          modal volume get mishkat-ft "/en/${{ steps.ft.outputs.run_id }}" ./ft-get
+          R="${{ steps.ft.outputs.run_id }}"
+          echo "on the Volume:"; modal volume ls mishkat-ft "en/$R" || true
+          mkdir -p ./ft-get && modal volume get --force mishkat-ft "en/$R" ./ft-get
+          echo "downloaded (names only):"; find ./ft-get -maxdepth 4 | head -40
+          [ -f ft-cost.json ] || cp "$(find ./ft-get -name ft-cost.json | head -1)" ft-cost.json 2>/dev/null || true
           D=$(dirname "$(find ./ft-get -name config.json | head -1)")
           [ -f "$D/config.json" ] || { echo "::error::no config.json in the downloaded encoder"; exit 1; }
           mv "$D" ./ft-en && ls -la ./ft-en
