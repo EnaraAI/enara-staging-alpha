@@ -95,7 +95,7 @@ export const SchoolImport = model<ISchoolImport>('SchoolImport', importSchema, '
 // ---- in-app notifications for parents
 export interface IParentNotification extends Document {
   id: string; parentUserId: string; studentId?: string; institutionId?: string; kind: 'absence' | 'late' | 'announcement';
-  title: string; body: string; refId?: string; readAt?: Date; createdAt: Date;
+  title: string; body: string; refId?: string; date?: string; readAt?: Date; createdAt: Date;
 }
 const notificationSchema = new Schema<IParentNotification>({
   id: { type: String, required: true, unique: true },
@@ -103,7 +103,7 @@ const notificationSchema = new Schema<IParentNotification>({
   studentId: { type: String, index: true }, institutionId: String,
   kind: { type: String, enum: ['absence', 'late', 'announcement'], required: true },
   title: { type: String, required: true, maxlength: 200 }, body: { type: String, maxlength: 600 },
-  refId: String, readAt: Date,
+  refId: String, date: String, readAt: Date, // date: the attendance day (YYYY-MM-DD, Cairo) for absence / late
 }, { timestamps: { createdAt: true, updatedAt: false } });
 notificationSchema.index({ parentUserId: 1, createdAt: -1 });
 notificationSchema.index({ parentUserId: 1, kind: 1, refId: 1 }, { unique: true, partialFilterExpression: { refId: { $type: 'string' } } });

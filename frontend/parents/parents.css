@@ -252,3 +252,14 @@
 .pp-rec { display: flex; flex-direction: column; gap: 4px; padding-block: 8px; border-block-start: 1px solid var(--line); }
 .pp-rec:first-of-type { border-block-start: 0; }
 .pp-rec-say { font-size: 14px; color: var(--text); }
+
+/* Parents school app (a) */
+.pp-bell { position: relative; }
+.pp-badge { min-inline-size: 18px; block-size: 18px; padding-inline: 5px; border-radius: 9999px; background: var(--bad); color: #fff; font-size: 11px; font-weight: 700; line-height: 18px; text-align: center; display: inline-block; }
+.pp-bell .pp-badge { position: absolute; inset-block-start: 4px; inset-inline-end: 2px; }
+.pp-school-seg { flex-wrap: wrap; }
+.pp-school-seg button { flex: none; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.pp-school-list { list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+.pp-school-list li { display: flex; gap: 12px; align-items: baseline; }
+.pp-school-list .pp-num { color: var(--muted); font-size: 13px; min-inline-size: 84px; }
+.pp-school-today { border: 2px solid var(--blue); }

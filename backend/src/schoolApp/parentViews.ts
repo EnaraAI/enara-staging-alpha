@@ -76,7 +76,7 @@ export async function announcements(ctx: LearnerContext, now = new Date()) {
 export async function notifications(parentUserId: string) {
   const live = (await ParentLearnerLink.find({ parentUserId, status: 'active' }).select('studentId').lean()).map((l) => l.studentId);
   const rows = await ParentNotification.find({ parentUserId, studentId: { $in: live } }).sort({ createdAt: -1 }).limit(100).lean();
-  return { notifications: rows.map((n) => ({ id: n.id, studentId: n.studentId, kind: n.kind, title: n.title, body: n.body, read: !!n.readAt, createdAt: n.createdAt })), unread: rows.filter((n) => !n.readAt).length };
+  return { notifications: rows.map((n) => ({ id: n.id, studentId: n.studentId, kind: n.kind, date: n.date ?? null, title: n.title, body: n.body, read: !!n.readAt, createdAt: n.createdAt })), unread: rows.filter((n) => !n.readAt).length };
 }
 export async function markRead(parentUserId: string, ids: unknown) {
   const list = Array.isArray(ids) ? ids.filter((x): x is string => typeof x === 'string').slice(0, 200) : [];

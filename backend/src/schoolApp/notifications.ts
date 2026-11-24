@@ -26,7 +26,7 @@ export async function notifyAbsences(institutionId: string, rows: { studentId: s
     const parents = await activeParents([...new Set(rows.map((r) => r.studentId))]);
     const names = new Map((await Student.find({ id: { $in: [...parents.keys()] } }).select('id name').lean()).map((s) => [s.id, String(s.name || '').split(/\s+/)[0]]));
     const docs = rows.flatMap((r) => (parents.get(r.studentId) ?? []).map((p) => ({
-      id: newId('pn'), parentUserId: p, studentId: r.studentId, institutionId, kind: r.status === 'late' ? 'late' : 'absence', refId: `${r.id}:${r.status}`,
+      id: newId('pn'), parentUserId: p, studentId: r.studentId, institutionId, kind: r.status === 'late' ? 'late' : 'absence', refId: `${r.id}:${r.status}`, date: r.date,
       title: r.status === 'late' ? `${names.get(r.studentId) ?? 'Your child'} was late on ${r.date}` : `${names.get(r.studentId) ?? 'Your child'} was absent on ${r.date}`,
       body: 'From the school attendance register.',
     })));
