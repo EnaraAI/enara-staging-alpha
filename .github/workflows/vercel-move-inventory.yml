@@ -1,0 +1,24 @@
+# Vercel move, step 1 (owner go, 24 Nov 2026): read-only inventory of the old account. Names only, no values.
+name: Vercel move inventory (read-only)
+on:
+  push:
+    branches: ['claude/tutor-lms-dscompare-run']
+    paths: ['deploy/vercel-move/inventory.mjs', '.github/workflows/vercel-move-inventory.yml']
+permissions:
+  contents: write
+jobs:
+  inventory:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - name: Inventory
+        env: { VERCEL_TOKEN_OLD: '${{ secrets.VERCEL_TOKEN_OLD }}' }
+        run: mkdir -p out && cd out && node ../deploy/vercel-move/inventory.mjs
+      - name: Publish (names only)
+        run: |
+          cd out && git init -q && git checkout -q -b r && git add VERCEL_MOVE.md && git -c user.name=github-actions -c user.email=github-actions@users.noreply.github.com commit -qm "Vercel inventory ${GITHUB_SHA::8}"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" r:claude/tutor-lms-vercel-move-results
