@@ -10,12 +10,14 @@ import type { SchoolDef } from './content';
 //   - Attendance: 8 weeks of school days for every current student (mostly present; some absent, late, excused, with notes).
 //   - Announcements: school-wide, per grade, per class, one for a single student, one expired, one scheduled, one withdrawn.
 //   - In-app notifications for the linked parents: recent absences and lateness, and the school-wide announcement (older ones read).
+//   - Fees (step b): a tuition plan of 3 instalments per current student (paid, overdue, due soon, waived), some receipts numbered, and a
+//     bus fee plan for some; amounts in EGP. Display only: ENARA takes no payments.
 //   - The import log (one confirmed import per section) and the school's sections turned on.
 export interface SeedStudent { id: string; name: string; first: string; school: SchoolDef; group: string; archived: boolean }
 export interface SeedLink { parentUserId: string; studentId: string; institutionId: string }
-type Add = (model: 'SchoolTimetableEntry' | 'SchoolDailyAttendance' | 'SchoolAnnouncement' | 'SchoolImport' | 'ParentNotification', key: string, doc: Record<string, unknown>) => void;
+type Add = (model: 'SchoolTimetableEntry' | 'SchoolDailyAttendance' | 'SchoolAnnouncement' | 'SchoolImport' | 'ParentNotification' | 'SchoolInstalment', key: string, doc: Record<string, unknown>) => void;
 
-export const SCHOOL_APP_SECTIONS_ON = { timetable: true, announcements: true, attendance: true, notifications: true };
+export const SCHOOL_APP_SECTIONS_ON = { timetable: true, announcements: true, attendance: true, notifications: true, fees: true };
 export const schoolAppSeeded = (s: SchoolDef) => s.portal === 'free';
 
 const sid = (p: string, key: string) => `${p}-${createHash('sha1').update(`enara-full-v1:school-app:${key}`).digest('hex').slice(0, 16)}`;
@@ -137,6 +139,36 @@ export function addSchoolAppSeed(input: { now: Date; add: Add; schools: SchoolDe
       }
       add('ParentNotification', `${l.parentUserId}:${openDay.id}:${l.studentId}`, { id: sid('pn', `${l.parentUserId}:${openDay.id}:${l.studentId}`), parentUserId: l.parentUserId, studentId: l.studentId, institutionId: school.id, kind: 'announcement',
         refId: `${openDay.id}:${l.studentId}`, title: openDay.title, body: openDay.body.slice(0, 280), createdAt: openDay.publishAt });
+    }
+    // ---- fees (step b): tuition in 3 instalments; a bus plan for about a third. Relative dates so the states stay meaningful.
+    const feeSource = imp('fees', lang === 'ar' ? 'المصروفات-2026-2027.xlsx' : 'fees-2026-2027.xlsx', 2, 0);
+    const tuitionName = lang === 'ar' ? 'المصروفات الدراسية 2026-2027' : 'Tuition 2026-2027';
+    const busName = lang === 'ar' ? 'اشتراك الحافلة 2026-2027' : 'School bus 2026-2027';
+    const dayAt = (n: number) => cairoDate(new Date(now.getTime() + n * DAY));
+    for (const s of students.filter((x) => x.school.id === school.id && !x.archived)) {
+      const base = (en ? 18_000 : 12_000) + Math.floor(R() * 4) * 1_500;
+      const r = R();
+      // instalment 2: 55 % paid, 30 % overdue, 15 % due in 7 days (a reminder goes out); instalment 3: later, 5 % waived
+      const second = r < 0.55 ? 'paid' : r < 0.85 ? 'overdue' : 'soon';
+      const rows = [
+        { n: 1, due: dayAt(-70), status: 'paid', paid: dayAt(-72 + Math.floor(R() * 4)) },
+        { n: 2, due: second === 'soon' ? dayAt(7) : dayAt(-10), status: second === 'paid' ? 'paid' : 'due', paid: second === 'paid' ? dayAt(-12 + Math.floor(R() * 3)) : undefined },
+        { n: 3, due: dayAt(80), status: R() < 0.05 ? 'waived' : 'due', paid: undefined as string | undefined },
+      ];
+      for (const row of rows) {
+        const key = `${s.id}:tuition:${row.n}`;
+        add('SchoolInstalment', key, { id: sid('sin', key), institutionId: school.id, studentId: s.id, planName: tuitionName, planKey: norm(tuitionName), academicYear: '2026-2027', number: row.n,
+          amount: base, currency: 'EGP', dueDate: row.due, status: row.status, ...(row.status === 'paid' ? { paidDate: row.paid, receiptRef: `${S}-R${1000 + Math.floor(R() * 9000)}` } : {}),
+          ...(row.status === 'waived' ? { note: lang === 'ar' ? 'إعفاء الأخوة' : 'Sibling discount' } : {}),
+          ...(row.n === 2 && second === 'soon' ? {} : row.n === 1 ? { reminders: ['d7', 'd1'] } : {}), source: feeSource, createdAt: feeSource.at, updatedAt: feeSource.at });
+      }
+      if (R() < 0.33) for (const n of [1, 2]) {
+        const key = `${s.id}:bus:${n}`;
+        const paid = n === 1;
+        add('SchoolInstalment', key, { id: sid('sin', key), institutionId: school.id, studentId: s.id, planName: busName, planKey: norm(busName), academicYear: '2026-2027', number: n,
+          amount: 4_500, currency: 'EGP', dueDate: n === 1 ? dayAt(-60) : dayAt(30), status: paid ? 'paid' : 'due', ...(paid ? { paidDate: dayAt(-61), receiptRef: `${S}-B${100 + Math.floor(R() * 900)}` } : {}),
+          source: feeSource, createdAt: feeSource.at, updatedAt: feeSource.at });
+      }
     }
     void today;
   }

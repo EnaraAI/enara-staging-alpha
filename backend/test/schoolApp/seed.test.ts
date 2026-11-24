@@ -40,3 +40,17 @@ describe('school app seed', () => {
     expect(of('ParentNotification').filter((n) => n.kind !== 'announcement').every((n) => n.date && n.refId)).toBe(true);
   });
 });
+
+describe('school app seed: fees (step b)', () => {
+  it('3 tuition instalments per current student with every state; bus plans for some; amounts in EGP', () => {
+    const fees = of('SchoolInstalment');
+    expect(fees.length).toBeGreaterThan(200);
+    const today = '2026-11-24';
+    const shown = fees.map((f) => (f.status === 'due' && f.dueDate < today ? 'overdue' : f.status));
+    expect(new Set(shown)).toEqual(new Set(['paid', 'due', 'overdue', 'waived']));
+    expect(fees.every((f) => f.currency === 'EGP' && f.amount > 0)).toBe(true);
+    expect(fees.filter((f) => f.status === 'paid').every((f) => f.paidDate && f.receiptRef)).toBe(true);
+    expect(fees.some((f) => /حافلة/.test(f.planName)) && fees.some((f) => /bus/i.test(f.planName))).toBe(true);
+    expect(fees.some((f) => f.status === 'due' && f.dueDate === '2026-12-01')).toBe(true); // a reminder 7 days ahead
+  });
+});

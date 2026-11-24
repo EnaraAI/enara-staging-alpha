@@ -16,7 +16,7 @@ export type ModelName =
   | 'ParentLearnerLink' | 'ParentLinkCode' | 'Invitation' | 'LmsOnboarding' | 'Assessment' | 'AssessmentVersion' | 'Assignment' | 'AssessmentAttempt'
   | 'GradeLedgerEntry' | 'LessonProgress' | 'ErrorToWorkOn' | 'SessionSummary' | 'LearnerProfile' | 'StudyHabitDaily' | 'ReviewItem'
   | 'StudentObjectiveMastery' | 'TutorSession' | 'TutorMessage' | 'AvatarSession' | 'LearningEvent' | 'UsageLedger' | 'ParentEmailSend' | 'ReminderLog'
-  | 'SchoolTimetableEntry' | 'SchoolDailyAttendance' | 'SchoolAnnouncement' | 'SchoolImport' | 'ParentNotification';
+  | 'SchoolTimetableEntry' | 'SchoolDailyAttendance' | 'SchoolAnnouncement' | 'SchoolImport' | 'ParentNotification' | 'SchoolInstalment';
 export interface PlannedDoc { model: ModelName; key: string; doc: Record<string, unknown> }
 export interface SeedUser { key: string; role: string; name: string; email: string; schoolId?: string; school?: string; state: string; userId: string }
 /** A parent link code a parent can type (owner, 22 Nov 2026: "write their codes and link those codes to the students accounts"). */

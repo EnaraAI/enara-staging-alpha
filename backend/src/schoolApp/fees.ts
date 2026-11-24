@@ -7,6 +7,8 @@ import type { LearnerContext } from '../parents/service';
 import { ParentNotification, SchoolInstalment, type InstalmentStatus } from './models';
 import { feesVisibleTo, newId, schoolSections, sectionOn } from './sections';
 import { emailSchoolNotices, type NoticeDoc } from './emails';
+import { randomBytes } from 'crypto';
+import { deleteUpload, readUpload, saveUpload } from '../services/uploadStorage';
 
 // Parents school app, step (b): fees and instalments. ENARA only SHOWS what the school recorded; it never takes or moves money and never
 // decides that something is paid: the school imports its fee sheet or marks an instalment paid (or waived) on the admin screen.
@@ -133,4 +135,54 @@ export async function runFeeReminders(now = new Date()): Promise<{ instalments: 
     }
   }
   return { instalments, notifications };
+}
+
+// ------------------------------------------------------------------ receipts (step b3)
+// The school attaches the receipt it issued (PDF, PNG or JPEG, at most 700 KB). Stored under an unguessable name in the upload store;
+// never served by the public /uploads route (that needs a signed link for a registered file). Read only through the two routes below,
+// after the same checks as the fee screens.
+const RECEIPT_TYPES: Record<string, { ext: string; magic: (b: Buffer) => boolean }> = {
+  'application/pdf': { ext: 'pdf', magic: (b) => b.subarray(0, 5).toString('latin1') === '%PDF-' },
+  'image/png': { ext: 'png', magic: (b) => b.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])) },
+  'image/jpeg': { ext: 'jpg', magic: (b) => b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff },
+};
+export const RECEIPT_MAX_BYTES = 700 * 1024;
+
+export async function attachReceipt(actor: Actor, id: string, body: Record<string, unknown>) {
+  const inst = await SchoolInstalment.findOne({ id });
+  if (!inst || inst.institutionId !== scope(actor, inst?.institutionId)) throw new AppError('Instalment not found', 404, 'NOT_FOUND');
+  if (!(await sectionOn(inst.institutionId, 'fees'))) throw new AppError('The fees section is off for this school', 409, 'SECTION_OFF');
+  const type = RECEIPT_TYPES[String(body.contentType ?? '')];
+  if (!type) throw new AppError('A receipt must be a PDF, PNG or JPEG file', 400, 'VALIDATION_ERROR');
+  const data = typeof body.dataBase64 === 'string' ? Buffer.from(body.dataBase64, 'base64') : Buffer.alloc(0);
+  if (!data.length) throw new AppError('The file is empty', 400, 'VALIDATION_ERROR');
+  if (data.length > RECEIPT_MAX_BYTES) throw new AppError('The receipt is larger than 700 KB', 413, 'TOO_LARGE');
+  if (!type.magic(data)) throw new AppError('The file content does not match its type', 400, 'VALIDATION_ERROR');
+  const name = `receipt-${inst.id}-${randomBytes(12).toString('hex')}.${type.ext}`;
+  await saveUpload(name, data, String(body.contentType));
+  const old = inst.receiptKey;
+  inst.receiptKey = name; inst.markedBy = actor.id; inst.markedAt = new Date();
+  await inst.save();
+  if (old) await deleteUpload(old).catch(() => undefined);
+  await recordAudit('school_app_receipt_attached', actor, { institutionId: inst.institutionId, type: 'school_instalment', id: inst.id }, { bytes: data.length, contentType: body.contentType });
+  return { id: inst.id, hasReceipt: true };
+}
+
+async function receiptFile(inst: { id: string; receiptKey?: string }) {
+  if (!inst.receiptKey) throw new AppError('No receipt for this instalment', 404, 'NOT_FOUND');
+  const f = await readUpload(inst.receiptKey);
+  if (!f) throw new AppError('No receipt for this instalment', 404, 'NOT_FOUND');
+  const ext = inst.receiptKey.split('.').pop() ?? 'pdf';
+  return { body: f.body, contentType: ext === 'pdf' ? 'application/pdf' : ext === 'png' ? 'image/png' : 'image/jpeg', fileName: `receipt-${inst.id}.${ext}` };
+}
+export async function receiptForParent(ctx: LearnerContext, instalmentId: string) {
+  const school = await gateFees(ctx);
+  const inst = await SchoolInstalment.findOne({ id: instalmentId, institutionId: school, studentId: ctx.student.id }).lean();
+  if (!inst) throw new AppError('Instalment not found', 404, 'NOT_FOUND');
+  return receiptFile(inst);
+}
+export async function receiptForAdmin(actor: Actor, instalmentId: string) {
+  const inst = await SchoolInstalment.findOne({ id: instalmentId }).lean();
+  if (!inst || inst.institutionId !== scope(actor, inst?.institutionId)) throw new AppError('Instalment not found', 404, 'NOT_FOUND');
+  return receiptFile(inst);
 }
