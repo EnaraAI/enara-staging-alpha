@@ -9,6 +9,15 @@ import { feesVisibleTo, newId, schoolSections, sectionOn } from './sections';
 import { emailSchoolNotices, type NoticeDoc } from './emails';
 import { randomBytes } from 'crypto';
 import { deleteUpload, readUpload, saveUpload } from '../services/uploadStorage';
+import { SchoolReceiptFile } from './models';
+
+// Where receipt files live: the upload store (R2) by default; the database only when SCHOOL_RECEIPTS_STORE=db (the E2E stack).
+const dbStore = () => process.env.SCHOOL_RECEIPTS_STORE === 'db';
+export const receiptStore = {
+  save: async (key: string, data: Buffer, contentType: string, institutionId: string) => (dbStore() ? void (await SchoolReceiptFile.create({ key, data, contentType, institutionId })) : saveUpload(key, data, contentType)),
+  read: async (key: string) => { if (!dbStore()) return readUpload(key); const f = await SchoolReceiptFile.findOne({ key }).lean(); return f ? { body: Buffer.from(f.data as unknown as Buffer), contentType: f.contentType } : null; },
+  remove: async (key: string) => (dbStore() ? void (await SchoolReceiptFile.deleteOne({ key })) : deleteUpload(key)),
+};
 
 // Parents school app, step (b): fees and instalments. ENARA only SHOWS what the school recorded; it never takes or moves money and never
 // decides that something is paid: the school imports its fee sheet or marks an instalment paid (or waived) on the admin screen.
@@ -159,18 +168,18 @@ export async function attachReceipt(actor: Actor, id: string, body: Record<strin
   if (data.length > RECEIPT_MAX_BYTES) throw new AppError('The receipt is larger than 700 KB', 413, 'TOO_LARGE');
   if (!type.magic(data)) throw new AppError('The file content does not match its type', 400, 'VALIDATION_ERROR');
   const name = `receipt-${inst.id}-${randomBytes(12).toString('hex')}.${type.ext}`;
-  await saveUpload(name, data, String(body.contentType));
+  await receiptStore.save(name, data, String(body.contentType), inst.institutionId);
   const old = inst.receiptKey;
   inst.receiptKey = name; inst.markedBy = actor.id; inst.markedAt = new Date();
   await inst.save();
-  if (old) await deleteUpload(old).catch(() => undefined);
+  if (old) await receiptStore.remove(old).catch(() => undefined);
   await recordAudit('school_app_receipt_attached', actor, { institutionId: inst.institutionId, type: 'school_instalment', id: inst.id }, { bytes: data.length, contentType: body.contentType });
   return { id: inst.id, hasReceipt: true };
 }
 
 async function receiptFile(inst: { id: string; receiptKey?: string }) {
   if (!inst.receiptKey) throw new AppError('No receipt for this instalment', 404, 'NOT_FOUND');
-  const f = await readUpload(inst.receiptKey);
+  const f = await receiptStore.read(inst.receiptKey);
   if (!f) throw new AppError('No receipt for this instalment', 404, 'NOT_FOUND');
   const ext = inst.receiptKey.split('.').pop() ?? 'pdf';
   return { body: f.body, contentType: ext === 'pdf' ? 'application/pdf' : ext === 'png' ? 'image/png' : 'image/jpeg', fileName: `receipt-${inst.id}.${ext}` };
