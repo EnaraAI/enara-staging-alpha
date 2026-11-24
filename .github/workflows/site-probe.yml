@@ -10,9 +10,10 @@ jobs:
   probe:
     if: github.repository == 'EnaraAI/enara-staging-alpha'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: '22' }
-      - run: node deploy/vercel-move/probe.mjs | tee -a "$GITHUB_STEP_SUMMARY"
+      - env: { LMSTEST_MAINTENANCE_TOKEN: '${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}' }
+        run: node deploy/vercel-move/probe.mjs | tee -a "$GITHUB_STEP_SUMMARY"
