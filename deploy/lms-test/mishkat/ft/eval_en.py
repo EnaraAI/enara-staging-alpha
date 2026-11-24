@@ -10,7 +10,7 @@ CODE = HERE.parent                                         # deploy/lms-test/mis
 DATA = os.environ.get('MK_EVAL_DATA', '')                  # the model-marked dev data (mk/data/mishkat-dev), set by the workflow
 V3B = os.environ.get('MK_EVAL_V3B', '')                    # today's v3b numbers on the human-scored essays
 TIMEOUT_MIN, USD_PER_GPU_HOUR = 30, 1.10
-RUN_ID_RE = re.compile(r'^\d{8}-[0-9a-f]{7}$')
+RUN_ID_RE = re.compile(r'^(\d{8}-[0-9a-f]{7}|base)$')  # 'base' = the frozen hub encoder (no fine-tune)
 
 image = (
     modal.Image.debian_slim(python_version='3.11')
@@ -26,12 +26,13 @@ vol = modal.Volume.from_name('mishkat-ft')
 app = modal.App('mishkat-ft-eval-en', image=image)
 
 @app.function(gpu='A10G', timeout=TIMEOUT_MIN * 60, volumes={'/vol': vol}, retries=0, cpu=4.0, memory=16384)
-def evaluate(run_id: str) -> dict:
+def evaluate(run_id: str, pre_max: str = '3000') -> dict:
     assert RUN_ID_RE.match(run_id), 'bad run id'
     t0 = time.time()
     env = {**os.environ, 'MK_LANG': 'en', 'MK_STAGE1': 'ellipse,asap2,persuade', 'MK_EGYPT': '0', 'MK_AUG': '0', 'MK_DATA': '/root/data',
            'MK_BASELINE': '/root/v3b-human.json', 'MK_V3B': '/root/v3b-human.json', 'MK_COMPARE': '/root/data/claude-compare/compare-en.json',
-           'MK_EXPORT': '0', 'MK_ENCODER_DIR': f'/vol/en/{run_id}', 'MK_FT_RUN': run_id, 'MK_CACHE': '/tmp/cache'}
+           'MK_EXPORT': '0', 'MK_CACHE': '/tmp/cache', 'MK_PRE_MAX': pre_max,
+           **({} if run_id == 'base' else {'MK_ENCODER_DIR': f'/vol/en/{run_id}', 'MK_FT_RUN': run_id})}
     p = subprocess.run(['python', 'train_mishkat.py'], cwd='/root/mk', env=env, capture_output=True, text=True)
     log = (p.stdout + p.stderr)[-200_000:]
     rep = pathlib.Path('/root/mk/results/report.json')
@@ -40,9 +41,9 @@ def evaluate(run_id: str) -> dict:
             'gpuSeconds': round(secs, 1), 'estimatedUsd': round(secs / 3600 * USD_PER_GPU_HOUR, 3)}
 
 @app.local_entrypoint()
-def main(run_id: str, out_dir: str):
+def main(run_id: str, out_dir: str, pre_max: str = '3000'):
     if not RUN_ID_RE.match(run_id): raise SystemExit('bad run id')
-    r = evaluate.remote(run_id)
+    r = evaluate.remote(run_id, pre_max)
     out = pathlib.Path(out_dir); (out / 'results').mkdir(parents=True, exist_ok=True)
     (out / 'train.log').write_text(r['log'])
     if r['report']: (out / 'results' / 'report.json').write_text(r['report'])
