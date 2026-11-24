@@ -8,6 +8,7 @@ import { feesVisibleTo, schoolSections, setFeesVisibleTo, setSchoolSections } fr
 import { confirmImport, listImports, previewImport, undoImport } from './importer';
 import { COLUMNS } from './importSpec';
 import * as views from './parentViews';
+import { answerRequest, consentCsv, consentDashboard, consentForms, consentsForParent, createConsentForm, createRequest, requestsForAdmin, requestsForParent, signConsent, withdrawConsentForm } from './requests';
 import { busForParent, busesForAdmin, sendBusNotice, setBusPhonesShared, withdrawBusNotice } from './buses';
 import { attachReceipt, feesForAdmin, feesForParent, markInstalment, receiptForAdmin, receiptForParent } from './fees';
 import { SchoolAnnouncement } from './models';
@@ -31,6 +32,10 @@ parentSchoolRoutes.get('/learners/:studentId/fees', h(async (req, res) => { res.
 const sendFile = (res: Response, f: { body: Buffer; contentType: string; fileName: string }) => { res.setHeader('Content-Type', f.contentType); res.setHeader('Content-Disposition', `attachment; filename="${f.fileName}"`); res.setHeader('Cache-Control', 'private, no-store'); res.setHeader('X-Content-Type-Options', 'nosniff'); res.send(f.body); };
 parentSchoolRoutes.get('/learners/:studentId/fees/:instalmentId/receipt', h(async (req, res) => { sendFile(res, await receiptForParent(await child(req), String(req.params.instalmentId))); }));
 parentSchoolRoutes.get('/learners/:studentId/bus', h(async (req, res) => { res.json(await busForParent(await child(req))); }));
+parentSchoolRoutes.get('/learners/:studentId/requests', h(async (req, res) => { res.json(await requestsForParent(await child(req))); }));
+parentSchoolRoutes.post('/learners/:studentId/requests', h(async (req, res) => { const b = ensurePlainObject(req.body); rejectMongoOperators(b); res.status(201).json(await createRequest(await child(req), b)); }));
+parentSchoolRoutes.get('/learners/:studentId/consents', h(async (req, res) => { res.json(await consentsForParent(await child(req))); }));
+parentSchoolRoutes.post('/learners/:studentId/consents/:formId', h(async (req, res) => { const b = ensurePlainObject(req.body); rejectMongoOperators(b); res.status(201).json(await signConsent(await child(req), String(req.params.formId), b, { ip: req.ip, userAgent: String(req.headers['user-agent'] ?? '') })); }));
 parentSchoolRoutes.get('/learners/:studentId/announcements', h(async (req, res) => { res.json(await views.announcements(await child(req))); }));
 parentSchoolRoutes.get('/notifications', h(async (req, res) => { res.json(await views.notifications(req.user!.id)); }));
 parentSchoolRoutes.post('/notifications/read', h(async (req, res) => { const b = ensurePlainObject(req.body); rejectMongoOperators(b); res.json(await views.markRead(req.user!.id, b.ids)); }));
@@ -85,6 +90,15 @@ schoolAppAdminRoutes.put('/buses/phones', h(async (req, res) => {
   const id = schoolId(req, b.institutionId); if (!id) throw new AppError('A school is required', 400, 'VALIDATION_ERROR');
   res.json(await setBusPhonesShared(actor(req), id, b.busPhonesShared));
 }));
+
+// Step (d): requests inbox and consent forms.
+schoolAppAdminRoutes.get('/requests', h(async (req, res) => { res.json(await requestsForAdmin(actor(req), { institutionId: typeof req.query.institutionId === 'string' ? req.query.institutionId : undefined, status: typeof req.query.status === 'string' ? req.query.status : undefined })); }));
+schoolAppAdminRoutes.post('/requests/:id', h(async (req, res) => { const b = ensurePlainObject(req.body); rejectMongoOperators(b); res.json(await answerRequest(actor(req), String(req.params.id), b)); }));
+schoolAppAdminRoutes.get('/consents', h(async (req, res) => { res.json(await consentForms(actor(req), typeof req.query.institutionId === 'string' ? req.query.institutionId : undefined)); }));
+schoolAppAdminRoutes.post('/consents', h(async (req, res) => { const b = ensurePlainObject(req.body); rejectMongoOperators(b); res.status(201).json(await createConsentForm(actor(req), b)); }));
+schoolAppAdminRoutes.get('/consents/:id', h(async (req, res) => { res.json(await consentDashboard(actor(req), String(req.params.id))); }));
+schoolAppAdminRoutes.get('/consents/:id/export', h(async (req, res) => { const csv = await consentCsv(actor(req), String(req.params.id)); res.setHeader('Content-Type', 'text/csv; charset=utf-8'); res.setHeader('Content-Disposition', `attachment; filename="consent-${String(req.params.id)}.csv"`); res.setHeader('Cache-Control', 'private, no-store'); res.send(csv); }));
+schoolAppAdminRoutes.post('/consents/:id/withdraw', h(async (req, res) => { res.json(await withdrawConsentForm(actor(req), String(req.params.id))); }));
 
 // Announcements written on the screen (no file). Audience: school, grade, group (class) or student.
 schoolAppAdminRoutes.get('/announcements', h(async (req, res) => {

@@ -13,15 +13,23 @@ import { parentRecipient, sendParentEmailOnce } from '../parents/parentEmails';
 //   emailPrefs.schoolAnnouncements  announcements (default on)
 //   emailPrefs.schoolFees           fee reminders (step b; default on)
 //   emailPrefs.schoolBus            bus delay / cancel notices (step c; default on)
+//   emailPrefs.schoolRequests       answers to requests and new consent forms (step d; default on)
 // Only parents with a usable address get one (code-only accounts have none). SMS and WhatsApp: later.
-export interface NoticeDoc { parentUserId: string; studentId: string; institutionId: string; kind: 'absence' | 'late' | 'announcement' | 'fee_due' | 'bus_notice'; refId: string; date?: string; title: string; body: string; amount?: number; planName?: string; daysBefore?: number; minutes?: number; busKind?: 'delay' | 'cancel'; direction?: 'morning' | 'afternoon'; routeName?: string; childName?: string }
+export interface NoticeDoc { parentUserId: string; studentId: string; institutionId: string; kind: 'absence' | 'late' | 'announcement' | 'fee_due' | 'bus_notice' | 'request_update' | 'consent'; refId: string; date?: string; title: string; body: string; amount?: number; planName?: string; daysBefore?: number; minutes?: number; busKind?: 'delay' | 'cancel'; direction?: 'morning' | 'afternoon'; routeName?: string; childName?: string; requestStatus?: string; requestType?: string }
 
 const firstName = (name?: string | null) => String(name ?? '').trim().split(/\s+/)[0] || '';
 const dayLabel = (day: string, lang: 'en' | 'ar') => new Intl.DateTimeFormat(lang === 'ar' ? 'ar-EG' : 'en-GB', { timeZone: 'UTC', weekday: 'long', day: 'numeric', month: 'short' }).format(new Date(`${day}T12:00:00Z`));
 const MAX_PER_CALL = 1000;
 
-export function headline(kind: NoticeDoc['kind'], lang: 'en' | 'ar', child: string, date: string | undefined, title: string, amount?: number, bus?: { busKind?: 'delay' | 'cancel'; direction?: 'morning' | 'afternoon'; minutes?: number; routeName?: string }): string {
+export function headline(kind: NoticeDoc['kind'], lang: 'en' | 'ar', child: string, date: string | undefined, title: string, amount?: number, bus?: { busKind?: 'delay' | 'cancel'; direction?: 'morning' | 'afternoon'; minutes?: number; routeName?: string; requestStatus?: string }): string {
   if (kind === 'announcement') return title.slice(0, 200);
+  if (kind === 'consent') return (lang === 'ar' ? `مطلوب ردّك بخصوص ${child}: ${title.replace(/^Consent needed: /, '')}` : `Your answer is needed for ${child}: ${title.replace(/^Consent needed: /, '')}`).slice(0, 200);
+  if (kind === 'request_update') {
+    const st = bus?.requestStatus ?? '';
+    const ar: Record<string, string> = { new: 'جديد', in_progress: 'قيد التنفيذ', done: 'تم', refused: 'مرفوض' };
+    const en: Record<string, string> = { new: 'new', in_progress: 'in progress', done: 'done', refused: 'refused' };
+    return lang === 'ar' ? `طلبك بخصوص ${child}: ${ar[st] ?? st}` : `Your request about ${child}: ${en[st] ?? st}`;
+  }
   if (kind === 'bus_notice') {
     const trip = lang === 'ar' ? (bus?.direction === 'afternoon' ? 'رحلة العودة' : 'رحلة الصباح') : `the ${bus?.direction ?? 'morning'} trip`;
     if (lang === 'ar') return bus?.busKind === 'cancel' ? `الحافلة ${bus?.routeName ?? ''}: أُلغيت ${trip} اليوم` : `الحافلة ${bus?.routeName ?? ''}: ${trip} متأخرة نحو ${bus?.minutes ?? ''} دقيقة`;
@@ -46,7 +54,7 @@ export async function emailSchoolNotices(docs: NoticeDoc[]): Promise<{ sent: num
     const recipients = new Map<string, Awaited<ReturnType<typeof parentRecipient>>>();
     for (const d of list) {
       const prefs = profiles.get(d.parentUserId);
-      const wanted = d.kind === 'announcement' ? prefs?.schoolAnnouncements !== false : d.kind === 'fee_due' ? prefs?.schoolFees !== false : d.kind === 'bus_notice' ? prefs?.schoolBus !== false : prefs?.schoolAttendance !== false;
+      const wanted = d.kind === 'announcement' ? prefs?.schoolAnnouncements !== false : d.kind === 'fee_due' ? prefs?.schoolFees !== false : d.kind === 'bus_notice' ? prefs?.schoolBus !== false : d.kind === 'request_update' || d.kind === 'consent' ? prefs?.schoolRequests !== false : prefs?.schoolAttendance !== false;
       if (!wanted) { skipped++; continue; }
       if (!recipients.has(d.parentUserId)) recipients.set(d.parentUserId, await parentRecipient(d.parentUserId));
       const to = recipients.get(d.parentUserId);
@@ -59,6 +67,7 @@ export async function emailSchoolNotices(docs: NoticeDoc[]): Promise<{ sent: num
           NAME: to.name, CHILD_NAME: child, SCHOOL_NAME: schools.get(d.institutionId) || (to.lang === 'ar' ? 'المدرسة' : 'the school'),
           HEADLINE: headline(d.kind, to.lang, child, d.date, d.title, d.amount, d),
           MESSAGE: d.kind === 'announcement' ? (d.body || d.title)
+            : d.kind === 'request_update' || d.kind === 'consent' ? (d.body || (to.lang === 'ar' ? 'افتح بوابة أولياء الأمور للتفاصيل.' : 'Open ENARA Parents for the details.'))
             : d.kind === 'bus_notice' ? (d.body || (to.lang === 'ar' ? `يخص ${child}. رسالة من المدرسة.` : `About ${child}. A message from the school.`))
             : d.kind === 'fee_due' ? (to.lang === 'ar' ? `${d.planName ?? ''}. يتم الدفع في المدرسة؛ إنارة تعرض سجل الرسوم كما سجّلته المدرسة فقط.` : `${d.planName ?? ''}. Payment is made at the school; ENARA only shows the school's fee record.`)
             : to.lang === 'ar' ? 'من سجل الحضور في المدرسة.' : "From the school's attendance register.",

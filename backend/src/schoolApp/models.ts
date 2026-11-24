@@ -147,6 +147,66 @@ const busNoticeSchema = new Schema<ISchoolBusNotice>({
 busNoticeSchema.index({ institutionId: 1, routeKey: 1, date: 1 });
 export const SchoolBusNotice = model<ISchoolBusNotice>('SchoolBusNotice', busNoticeSchema, 'school_bus_notices');
 
+// ---- requests (step d): a parent asks the school office (certificate, early leave, teacher meeting, other); the school answers.
+export const REQUEST_TYPES = ['certificate', 'early_leave', 'teacher_meeting', 'other'] as const;
+export const REQUEST_STATUSES = ['new', 'in_progress', 'done', 'refused'] as const;
+export interface ISchoolRequest extends Document {
+  id: string; institutionId: string; studentId: string; parentUserId: string; type: (typeof REQUEST_TYPES)[number]; details: string; preferredDate?: string;
+  status: (typeof REQUEST_STATUSES)[number]; reply?: string; history: { at: Date; by: 'parent' | 'school'; status: string; note?: string }[]; via?: 'screen' | 'chat'; createdAt: Date; updatedAt: Date;
+}
+const requestSchema = new Schema<ISchoolRequest>({
+  id: { type: String, required: true, unique: true },
+  institutionId: { type: String, required: true, index: true },
+  studentId: { type: String, required: true, index: true },
+  parentUserId: { type: String, required: true, index: true },
+  type: { type: String, enum: REQUEST_TYPES, required: true },
+  details: { type: String, required: true, maxlength: 2000 },
+  preferredDate: String,
+  status: { type: String, enum: REQUEST_STATUSES, required: true },
+  reply: { type: String, maxlength: 2000 },
+  history: { type: [{ at: Date, by: String, status: String, note: String, _id: false }], default: [] },
+  via: { type: String, enum: ['screen', 'chat'] },
+}, { timestamps: true });
+requestSchema.index({ institutionId: 1, status: 1, createdAt: -1 });
+export const SchoolRequest = model<ISchoolRequest>('SchoolRequest', requestSchema, 'school_requests');
+
+// ---- consent forms (step d) and the parents' answers. Each answer is kept (append-only), with the time, the device, a hash of the
+// network address and a hash of the exact text shown, so the school can show what was agreed to, when and by whom.
+export interface ISchoolConsentForm extends Document {
+  id: string; institutionId: string; title: string; body: string; titleAr?: string; bodyAr?: string;
+  audience: Audience; audienceValue?: string; audienceKey?: string; options: { key: string; label: string; labelAr?: string }[];
+  deadline: string; textHash: string; createdBy: string; withdrawnAt?: Date; createdAt: Date;
+}
+const consentFormSchema = new Schema<ISchoolConsentForm>({
+  id: { type: String, required: true, unique: true },
+  institutionId: { type: String, required: true, index: true },
+  title: { type: String, required: true, maxlength: 160 }, body: { type: String, required: true, maxlength: 6000 },
+  titleAr: { type: String, maxlength: 160 }, bodyAr: { type: String, maxlength: 6000 },
+  audience: { type: String, enum: AUDIENCES, required: true }, audienceValue: String, audienceKey: String,
+  options: { type: [{ key: String, label: String, labelAr: String, _id: false }], required: true },
+  deadline: { type: String, required: true }, // YYYY-MM-DD (Cairo), answers accepted until the end of that day
+  textHash: { type: String, required: true },
+  createdBy: { type: String, required: true }, withdrawnAt: Date,
+}, { timestamps: true });
+export const SchoolConsentForm = model<ISchoolConsentForm>('SchoolConsentForm', consentFormSchema, 'school_consent_forms');
+
+export interface ISchoolConsent extends Document {
+  id: string; formId: string; institutionId: string; studentId: string; parentUserId: string; choice: string; textHash: string; device?: string; ipHash?: string; at: Date;
+}
+const consentSchema = new Schema<ISchoolConsent>({
+  id: { type: String, required: true, unique: true },
+  formId: { type: String, required: true, index: true },
+  institutionId: { type: String, required: true, index: true },
+  studentId: { type: String, required: true, index: true },
+  parentUserId: { type: String, required: true },
+  choice: { type: String, required: true },
+  textHash: { type: String, required: true },
+  device: { type: String, maxlength: 200 }, ipHash: String,
+  at: { type: Date, required: true },
+}, { timestamps: false });
+consentSchema.index({ formId: 1, studentId: 1, at: -1 });
+export const SchoolConsent = model<ISchoolConsent>('SchoolConsent', consentSchema, 'school_consents');
+
 // ---- imports (preview, confirm, undo)
 export interface ISchoolImport extends Document {
   id: string; institutionId: string; section: string; fileName?: string; status: 'preview' | 'confirmed' | 'undone' | 'expired';
@@ -171,14 +231,14 @@ export const SchoolImport = model<ISchoolImport>('SchoolImport', importSchema, '
 
 // ---- in-app notifications for parents
 export interface IParentNotification extends Document {
-  id: string; parentUserId: string; studentId?: string; institutionId?: string; kind: 'absence' | 'late' | 'announcement' | 'fee_due' | 'bus_notice';
+  id: string; parentUserId: string; studentId?: string; institutionId?: string; kind: 'absence' | 'late' | 'announcement' | 'fee_due' | 'bus_notice' | 'request_update' | 'consent';
   title: string; body: string; refId?: string; date?: string; readAt?: Date; createdAt: Date;
 }
 const notificationSchema = new Schema<IParentNotification>({
   id: { type: String, required: true, unique: true },
   parentUserId: { type: String, required: true, index: true },
   studentId: { type: String, index: true }, institutionId: String,
-  kind: { type: String, enum: ['absence', 'late', 'announcement', 'fee_due', 'bus_notice'], required: true },
+  kind: { type: String, enum: ['absence', 'late', 'announcement', 'fee_due', 'bus_notice', 'request_update', 'consent'], required: true },
   title: { type: String, required: true, maxlength: 200 }, body: { type: String, maxlength: 600 },
   refId: String, date: String, readAt: Date, // date: the attendance day (YYYY-MM-DD, Cairo) for absence / late
 }, { timestamps: { createdAt: true, updatedAt: false } });
