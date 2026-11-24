@@ -28,6 +28,9 @@ def X_of(texts, part): return MF.X_of(texts, LANG, _E, part, log)
 def sh(c): subprocess.run(c, shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 STAGE1 = [x for x in os.environ.get('MK_STAGE1', 'ellipse' if LANG == 'en' else 'laila').split(',') if x]
 PRE_EXTRA = int(os.environ.get('MK_PRE_EXTRA', '2500'))
+# Owner, 24 Nov: stage 1 stops at 3000 essays in total, split evenly across its sources.
+PRE_MAX = int(os.environ.get('MK_PRE_MAX', '3000'))
+if STAGE1: PRE_N, PRE_EXTRA = min(PRE_N, PRE_MAX // len(STAGE1)), min(PRE_EXTRA, PRE_MAX // len(STAGE1))
 def _norm(v, lo, hi): return ((np.asarray(v, dtype=np.float32) - lo) / (hi - lo) * 2).astype(np.float32)
 def _get(url, path):
     if not os.path.exists(path): subprocess.run(['curl', '-sSfL', '-o', path, url], check=True)
