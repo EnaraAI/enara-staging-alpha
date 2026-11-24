@@ -209,6 +209,9 @@ jobs:
       - name: Health check run (LTI login, launch, exchange, grade to the mock)
         id: health
         run: node deploy/lms-test/cli.mjs maintenance run
+      - name: Env check (every variable, read-only; fails only on a required one)
+        id: envcheck
+        run: node deploy/lms-test/cli.mjs env-check
       - name: Passed
         id: passed
         run: echo "ok=true" >> "$GITHUB_OUTPUT"
@@ -233,7 +236,7 @@ jobs:
           PASSED: ${{ steps.passed.outputs.ok }}
           STARTED: ${{ steps.vdeploy.outputs.started }}
           ROLLBACK: ${{ steps.rollback.outcome }}
-          REASON: ${{ steps.sha.outputs.reason || steps.guard.outputs.reason || steps.prev.outputs.reason || steps.flags.outputs.reason || steps.vdeploy.outputs.reason || steps.dep.outputs.reason || steps.serving.outputs.reason || steps.site.outputs.reason || steps.migrate.outputs.reason || steps.setup.outputs.reason || steps.health.outputs.reason }}
+          REASON: ${{ steps.sha.outputs.reason || steps.guard.outputs.reason || steps.prev.outputs.reason || steps.flags.outputs.reason || steps.vdeploy.outputs.reason || steps.dep.outputs.reason || steps.serving.outputs.reason || steps.site.outputs.reason || steps.migrate.outputs.reason || steps.setup.outputs.reason || steps.health.outputs.reason || steps.envcheck.outputs.reason }}
         run: |
           if [ "$PASSED" = "true" ]; then outcome=passed
           elif [ "$STARTED" != "true" ]; then outcome=not_deployed
