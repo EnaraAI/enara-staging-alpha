@@ -58,6 +58,7 @@ export async function gradeBatch(p: { runId: string; domain: BenchDomain; lang: 
       model: ok ? Object.fromEntries(g.criterionScores.map((c) => [c.criterionId, c.points])) : null, modelTotal: ok ? g.points : null,
       flagged: g.flagged, flagReasons: g.flagReasons, confidence: g.confidence, latencyMs: Date.now() - t0,
       error: ok ? null : g.flagReasons[0] ?? 'error', errorCodes: g.errorCodes, goldErrorCodes: a.errorCodes, modelName: ok ? g.grader.replace(/^model:/, '') : null,
+      engine: g.engine ?? null,
     };
     await AssessmentBenchResult.updateOne({ runId: p.runId, answerId: a.id }, { $set: { runId: p.runId, ...row } }, { upsert: true });
   }));
