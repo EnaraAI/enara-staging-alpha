@@ -1,0 +1,18 @@
+# Read-only probe of the three sites (/ready states only).
+name: Site probe (read-only)
+on:
+  push:
+    branches: ['claude/tutor-lms-dscompare-run']
+    paths: ['deploy/vercel-move/probe.mjs', '.github/workflows/site-probe.yml']
+permissions:
+  contents: read
+jobs:
+  probe:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - run: node deploy/vercel-move/probe.mjs | tee -a "$GITHUB_STEP_SUMMARY"
