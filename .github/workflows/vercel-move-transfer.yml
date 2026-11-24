@@ -1,0 +1,39 @@
+# Vercel move (owner go, 24 Nov 2026): Vercel's own project transfer, one project at a time (deploy/vercel-move/transfer-target.txt),
+# dry run unless transfer-mode.txt says "transfer". Then checks. Names and states only; no values, codes or tokens are printed.
+name: Vercel move transfer
+on:
+  push:
+    branches: ['claude/tutor-lms-dscompare-run']
+    paths: ['deploy/vercel-move/transfer-target.txt', 'deploy/vercel-move/transfer-mode.txt', 'deploy/vercel-move/transfer.mjs', '.github/workflows/vercel-move-transfer.yml']
+permissions:
+  contents: write
+concurrency: { group: vercel-move, cancel-in-progress: false }
+jobs:
+  transfer:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - name: Transfer and verify
+        id: t
+        env:
+          VERCEL_TOKEN_OLD: ${{ secrets.VERCEL_TOKEN_OLD }}
+          VERCEL_TOKEN_NEW: ${{ secrets.VERCEL_TOKEN_NEW }}
+        run: mkdir -p out && cd out && node ../deploy/vercel-move/transfer.mjs
+      - name: lms-test health check (site, database, tool keys, LTI flow against the mock LMS; uses LMS_KEK)
+        if: always() && hashFiles('deploy/vercel-move/transfer-target.txt') != '' && steps.t.outcome != 'skipped'
+        env:
+          LMSTEST_MAINTENANCE_TOKEN: ${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}
+        run: |
+          [ "$(cat deploy/vercel-move/transfer-target.txt)" = enara-lms-test ] || { echo "not lms-test: read-only checks only (above)"; exit 0; }
+          { node deploy/lms-test/cli.mjs check-site && node deploy/lms-test/cli.mjs maintenance setup && node deploy/lms-test/cli.mjs maintenance run; } 2>&1 | tee out/health.log
+          echo "- lms-test health check: ${PIPESTATUS[0]}" >> out/transfer.md
+      - name: Publish (names and states only)
+        if: always()
+        run: |
+          T=$(cat deploy/vercel-move/transfer-target.txt)
+          cd out && rm -f new-team.txt && git init -q && git checkout -q -b r && git add -A && git -c user.name=github-actions -c user.email=github-actions@users.noreply.github.com commit -qm "Vercel transfer $T ${GITHUB_SHA::8}"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" "r:claude/tutor-lms-vercel-move-$T"
