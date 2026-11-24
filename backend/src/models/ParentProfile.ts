@@ -19,7 +19,7 @@ export interface IParentProfile extends Document {
   mergedInto?: string;
   // Parents P4: the parent's own on/off for the weekly summary and new results
   // emails (unset = on; the school's switches apply first).
-  emailPrefs?: { weeklySummary?: boolean; newResults?: boolean };
+  emailPrefs?: { weeklySummary?: boolean; newResults?: boolean; schoolAttendance?: boolean; schoolAnnouncements?: boolean };
 }
 
 const profileSchema = new Schema<IParentProfile>(
@@ -33,7 +33,7 @@ const profileSchema = new Schema<IParentProfile>(
     signIn: { type: String, enum: ['code', 'password', 'google'] },
     emailVerifiedAt: Date,
     mergedInto: String,
-    emailPrefs: { type: { weeklySummary: Boolean, newResults: Boolean, _id: false }, default: undefined },
+    emailPrefs: { type: { weeklySummary: Boolean, newResults: Boolean, schoolAttendance: Boolean, schoolAnnouncements: Boolean, _id: false }, default: undefined },
   },
   { collection: 'parent_profiles', versionKey: false, timestamps: true },
 );

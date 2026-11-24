@@ -5,7 +5,7 @@ import { Avatar, ErrorBox, Icon, Loading, useP } from '../ui';
 import { useLive } from '../useLive';
 import { AddEmail } from './AddEmail';
 
-export const Account: React.FC<{ refreshKey: number; setLang: (l: Lang) => void; onLink: () => void; onPick: (studentId: string) => void; onChanged: () => void; onSignOut: () => void }> = ({ refreshKey, setLang, onLink, onPick, onChanged, onSignOut }) => {
+export const Account: React.FC<{ refreshKey: number; setLang: (l: Lang) => void; onLink: () => void; onPick: (studentId: string) => void; onChanged: () => void; onSignOut: () => void ; schoolOn?: boolean }> = ({ refreshKey, setLang, onLink, onPick, onChanged, onSignOut , schoolOn }) => {
   const { t, n, lang } = useP();
   const q = useLive(() => parentsApi.account(), [], refreshKey);
   const [note, setNote] = useState<string | null>(null);
@@ -117,6 +117,15 @@ export const Account: React.FC<{ refreshKey: number; setLang: (l: Lang) => void;
                   onChange={(e) => { void parentsApi.savePreferences({ [k === 'weeklySummary' ? 'weeklySummaryEmail' : 'newResultsEmail']: e.target.checked } as never).then(() => q.reload()); }} />
               </label>
             ))}
+            {/* Parents school app (a4): school notice emails; in-app notifications are always on. SMS and WhatsApp come later. */}
+            {schoolOn && (['schoolAttendance', 'schoolAnnouncements'] as const).map((k) => (
+              <label key={k} className="pp-row" style={{ fontSize: 14, minBlockSize: 44 }}>
+                <span>{k === 'schoolAttendance' ? t.sch.emailAttendance : t.sch.emailAnnouncements}</span>
+                <input type="checkbox" checked={d.preferences.emails![k] !== false} data-testid={`pp-pref-${k}`}
+                  onChange={(e) => { void parentsApi.savePreferences({ [k === 'schoolAttendance' ? 'schoolAttendanceEmail' : 'schoolAnnouncementsEmail']: e.target.checked } as never).then(() => q.reload()); }} />
+              </label>
+            ))}
+            {schoolOn && <p className="pp-sub">{t.sch.smsLater}</p>}
             {!d.signIn?.hasEmail && <p className="pp-sub">{t.emailsNeedAddress}</p>}
           </>
         ) : (
