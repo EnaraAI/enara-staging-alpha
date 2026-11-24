@@ -71,3 +71,5 @@ Local test, no Modal or model download: `python -m pytest -q deploy/modal/mishka
 | Idle outside school hours | $0 | $0 |
 
 The cost per answer depends on throughput, measured by the load test (`deploy/modal/mishkat-loadtest`, run after every deploy; results on `claude/tutor-lms-mishkat-service`).
+
+Service URL: https://enaraai--mishkat-web.us-east.modal.run (region us-east, next to Vercel iad1 and Atlas).

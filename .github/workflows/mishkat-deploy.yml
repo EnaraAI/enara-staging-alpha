@@ -52,7 +52,7 @@ jobs:
         if: steps.gate.outputs.skip == '0'
         run: |
           modal deploy deploy/modal/mishkat/app.py 2>&1 | tee deploy.log
-          URL=$(grep -oE 'https://[a-z0-9-]+--mishkat-web[a-z0-9-]*\.modal\.run' deploy.log | head -1)
+          URL=$(grep -oE 'https://[a-z0-9-]+--mishkat-web[a-z0-9.-]*\.modal\.run' deploy.log | head -1)
           [ -n "$URL" ] || { echo "::error::no service URL in the deploy output"; exit 1; }
           echo "url=$URL" >> "$GITHUB_OUTPUT"; echo "service: $URL"
       - uses: actions/setup-node@v4
