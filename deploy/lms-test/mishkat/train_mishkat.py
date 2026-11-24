@@ -76,12 +76,12 @@ def stage1():
             add(df.essay.tolist(), Y, df.essay_id.astype(str).tolist(), PRE_N)
         elif src == 'arasag':  # AR-ASAG (Mendeley Data, CC BY 4.0; GitHub copy by the authors): Arabic short answers, average of 2 graders as holistic
             raw = _get('https://raw.githubusercontent.com/leilaouahrani/AR-ASAG-Dataset/master/TXT-%20Version/Questions-%20Model%20Answers%20-%20Student%20Answers%20-%20Grade1-%20Grade2-%20%20Average%20Gold.txt', '/tmp/arasag.txt')
+            # Layout: blocks of "Question: ..." / "Answer: ..." (the model answer), then lines "<mark1> <mark2> <average> [n] <student answer>".
+            R = re.compile(r'^\s*(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)\s+\[\d+\]\s*(.+?)\s*$')
             texts, scores = [], []
-            for line in open(raw, encoding='utf-8', errors='replace').read().splitlines()[1:]:
-                f_ = [x.strip() for x in line.split('\t')]
-                nums = []
-                while f_ and re.fullmatch(r'-?\d+(\.\d+)?', f_[-1].replace(',', '.')): nums.insert(0, float(f_.pop().replace(',', '.')))
-                if len(nums) >= 1 and f_ and f_[-1]: texts.append(f_[-1]); scores.append(nums[-1])
+            for line in open(raw, encoding='utf-8', errors='replace').read().splitlines():
+                m_ = R.match(line)
+                if m_ and m_.group(4).strip(): texts.append(m_.group(4)); scores.append(float(m_.group(3)))
             sc = np.array(scores, dtype=np.float32)
             Y = np.full((len(texts), 6), np.nan, dtype=np.float32); Y[:, 5] = _norm(sc, float(sc.min()), float(sc.max())) if len(sc) else sc
             log(f'AR-ASAG: {len(texts)} answers, score range {float(sc.min()) if len(sc) else "?"}-{float(sc.max()) if len(sc) else "?"}')

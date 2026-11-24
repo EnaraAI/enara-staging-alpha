@@ -4,20 +4,28 @@ name: lms-test Mishkat training
 on:
   push:
     branches: ['claude/tutor-lms-dscompare-run']
-    paths: ['deploy/lms-test/mishkat/train_mishkat.py', 'deploy/lms-test/mishkat/mishkat_features.py', '.github/workflows/lms-test-mishkat-train.yml']
+    paths: ['deploy/lms-test/mishkat/run-langs.txt', 'deploy/lms-test/mishkat/train_mishkat.py', 'deploy/lms-test/mishkat/mishkat_features.py', '.github/workflows/lms-test-mishkat-train.yml']
 permissions:
   contents: write
 jobs:
+  plan:  # which languages this push trains (deploy/lms-test/mishkat/run-langs.txt; default both), so a fix to one never restarts the other
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    outputs: { matrix: '${{ steps.m.outputs.matrix }}' }
+    steps:
+      - uses: actions/checkout@v4
+      - id: m
+        run: |
+          L=$(cat deploy/lms-test/mishkat/run-langs.txt 2>/dev/null || echo "en ar")
+          python3 -c "import json,sys; all_={'en':{'lang':'en','stage1':'ellipse,asap2,persuade','premax':'0'},'ar':{'lang':'ar','stage1':'araes,arasag','premax':'0'}}; print('matrix='+json.dumps({'include':[all_[l] for l in sys.argv[1:] if l in all_]}))" $L >> "$GITHUB_OUTPUT"
   train:
+    needs: plan
     if: github.repository == 'EnaraAI/enara-staging-alpha'
     runs-on: ubuntu-latest
     timeout-minutes: 355
     strategy:
       fail-fast: false
-      matrix:
-        include:  # run 8 (24 Nov): more stage-1 corpora; Egyptian test set for Arabic
-          - { lang: en, stage1: 'ellipse,asap2,persuade', premax: '0' }   # owner 24 Nov 2:10 PM: ELLIPSE 2,500 + ASAP 2.0 + PERSUADE, no cap
-          - { lang: ar, stage1: 'araes,arasag', premax: '0' }             # AR-AES two-stage (adopted) + AR-ASAG (CC BY 4.0)
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
