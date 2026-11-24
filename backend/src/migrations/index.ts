@@ -569,6 +569,13 @@ export const MIGRATIONS: Migration[] = [
       const m = await import('../schoolApp/models');
       for (const model of [m.SchoolTimetableEntry, m.SchoolDailyAttendance, m.SchoolAnnouncement, m.SchoolImport, m.ParentNotification]) await (model as { createIndexes(): Promise<unknown> }).createIndexes();
     },
+  },  {
+    id: '2026-12-03-school-app-b',
+    description: 'Parents school app, step (b): indexes of school_instalments (new collection). Nothing existing changed.',
+    up: async () => {
+      const m = await import('../schoolApp/models');
+      await m.SchoolInstalment.createIndexes();
+    },
   },
 ];
 
