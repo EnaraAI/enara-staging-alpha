@@ -125,6 +125,30 @@ def finetune(run_id: str) -> dict:
         backbone.train(); head.train()
         return float(se.sum() / n.sum().clamp(min=1)), {c: (round(float(se[j] / n[j]), 4) if n[j] else None) for j, c in enumerate(D.TARGETS)}
 
+    # Diagnostics (run 3, 24 Nov): runs 1 and 2 gave a non-finite loss from step 1, in bf16 and in fp32. Check each stage of the first
+    # batch and stop with the stage named if any is not finite. Numbers only.
+    def fin(t): return bool(torch.isfinite(t).all())
+    d = {'Yinf': int(np.isinf(Y).sum()), 'YnanPerTarget': {c: int(np.isnan(Y[:, j]).sum()) for j, c in enumerate(D.TARGETS)},
+         'Yrange': [float(np.nanmin(Y)), float(np.nanmax(Y))], 'backboneDtype': str(next(backbone.parameters()).dtype),
+         'weightsFinite': all(fin(p_) for p_ in backbone.parameters()), 'vocab': int(backbone.config.vocab_size),
+         'transformers': __import__('transformers').__version__, 'torch': torch.__version__}
+    ids0, am0, y0 = batch(list(tri[:BATCH]))
+    d.update({'idsMax': int(ids0.max()), 'idsMin': int(ids0.min()), 'maskMinLen': int(am0.sum(1).min()), 'yFiniteOrNan': bool((torch.isfinite(y0) | torch.isnan(y0)).all())})
+    for mode in ('eval', 'train'):
+        backbone.train(mode == 'train')
+        with torch.no_grad():
+            out = backbone(input_ids=ids0, attention_mask=am0)
+            h = out.last_hidden_state; pooled = D.mean_pool(h.float(), am0); pred = head(pooled)
+            d[mode] = {'hiddenFinite': fin(h), 'hiddenNonFiniteShare': round(float((~torch.isfinite(h)).float().mean()), 4),
+                       'pooledFinite': fin(pooled), 'predFinite': fin(pred), 'loss': float(D.masked_mse(pred, y0))}
+            if not fin(h):  # which layer first goes non-finite
+                hs = backbone(input_ids=ids0, attention_mask=am0, output_hidden_states=True).hidden_states
+                d[mode]['firstNonFiniteLayer'] = next((i for i, x in enumerate(hs) if not fin(x)), None)
+    backbone.train(); head.train()
+    log('diagnostics: ' + json.dumps(d))
+    if not (d['eval']['predFinite'] and d['train']['predFinite'] and d['yFiniteOrNan'] and d['Yinf'] == 0):
+        raise RuntimeError('diagnostics: non-finite before training; see the diagnostics line')
+
     val_hist, best, stopped, step, bad_steps = [], (float('inf'), None, -1), False, 0, 0
     rng = np.random.default_rng(D.SEED)
     backbone.train(); head.train()
