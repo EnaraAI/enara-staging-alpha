@@ -1,5 +1,5 @@
 // Owner (22 Nov 2026): load the full data set on lms-test (POST /api/maintenance/full-seed). Prints counts only: no passwords, no
-// user list (that is in docs/lms/SEED_USERS.md). ACTION=run|remove|status.
+// user list (that is in docs/lms/SEED_USERS.md). ACTION=run|remove|status|rerun|run-school-app (parents school app data only).
 const SITE = 'https://lms-test.enara.app';
 const H = { Authorization: `Bearer ${process.env.LMSTEST_MAINTENANCE_TOKEN}`, 'Content-Type': 'application/json' };
 const call = async (action) => { const r = await fetch(`${SITE}/api/maintenance/full-seed`, { method: 'POST', headers: H, body: JSON.stringify({ action }), signal: AbortSignal.timeout(300_000) }); const j = await r.json().catch(() => ({})); return { status: r.status, body: j }; };

@@ -18,5 +18,5 @@ jobs:
       - name: Full data set (lms-test)
         env:
           LMSTEST_MAINTENANCE_TOKEN: ${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}
-          ACTION: rerun
+          ACTION: run-school-app # parents school app data only (no users or passwords touched); was: rerun
         run: node deploy/lms-test/fullseed/run.mjs
