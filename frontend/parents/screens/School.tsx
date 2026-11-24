@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { cairoDate, cairoTime, schoolApi, type AttendanceStatus, type LearnerChip, type SchoolOverview, type SchoolSection, type SchoolSource } from '../api';
+import { cairoDate, cairoTime, schoolApi, type AttendanceStatus, type FeeStatus, type LearnerChip, type SchoolOverview, type SchoolSection, type SchoolSource } from '../api';
 import { ErrorBox, Icon, Loading, useP } from '../ui';
 import { useLive } from '../useLive';
 
 // Parents school app (a): one child's school information, read from the school's own sheets (or, later, its system).
 // ENARA only shows it. Each part names its source and when it was last updated. A section the school has off is not shown.
-export type SchoolView = 'today' | 'timetable' | 'attendance' | 'announcements' | 'notifications';
+export type SchoolView = 'today' | 'timetable' | 'attendance' | 'announcements' | 'fees' | 'notifications';
 
 const STATUS_COLOR: Record<AttendanceStatus, string> = { present: '#047857', absent: '#b42318', late: '#db7706', excused: '#075985' };
 const cairoMonth = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Cairo', year: 'numeric', month: '2-digit' }).format(new Date()).slice(0, 7);
@@ -26,7 +26,7 @@ const StatusTag: React.FC<{ status: AttendanceStatus }> = ({ status }) => {
 export const School: React.FC<{ learner: LearnerChip; refreshKey: number; overview: SchoolOverview; view: SchoolView; setView: (v: SchoolView) => void; onRead: () => void; nameOf: (studentId: string) => string }> = ({ learner, refreshKey, overview, view, setView, onRead, nameOf }) => {
   const { t } = useP();
   const on = overview.sections;
-  const views: SchoolView[] = (['today', 'timetable', 'attendance', 'announcements', 'notifications'] as const).filter((v) => v === 'today' || on[v as SchoolSection]);
+  const views: SchoolView[] = (['today', 'timetable', 'attendance', 'fees', 'announcements', 'notifications'] as const).filter((v) => v === 'today' || on[v as SchoolSection]);
   const current = views.includes(view) ? view : 'today';
   return (
     <>
@@ -43,6 +43,7 @@ export const School: React.FC<{ learner: LearnerChip; refreshKey: number; overvi
       {current === 'timetable' && <Timetable learner={learner} refreshKey={refreshKey} today={overview.today} />}
       {current === 'attendance' && <Attendance learner={learner} refreshKey={refreshKey} />}
       {current === 'announcements' && <Announcements learner={learner} refreshKey={refreshKey} />}
+      {current === 'fees' && <Fees learner={learner} refreshKey={refreshKey} />}
       {current === 'notifications' && <Notifications refreshKey={refreshKey} onRead={onRead} nameOf={nameOf} />}
       <p className="pp-sub" style={{ marginBlockStart: 4 }}>{t.sch.displayOnly}</p>
     </>
@@ -179,7 +180,9 @@ const Notifications: React.FC<{ refreshKey: number; onRead: () => void; nameOf: 
               <span className="pp-dot" style={{ background: x.read ? 'transparent' : x.kind === 'absence' ? '#b42318' : x.kind === 'late' ? '#db7706' : '#2f6bff' }} aria-hidden="true" />
               <p>
                 <b dir="auto" style={{ fontWeight: x.read ? 500 : 700 }}>{t.sch.kind[x.kind] ?? x.kind} · {nameOf(x.studentId)}</b>
-                {x.kind !== 'announcement' && x.date ? (
+                {x.kind === 'fee_due' ? (
+                  <span style={{ display: 'block' }} dir="auto">{x.title}</span>
+                ) : x.kind !== 'announcement' && x.date ? (
                   <>
                     <span style={{ display: 'block' }}>{(x.kind === 'late' ? t.sch.wasLate : t.sch.wasAbsent)(nameOf(x.studentId), cairoDate(x.date, lang, { weekday: 'long', day: 'numeric', month: 'short' }))}</span>
                     <span className="pp-meta" style={{ display: 'block' }}>{t.sch.fromRegister}</span>
@@ -202,7 +205,7 @@ const Notifications: React.FC<{ refreshKey: number; onRead: () => void; nameOf: 
 
 /** The school card on Home: today's attendance, the next class, announcements and unread notifications. Hidden when every section is off. */
 export const SchoolHomeCard: React.FC<{ overview: SchoolOverview; open: (v: SchoolView) => void }> = ({ overview: o, open }) => {
-  const { t, n } = useP();
+  const { t, n, lang } = useP();
   const nowHm = new Intl.DateTimeFormat('en-GB', { timeZone: 'Africa/Cairo', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date());
   const next = o.todayClasses?.find((c) => c.end > nowHm) ?? null;
   return (
@@ -220,14 +223,66 @@ export const SchoolHomeCard: React.FC<{ overview: SchoolOverview; open: (v: Scho
       )}
       {o.sections.announcements && (
         <button type="button" className="pp-list-row pp-card--link" style={{ border: 0, background: 'none' }} onClick={() => open('announcements')}>
-          <p>{t.sch.announcements}</p><span className="pp-meta">{o.announcementsCount ? n(o.announcementsCount) : t.noAlerts}</span>
+          <p>{t.sch.announcements}</p><span className="pp-meta">{o.announcementsCount ? n(o.announcementsCount) : t.sch.none}</span>
+        </button>
+      )}
+      {o.sections.fees && o.fees && (
+        <button type="button" className="pp-list-row pp-card--link" style={{ border: 0, background: 'none' }} onClick={() => open('fees')} data-testid="pp-school-home-fees">
+          <p>{t.sch.feeNext}</p>{o.fees.next ? <span className="pp-meta">{t.sch.feeDueLine(n(o.fees.next.amount.toLocaleString('en-US')), cairoDate(o.fees.next.dueDate, lang))}{o.fees.overdueCount ? <> · <b style={{ color: '#b42318' }}>{t.sch.overdueCount(n(o.fees.overdueCount))}</b></> : null}</span> : <span className="pp-meta">{t.sch.feeNone}</span>}
         </button>
       )}
       {o.sections.notifications && (
         <button type="button" className="pp-list-row pp-card--link" style={{ border: 0, background: 'none' }} onClick={() => open('notifications')}>
-          <p>{t.sch.notifications}</p>{o.unreadNotifications ? <span className="pp-badge">{n(o.unreadNotifications)}</span> : <span className="pp-meta">{t.noAlerts}</span>}
+          <p>{t.sch.notifications}</p>{o.unreadNotifications ? <span className="pp-badge">{n(o.unreadNotifications)}</span> : <span className="pp-meta">{t.sch.none}</span>}
         </button>
       )}
     </section>
+  );
+};
+
+const FEE_COLOR: Record<FeeStatus, string> = { paid: '#047857', due: '#075985', overdue: '#b42318', waived: '#566376' };
+const money = (a: number, n: (x: number | string) => string) => n(a.toLocaleString('en-US', { maximumFractionDigits: 2 }));
+
+/** Step (b): fees, display only. The school records payments; ENARA never takes money. */
+const Fees: React.FC<{ learner: LearnerChip; refreshKey: number }> = ({ learner, refreshKey }) => {
+  const { t, n, lang } = useP();
+  const q = useLive(() => schoolApi.fees(learner.studentId), [learner.studentId], refreshKey);
+  if (!q.data) return q.error ? (q.error.status === 404 ? <p className="pp-notice">{t.sch.off}</p> : q.error.status === 403 ? <p className="pp-notice" data-testid="pp-fees-main-only">{t.sch.feesMainOnly}</p> : <ErrorBox onRetry={q.reload} />) : <Loading />;
+  const f = q.data;
+  const stat = (label: string, v: number, color?: string, id?: string) => (
+    <div style={{ flex: '1 1 40%', minInlineSize: 0 }}><p className="pp-meta">{label}</p><p style={{ fontSize: 18, fontWeight: 700, color }} className="pp-num" data-testid={id}>{t.sch.egp(money(v, n))}</p></div>
+  );
+  return (
+    <>
+      <p className="pp-notice" style={{ display: 'block', fontSize: 13 }} data-testid="pp-fees-pay-at-school">{t.sch.payAtSchool}</p>
+      {!f.plans.length ? <p className="pp-notice" style={{ display: 'block' }}>{t.sch.noFees}</p> : (
+        <>
+          <section className="pp-card" aria-label={t.sch.fees} data-testid="pp-fees-totals">
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+              {stat(t.sch.feeTotal, f.totals.total)}
+              {stat(t.sch.feePaid, f.totals.paid, '#047857', 'pp-fees-paid')}
+              {stat(t.sch.feeRemaining, f.totals.remaining, undefined, 'pp-fees-remaining')}
+              {f.totals.overdue > 0 && stat(t.sch.feeOverdue, f.totals.overdue, '#b42318', 'pp-fees-overdue')}
+            </div>
+            {f.next && <p className="pp-sub">{t.sch.feeNext}: {t.sch.instalment(n(f.next.number))} · {t.sch.egp(money(f.next.amount, n))} · {t.sch.dueOn(cairoDate(f.next.dueDate, lang))}</p>}
+          </section>
+          {f.plans.map((p) => (
+            <section key={p.name} className="pp-card pp-card--flush" aria-label={p.name} data-testid="pp-fee-plan">
+              <h2 className="pp-h2" style={{ padding: '14px 16px 4px' }} dir="auto">{p.name}{p.academicYear ? <span className="pp-meta"> · {p.academicYear}</span> : null}</h2>
+              {p.instalments.map((i) => (
+                <div className="pp-list-row" key={i.id} data-testid="pp-instalment" data-status={i.status}>
+                  <p>
+                    <b>{t.sch.instalment(n(i.number))} · {t.sch.egp(money(i.amount, n))}</b>
+                    <span className="pp-meta" style={{ display: 'block' }}>{i.status === 'paid' && i.paidDate ? t.sch.paidOn(cairoDate(i.paidDate, lang)) : t.sch.dueOn(cairoDate(i.dueDate, lang))}{i.receiptRef ? ` · ${t.sch.receipt(i.receiptRef)}` : ''}</span>
+                  </p>
+                  <span className="pp-tag" style={{ color: FEE_COLOR[i.status], background: '#f6f7fa', border: `1px solid ${FEE_COLOR[i.status]}33` }}>{t.sch.feeStatus[i.status]}</span>
+                </div>
+              ))}
+            </section>
+          ))}
+        </>
+      )}
+      <Source source={f.source} />
+    </>
   );
 };

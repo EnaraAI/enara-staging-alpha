@@ -25,7 +25,7 @@ export interface Controls { learner: LearnerHeader; controls: { weeklyGoalMin: n
 /** lms-test: parent emails are blocked until a later step (backend parents/emailBlock.ts). */
 export interface ParentEmailState { blocked: boolean; code?: string; message?: { en: string; ar: string } }
 export interface Report { learner: LearnerHeader; shareEmail?: ParentEmailState; report: { weekStart: string; status: WeeklyStatus['status']; minutesDone: number; goalMinutes: number; streak: number; level: Level; learned: { mock: boolean; items: Bi[] }; tryAtHome: { mock: boolean; text: Bi } } }
-export interface Account { learners: LearnerChip[]; pending: { linkId: string }[]; guardians: { byLearner: { studentId: string; canManage: boolean; items: { linkId: string; name: string; role: LinkRole; isYou: boolean }[] }[] }; plan: AccountPlan; preferences: { language: 'en' | 'ar'; alertChannels: string[]; emails?: { weeklySummary: boolean; newResults: boolean; schoolAttendance?: boolean; schoolAnnouncements?: boolean } }; signIn?: { method: 'code' | 'password' | 'google'; hasEmail: boolean; emailSignin?: boolean; email?: string; emailVerified?: boolean; suggestedEmail?: string }; hiddenBySchool?: number }
+export interface Account { learners: LearnerChip[]; pending: { linkId: string }[]; guardians: { byLearner: { studentId: string; canManage: boolean; items: { linkId: string; name: string; role: LinkRole; isYou: boolean }[] }[] }; plan: AccountPlan; preferences: { language: 'en' | 'ar'; alertChannels: string[]; emails?: { weeklySummary: boolean; newResults: boolean; schoolAttendance?: boolean; schoolAnnouncements?: boolean; schoolFees?: boolean } }; signIn?: { method: 'code' | 'password' | 'google'; hasEmail: boolean; emailSignin?: boolean; email?: string; emailVerified?: boolean; suggestedEmail?: string }; hiddenBySchool?: number }
 // Parents P1: with PARENT_SETTINGS_ENABLED the plan is "Provided by <school>" (no price); otherwise the mock plan.
 export type AccountPlan = { mock: true; name: Bi; price: string; learners: number; renewsOn: string; payment: Bi } | { mock: false; kind: 'school'; providedBy: string[] };
 
@@ -58,7 +58,7 @@ export const parentsApi = {
   saveControls: (id: string, body: Partial<Controls['controls']>) => apiRequest<Controls>('PUT', `${L(id)}/controls`, body),
   setGuardianRole: (id: string, linkId: string, role: 'full' | 'view') => apiRequest('PUT', `${L(id)}/guardians/${encodeURIComponent(linkId)}`, { role }),
   account: () => apiRequest<Account>('GET', '/api/parents/account'),
-  savePreferences: (body: { language?: 'en' | 'ar'; weeklySummaryEmail?: boolean; newResultsEmail?: boolean; schoolAttendanceEmail?: boolean; schoolAnnouncementsEmail?: boolean }) => apiRequest('PUT', '/api/parents/account/preferences', body),
+  savePreferences: (body: { language?: 'en' | 'ar'; weeklySummaryEmail?: boolean; newResultsEmail?: boolean; schoolAttendanceEmail?: boolean; schoolAnnouncementsEmail?: boolean; schoolFeesEmail?: boolean }) => apiRequest('PUT', '/api/parents/account/preferences', body),
   previewCode: (code: string) => apiRequest<{ learner: string; school: string | null }>('POST', '/api/parents/link/preview', { code }),
   confirmCode: (code: string) => apiRequest<{ studentId: string; role: LinkRole }>('POST', '/api/parents/link/confirm', { code }),
   unlink: (linkId: string) => apiRequest('DELETE', `/api/parents/links/${encodeURIComponent(linkId)}`),
@@ -70,21 +70,25 @@ export const parentsApi = {
 
 // Parents school app (a): /api/parents/school. 404 while every SCHOOL_APP_* switch is off (the tab is then hidden);
 // a section the school has off answers 404 SECTION_OFF.
-export type SchoolSection = 'timetable' | 'announcements' | 'attendance' | 'notifications';
+export type SchoolSection = 'timetable' | 'announcements' | 'attendance' | 'notifications' | 'fees';
 export interface SchoolSource { label: string; updatedAt: string | null; kind: string | null }
 export type AttendanceStatus = 'present' | 'absent' | 'late' | 'excused';
-export interface SchoolOverview { sections: Record<SchoolSection, boolean>; today: string; attendanceToday?: AttendanceStatus | null; todayClasses?: { period: number; start: string; end: string; subject: string }[]; announcementsCount?: number; unreadNotifications?: number }
+export interface SchoolOverview { sections: Record<SchoolSection, boolean>; today: string; attendanceToday?: AttendanceStatus | null; todayClasses?: { period: number; start: string; end: string; subject: string }[]; announcementsCount?: number; unreadNotifications?: number; fees?: { next: { amount: number; dueDate: string; status: FeeStatus } | null; overdueCount: number; currency: string } }
 export interface SchoolTimetable { group: string | null; days: { day: number; periods: { period: number; start: string; end: string; subject: string; teacher: string | null; room: string | null }[] }[]; source: SchoolSource }
 export interface SchoolAttendance { month: string; records: { date: string; period: number | null; status: AttendanceStatus; note: string | null }[]; counts: Record<AttendanceStatus, number>; source: SchoolSource }
 export interface SchoolAnnouncementItem { id: string; title: string; body: string; titleAr: string | null; bodyAr: string | null; audience: string; publishAt: string; expiresAt: string | null }
 export interface SchoolAnnouncements { announcements: SchoolAnnouncementItem[]; source: SchoolSource }
-export interface ParentNotificationItem { id: string; studentId: string; kind: 'absence' | 'late' | 'announcement'; date: string | null; title: string; body: string; read: boolean; createdAt: string }
+export type FeeStatus = 'due' | 'overdue' | 'paid' | 'waived';
+export interface FeeTotals { total: number; paid: number; waived: number; remaining: number; overdue: number }
+export interface SchoolFees { currency: string; totals: FeeTotals; next: { id: string; planName: string; number: number; amount: number; dueDate: string; status: FeeStatus } | null; plans: { name: string; academicYear: string | null; totals: FeeTotals; instalments: { id: string; number: number; amount: number; dueDate: string; status: FeeStatus; paidDate: string | null; receiptRef: string | null; hasReceipt: boolean; note: string | null }[] }[]; source: SchoolSource }
+export interface ParentNotificationItem { id: string; studentId: string; kind: 'absence' | 'late' | 'announcement' | 'fee_due'; date: string | null; title: string; body: string; read: boolean; createdAt: string }
 const S = (id: string) => `/api/parents/school/learners/${encodeURIComponent(id)}`;
 export const schoolApi = {
   overview: (id: string) => apiRequest<SchoolOverview>('GET', S(id)),
   timetable: (id: string) => apiRequest<SchoolTimetable>('GET', `${S(id)}/timetable`),
   attendance: (id: string, month?: string) => apiRequest<SchoolAttendance>('GET', `${S(id)}/attendance${month ? `?month=${encodeURIComponent(month)}` : ''}`),
   announcements: (id: string) => apiRequest<SchoolAnnouncements>('GET', `${S(id)}/announcements`),
+  fees: (id: string) => apiRequest<SchoolFees>('GET', `${S(id)}/fees`),
   notifications: () => apiRequest<{ notifications: ParentNotificationItem[]; unread: number }>('GET', '/api/parents/school/notifications'),
   markRead: (ids?: string[]) => apiRequest<{ marked: number }>('POST', '/api/parents/school/notifications/read', { ids: ids ?? [] }),
 };
