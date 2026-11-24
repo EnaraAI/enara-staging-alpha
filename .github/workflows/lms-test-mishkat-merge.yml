@@ -1,0 +1,38 @@
+# Mishkat engine Step B (owner go, 24 Nov 2026): learned merge of the trained scorer's marks and v3b's marks.
+# MODEL-MARKED: development only. CPU, no secrets, no lms-test calls. Numbers only to claude/tutor-lms-mishkat-merge-results.
+name: lms-test Mishkat merge experiment
+on:
+  push:
+    branches: ['claude/tutor-lms-dscompare-run']
+    paths: ['deploy/lms-test/mishkat/merge/**', '.github/workflows/lms-test-mishkat-merge.yml']
+permissions:
+  contents: write
+jobs:
+  merge:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -q numpy scikit-learn
+      - name: Inputs (numbers only)
+        run: |
+          git fetch -q --depth 1 origin claude/tutor-lms-mishkat && git worktree add -q mk FETCH_HEAD
+          for l in ar en; do
+            git fetch -q --depth 1 origin claude/tutor-lms-mishkat-results-$l || continue
+            git show FETCH_HEAD:report.json > report-$l.json 2>/dev/null || rm -f report-$l.json
+            git log -1 --format="$l scorer run: %s" FETCH_HEAD
+          done
+      - name: Learned merge, 5-fold by question
+        run: |
+          mkdir -p out
+          for l in ar en; do
+            if [ -f report-$l.json ]; then python -I deploy/lms-test/mishkat/merge/merge_experiment.py $l report-$l.json mk/data/mishkat-dev/labels-$l.json out/merge-$l.json 2>&1 | grep -vi warn | tee -a out/merge.log
+            else echo "$l: no scorer report yet (training still running); skipped" | tee -a out/merge.log; fi
+          done
+      - name: Publish (numbers only)
+        run: |
+          cd out && git init -q && git checkout -q -b r && git add . && git -c user.name=github-actions -c user.email=github-actions@users.noreply.github.com commit -qm "Mishkat merge experiment ${GITHUB_SHA::8}"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" r:claude/tutor-lms-mishkat-merge-results
