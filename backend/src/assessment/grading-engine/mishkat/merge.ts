@@ -6,6 +6,9 @@
 //   - Mishkat and v3b 2 or more levels apart on a criterion: flag 'graders_disagree' (the teacher's queue, as other flags).
 //   - Mishkat unavailable, or nothing to do: v3b's grade is returned unchanged (the same object).
 // Totals are recomputed. Confidence, error codes, feedback, strengths/improvements and the other flags stay v3b's.
+// The Mishkat engine (docs/tutor/MISHKAT_ENGINE_PLAN.md, Step A): v3b and the trained scorer together are one engine, "Mishkat". When
+// the scorer scored at least one criterion of the answer (used, or kept v3b's at a boundary), the grade records one engine id,
+// `<scorer version>+v3b` (engineId). Otherwise the grade is plain v3b and has no engine id.
 import type { OpenGrade, FlagReason } from '../open';
 import type { OpenItem, CriterionScore } from '../graders/domains';
 import type { MishkatResult } from './client';
@@ -15,6 +18,9 @@ export const BOUNDARY_BAND = 0.15;
 export const DISAGREE_LEVELS = 2;
 export const MISHKAT_REASON = 'scored by Mishkat (trained scorer)';
 export const BOUNDARY_REASON = 'mishkat_boundary';
+export const RUBRIC_VERSION = 'v3b';
+/** One id for the whole engine: the trained scorer's bundle version and the rubric v3b runs with. */
+export const engineId = (scorerVersion: string): string => `${scorerVersion}+${RUBRIC_VERSION}`;
 
 export interface MishkatLog {
   status: 'used' | 'unchanged' | 'unavailable' | 'not_eligible';
@@ -37,6 +43,7 @@ export function mergeMishkat(grade: OpenGrade, m: MishkatResult, ctx: { item: Pi
   if (!target || !grade.grader.startsWith('model:') || !grade.criterionScores.length) return { grade, log: { ...log, status: 'not_eligible' } };
   if (m.status !== 'ok') return { grade, log: { ...log, status: 'unavailable', reason: m.reason } };
   log.version = m.version;
+  const engine = engineId(m.version);
   const byId = new Map(grade.criterionScores.map((s) => [s.criterionId, s]));
   const replaced = new Map<string, { score: CriterionScore; v3b: number }>();
   const boundary = new Set<string>();
@@ -50,7 +57,7 @@ export function mergeMishkat(grade: OpenGrade, m: MishkatResult, ctx: { item: Pi
     replaced.set(c, { v3b: v3b.points, score: { criterionId: c, levelId: `p${rounded}`, points: rounded, scoredBy: 'mishkat', rule: `mishkat@${m.version}`, reason: MISHKAT_REASON } });
     log.used.push(c);
   }
-  if (!replaced.size && !boundary.size && !log.disagree.length) return { grade, log };
+  if (!replaced.size && !boundary.size && !log.disagree.length) return { grade, log }; // the scorer had nothing to say: plain v3b
   log.status = replaced.size ? 'used' : 'unchanged';
   const criterionScores: CriterionScore[] = grade.criterionScores.map((s) =>
     replaced.get(s.criterionId)?.score ?? (s.scoredBy ? s : { ...s, scoredBy: 'model' as const, ...(boundary.has(s.criterionId) ? { reason: BOUNDARY_REASON } : {}) }));
@@ -61,7 +68,7 @@ export function mergeMishkat(grade: OpenGrade, m: MishkatResult, ctx: { item: Pi
   });
   const flagReasons: FlagReason[] = log.disagree.length && !grade.flagReasons.includes('graders_disagree') ? [...grade.flagReasons, 'graders_disagree'] : grade.flagReasons;
   return {
-    grade: { ...grade, criterionScores, criteria, points: criterionScores.reduce((n, s) => n + s.points, 0), flagReasons, flagged: flagReasons.length > 0 },
+    grade: { ...grade, engine, criterionScores, criteria, points: criterionScores.reduce((n, s) => n + s.points, 0), flagReasons, flagged: flagReasons.length > 0 },
     log,
   };
 }

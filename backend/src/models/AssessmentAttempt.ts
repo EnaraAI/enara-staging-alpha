@@ -36,6 +36,8 @@ export interface IAttemptAnswer {
   // Why the engine sent this answer to the teacher (low_confidence, runs_disagree, near_pass_mark, model_unavailable, ...).
   flagReasons?: string[];
   grader?: string;
+  // The Mishkat engine id (`<scorer version>+v3b`) when the answer was graded by the Mishkat engine (switch mishkatSplit).
+  engine?: string;
   feedbackText?: string;
   // The learner's answer to an engine question in plain words (option texts, not ids). Their own data: removed with them.
   answerText?: string;
@@ -179,6 +181,7 @@ const attemptAnswerSchema = new Schema<IAttemptAnswer>(
     flagged: Boolean,
     flagReasons: { type: [String], default: undefined },
     grader: String,
+    engine: { type: String, maxlength: 120 },
     feedbackText: { type: String, maxlength: 4000 },
     answerText: { type: String, maxlength: 4000 },
     teacherOverride: {

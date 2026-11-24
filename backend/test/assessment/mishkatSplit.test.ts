@@ -79,8 +79,11 @@ describe('merge (pure)', () => {
     expect(g.organisation).toMatchObject({ points: 1, scoredBy: 'model' });
     expect(grade.points).toBe(2 + 2 + 1 + 1 + 2);
     expect(grade.criterionScores.find((s) => s.criterionId === 'grammar_accuracy')).toMatchObject({ levelId: 'p2', points: 2, scoredBy: 'mishkat' });
-    expect({ ...grade, criteria: undefined, criterionScores: undefined, points: undefined }).toEqual({ ...before, criteria: undefined, criterionScores: undefined, points: undefined });
+    expect({ ...grade, criteria: undefined, criterionScores: undefined, points: undefined, engine: undefined }).toEqual({ ...before, criteria: undefined, criterionScores: undefined, points: undefined });
     expect(grade.flagged).toBe(false);
+    // One engine: the grade records the Mishkat engine id (scorer version + the v3b rubric).
+    expect(grade.engine).toBe('en-2026.11.1+v3b');
+    expect(before.engine).toBeUndefined();
   });
   it('clamps below zero and above the max', () => {
     expect(roundScore(-0.4, 2)).toBe(0);
@@ -94,6 +97,7 @@ describe('merge (pure)', () => {
     expect(log.boundary).toEqual(['grammar_accuracy']);
     expect(log.used).toEqual(['mechanics']);
     expect(grade.criteria.find((c) => c.code === 'grammar_accuracy')).toMatchObject({ points: 1, scoredBy: 'model', reason: 'mishkat_boundary' });
+    expect(grade.engine).toBe('en-2026.11.1+v3b');
   });
   it('2 or more levels apart: flagged graders_disagree for the teacher', () => {
     const { grade, log } = mergeMishkat(v3b({ ...v3bPoints, grammar_accuracy: 0 }), ok({ grammar_accuracy: 2.0 }), { item: essay, maxByCriterion: max });
@@ -107,6 +111,7 @@ describe('merge (pure)', () => {
     const before = v3b();
     const r = mergeMishkat(before, { status: 'unavailable', reason: 'timeout' }, { item: essay, maxByCriterion: max });
     expect(r.grade).toBe(before);
+    expect(r.grade.engine).toBeUndefined();
     expect(r.log).toMatchObject({ status: 'unavailable', reason: 'timeout' });
   });
   it('criteria the service does not list stay v3b (even with a score sent for them)', () => {
@@ -195,6 +200,7 @@ describe('in the engine (gradeOpenAnswer)', () => {
     expect(calls).toEqual(prompts);
     expect(fetchMock).not.toHaveBeenCalled();
     expect(off.criteria.every((c) => !('scoredBy' in c))).toBe(true);
+    expect('engine' in off).toBe(false);
   });
   it('switch on: Mishkat called once in parallel, its criteria replace v3b; the v3b prompts are unchanged', async () => {
     process.env.ENARA_ENGINE_V2 = 'assessGrading';
@@ -211,6 +217,7 @@ describe('in the engine (gradeOpenAnswer)', () => {
     expect(g.criteria.filter((c) => c.scoredBy === 'mishkat').map((c) => c.code)).toEqual(['grammar_accuracy', 'vocabulary_range', 'mechanics']);
     expect(g.points).toBe(2 + 2 + 2 + 1 + 1);
     expect(g.feedback).toBe('Good. Add one linking word.');
+    expect(g.engine).toBe('en-1+v3b');
   });
   it('switch on but Mishkat down or not configured: today\'s v3b result', async () => {
     process.env.ENARA_ENGINE_V2 = 'assessGrading';
