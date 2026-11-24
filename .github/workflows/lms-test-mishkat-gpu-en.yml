@@ -1,0 +1,37 @@
+# Owner, 24 Nov 2026 3:35 PM ("Yes"): English run 10 (ELLIPSE 2,500 + ASAP 2.0 + PERSUADE, no cap, frozen base encoder) on a Modal
+# GPU instead of hours on CPU. Same train_mishkat.py; numbers only to claude/tutor-lms-mishkat-results-en. A10G, cap 30 min.
+name: lms-test Mishkat English on GPU
+on:
+  push:
+    branches: ['claude/tutor-lms-dscompare-run']
+    paths: ['deploy/lms-test/mishkat/gpu-en.txt']
+permissions:
+  contents: write
+jobs:
+  gpu:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    env:
+      MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+      MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - name: Data (model-marked) and today's v3b numbers on the human-scored essays
+        run: |
+          git fetch -q --depth 1 origin claude/tutor-lms-mishkat && git worktree add -q mk FETCH_HEAD
+          git fetch -q --depth 1 origin claude/tutor-lms-recal-results && git show FETCH_HEAD:summary.json > v3b-human.json
+      - name: Train and evaluate on a Modal GPU (frozen base encoder, stage 1 with no cap)
+        env: { MK_EVAL_DATA: '${{ github.workspace }}/mk/data/mishkat-dev', MK_EVAL_V3B: '${{ github.workspace }}/v3b-human.json' }
+        run: |
+          pip install -q modal
+          modal run deploy/lms-test/mishkat/ft/eval_en.py --run-id base --pre-max 0 --out-dir out
+      - name: Publish (numbers only)
+        if: always()
+        run: |
+          B=claude/tutor-lms-mishkat-results-en; [ -f out/results/report.json ] || B="$B-failed"
+          P="$RUNNER_TEMP/pub"; mkdir -p "$P"; cp out/results/report.json out/train.log out/eval-cost.json "$P/" 2>/dev/null || true
+          cd "$P" && git init -q && git checkout -q -b r && git add -A && git -c user.name=github-actions -c user.email=github-actions@users.noreply.github.com commit -qm "Mishkat training en GPU ${GITHUB_SHA::8}"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" "r:$B"
