@@ -1,0 +1,75 @@
+{
+ "runId": "20261124-828e2db",
+ "base": "microsoft/deberta-v3-base",
+ "gpu": "A10G",
+ "assumedUsdPerGpuHour": 1.1,
+ "timeoutCapMinutes": 50,
+ "capUsd": 0.92,
+ "gpuSeconds": 902.5,
+ "estimatedUsd": 0.276,
+ "precision": "bf16",
+ "maxTokens": 256,
+ "epochs": 2,
+ "lr": 2e-05,
+ "batch": 16,
+ "valFraction": 0.05,
+ "bestEpoch": 2,
+ "stoppedByBudget": false,
+ "valLossPerEpoch": [
+  {
+   "epoch": 1,
+   "valLoss": 0.15665,
+   "trainLoss": 0.16563,
+   "perTarget": {
+    "task_completion": null,
+    "grammar_accuracy": 0.2646,
+    "vocabulary_range": 0.2388,
+    "organisation": 0.3376,
+    "mechanics": 0.2679,
+    "holistic": 0.0879
+   },
+   "steps": 1701,
+   "partial": false
+  },
+  {
+   "epoch": 2,
+   "valLoss": 0.14286,
+   "trainLoss": 0.1188,
+   "perTarget": {
+    "task_completion": null,
+    "grammar_accuracy": 0.2439,
+    "vocabulary_range": 0.2436,
+    "organisation": 0.2924,
+    "mechanics": 0.2697,
+    "holistic": 0.0747
+   },
+   "steps": 3402,
+   "partial": false
+  }
+ ],
+ "counts": {
+  "perSourceDownloaded": {
+   "ellipse": 3911,
+   "asap2": 17307,
+   "persuade": 15593
+  },
+  "perSourceUsed": {
+   "ellipse": 3911,
+   "asap2": 17307,
+   "persuade": 7429
+  },
+  "excludedTestOverlap": 0,
+  "duplicates": 8164,
+  "empty": 0,
+  "train": 27215,
+  "validation": 1432,
+  "presentTargetsTrain": {
+   "task_completion": 0,
+   "grammar_accuracy": 3707,
+   "vocabulary_range": 3707,
+   "organisation": 3707,
+   "mechanics": 3707,
+   "holistic": 27215
+  }
+ }
+}

@@ -1,0 +1,7922 @@
+{
+ "label": "MODEL-MARKED: development only, not for claims, never for a real school",
+ "lang": "en",
+ "encoder": "deberta-v3-base fine-tuned (20261124-828e2db)",
+ "maxTokens": 256,
+ "stage1Essays": 3000,
+ "enaraLabelled": 495,
+ "ownerCorrections": 0,
+ "evaluation": "5-fold cross-validation by question (every answer tested once, never trained on in its fold)",
+ "types": {
+  "essay": {
+   "answers": 233,
+   "questions": 143,
+   "perCriterion": {
+    "task_completion": {
+     "vsMedian": {
+      "two_stage": {
+       "n": 233,
+       "exact": 0.833,
+       "within1": 0.987,
+       "qwk": 0.539,
+       "bias": 0.01
+      },
+      "stage2_only": {
+       "n": 233,
+       "exact": 0.82,
+       "within1": 0.996,
+       "qwk": 0.594,
+       "bias": -0.03
+      },
+      "stage1_only": {
+       "n": 233,
+       "exact": 0.043,
+       "within1": 0.197,
+       "qwk": 0.0,
+       "bias": -1.76
+      },
+      "v3b_deepseek": {
+       "n": 233,
+       "exact": 0.931,
+       "within1": 1.0,
+       "qwk": 0.863,
+       "bias": 0.02
+      }
+     },
+     "vsSonnetOpusAgreed": {
+      "two_stage": {
+       "n": 213,
+       "exact": 0.85,
+       "within1": 0.991,
+       "qwk": 0.551,
+       "bias": 0.0
+      },
+      "stage2_only": {
+       "n": 213,
+       "exact": 0.85,
+       "within1": 0.995,
+       "qwk": 0.615,
+       "bias": -0.03
+      },
+      "stage1_only": {
+       "n": 213,
+       "exact": 0.038,
+       "within1": 0.164,
+       "qwk": 0.0,
+       "bias": -1.8
+      },
+      "v3b_deepseek": {
+       "n": 213,
+       "exact": 0.925,
+       "within1": 1.0,
+       "qwk": 0.827,
+       "bias": 0.02
+      }
+     },
+     "labelSpread": {
+      "0": 10,
+      "1": 36,
+      "2": 187
+     }
+    },
+    "grammar_accuracy": {
+     "vsMedian": {
+      "two_stage": {
+       "n": 233,
+       "exact": 0.867,
+       "within1": 1.0,
+       "qwk": 0.719,
+       "bias": 0.0
+      },
+      "stage2_only": {
+       "n": 233,
+       "exact": 0.88,
+       "within1": 1.0,
+       "qwk": 0.747,
+       "bias": 0.0
+      },
+      "stage1_only": {
+       "n": 233,
+       "exact": 0.661,
+       "within1": 0.961,
+       "qwk": 0.506,
+       "bias": -0.34
+      },
+      "v3b_deepseek": {
+       "n": 233,
+       "exact": 0.906,
+       "within1": 1.0,
+       "qwk": 0.809,
+       "bias": -0.09
+      }
+     },
+     "vsSonnetOpusAgreed": {
+      "two_stage": {
+       "n": 211,
+       "exact": 0.886,
+       "within1": 1.0,
+       "qwk": 0.749,
+       "bias": -0.03
+      },
+      "stage2_only": {
+       "n": 211,
+       "exact": 0.905,
+       "within1": 1.0,
+       "qwk": 0.791,
+       "bias": -0.03
+      },
+      "stage1_only": {
+       "n": 211,
+       "exact": 0.654,
+       "within1": 0.957,
+       "qwk": 0.488,
+       "bias": -0.36
+      },
+      "v3b_deepseek": {
+       "n": 211,
+       "exact": 0.896,
+       "within1": 1.0,
+       "qwk": 0.781,
+       "bias": -0.09
+      }
+     },
+     "labelSpread": {
+      "0": 0,
+      "1": 90,
+      "2": 143
+     }
+    },
+    "vocabulary_range": {
+     "vsMedian": {
+      "two_stage": {
+       "n": 233,
+       "exact": 0.85,
+       "within1": 1.0,
+       "qwk": 0.85,
+       "bias": -0.01
+      },
+      "stage2_only": {
+       "n": 233,
+       "exact": 0.888,
+       "within1": 1.0,
+       "qwk": 0.891,
+       "bias": -0.03
+      },
+      "stage1_only": {
+       "n": 233,
+       "exact": 0.687,
+       "within1": 0.983,
+       "qwk": 0.609,
+       "bias": 0.13
+      },
+      "v3b_deepseek": {
+       "n": 233,
+       "exact": 0.82,
+       "within1": 1.0,
+       "qwk": 0.816,
+       "bias": 0.14
+      }
+     },
+     "vsSonnetOpusAgreed": {
+      "two_stage": {
+       "n": 202,
+       "exact": 0.881,
+       "within1": 1.0,
+       "qwk": 0.887,
+       "bias": 0.02
+      },
+      "stage2_only": {
+       "n": 202,
+       "exact": 0.921,
+       "within1": 1.0,
+       "qwk": 0.926,
+       "bias": 0.0
+      },
+      "stage1_only": {
+       "n": 202,
+       "exact": 0.688,
+       "within1": 0.98,
+       "qwk": 0.623,
+       "bias": 0.16
+      },
+      "v3b_deepseek": {
+       "n": 202,
+       "exact": 0.792,
+       "within1": 1.0,
+       "qwk": 0.797,
+       "bias": 0.16
+      }
+     },
+     "labelSpread": {
+      "0": 39,
+      "1": 99,
+      "2": 95
+     }
+    },
+    "organisation": {
+     "vsMedian": {
+      "two_stage": {
+       "n": 233,
+       "exact": 0.803,
+       "within1": 0.991,
+       "qwk": 0.733,
+       "bias": 0.02
+      },
+      "stage2_only": {
+       "n": 233,
+       "exact": 0.794,
+       "within1": 0.996,
+       "qwk": 0.739,
+       "bias": -0.0
+      },
+      "stage1_only": {
+       "n": 233,
+       "exact": 0.498,
+       "within1": 0.991,
+       "qwk": 0.288,
+       "bias": -0.24
+      },
+      "v3b_deepseek": {
+       "n": 233,
+       "exact": 0.88,
+       "within1": 1.0,
+       "qwk": 0.854,
+       "bias": -0.04
+      }
+     },
+     "vsSonnetOpusAgreed": {
+      "two_stage": {
+       "n": 182,
+       "exact": 0.852,
+       "within1": 0.989,
+       "qwk": 0.755,
+       "bias": 0.02
+      },
+      "stage2_only": {
+       "n": 182,
+       "exact": 0.841,
+       "within1": 0.995,
+       "qwk": 0.77,
+       "bias": -0.01
+      },
+      "stage1_only": {
+       "n": 182,
+       "exact": 0.478,
+       "within1": 0.995,
+       "qwk": 0.266,
+       "bias": -0.29
+      },
+      "v3b_deepseek": {
+       "n": 182,
+       "exact": 0.846,
+       "within1": 1.0,
+       "qwk": 0.802,
+       "bias": -0.05
+      }
+     },
+     "labelSpread": {
+      "0": 23,
+      "1": 94,
+      "2": 116
+     }
+    },
+    "mechanics": {
+     "vsMedian": {
+      "two_stage": {
+       "n": 233,
+       "exact": 0.906,
+       "within1": 1.0,
+       "qwk": 0.513,
+       "bias": 0.03
+      },
+      "stage2_only": {
+       "n": 233,
+       "exact": 0.931,
+       "within1": 1.0,
+       "qwk": 0.657,
+       "bias": 0.02
+      },
+      "stage1_only": {
+       "n": 233,
+       "exact": 0.901,
+       "within1": 0.996,
+       "qwk": 0.482,
+       "bias": 0.01
+      },
+      "v3b_deepseek": {
+       "n": 233,
+       "exact": 0.76,
+       "within1": 1.0,
+       "qwk": 0.436,
+       "bias": -0.23
+      }
+     },
+     "vsSonnetOpusAgreed": {
+      "two_stage": {
+       "n": 223,
+       "exact": 0.924,
+       "within1": 1.0,
+       "qwk": 0.473,
+       "bias": 0.0
+      },
+      "stage2_only": {
+       "n": 223,
+       "exact": 0.946,
+       "within1": 1.0,
+       "qwk": 0.637,
+       "bias": 0.0
+      },
+      "stage1_only": {
+       "n": 223,
+       "exact": 0.924,
+       "within1": 1.0,
+       "qwk": 0.567,
+       "bias": -0.02
+      },
+      "v3b_deepseek": {
+       "n": 223,
+       "exact": 0.749,
+       "within1": 1.0,
+       "qwk": 0.336,
+       "bias": -0.24
+      }
+     },
+     "labelSpread": {
+      "0": 1,
+      "1": 25,
+      "2": 207
+     }
+    }
+   },
+   "lengthTests": {
+    "truncation": {
+     "n": 119,
+     "meanDropGrammarSpelling": 0.001,
+     "pass": true
+    },
+    "padding": {
+     "n": 233,
+     "meanRiseGrammarSpelling": -0.021,
+     "pass": true
+    }
+   },
+   "lengthTests_stage2only": {
+    "truncation": {
+     "n": 119,
+     "meanDropGrammarSpelling": 0.053,
+     "pass": true
+    },
+    "padding": {
+     "n": 233,
+     "meanRiseGrammarSpelling": -0.02,
+     "pass": true
+    }
+   },
+   "lengthAugmentation": false,
+   "passesBar": {
+    "task_completion": false,
+    "grammar_accuracy": false,
+    "vocabulary_range": true,
+    "organisation": false,
+    "mechanics": true
+   },
+   "humanRecheck": {
+    "two_stage": {
+     "grammar_accuracy": {
+      "n": 200,
+      "exact": 0.615,
+      "within1": 1.0,
+      "qwk": 0.421,
+      "bias": 0.1
+     },
+     "vocabulary_range": {
+      "n": 200,
+      "exact": 0.67,
+      "within1": 0.99,
+      "qwk": 0.467,
+      "bias": -0.11
+     },
+     "organisation": {
+      "n": 200,
+      "exact": 0.595,
+      "within1": 0.99,
+      "qwk": 0.297,
+      "bias": 0.17
+     },
+     "mechanics": {
+      "n": 200,
+      "exact": 0.62,
+      "within1": 1.0,
+      "qwk": 0.412,
+      "bias": 0.18
+     }
+    },
+    "stage1_only": {
+     "grammar_accuracy": {
+      "n": 200,
+      "exact": 0.67,
+      "within1": 1.0,
+      "qwk": 0.596,
+      "bias": 0.04
+     },
+     "vocabulary_range": {
+      "n": 200,
+      "exact": 0.67,
+      "within1": 1.0,
+      "qwk": 0.495,
+      "bias": -0.08
+     },
+     "organisation": {
+      "n": 200,
+      "exact": 0.655,
+      "within1": 0.995,
+      "qwk": 0.534,
+      "bias": -0.02
+     },
+     "mechanics": {
+      "n": 200,
+      "exact": 0.67,
+      "within1": 0.99,
+      "qwk": 0.487,
+      "bias": -0.02
+     }
+    },
+    "v3b_deepseek": {
+     "grammar_accuracy": {
+      "n": 200,
+      "exact": 0.6,
+      "within1": 1,
+      "qwk": 0.113
+     },
+     "vocabulary_range": {
+      "n": 200,
+      "exact": 0.64,
+      "within1": 1,
+      "qwk": 0.207
+     },
+     "organisation": {
+      "n": 200,
+      "exact": 0.535,
+      "within1": 0.965,
+      "qwk": 0.33
+     },
+     "mechanics": {
+      "n": 200,
+      "exact": 0.6,
+      "within1": 1,
+      "qwk": 0.132
+     }
+    }
+   }
+  },
+  "short_answer": {
+   "answers": 262,
+   "questions": 114,
+   "perCriterion": {
+    "task_completion": {
+     "vsMedian": {
+      "two_stage": {
+       "n": 262,
+       "exact": 0.553,
+       "within1": 0.985,
+       "qwk": 0.379,
+       "bias": -0.03
+      },
+      "stage2_only": {
+       "n": 262,
+       "exact": 0.607,
+       "within1": 0.992,
+       "qwk": 0.499,
+       "bias": -0.03
+      },
+      "stage1_only": {
+       "n": 262,
+       "exact": 0.145,
+       "within1": 0.389,
+       "qwk": 0.0,
+       "bias": -1.47
+      },
+      "v3b_deepseek": {
+       "n": 262,
+       "exact": 0.802,
+       "within1": 1.0,
+       "qwk": 0.779,
+       "bias": 0.18
+      }
+     },
+     "vsSonnetOpusAgreed": {
+      "two_stage": {
+       "n": 239,
+       "exact": 0.561,
+       "within1": 0.983,
+       "qwk": 0.4,
+       "bias": -0.02
+      },
+      "stage2_only": {
+       "n": 239,
+       "exact": 0.611,
+       "within1": 0.992,
+       "qwk": 0.517,
+       "bias": -0.01
+      },
+      "stage1_only": {
+       "n": 239,
+       "exact": 0.155,
+       "within1": 0.372,
+       "qwk": 0.0,
+       "bias": -1.47
+      },
+      "v3b_deepseek": {
+       "n": 239,
+       "exact": 0.782,
+       "within1": 1.0,
+       "qwk": 0.763,
+       "bias": 0.2
+      }
+     },
+     "labelSpread": {
+      "0": 38,
+      "1": 64,
+      "2": 160
+     }
+    },
+    "grammar_accuracy": {
+     "vsMedian": {
+      "two_stage": {
+       "n": 262,
+       "exact": 0.996,
+       "within1": 1.0,
+       "qwk": 0.0,
+       "bias": 0.0
+      },
+      "stage2_only": {
+       "n": 262,
+       "exact": 0.996,
+       "within1": 1.0,
+       "qwk": 0.0,
+       "bias": 0.0
+      },
+      "stage1_only": {
+       "n": 262,
+       "exact": 0.687,
+       "within1": 1.0,
+       "qwk": 0.016,
+       "bias": -0.31
+      },
+      "v3b_deepseek": {
+       "n": 262,
+       "exact": 0.973,
+       "within1": 1.0,
+       "qwk": -0.007,
+       "bias": -0.02
+      }
+     },
+     "vsSonnetOpusAgreed": {
+      "two_stage": {
+       "n": 262,
+       "exact": 0.996,
+       "within1": 1.0,
+       "qwk": 0.0,
+       "bias": 0.0
+      },
+      "stage2_only": {
+       "n": 262,
+       "exact": 0.996,
+       "within1": 1.0,
+       "qwk": 0.0,
+       "bias": 0.0
+      },
+      "stage1_only": {
+       "n": 262,
+       "exact": 0.687,
+       "within1": 1.0,
+       "qwk": 0.016,
+       "bias": -0.31
+      },
+      "v3b_deepseek": {
+       "n": 262,
+       "exact": 0.973,
+       "within1": 1.0,
+       "qwk": -0.007,
+       "bias": -0.02
+      }
+     },
+     "labelSpread": {
+      "0": 1,
+      "1": 261
+     }
+    },
+    "mechanics": {
+     "vsMedian": {
+      "two_stage": {
+       "n": 262,
+       "exact": 0.996,
+       "within1": 1.0,
+       "qwk": 0.0,
+       "bias": -0.0
+      },
+      "stage2_only": {
+       "n": 262,
+       "exact": 1.0,
+       "within1": 1.0,
+       "qwk": null,
+       "bias": 0.0
+      },
+      "stage1_only": {
+       "n": 262,
+       "exact": 0.908,
+       "within1": 1.0,
+       "qwk": 0.0,
+       "bias": -0.09
+      },
+      "v3b_deepseek": {
+       "n": 262,
+       "exact": 0.981,
+       "within1": 1.0,
+       "qwk": 0.0,
+       "bias": -0.02
+      }
+     },
+     "vsSonnetOpusAgreed": {
+      "two_stage": {
+       "n": 261,
+       "exact": 0.996,
+       "within1": 1.0,
+       "qwk": 0.0,
+       "bias": -0.0
+      },
+      "stage2_only": {
+       "n": 261,
+       "exact": 1.0,
+       "within1": 1.0,
+       "qwk": null,
+       "bias": 0.0
+      },
+      "stage1_only": {
+       "n": 261,
+       "exact": 0.908,
+       "within1": 1.0,
+       "qwk": 0.0,
+       "bias": -0.09
+      },
+      "v3b_deepseek": {
+       "n": 261,
+       "exact": 0.981,
+       "within1": 1.0,
+       "qwk": 0.0,
+       "bias": -0.02
+      }
+     },
+     "labelSpread": {
+      "0": 0,
+      "1": 262
+     }
+    }
+   },
+   "lengthTests": {
+    "shortCorrectNotScoredDown": {
+     "n": 160,
+     "share": 0.994,
+     "pass": true
+    }
+   },
+   "lengthTests_stage2only": {
+    "shortCorrectNotScoredDown": {
+     "n": 160,
+     "share": 1.0,
+     "pass": true
+    }
+   },
+   "lengthAugmentation": false,
+   "passesBar": {
+    "task_completion": false,
+    "grammar_accuracy": true,
+    "mechanics": true
+   }
+  }
+ },
+ "recipe": "two_stage",
+ "oof": {
+  "essay": {
+   "language-en-16-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 0,
+    "organisation": 1,
+    "mechanics": 1
+   },
+   "language-en-16-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 0,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "language-en-16-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "language-en-17-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 0,
+    "organisation": 1,
+    "mechanics": 1
+   },
+   "language-en-17-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "language-en-17-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "language-en-18-weak": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 0,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "language-en-18-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "language-en-18-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "language-en-19-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 0,
+    "organisation": 0,
+    "mechanics": 1
+   },
+   "language-en-19-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 0,
+    "mechanics": 2
+   },
+   "language-en-19-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "language-en-20-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 0,
+    "organisation": 1,
+    "mechanics": 1
+   },
+   "language-en-20-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 1
+   },
+   "language-en-20-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "language-en-21-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 0,
+    "organisation": 0,
+    "mechanics": 1
+   },
+   "language-en-21-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "language-en-21-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "language-en-22-weak": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 0,
+    "organisation": 0,
+    "mechanics": 2
+   },
+   "language-en-22-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "language-en-22-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "language-en-23-weak": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 0,
+    "organisation": 1,
+    "mechanics": 1
+   },
+   "language-en-23-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "language-en-23-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "language-en-24-weak": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "language-en-24-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "language-en-24-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "language-en-25-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 0,
+    "organisation": 0,
+    "mechanics": 1
+   },
+   "language-en-25-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "language-en-25-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "language-en-26-weak": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 0,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "language-en-26-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "language-en-26-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "language-en-27-weak": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 0,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "language-en-27-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "language-en-27-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "language-en-28-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 0,
+    "organisation": 1,
+    "mechanics": 1
+   },
+   "language-en-28-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "language-en-28-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "language-en-29-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 0,
+    "organisation": 1,
+    "mechanics": 1
+   },
+   "language-en-29-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "language-en-29-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "language-en-30-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 0,
+    "organisation": 0,
+    "mechanics": 2
+   },
+   "language-en-30-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "language-en-30-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "science-en-16-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 0,
+    "organisation": 0,
+    "mechanics": 2
+   },
+   "science-en-16-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "science-en-16-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "science-en-17-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "science-en-17-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "science-en-17-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "science-en-18-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 0,
+    "organisation": 1,
+    "mechanics": 1
+   },
+   "science-en-18-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 0,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "science-en-18-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 1
+   },
+   "science-en-19-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 1
+   },
+   "science-en-19-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "science-en-19-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "science-en-20-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 0,
+    "mechanics": 1
+   },
+   "science-en-20-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "science-en-20-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "science-en-21-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 0,
+    "organisation": 1,
+    "mechanics": 1
+   },
+   "science-en-21-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "science-en-21-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "science-en-22-weak": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "science-en-22-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "science-en-22-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "science-en-23-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 0,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "science-en-23-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "science-en-23-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "science-en-24-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "science-en-24-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "science-en-24-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "science-en-25-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 0,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "science-en-25-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "science-en-25-strong": {
+    "task_completion": 1,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "science-en-26-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 0,
+    "mechanics": 2
+   },
+   "science-en-26-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "science-en-26-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "science-en-27-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "science-en-27-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "science-en-27-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "science-en-28-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 0,
+    "organisation": 0,
+    "mechanics": 2
+   },
+   "science-en-28-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "science-en-28-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "science-en-29-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 2,
+    "mechanics": 1
+   },
+   "science-en-29-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "science-en-29-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "science-en-30-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 0,
+    "organisation": 1,
+    "mechanics": 1
+   },
+   "science-en-30-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "science-en-30-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "humanities-en-16-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 0,
+    "organisation": 0,
+    "mechanics": 2
+   },
+   "humanities-en-16-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "humanities-en-16-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "humanities-en-17-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 0,
+    "organisation": 0,
+    "mechanics": 2
+   },
+   "humanities-en-17-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "humanities-en-17-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "humanities-en-18-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 0,
+    "organisation": 0,
+    "mechanics": 2
+   },
+   "humanities-en-18-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "humanities-en-18-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "humanities-en-19-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 0,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "humanities-en-19-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "humanities-en-19-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "humanities-en-20-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 0,
+    "organisation": 0,
+    "mechanics": 2
+   },
+   "humanities-en-20-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "humanities-en-20-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "humanities-en-21-weak": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "humanities-en-21-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "humanities-en-21-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "humanities-en-22-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 0,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "humanities-en-22-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "humanities-en-22-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "humanities-en-23-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 0,
+    "organisation": 0,
+    "mechanics": 2
+   },
+   "humanities-en-23-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "humanities-en-23-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "humanities-en-24-weak": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 0,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "humanities-en-24-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "humanities-en-24-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "humanities-en-25-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 0,
+    "organisation": 0,
+    "mechanics": 2
+   },
+   "humanities-en-25-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "humanities-en-25-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "humanities-en-26-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "humanities-en-26-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "humanities-en-26-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "humanities-en-27-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 0,
+    "organisation": 0,
+    "mechanics": 2
+   },
+   "humanities-en-27-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "humanities-en-27-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "humanities-en-28-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 0,
+    "organisation": 0,
+    "mechanics": 1
+   },
+   "humanities-en-28-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "humanities-en-28-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "humanities-en-29-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 0,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "humanities-en-29-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "humanities-en-29-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "humanities-en-30-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "humanities-en-30-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "humanities-en-30-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-001": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "mk-en-002": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 0,
+    "organisation": 1,
+    "mechanics": 1
+   },
+   "mk-en-003": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "mk-en-004": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 1
+   },
+   "mk-en-005": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "mk-en-006": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "mk-en-007": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "mk-en-008": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "mk-en-009": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-010": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "mk-en-011": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "mk-en-012": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "mk-en-013": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "mk-en-014": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "mk-en-015": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "mk-en-016": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "mk-en-017": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-018": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-019": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-020": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-021": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-022": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-023": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-024": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-025": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-026": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-027": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-028": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "mk-en-029": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-030": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-031": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-032": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-033": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-034": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-035": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-036": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-037": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "mk-en-038": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "mk-en-039": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "mk-en-040": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "mk-en-041": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "mk-en-042": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-043": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-044": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-045": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-046": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-047": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "mk-en-048": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-049": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-050": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 1
+   },
+   "mk-en-051": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "mk-en-052": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "mk-en-053": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-054": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-055": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-056": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-057": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-058": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-059": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-060": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-061": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-062": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-063": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-064": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-065": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-066": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-067": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-068": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-069": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-070": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-071": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-072": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-073": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "mk-en-075": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-076": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "mk-en-077": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-078": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-079": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-080": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "mk-en-081": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-082": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-084": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-085": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "mk-en-086": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-087": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 1,
+    "mechanics": 2
+   },
+   "mk-en-088": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 1,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-089": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-090": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-091": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-092": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 1,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-093": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-094": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-095": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-096": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-097": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-098": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-099": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   },
+   "mk-en-100": {
+    "task_completion": 2,
+    "grammar_accuracy": 2,
+    "vocabulary_range": 2,
+    "organisation": 2,
+    "mechanics": 2
+   }
+  },
+  "short_answer": {
+   "language-en-01-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-01-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 0
+   },
+   "language-en-01-strong": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-02-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-02-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-02-strong": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-03-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-03-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-03-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-04-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-04-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-04-strong": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-05-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-05-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-05-strong": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-06-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-06-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-06-strong": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-07-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-07-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-07-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-08-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-08-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-08-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-09-weak": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-09-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-09-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-10-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-10-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-10-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-11-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-11-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-11-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-12-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-12-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-12-strong": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-13-weak": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-13-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-13-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-14-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-14-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-14-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-15-weak": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-15-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "language-en-15-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-01-weak": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-01-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-01-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-02-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-02-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-02-strong": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-03-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-03-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-03-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-04-weak": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-04-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-04-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-05-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-05-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-05-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-06-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-06-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-06-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-07-weak": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-07-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-07-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-08-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-08-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-08-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-09-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-09-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-09-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-10-weak": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-10-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-10-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-11-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-11-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-11-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-12-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-12-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-12-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-13-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-13-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-14-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-14-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-14-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-15-weak": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-15-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "science-en-15-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-01-weak": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-01-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-01-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-02-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-02-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-02-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-03-weak": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-03-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-03-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-04-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-04-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-04-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-05-weak": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-05-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-05-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-06-weak": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-06-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-06-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-07-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-07-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-07-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-08-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-08-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-08-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-09-weak": {
+    "task_completion": 0,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-09-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-09-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-10-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-10-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-10-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-11-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-11-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-11-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-12-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-12-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-12-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-13-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-13-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-13-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-14-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-14-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-14-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-15-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-15-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "humanities-en-15-strong": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-01-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-01-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-01-strong": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-02-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-02-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-02-strong": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-03-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-03-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-03-strong": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-04-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-04-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-04-strong": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-05-weak": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-05-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-05-strong": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-06-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-06-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-06-strong": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-07-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-07-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-07-strong": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-08-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-08-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-08-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-09-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-09-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-09-strong": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-10-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-10-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-10-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-11-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-11-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-11-strong": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-12-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-12-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-12-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-13-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-13-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-13-strong": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-14-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-14-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-14-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-15-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-15-mid": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-15-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-16-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-16-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-16-strong": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-17-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-17-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-17-strong": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-18-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-18-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-18-strong": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-19-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-19-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-19-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-20-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-20-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-20-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-21-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-21-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-21-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-22-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-22-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-22-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-23-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-23-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-24-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-24-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-24-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-25-weak": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-25-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-25-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-26-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-26-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-26-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-27-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-27-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-27-strong": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-28-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-28-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-28-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-29-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-29-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-29-strong": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-30-weak": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-30-mid": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "listening-en-30-strong": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "mk-en-101": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "mk-en-102": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "mk-en-103": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "mk-en-104": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "mk-en-105": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "mk-en-106": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "mk-en-107": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "mk-en-108": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "mk-en-109": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "mk-en-110": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "mk-en-111": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "mk-en-112": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "mk-en-114": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "mk-en-115": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "mk-en-116": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "mk-en-117": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "mk-en-118": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "mk-en-119": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "mk-en-120": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "mk-en-121": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "mk-en-122": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "mk-en-123": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "mk-en-124": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "mk-en-125": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "mk-en-126": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "mk-en-127": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "mk-en-128": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "mk-en-129": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "mk-en-130": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "mk-en-131": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "mk-en-132": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "mk-en-133": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "mk-en-134": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "mk-en-135": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "mk-en-136": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "mk-en-137": {
+    "task_completion": 1,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "mk-en-138": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "mk-en-139": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   },
+   "mk-en-140": {
+    "task_completion": 2,
+    "grammar_accuracy": 1,
+    "mechanics": 1
+   }
+  }
+ },
+ "compareScores": {
+  "esl7:a41f2131ad3c2": {
+   "task_completion": 1,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:a53c61bfc90aa": {
+   "task_completion": 1,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:ad7a53b934c53": {
+   "task_completion": 1,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:ac66ed3cfd84f": {
+   "task_completion": 1,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:a5166ae8f804a": {
+   "task_completion": 1,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:a5279b2f8d117": {
+   "task_completion": 1,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:a1fe3a1910da9": {
+   "task_completion": 1,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:af5d96ecd92a6": {
+   "task_completion": 1,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:aa1435f702641": {
+   "task_completion": 1,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:a539219680d11": {
+   "task_completion": 1,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:a8971ab91b4b0": {
+   "task_completion": 1,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:a3214de7be8b0": {
+   "task_completion": 1,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:a7c7490bb2b87": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:a7b94a4156230": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:a1c83c5fc5cf3": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:a36f1aaad1594": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:a842a06fe25aa": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:a90157a0316bf": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:aae31cf42c91c": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:af7c0cbbe2e1c": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:a481ad519401f": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:aa026eacec6a9": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:ac287e4ab261b": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:a6419a6f4a1fb": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:a44fef14ccf22": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a4715e5317332": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a57ac63dc4ae4": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a94f861c3b33c": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:aedabfd42c668": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a496bd7ac1381": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:ac551853cc6cb": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a09a7dcb42aac": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a6778b82d992f": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a33d7fe68c3d0": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a28404f06876d": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a61cf17266072": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:aeb1efcb59390": {
+   "task_completion": 2,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 1,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a4e3f8e14590a": {
+   "task_completion": 2,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 1,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a073bcc5b5c2a": {
+   "task_completion": 2,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 1,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a4ceae61d338a": {
+   "task_completion": 2,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 1,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a366fae744a13": {
+   "task_completion": 2,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 1,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a706787f79ddd": {
+   "task_completion": 2,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 1,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:ad757807192d7": {
+   "task_completion": 2,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 1,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a09473eeb08f9": {
+   "task_completion": 2,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 1,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a2700c59a45f7": {
+   "task_completion": 2,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 1,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a78afa0cd2e24": {
+   "task_completion": 2,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 1,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a022679e90d08": {
+   "task_completion": 2,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 1,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a706941fa968e": {
+   "task_completion": 2,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 1,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a2037fbe8ae80": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a4d302bb54a5d": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:add2a9f1ce9cf": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:a47827cdf64f4": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:a2ad5592ffef7": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:ab83865ca1d87": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:aed58e00f4f62": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a78b363ea069d": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:a48b173aa7103": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:a4e08e820f70e": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a190d857cbc5a": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:a1d2ab7f5afb7": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:a0ef7e5905352": {
+   "task_completion": 2,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 1,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a7f0ea4c60b34": {
+   "task_completion": 2,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 1,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a49d3fe91af47": {
+   "task_completion": 2,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 1,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a39c8cad156b9": {
+   "task_completion": 2,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 1,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:aa1693447043d": {
+   "task_completion": 2,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 1,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:afef540008c18": {
+   "task_completion": 2,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 1,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a7f4f791446a3": {
+   "task_completion": 2,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 1,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a1afdcdd0170b": {
+   "task_completion": 2,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 1,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a858abf61467f": {
+   "task_completion": 2,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 1,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a7d8cba47a842": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:a7cf1eeebdd2c": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:af2809fdf143c": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:aee60d88dc891": {
+   "task_completion": 1,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:ac3b3fe1f04b1": {
+   "task_completion": 2,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a53439fb8eb0c": {
+   "task_completion": 1,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:a8687bdf6c3c3": {
+   "task_completion": 2,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a261f3ac6fb22": {
+   "task_completion": 2,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a4aa0266c428f": {
+   "task_completion": 2,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a94f8177cff1d": {
+   "task_completion": 2,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a5edfbffc3b45": {
+   "task_completion": 2,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:ac1f560bd8f6c": {
+   "task_completion": 2,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:aef41c1976d75": {
+   "task_completion": 2,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a330abb7f2b5e": {
+   "task_completion": 2,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a96aca4770c41": {
+   "task_completion": 1,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:abf4ff53bfc77": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:af70c980faccb": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:ad15d5abadc36": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:ac6e1edd0efe1": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:a3064c36c83a1": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:a9de39e578586": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:a67ed6ec3ee1d": {
+   "task_completion": 2,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 1,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a2684c9276597": {
+   "task_completion": 2,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 1,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a4933e0d84adc": {
+   "task_completion": 2,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 1,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a0b84bc133dbb": {
+   "task_completion": 2,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 1,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "esl7:a0109cb000d77": {
+   "task_completion": 2,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 1,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "esl7:a587878ebd6c9": {
+   "task_completion": 2,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 1,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "phase3:en-fractions/en-f-1": {
+   "task_completion": 1,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 1,
+   "organisation": 2,
+   "mechanics": 2
+  },
+  "phase3:en-fractions/en-f-2": {
+   "task_completion": 1,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "phase3:en-fractions/en-f-3": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "phase3:en-fractions/en-f-4": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 1,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "phase3:en-fractions/en-f-5": {
+   "task_completion": 1,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 0,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "phase3:en-fractions/en-f-6": {
+   "task_completion": 1,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 1,
+   "organisation": 1,
+   "mechanics": 1
+  },
+  "phase3:en-fractions/en-f-7": {
+   "task_completion": 1,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 0,
+   "organisation": 0,
+   "mechanics": 2
+  },
+  "phase3:en-fractions/en-f-8": {
+   "task_completion": 2,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 2,
+   "organisation": 2,
+   "mechanics": 2
+  },
+  "phase3:en-ice/en-i-1": {
+   "task_completion": 2,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 2,
+   "organisation": 2,
+   "mechanics": 2
+  },
+  "phase3:en-ice/en-i-2": {
+   "task_completion": 1,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 1,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "phase3:en-ice/en-i-3": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 0,
+   "mechanics": 1
+  },
+  "phase3:en-ice/en-i-4": {
+   "task_completion": 1,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 0,
+   "organisation": 0,
+   "mechanics": 1
+  },
+  "phase3:en-ice/en-i-5": {
+   "task_completion": 2,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 1,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "phase3:en-ice/en-i-6": {
+   "task_completion": 2,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 1,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "phase3:en-ice/en-i-7": {
+   "task_completion": 2,
+   "grammar_accuracy": 2,
+   "vocabulary_range": 1,
+   "organisation": 1,
+   "mechanics": 2
+  },
+  "phase3:en-ice/en-i-8": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "vocabulary_range": 0,
+   "organisation": 0,
+   "mechanics": 2
+  },
+  "a1a2:R7-070": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R3-125": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R4-122": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:a1a2-070": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:a1a2-078": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R7-105": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R12-127": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R3-048": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R8-093": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R7-085": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:a1a2-053": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:a1a2-090": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R5-146": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R5-109": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R6-018": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R12-141": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R5-009": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:a1a2-096": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R4-106": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R5-020": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R12-113": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R12-118": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:a1a2-071": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:a1a2-061": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R5-122": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R12-099": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R4-024": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R7-118": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R8-130": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R5-029": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R12-148": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R7-133": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R8-003": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R4-092": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R12-117": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R8-148": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R3-144": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R12-102": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R8-100": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R4-134": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R3-096": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R7-054": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R7-029": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R6-029": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R7-146": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R7-015": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R7-089": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R4-040": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R4-130": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R12-135": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:a1a2-067": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R7-141": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R12-149": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:a1a2-089": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R4-139": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R4-029": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R3-034": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R12-104": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R8-135": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R3-149": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R3-109": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:a1a2-085": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R3-104": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R3-108": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R12-134": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R3-030": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R4-133": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R8-150": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R12-121": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:a1a2-063": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R3-072": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R7-025": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R3-029": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R7-079": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R4-105": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R7-110": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R12-133": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R12-105": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R3-068": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:a1a2-088": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:a1a2-064": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R7-055": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R6-006": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R12-083": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R3-045": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R3-085": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R8-094": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R12-126": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R8-141": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R4-053": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R8-055": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:a1a2-095": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R6-020": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R7-058": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:a1a2-098": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R8-114": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R4-039": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R3-123": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:a1a2-059": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R8-128": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R3-076": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R12-085": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R3-053": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R4-049": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R7-024": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R6-039": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:a1a2-057": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R8-031": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R5-063": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R5-113": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R3-010": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R5-013": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R5-080": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R12-084": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R5-101": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R8-103": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R5-010": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R3-097": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R7-113": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R3-060": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R7-040": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R4-057": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R5-030": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R12-093": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R4-058": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R12-080": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R8-109": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R3-024": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R8-006": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R8-111": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R4-145": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R6-009": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R12-143": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:a1a2-074": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R8-087": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R3-019": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R5-094": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R7-049": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R5-004": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:a1a2-084": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R3-135": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R4-114": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R12-137": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R5-073": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R5-090": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R8-014": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R5-050": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:a1a2-054": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R8-091": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R4-087": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R12-125": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:a1a2-076": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R8-063": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R7-034": {
+   "task_completion": 2,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R3-105": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R7-106": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:a1a2-056": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R4-110": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R4-019": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R12-147": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R7-102": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R4-082": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R4-126": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R3-092": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R12-115": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R5-138": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R12-078": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R7-048": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R3-004": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R6-010": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R12-145": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R8-029": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R8-076": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R3-015": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R5-024": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R6-008": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R4-048": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R4-066": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:a1a2-051": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R12-082": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R5-053": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R7-069": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R12-108": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R7-114": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R5-114": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R5-105": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R7-065": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:a1a2-055": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:a1a2-097": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R6-028": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R8-122": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R8-025": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R3-084": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:a1a2-086": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R4-118": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:a1a2-081": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:a1a2-072": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R4-062": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:a1a2-094": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R3-139": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R4-102": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:a1a2-099": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R12-107": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R8-054": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R5-142": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R12-096": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R3-134": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R5-043": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R7-137": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R3-124": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R4-097": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:a1a2-069": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R12-144": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R12-150": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R5-008": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R12-076": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R7-109": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R8-137": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R5-040": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R4-144": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R7-060": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R4-020": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R8-021": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R7-088": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R8-086": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R7-045": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R5-079": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R5-003": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R12-100": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R4-079": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:a1a2-077": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R4-138": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R5-044": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R8-068": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R12-136": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R5-060": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R7-125": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R3-039": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R7-129": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R12-091": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:a1a2-058": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R5-039": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R7-101": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R8-017": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R7-078": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:a1a2-083": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R5-126": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:a1a2-082": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R3-114": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "a1a2:R3-119": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r98cfb29a": {
+   "task_completion": 2,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r1362322e": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r0a7410c7": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r848b44a0": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:ra231c3f2": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r924a1dbe": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r75495076": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r9627ed95": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:ree889999": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r7118c5f7": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r35f2dfe2": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r92f9d8e1": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r38d55a0a": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r76a524a4": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r608eba64": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r6b94e2eb": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r62b7a537": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r117d14c9": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r251e74b7": {
+   "task_completion": 2,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r781948c1": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r69c243ed": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r5780af2d": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:racf9968f": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:re3053988": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:rd951d625": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r76b8970f": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:rcebd4914": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r7fdb77c5": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r8977e289": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r9798b1c7": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r1f428a91": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:ra98b5699": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:redd5f283": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:re49a39d8": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r7a51bca7": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:rbff5dc82": {
+   "task_completion": 2,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r4498ba2d": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r09a86c4a": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r0ab9b976": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:rd6d73bf2": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r5a552575": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:red28ae43": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r751fc8e7": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r3805c97c": {
+   "task_completion": 2,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:rca5c9f0a": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r2ef80a43": {
+   "task_completion": 2,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r9ee93ad9": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r16548203": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r4c6a7c9d": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r71fb89e5": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r7812bea3": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r481346dc": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r0f9e171a": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r846de4b5": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:rb9b136ea": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:rb2fdafe7": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r3bc8e846": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r8abd8532": {
+   "task_completion": 2,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r4cdaa6c5": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r53ae6037": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:raacc93b7": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r79e57299": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:rd91845f7": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r558146c9": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:rf386e5b0": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r51f5c2f7": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r41c90ac1": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:ra3fbec42": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r2a21bc41": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:ra73a2262": {
+   "task_completion": 2,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:rb1e8f4ca": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:rf3735132": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r799a8bb1": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:rb394808a": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:ra3fab670": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:rd91d82c2": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r14750506": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r64e67e3d": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r36e7ee75": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r7588ab42": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:radbcc84f": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:rf9d34212": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:ra1f63560": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:ree813c33": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r1ff0f0e5": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r0689ac5f": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r8abdc6c7": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:rb03c3171": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r2a1ec465": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r66495c71": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:rc930b40d": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:rceb05eb2": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:rc26a00d5": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:rb56fc369": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r86dd46ca": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r55fdb049": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:rfaf4e9df": {
+   "task_completion": 2,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r2a1a068f": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r418e2ea1": {
+   "task_completion": 2,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:rd7853dad": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r60d25295": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:ra71f965d": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r43ce3e09": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:re07d1a6e": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r4356bc3d": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r8b0bb807": {
+   "task_completion": 2,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:rd3275cd2": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r46640123": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r51ef73ab": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r327f9e44": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r31a544ac": {
+   "task_completion": 2,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:ra8097293": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r0608fbbd": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r440d2970": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:rf7be000c": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r4098954e": {
+   "task_completion": 2,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:rf0314d5b": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r6ba04a80": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r0177ab1e": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r070cc1c6": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r8288ba11": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r2730c7df": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r6ca6de83": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:rfa583437": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r6a04a472": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r52f148be": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r287dfc76": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r40d56665": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r879633cf": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:ra37442e0": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r6392fa18": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r42fcb7f1": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r1f87f017": {
+   "task_completion": 2,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r0cbc2f24": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r1efec2d1": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r3546349c": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:ra5f7dfe1": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:rbe99f2d5": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:rd4e6942d": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:rfebe5743": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:re29c4b70": {
+   "task_completion": 2,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r5ebc3e61": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r8cda740f": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r043fc74b": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:rfefce565": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r9652b4f7": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r8f91374f": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:r8ef4ceff": {
+   "task_completion": 2,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:re5194a21": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl1:re33a8692": {
+   "task_completion": 2,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a914ccd7e7767": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:ade9f57178000": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a6c94401196d5": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:ab4efc89d55b9": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a2f5ddf02a862": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a345a6557c313": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a228300c23d55": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a2ec6b7df27ef": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a5aae5f7028c8": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a727dbcd70ca3": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a0afe48b7f554": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a122dfba5cf26": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a8072160951d4": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:ae00d08c2f223": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a114a3a9a5016": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a910cf977bb9a": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:adfa2bf8dabc1": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:afaee88d26af5": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:ac387991dec81": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:aa4cdc29bd3b8": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a08571bb64684": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:ac842eea20ce8": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a0985005391ea": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:acaa9874d4d9d": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:ad3c070fae571": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:ab65b03227c04": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a5be37e3f3a81": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:ad595d50fc9da": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:aa370a05819b7": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a16a6871d8909": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a87e6c45e07a8": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a94c65c0f3a81": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a5e0ca8531b03": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:adb67f0775fa9": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a0890a8cd371e": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a6d6f182deca3": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:ad4489c87d4b0": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:ae6dfa7326e5a": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a53502ae2bb5b": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:adb7928ce2191": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a1055b7ce3a68": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a1ea053719575": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:acc34ec1f5f50": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a03c502f07dd3": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a1759201859c9": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:afbb348efd323": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a177ca911f5ca": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a269d894eed77": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:af066a6b0c078": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a84ff4c076fe2": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a78e0cdb83904": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a63c568cd774f": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a0f79b90467ee": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a500f34a634ae": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:abe1b1bbb09d4": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a64cd90c86b6d": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:ae76bfc303db9": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a77f13366b94e": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a22e6d567ca0e": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a646bdd7889fa": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a3531dc53c955": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a29ed70af0f88": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a2c386bc8f8fe": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a7cc1de370a65": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a50ca6af9353a": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a12770380d1bf": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a00eafaf1d70a": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a587d43104efe": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a734a3772e033": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a22cfbed3363d": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a7a0a9874486d": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:af6b5b3412f08": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:ac1370a0ee331": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:ac67e1636ce47": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:aedb997621599": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a1d2b0e91d88d": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a34aeef0fb7c7": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a0a5a5258ce6b": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:aaf3a4b51052d": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:abd117d51911d": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a0f0cba2a6f1a": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a6f8de25a8903": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a788baadc1357": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a72eaf75ff79f": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:ace84218c288b": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a0846cd9265f1": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a7a64af16890d": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a630cff73315f": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a044b38173249": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a0c54f6236847": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a5142876c1e88": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:ab986eb2dd082": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a974183896964": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a7033b75ce01b": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:aec4ac035dc96": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a0ee870c3cce1": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a74ba75145fa4": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a4e00b01d2d11": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a4d49b5e4de01": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a4a054684699b": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a9ca0f8abc038": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:aea36f42a065c": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:acab1895c016b": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a813ad3acc2f8": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:aab5fe247ff90": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a3e34adea4064": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:ae5e57e71df6c": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a57622ea0e8cc": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:aa8ba60341669": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a25efed4cc11b": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a1eb37b109f2f": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a349599ddf7e9": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:affa678b3fc9b": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a52f67e56c241": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a2e9b87bd6db0": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:ae9c06da58398": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:ab81bb7d6dbbd": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a1be64f685d57": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a999d50e533fb": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:afa0a47ae072a": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a0586b3bb6af8": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a0f13e90c5762": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:aa7a6d65d10e8": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a6f5c08a6ebb5": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a7720d44608d9": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a5f87bb9d4bea": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a5389cdc96e4e": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a43ab64bd116a": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a39fee1630ce3": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a636f1f7a8bfb": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a5ba89c8dda10": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a4a7f34dfaa4e": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a4fcea0b89c11": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:ab68c5ffe48bb": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a6f971ab53553": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:acab6488a69c3": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a4e12cd89c9b3": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a8f3b33ba196c": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a96a0e1e2ed4d": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:ae527b37c6928": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "esl7:a63337ff4e81b": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "phase3:sa-1": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "phase3:sa-2": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "phase3:sa-3": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "phase3:sa-4": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "phase3:sa-5": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "phase3:sa-6": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:aborted-exp5-no-evidence#61": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-3#419": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-2#439": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp5b-main#801": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:validation-campaign-1#314": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp4-main#497": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-3#107": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp5b-main#667": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-2#292": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:aborted-exp5-no-evidence#40": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-3#349": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp4-pilot#5": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp5b-main#393": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp4-main#493": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp5b-main#650": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-2#543": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp5b-main#593": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp4-main#106": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp4-main#178": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:validation-campaign-2#263": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-3#775": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp4-main#125": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp4-main#571": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-2#405": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-2#158": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp5b-main#364": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp5b-main#404": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-3#428": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp5c-main#242": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp5b-main#913": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-3#755": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp5b-main#522": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-2#639": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp4-main#666": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:validation-campaign-2#228": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp4-pilot#92": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp5b-main#638": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-3#873": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-2#533": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:aborted-exp5-no-evidence#52": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:aborted-full-experiment-150-students#6": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-3#684": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp5b-main#238": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-2#421": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp4-main#856": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp5b-main#65": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-2#670": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:validation-campaign-2#57": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp5b-main#182": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:validation-campaign-2#364": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp4-main#998": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp4-pilot#9": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-3#718": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp4-main#124": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp4-main#37": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-3#246": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp5b-main#933": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-3#705": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp5b-main#752": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:aborted-full-experiment-150-students#180": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp5b-main#625": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp4-main#787": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-2#3": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp5b-main#49": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp5b-main#138": {
+   "task_completion": 2,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:validation-campaign-2#90": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp4-pilot#119": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp4-main#504": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp4-main#304": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:validation-campaign-1#99": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-2#424": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-2#242": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp5b-main#943": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:validation-campaign-2#86": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp5b-main#179": {
+   "task_completion": 2,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp4-main#896": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:validation-campaign-1#96": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp5b-main#872": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-3#30": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-3#157": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:validation-campaign-1#118": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:aborted-full-experiment-150-students#90": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-2#286": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-2#22": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-3#1034": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp5b-main#478": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:aborted-exp5-no-evidence#181": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp4-main#25": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp4-main#751": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-3#491": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp5b-main#44": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp4-main#509": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp4-main#454": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp4-main#921": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:aborted-full-experiment-150-students#10": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-2#584": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:validation-campaign-1#270": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:aborted-exp5-no-evidence#110": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp4-main#469": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp5b-main#102": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:aborted-full-experiment-150-students#144": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp5b-main#322": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-3#812": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:aborted-exp5-no-evidence#36": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:validation-campaign-2#210": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp5c-main#248": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp5b-main#724": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:validation-campaign-2#107": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp4-main#225": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-3#383": {
+   "task_completion": 2,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-3#585": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp4-main#764": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-3#190": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp4-main#301": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp4-pilot#178": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-2#337": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp4-main#45": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp4-main#248": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp5b-main#260": {
+   "task_completion": 2,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-2#81": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp4-main#316": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-3#398": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:validation-campaign-1#235": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:validation-campaign-2#102": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:validation-campaign-2#106": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-2#440": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-3#931": {
+   "task_completion": 2,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp4-main#473": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:validation-campaign-2#349": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-3#595": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp5b-main#45": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp4-pilot#79": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp5b-main#927": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:aborted-full-experiment-150-students#137": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:aborted-exp5-no-evidence#73": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-2#198": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:aborted-full-experiment-150-students#213": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:aborted-full-experiment-150-students#125": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-2#465": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-2#406": {
+   "task_completion": 2,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp4-main#606": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-3#994": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp5b-main#305": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:validation-campaign-2#311": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp5c-main#192": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-2#102": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:validation-campaign-1#365": {
+   "task_completion": 0,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp5b-main#25": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:exp4-main#548": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  },
+  "simv2:full-experiment-2#555": {
+   "task_completion": 1,
+   "grammar_accuracy": 1,
+   "mechanics": 1
+  }
+ },
+ "stage1": [
+  "ellipse",
+  "asap2",
+  "persuade"
+ ]
+}
