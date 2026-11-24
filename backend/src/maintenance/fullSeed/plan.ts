@@ -5,6 +5,7 @@
 import { createHash } from 'crypto';
 import { CODE_ALPHABET, hashCode } from '../../parents/codes';
 import { formOutcomes } from '../../parents/levels';
+import { addSchoolAppSeed, schoolAppSeeded, SCHOOL_APP_SECTIONS_ON, type SeedLink } from './schoolApp';
 import { EMAIL_DOMAIN, FAMILY, FEMALE, INTL, MALE, PUBLIC_FIGURES, SCHOOLS, SUBJECTS, type SchoolDef, type SubjectKey } from './content';
 
 export const SEED_BATCH = 'full-v1';
@@ -14,7 +15,8 @@ export type ModelName =
   | 'Institution' | 'User' | 'Student' | 'Batch' | 'Curriculum' | 'CourseInstance' | 'ClassEnrollment' | 'LearningObjective' | 'ParentProfile'
   | 'ParentLearnerLink' | 'ParentLinkCode' | 'Invitation' | 'LmsOnboarding' | 'Assessment' | 'AssessmentVersion' | 'Assignment' | 'AssessmentAttempt'
   | 'GradeLedgerEntry' | 'LessonProgress' | 'ErrorToWorkOn' | 'SessionSummary' | 'LearnerProfile' | 'StudyHabitDaily' | 'ReviewItem'
-  | 'StudentObjectiveMastery' | 'TutorSession' | 'TutorMessage' | 'AvatarSession' | 'LearningEvent' | 'UsageLedger' | 'ParentEmailSend' | 'ReminderLog';
+  | 'StudentObjectiveMastery' | 'TutorSession' | 'TutorMessage' | 'AvatarSession' | 'LearningEvent' | 'UsageLedger' | 'ParentEmailSend' | 'ReminderLog'
+  | 'SchoolTimetableEntry' | 'SchoolDailyAttendance' | 'SchoolAnnouncement' | 'SchoolImport' | 'ParentNotification';
 export interface PlannedDoc { model: ModelName; key: string; doc: Record<string, unknown> }
 export interface SeedUser { key: string; role: string; name: string; email: string; schoolId?: string; school?: string; state: string; userId: string }
 /** A parent link code a parent can type (owner, 22 Nov 2026: "write their codes and link those codes to the students accounts"). */
@@ -44,7 +46,7 @@ export function buildPlan(now: Date): FullSeedPlan {
   const ago = (days: number, hour = 10, min = 0) => { const d = new Date(now.getTime() - days * DAY); d.setUTCHours(hour, min, 0, 0); return d; };
   /** Like ago(), for things that already happened: never later than 20 minutes before the run. */
   const past = (days: number, hour = 10, min = 0) => { const d = ago(days, hour, min); const cap = now.getTime() - 20 * 60_000; return d.getTime() > cap ? new Date(cap) : d; };
-  const docs: PlannedDoc[] = []; const users: SeedUser[] = []; const codes: SeedCode[] = []; const parentsOf = new Map<string, string[]>();
+  const docs: PlannedDoc[] = []; const users: SeedUser[] = []; const codes: SeedCode[] = []; const parentsOf = new Map<string, string[]>(); const activeLinks: SeedLink[] = [];
   const add = (model: ModelName, key: string, doc: Record<string, unknown>) => { docs.push({ model, key, doc: { _id: oid(`${model}:${key}`), ...doc } }); };
   const usedEmails = new Set<string>(); const usedNames = new Set<string>();
   const slug = (s: string) => s.toLowerCase().normalize('NFKD').replace(/[^a-z]+/g, '');
@@ -91,6 +93,7 @@ export function buildPlan(now: Date): FullSeedPlan {
       timeZone: 'Africa/Cairo', country: 'EG', emailLanguage: school.emailLanguage, ...(school.lmsSystem ? { lmsSystem: school.lmsSystem } : {}),
       parentPortal: { access: school.portal, showResults: school.results, codeTtlDays: 14, teachersMayIssueCodes: true, updatedAt: created, updatedBy: admin.email, emails: { linkConfirmed: true, weeklySummary: true, newResults: true, linkEnded: true } },
       learningSettings: { pathwayMode: school.pathwayMode, ...(school.adultLearners ? { adultLearners: true } : {}) },
+      ...(schoolAppSeeded(school) ? { schoolApp: { sections: SCHOOL_APP_SECTIONS_ON, updatedAt: created, updatedBy: admin.email } } : {}),
       createdAt: created, updatedAt: created,
     });
 
@@ -256,6 +259,7 @@ export function buildPlan(now: Date): FullSeedPlan {
             const consent = status === 'pending' ? 'pending' : s.age < 13 ? 'captured' : 'not_required';
             add('ParentLearnerLink', `${key}:${s.id}`, { id: `pl-${key.toLowerCase().replace(/\./g, '-')}-${s.id.toLowerCase()}`, parentUserId: u.id, studentId: s.id, institutionId: school.id, role: pi === 0 ? (ci === 0 && R() < 0.05 ? 'view' : 'owner') : 'full', status, consent,
               ...(status === 'ended' ? { endedAt: ago(9), endReason: s.archived ? 'left_school' : 'unlinked_by_parent', endedBy: s.archived ? admin.id : u.id } : {}), learnerNotifiedAt: linkedAt, createdAt: linkedAt, updatedAt: status === 'ended' ? ago(9) : linkedAt });
+            if (status === 'active') activeLinks.push({ parentUserId: u.id, studentId: s.id, institutionId: school.id });
             if (status !== 'ended') parentsOf.set(s.id, [...(parentsOf.get(s.id) ?? []), `${u.email}${status === 'pending' ? ' (pending)' : ''}`]);
             linkStates.push(`${s.first} (${status}${consent === 'pending' ? ', consent pending' : consent === 'captured' ? ', consent given' : ''})`);
           }
@@ -401,6 +405,11 @@ export function buildPlan(now: Date): FullSeedPlan {
     }
     allStudents.push(...schoolStudents);
   }
-  void allStudents;
+  // Parents school app (a5): timetables, attendance, announcements, notifications (own random stream; appended last).
+  addSchoolAppSeed({
+    now, add: (m, k, d) => add(m, k, d), schools: SCHOOLS, students: allStudents.map((s) => ({ id: s.id, name: s.name, first: s.first, school: s.school, group: s.group, archived: s.archived })), links: activeLinks,
+    groupName: (gid) => { for (const sc of SCHOOLS) { const g = sc.groups.find((x) => `GRP-${sc.id.replace('SCH-', '')}-${x.key}` === gid); if (g) return g.name; } return gid; },
+    adminOf: (schoolId) => uid(`${schoolId.replace('SCH-', '')}.admin`),
+  });
   return { docs, users, codes };
 }

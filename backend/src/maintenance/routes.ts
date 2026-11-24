@@ -9,7 +9,7 @@ import { shadowReport } from '../services/enrollmentShadowReport';
 import { cleanDanglingClassMembers, planDanglingClassMembers } from '../services/danglingClassMembers';
 import { maintenanceAllowed, maintenanceAuthorised } from './guards';
 import { seedLmsTest } from './lmsTestSeed';
-import { fullSeedStatus, removeFullSeed, runFullSeed, SeedRefused } from './fullSeed/run';
+import { fullSeedStatus, removeFullSeed, runFullSeed, runSchoolAppSeed, SeedRefused } from './fullSeed/run';
 import { mockLmsRouter } from './mockLms';
 import { runHealthCheck, setupHealthCheck } from './healthCheck';
 import { avatarUsageReport, parseAvatarIds } from './avatarUsageReport';
@@ -126,7 +126,12 @@ router.post('/full-seed', async (req, res, next) => {
       res.json(out);
       return;
     }
-    if (action !== 'run') { res.status(400).json({ error: "action must be 'run', 'remove' or 'status'" }); return; }
+    if (action === 'run-school-app') {
+      try { const out = await runSchoolAppSeed(); logger.info('maintenance_full_seed_school_app', { counts: out.counts }); res.json(out); }
+      catch (e) { if (e instanceof SeedRefused) { res.status(409).json({ error: e.message }); return; } throw e; }
+      return;
+    }
+    if (action !== 'run') { res.status(400).json({ error: "action must be 'run', 'run-school-app', 'remove' or 'status'" }); return; }
     try {
       const out = await runFullSeed();
       logger.info('maintenance_full_seed_run', { total: out.total });

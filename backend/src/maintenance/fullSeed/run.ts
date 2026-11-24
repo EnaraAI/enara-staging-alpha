@@ -32,16 +32,20 @@ import { AvatarSession } from '../../models/AvatarSession';
 import { LearningEvent } from '../../models/LearningEvent';
 import { UsageLedger } from '../../models/UsageLedger';
 import { ParentEmailSend } from '../../models/ParentEmailSend';
+import { ParentNotification, SchoolAnnouncement, SchoolDailyAttendance, SchoolImport, SchoolTimetableEntry } from '../../schoolApp/models';
 import { ReminderLog } from '../../models/ReminderLog';
 import { ALL_FLAGS, forgetFeatureFlags } from '../../services/featureFlags';
 import { CURRENT_PRICE_VERSION } from '../../services/priceCatalog';
 import { buildPlan, PRICE_VERSION_SLOT, SEED_BATCH, type ModelName, type SeedUser } from './plan';
+import { SCHOOLS } from './content';
+import { schoolAppSeeded, SCHOOL_APP_SECTIONS_ON } from './schoolApp';
 
 export const REGISTRY = 'seed_registry';
 const MODELS: Record<ModelName, Model<any>> = {
   Institution, User, Student, Batch, Curriculum, CourseInstance, ClassEnrollment, LearningObjective, ParentProfile, ParentLearnerLink, ParentLinkCode,
   Invitation, LmsOnboarding, Assessment, AssessmentVersion, Assignment, AssessmentAttempt, GradeLedgerEntry, LessonProgress, ErrorToWorkOn, SessionSummary,
   LearnerProfile, StudyHabitDaily, ReviewItem, StudentObjectiveMastery, TutorSession, TutorMessage, AvatarSession, LearningEvent, UsageLedger, ParentEmailSend, ReminderLog,
+  SchoolTimetableEntry, SchoolDailyAttendance, SchoolAnnouncement, SchoolImport, ParentNotification,
 };
 
 export class SeedRefused extends Error {}
@@ -58,8 +62,9 @@ export function seedPassword(env: NodeJS.ProcessEnv = process.env): string {
 export interface RunResult { batch: string; counts: Record<string, number>; total: number; users: Omit<SeedUser, 'key' | 'userId'>[] }
 
 /** Casts and validates every planned document (no writes). Returns rows grouped by collection, or the list of problems. */
-export function preparePlan(now: Date, hash: string) {
-  const plan = buildPlan(now);
+export function preparePlan(now: Date, hash: string, only?: readonly ModelName[]) {
+  const full = buildPlan(now);
+  const plan = only ? { ...full, docs: full.docs.filter((d) => only.includes(d.model)) } : full;
   const features = Object.fromEntries(ALL_FLAGS.map((f) => [f, true]));
   const byCollection = new Map<string, { model: Model<any>; rows: Record<string, any>[] }>();
   const problems: string[] = [];
@@ -101,6 +106,29 @@ export async function runFullSeed(now = new Date(), env: NodeJS.ProcessEnv = pro
   }
   for (const d of plan.docs) if (d.model === 'Institution') forgetFeatureFlags(String(d.doc.id));
   return { batch: SEED_BATCH, counts, total: plan.docs.length, users: plan.users.map(({ key: _k, userId: _u, ...u }) => u) };
+}
+
+/** Parents school app (a5): writes only the school app part of the plan (no users, no passwords touched) and turns the sections on for
+ * the seeded schools with parent access. Same registry, so the full-seed remove clears it. For a database that already has the full seed. */
+export const SCHOOL_APP_MODELS: readonly ModelName[] = ['SchoolTimetableEntry', 'SchoolDailyAttendance', 'SchoolAnnouncement', 'SchoolImport', 'ParentNotification'];
+export async function runSchoolAppSeed(now = new Date()): Promise<{ batch: string; counts: Record<string, number>; schools: string[] }> {
+  const seeded = await Institution.find({ id: { $in: SCHOOLS.filter(schoolAppSeeded).map((s) => s.id) } }).select('id').lean();
+  if (seeded.length !== SCHOOLS.filter(schoolAppSeeded).length) throw new SeedRefused('Run the full seed first: the seeded schools are not all here; nothing was written');
+  const { byCollection, problems } = preparePlan(now, '-', SCHOOL_APP_MODELS);
+  if (problems.length) throw new SeedRefused(`The plan has ${problems.length} invalid documents; nothing was written. First: ${problems.slice(0, 5).join(' | ')}`);
+  const registry = mongoose.connection.collection(REGISTRY);
+  const counts: Record<string, number> = {};
+  for (const [coll, { model, rows }] of byCollection) {
+    for (let i = 0; i < rows.length; i += 500) {
+      const chunk = rows.slice(i, i + 500);
+      await registry.bulkWrite(chunk.map((r) => ({ updateOne: { filter: { _id: `${coll}:${String(r._id)}` as any }, update: { $setOnInsert: { collection: coll, ref: r._id, batch: SEED_BATCH, createdAt: new Date() } }, upsert: true } })), { ordered: false });
+      await model.collection.bulkWrite(chunk.map((r) => ({ replaceOne: { filter: { _id: r._id }, replacement: r, upsert: true } })), { ordered: false });
+    }
+    counts[coll] = rows.length;
+  }
+  const ids = seeded.map((s) => s.id);
+  await Institution.updateMany({ id: { $in: ids } }, { $set: { 'schoolApp.sections': SCHOOL_APP_SECTIONS_ON, 'schoolApp.updatedAt': now, 'schoolApp.updatedBy': 'full-seed' } });
+  return { batch: SEED_BATCH, counts, schools: ids };
 }
 
 export async function removeFullSeed(): Promise<{ batch: string; deleted: Record<string, number>; registryRowsDeleted: number }> {
