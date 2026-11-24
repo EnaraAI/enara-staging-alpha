@@ -1,4 +1,4 @@
-# Parents school app (e): the assistant on lms-test with DeepSeek (seed reload + school-chat-check). Counts and seed answers only.
+# Parents school app (e): the assistant on lms-test with DeepSeek (one question per call, as seeded parents). Counts and seed answers only.
 name: lms-test school chat check
 on:
   push:
@@ -17,5 +17,5 @@ jobs:
         with: { node-version: 22 }
       - name: School chat check (lms-test)
         env:
-          LMSTEST_MAINTENANCE_TOKEN: ${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}
+          SEED_USER_PASSWORD: ${{ secrets.SEED_USER_PASSWORD }}
         run: node deploy/lms-test/schoolchat/run.mjs
