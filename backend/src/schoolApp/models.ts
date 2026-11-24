@@ -98,7 +98,6 @@ instalmentSchema.index({ institutionId: 1, studentId: 1, planKey: 1, number: 1 }
 instalmentSchema.index({ status: 1, dueDate: 1 });
 export const SchoolInstalment = model<ISchoolInstalment>('SchoolInstalment', instalmentSchema, 'school_instalments');
 
-<<<<<<< HEAD
 // ---- buses (step c): routes with their stops and times, each child's route and stop, and delay / cancel notices. Stop times only:
 // no live GPS in this phase.
 export interface BusStop { name: string; morning?: string; afternoon?: string; mapLink?: string; order: number }
@@ -147,14 +146,12 @@ const busNoticeSchema = new Schema<ISchoolBusNotice>({
 }, { timestamps: { createdAt: true, updatedAt: false } });
 busNoticeSchema.index({ institutionId: 1, routeKey: 1, date: 1 });
 export const SchoolBusNotice = model<ISchoolBusNotice>('SchoolBusNotice', busNoticeSchema, 'school_bus_notices');
-=======
 // ---- receipt files kept in the database (only when SCHOOL_RECEIPTS_STORE=db, the E2E stack, which has no reachable R2). Elsewhere: R2.
 export interface ISchoolReceiptFile extends Document { key: string; institutionId: string; contentType: string; data: Buffer; createdAt: Date }
 const receiptFileSchema = new Schema<ISchoolReceiptFile>({
   key: { type: String, required: true, unique: true }, institutionId: { type: String, required: true }, contentType: { type: String, required: true }, data: { type: Buffer, required: true },
 }, { timestamps: { createdAt: true, updatedAt: false } });
 export const SchoolReceiptFile = model<ISchoolReceiptFile>('SchoolReceiptFile', receiptFileSchema, 'school_receipt_files');
->>>>>>> claude/lms-parents-school-b3
 
 // ---- requests (step d): a parent asks the school office (certificate, early leave, teacher meeting, other); the school answers.
 export const REQUEST_TYPES = ['certificate', 'early_leave', 'teacher_meeting', 'other'] as const;
