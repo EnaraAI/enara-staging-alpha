@@ -1,3 +1,20 @@
+# Vercel move: result (24 Nov 2026, 12:25 PM Cairo)
+
+All 3 projects moved from the old team (team_xbSucLT1roYt4njeB4tRPfKQ, blocked by Vercel) to the new team (team_fHEDYVPWJ218PaXEBwnBMFvk, Hobby) with Vercel's own project transfer, from GitHub Actions. The old team now has 0 projects. Neither team owns a domain at Vercel (DNS is elsewhere), so no DNS change was needed.
+
+| Project | Domains | Variables | Live deployment | Site before → after | Extra check |
+|---|---|---|---|---|---|
+| enara-lms-test | lms-test.enara.app | 66/66 match (16 sensitive: by name and type) | same (dpl_7rymKb8…, commit b9ee3b32) | 402 → 200, mongo ok | full health check passed (LTI login, launch, roster, grade passback; uses LMS_KEK) |
+| enara-staging-alpha (test.enara.app, frozen) | test.enara.app | 34/34 match (9 sensitive) | same (dpl_APDuhwjuF…, commit 894f3ee7); no build | 402 → 200, mongo ok | read-only only |
+| enara-landing | enara.app, www.enara.app → enara.app | 3/3 match (1 sensitive) | same (dpl_CWrrDQ7NB…) | 402 → 200 (www: 308 redirect) | — |
+
+- A second read of the new team, compared line by line with the inventory below (settings, domains, variable names, targets and types, protection, crons, live deployment and commit): **0 differences**.
+- Sensitive values cannot be read back by anyone, so they are checked by behaviour only. Not yet exercised: email (Resend), avatar (Anam, ElevenLabs), uploads (R2), login tokens (JWT_SECRET), CRON_SECRET; and on test.enara.app everything except the database.
+- Pipeline: draft PR #107 points the lms-test deploy at the new team (`VERCEL_TOKEN_NEW`). test.enara.app and enara.app have no pipeline.
+- Rollback for any project: transfer it back (same Action, reversed tokens).
+
+---
+
 # Vercel move: inventory of the old account (names only)
 _Generated 2026-11-24T10:03:23.131Z by a read-only GitHub Action. No values; variable names, targets and types only._
 
