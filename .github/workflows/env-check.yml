@@ -1,0 +1,37 @@
+# One test of every environment variable, Part 1 (owner go, 24 Nov 2026): outside, read-only, all projects of the new Vercel team.
+# Names and states only. Plus lms-test's full health check (LTI flow with LMS_KEK). test.enara.app: read-only /ready only.
+name: Env check (outside, read-only)
+on:
+  push:
+    branches: ['claude/tutor-lms-dscompare-run']
+    paths: ['deploy/vercel-move/env-check.mjs', '.github/workflows/env-check.yml']
+permissions:
+  contents: write
+jobs:
+  check:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - name: Fetch the live commits' branches
+        run: git fetch -q origin '+refs/heads/*:refs/remotes/origin/*' || true
+      - name: Variables, formats, names in code, running sites
+        env: { VERCEL_TOKEN_NEW: '${{ secrets.VERCEL_TOKEN_NEW }}' }
+        run: mkdir -p out && node deploy/vercel-move/env-check.mjs && mv ENV_CHECK.md out/
+      - name: lms-test health check (database, tool keys, LTI flow with LMS_KEK, grade passback)
+        env: { LMSTEST_MAINTENANCE_TOKEN: '${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}' }
+        run: |
+          set -o pipefail
+          { git show origin/lms-test-live:deploy/lms-test/cli.mjs > /dev/null 2>&1; } || true
+          git worktree add -q /tmp/live origin/lms-test-live
+          { node /tmp/live/deploy/lms-test/cli.mjs check-site && node /tmp/live/deploy/lms-test/cli.mjs maintenance setup && node /tmp/live/deploy/lms-test/cli.mjs maintenance run; } 2>&1 | grep -v '^\[out\]' | tee out/health.log
+          printf '\n## lms-test health check\n```\n%s\n```\n' "$(cat out/health.log)" >> out/ENV_CHECK.md
+      - name: Publish (names and states only)
+        if: always()
+        run: |
+          cd out && git init -q && git checkout -q -b r && git add -A && git -c user.name=github-actions -c user.email=github-actions@users.noreply.github.com commit -qm "env check ${GITHUB_SHA::8}"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" r:claude/tutor-lms-env-check-results
