@@ -60,5 +60,9 @@ for (const s of scopes) {
     L(); L(`Sensitive (cannot be read back, must be re-entered by hand): ${sens.length ? sens.join(', ') : 'none'}`);
   }
 }
+for (const t of teams) {
+  const d = await get(`/v5/domains?teamId=${t.id}&limit=100`).catch((e) => ({ error: e.message }));
+  L(); L(`## Domains owned by team ${t.slug} (DNS zones / registrations): ${d.error ? `could not list (${d.error})` : (d.domains ?? []).map((x) => `${x.name} (${x.serviceType ?? '?'}${x.boughtAt ? ', bought at Vercel' : ''}${x.expiresAt ? `, expires ${new Date(x.expiresAt).toISOString().slice(0, 10)}` : ''}, nameservers ${x.verified ? 'verified' : 'unverified'})`).join(', ') || 'none'}`);
+}
 writeFileSync('VERCEL_MOVE.md', out.join('\n') + '\n');
 console.log(`inventory written: ${out.length} lines`);
