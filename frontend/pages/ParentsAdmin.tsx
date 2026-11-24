@@ -4,6 +4,7 @@ import { fetchParentsAdminSchools, setSchoolParentAccess, type ParentAccess, typ
 import { ParentCodeTools } from './ParentCodeTools';
 import { ParentSchoolSettings } from './ParentSchoolSettings';
 import { ParentCsvInvites } from './ParentCsvInvites';
+import { SchoolAppAdmin } from './SchoolAppAdmin';
 import { LangSwitch, initialLang, type Lang } from './LmsSchoolStatus';
 
 // Parents P1 (PARENT_SETTINGS_ENABLED): the "Parents" page.
@@ -83,6 +84,8 @@ export const ParentsAdmin: React.FC<{ status?: ParentsAdminStatus }> = ({ status
       {status?.canChangeSettings && <ParentSchoolSettings lang={lang} status={status} />}
       {status?.codeTools && <ParentCodeTools lang={lang} status={status} />}
       {status?.csvInvites && <ParentCsvInvites lang={lang} />}
+      {/* Parents school app (a3): hides itself unless a SCHOOL_APP switch is on and the user is the school's admin. */}
+      {showUsage && <SchoolAppAdmin lang={lang} />}
       {note && <p className="text-sm text-slate-600" role="status">{note}</p>}
 
       {data && !data.canChangeAccess && data.schools.map((s) => (
