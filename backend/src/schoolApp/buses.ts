@@ -76,9 +76,9 @@ export async function busesForAdmin(actor: Actor, institutionId?: string, now = 
 /** The school sends a delay or cancel notice for a route's trip today: in-app (and email) to parents of children on that trip. Audited. */
 export async function sendBusNotice(actor: Actor, body: Record<string, unknown>, now = new Date()) {
   const school = scope(actor, typeof body.institutionId === 'string' ? body.institutionId : undefined);
-  if (!(await sectionOn(school, 'buses'))) throw new AppError('The buses section is off for this school', 409, 'SECTION_OFF');
   const route = await SchoolBusRoute.findOne({ institutionId: school, routeKey: norm(body.route) }).lean();
   if (!route) throw new AppError('Route not found', 404, 'NOT_FOUND');
+  if (!(await sectionOn(school, 'buses'))) throw new AppError('The buses section is off for this school', 409, 'SECTION_OFF');
   const kind = body.kind === 'cancel' ? 'cancel' : body.kind === 'delay' ? 'delay' : null;
   if (!kind) throw new AppError("kind must be 'delay' or 'cancel'", 400, 'VALIDATION_ERROR');
   const direction = body.direction === 'afternoon' ? 'afternoon' : body.direction === 'morning' ? 'morning' : null;
