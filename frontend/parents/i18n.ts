@@ -15,7 +15,7 @@ export const T = {
   en: {
     brand: 'ENARA', parents: 'Parents', sample: 'Sample data', sampleHint: 'Parts marked Sample data are examples until ENARA has real data for them.',
     chooseLearner: 'Choose learner', age: (n: string) => `Age ${n}`, main: 'Main',
-    tabs: { home: 'Home', progress: 'Progress', activity: 'Activity', controls: 'Controls', account: 'Account' },
+    tabs: { home: 'Home', progress: 'Progress', activity: 'Activity', controls: 'Controls', account: 'Account', school: 'School' },
     updated: (when: string, time: string) => `Updated ${when} · ${time} Cairo time`, justNow: 'just now', minAgo: (n: string) => `${n} min ago`,
     refresh: 'Refresh', refreshing: 'Updating…', pullToRefresh: 'Pull to refresh', loading: 'Loading…', error: 'Could not load this. Check your connection and try again.', retry: 'Try again',
     signOut: 'Sign out', language: 'Language',
@@ -90,6 +90,20 @@ export const T = {
     signInTitle: 'Signing in', codeOnlyBody: 'You joined with a school code. This device remembers you. If you lose this device or sign out, ask the school for a new code.',
     codeOnlySignOut: 'You joined with a school code and have no email on this account. If you sign out, you will need a new code from the school to come back. Sign out anyway?',
     hiddenBySchool: "A child linked to you is hidden for now: their school switched parent access off. Ask the school.",
+    // Parents school app (a). Data comes from the school; ENARA only shows it.
+    sch: {
+      title: 'School', today: 'Today', timetable: 'Timetable', attendance: 'Attendance', announcements: 'Announcements', notifications: 'Notifications',
+      attendanceToday: 'Attendance today', notRecorded: 'Not recorded yet', todayClasses: 'Classes today', noClassesToday: 'No classes today.',
+      status: { present: 'Present', absent: 'Absent', late: 'Late', excused: 'Excused' } as Record<string, string>,
+      period: (p: string) => `Period ${p}`, teacher: 'Teacher', room: 'Room', group: (g: string) => `Class ${g}`, noTimetable: 'The school has not shared a timetable yet.',
+      source: (label: string, when: string) => `From the school's ${label} · updated ${when}`, sourceNone: (label: string) => `From the school's ${label}`,
+      srcLabel: { timetable: 'timetable', attendance: 'attendance sheet', announcements: 'announcements' } as Record<string, string>,
+      month: 'Month', prevMonth: 'Previous month', nextMonth: 'Next month', noAttendance: 'No attendance recorded this month.', counts: (p: string, a: string, l: string, e: string) => `Present ${p} · Absent ${a} · Late ${l} · Excused ${e}`,
+      noAnnouncements: 'No announcements right now.', newAnnouncements: (n: string) => `${n} announcements`, until: (d: string) => `Until ${d}`, forAll: 'Whole school', forGrade: 'This grade', forGroup: 'This class', forStudent: 'Only for your child',
+      noNotifications: 'No notifications yet.', unread: (n: string) => `${n} unread`, markAllRead: 'Mark all as read', wasAbsent: (name: string, d: string) => `${name} was absent on ${d}.`, wasLate: (name: string, d: string) => `${name} was late on ${d}.`, fromRegister: "From the school's attendance register.", bell: (n: string) => `Notifications, ${n} unread`,
+      kind: { absence: 'Absence', late: 'Late arrival', announcement: 'Announcement' } as Record<string, string>,
+      off: 'The school has not shared this.', displayOnly: 'This information comes from the school. For any correction, contact the school.',
+    },
     // Parents P3
     waitingForTeacher: 'Waiting for the teacher',
     allSubjects: 'All subjects', subjectsNav: 'Subjects', howToHelp: 'How you can help this week', helpWhy: 'Why', helpSay: 'You could say',
@@ -125,7 +139,7 @@ export const T = {
   ar: {
     brand: 'إنارة', parents: 'أولياء الأمور', sample: 'بيانات تجريبية', sampleHint: 'الأجزاء المكتوب عليها «بيانات تجريبية» أمثلة لحد ما يبقى عند إنارة بيانات حقيقية ليها.',
     chooseLearner: 'اختار الابن', age: (n: string) => `${n} سنة`, main: 'القائمة الرئيسية',
-    tabs: { home: 'الرئيسية', progress: 'التقدّم', activity: 'النشاط', controls: 'الإعدادات', account: 'الحساب' },
+    tabs: { home: 'الرئيسية', progress: 'التقدّم', activity: 'النشاط', controls: 'الإعدادات', account: 'الحساب', school: 'المدرسة' },
     updated: (when: string, time: string) => `اتحدّث ${when} · ${time} بتوقيت القاهرة`, justNow: 'دلوقتي', minAgo: (n: string) => `من ${n} دقيقة`,
     refresh: 'تحديث', refreshing: 'جاري التحديث…', pullToRefresh: 'اسحب للتحديث', loading: 'جاري التحميل…', error: 'مقدرناش نحمّل ده. اتأكد من الإنترنت وجرّب تاني.', retry: 'جرّب تاني',
     signOut: 'تسجيل خروج', language: 'اللغة',
@@ -194,6 +208,20 @@ export const T = {
     signInTitle: 'تسجيل الدخول', codeOnlyBody: 'انضممت برمز من المدرسة. هذا الجهاز يتذكرك. إذا فقدت هذا الجهاز أو سجّلت الخروج، فاطلب رمزًا جديدًا من المدرسة.',
     codeOnlySignOut: 'انضممت برمز من المدرسة ولا يوجد بريد إلكتروني في هذا الحساب. إذا سجّلت الخروج فستحتاج إلى رمز جديد من المدرسة للعودة. هل تريد تسجيل الخروج؟',
     hiddenBySchool: 'أحد أبنائك المرتبطين مخفي حاليًا: أوقفت مدرسته وصول أولياء الأمور. تواصل مع المدرسة.',
+    // تطبيق المدرسة لأولياء الأمور (أ). البيانات من المدرسة؛ إنارة تعرضها فقط.
+    sch: {
+      title: 'المدرسة', today: 'اليوم', timetable: 'الجدول', attendance: 'الحضور', announcements: 'الإعلانات', notifications: 'الإشعارات',
+      attendanceToday: 'الحضور اليوم', notRecorded: 'لم يُسجَّل بعد', todayClasses: 'حصص اليوم', noClassesToday: 'لا حصص اليوم.',
+      status: { present: 'حاضر', absent: 'غائب', late: 'متأخر', excused: 'غياب بعذر' } as Record<string, string>,
+      period: (p: string) => `الحصة ${p}`, teacher: 'المعلم', room: 'القاعة', group: (g: string) => `الفصل ${g}`, noTimetable: 'لم تشارك المدرسة الجدول بعد.',
+      source: (label: string, when: string) => `من ${label} المدرسة · آخر تحديث ${when}`, sourceNone: (label: string) => `من ${label} المدرسة`,
+      srcLabel: { timetable: 'جدول', attendance: 'كشف حضور', announcements: 'إعلانات' } as Record<string, string>,
+      month: 'الشهر', prevMonth: 'الشهر السابق', nextMonth: 'الشهر التالي', noAttendance: 'لا يوجد حضور مسجَّل هذا الشهر.', counts: (p: string, a: string, l: string, e: string) => `حاضر ${p} · غائب ${a} · متأخر ${l} · بعذر ${e}`,
+      noAnnouncements: 'لا توجد إعلانات الآن.', newAnnouncements: (n: string) => `${n} إعلانات`, until: (d: string) => `حتى ${d}`, forAll: 'كل المدرسة', forGrade: 'هذا الصف', forGroup: 'هذا الفصل', forStudent: 'لطفلك فقط',
+      noNotifications: 'لا توجد إشعارات بعد.', unread: (n: string) => `${n} غير مقروءة`, markAllRead: 'تعليم الكل كمقروء', wasAbsent: (name: string, d: string) => `تغيّب ${name} يوم ${d}.`, wasLate: (name: string, d: string) => `تأخّر ${name} يوم ${d}.`, fromRegister: 'من سجل الحضور في المدرسة.', bell: (n: string) => `الإشعارات، ${n} غير مقروءة`,
+      kind: { absence: 'غياب', late: 'تأخر', announcement: 'إعلان' } as Record<string, string>,
+      off: 'لم تشارك المدرسة هذه المعلومات.', displayOnly: 'هذه المعلومات من المدرسة. لأي تصحيح تواصل مع المدرسة.',
+    },
     // Parents P3
     waitingForTeacher: 'بانتظار المعلم',
     allSubjects: 'كل المواد', subjectsNav: 'المواد', howToHelp: 'إزاي تساعد الأسبوع ده', helpWhy: 'ليه', helpSay: 'ممكن تقول',

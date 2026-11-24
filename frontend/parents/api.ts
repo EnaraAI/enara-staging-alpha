@@ -68,6 +68,27 @@ export const parentsApi = {
   emailMerge: (ticket: string) => apiRequest<{ token: string; user: any; deviceToken: string; linksMoved: number }>('POST', '/api/parents/email/merge', { ticket }),
 };
 
+// Parents school app (a): /api/parents/school. 404 while every SCHOOL_APP_* switch is off (the tab is then hidden);
+// a section the school has off answers 404 SECTION_OFF.
+export type SchoolSection = 'timetable' | 'announcements' | 'attendance' | 'notifications';
+export interface SchoolSource { label: string; updatedAt: string | null; kind: string | null }
+export type AttendanceStatus = 'present' | 'absent' | 'late' | 'excused';
+export interface SchoolOverview { sections: Record<SchoolSection, boolean>; today: string; attendanceToday?: AttendanceStatus | null; todayClasses?: { period: number; start: string; end: string; subject: string }[]; announcementsCount?: number; unreadNotifications?: number }
+export interface SchoolTimetable { group: string | null; days: { day: number; periods: { period: number; start: string; end: string; subject: string; teacher: string | null; room: string | null }[] }[]; source: SchoolSource }
+export interface SchoolAttendance { month: string; records: { date: string; period: number | null; status: AttendanceStatus; note: string | null }[]; counts: Record<AttendanceStatus, number>; source: SchoolSource }
+export interface SchoolAnnouncementItem { id: string; title: string; body: string; titleAr: string | null; bodyAr: string | null; audience: string; publishAt: string; expiresAt: string | null }
+export interface SchoolAnnouncements { announcements: SchoolAnnouncementItem[]; source: SchoolSource }
+export interface ParentNotificationItem { id: string; studentId: string; kind: 'absence' | 'late' | 'announcement'; date: string | null; title: string; body: string; read: boolean; createdAt: string }
+const S = (id: string) => `/api/parents/school/learners/${encodeURIComponent(id)}`;
+export const schoolApi = {
+  overview: (id: string) => apiRequest<SchoolOverview>('GET', S(id)),
+  timetable: (id: string) => apiRequest<SchoolTimetable>('GET', `${S(id)}/timetable`),
+  attendance: (id: string, month?: string) => apiRequest<SchoolAttendance>('GET', `${S(id)}/attendance${month ? `?month=${encodeURIComponent(month)}` : ''}`),
+  announcements: (id: string) => apiRequest<SchoolAnnouncements>('GET', `${S(id)}/announcements`),
+  notifications: () => apiRequest<{ notifications: ParentNotificationItem[]; unread: number }>('GET', '/api/parents/school/notifications'),
+  markRead: (ids?: string[]) => apiRequest<{ marked: number }>('POST', '/api/parents/school/notifications/read', { ids: ids ?? [] }),
+};
+
 // --- Africa/Cairo formatting --------------------------------------------------
 const TZ = 'Africa/Cairo';
 export function cairoTime(iso: string | Date, lang: 'en' | 'ar'): string {

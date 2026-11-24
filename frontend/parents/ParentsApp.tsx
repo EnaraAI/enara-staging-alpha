@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import './parents.css';
 import type { Lang } from './i18n';
-import { parentsApi, type LearnerChip } from './api';
+import { parentsApi, schoolApi, type LearnerChip } from './api';
 import { Avatar, Icon, Loading, ParentsCtx, makeCtx, ErrorBox } from './ui';
 import { StatusLine, Updated } from './shared';
 import { useLive } from './useLive';
@@ -14,12 +14,13 @@ import { LinkChild } from './screens/LinkChild';
 import { ShareSheet } from './screens/ShareSheet';
 import { AddEmail } from './screens/AddEmail';
 import { ALL, SubjectChips } from './screens/Subjects';
+import { School, SchoolHomeCard, type SchoolView } from './screens/School';
 
 // ENARA Parents Portal: a parent mode inside the ENARA app, under /parents.
 // Mobile-first; English and Arabic with full RTL; week starts Saturday;
 // times in Africa/Cairo; live data on every visit, focus and pull-to-refresh.
 
-const TABS = ['home', 'progress', 'activity', 'controls', 'account'] as const;
+const TABS = ['home', 'progress', 'activity', 'controls', 'account', 'school'] as const;
 type Tab = (typeof TABS)[number] | 'link';
 const LANG_KEY = 'enara_parents_lang';
 const LEARNER_KEY = 'enara_parents_learner';
@@ -98,6 +99,12 @@ const ParentsApp: React.FC<{ userName?: string; onSignOut: () => void }> = ({ on
   const subjectList = subjects.data?.subjects ?? [];
   const chosen = subject === ALL ? null : subjectList.find((x) => x.key === subject) ?? null;
   const subjectKey = chosen ? chosen.key : ALL;
+  // Parents school app (a): the School tab and the bell appear only when the site and the child's school have a section on.
+  const school = useLive(() => (learner ? schoolApi.overview(learner.studentId).catch(() => null) : Promise.resolve(null)), [learner?.studentId], refreshKey);
+  const schoolOn = !!school.data && Object.values(school.data.sections).some(Boolean);
+  const unread = school.data?.unreadNotifications ?? 0;
+  const [schoolView, setSchoolView] = useState<SchoolView>('today');
+  const tabs = TABS.filter((k) => k !== 'school' || schoolOn);
   const [screenFetched, setScreenFetched] = useState<{ at: Date | null; loading: boolean }>({ at: null, loading: false });
   const onFetched = useCallback((at: Date | null, loading: boolean) => setScreenFetched({ at, loading }), []);
   useEffect(() => { setScreenFetched({ at: null, loading: false }); }, [tab, learner?.studentId]);
@@ -128,7 +135,7 @@ const ParentsApp: React.FC<{ userName?: string; onSignOut: () => void }> = ({ on
 
   const nav = (
     <nav className="pp-nav" aria-label={t.main}>
-      {TABS.map((k) => (
+      {tabs.map((k) => (
         <button type="button" key={k} className="pp-navlink" aria-current={tab === k ? 'page' : undefined} onClick={() => go(k)}>
           <Icon name={k} />{t.tabs[k]}
         </button>
@@ -142,6 +149,11 @@ const ParentsApp: React.FC<{ userName?: string; onSignOut: () => void }> = ({ on
         <header className="pp-header">
           <div className="pp-brand"><b>{t.brand}</b><span>{t.parents}</span></div>
           <div className="pp-head-actions">
+            {schoolOn && school.data?.sections.notifications && (
+              <button type="button" className="pp-iconbtn pp-bell" data-testid="pp-bell" aria-label={t.sch.bell(n(unread))} onClick={() => { setSchoolView('notifications'); go('school'); }}>
+                <Icon name="bell" />{unread > 0 && <span className="pp-badge" aria-hidden="true">{n(unread > 99 ? '99+' : unread)}</span>}
+              </button>
+            )}
             <button type="button" className="pp-langbtn" onClick={() => setLang(lang === 'en' ? 'ar' : 'en')} lang={lang === 'en' ? 'ar' : 'en'} aria-label={`${t.language}: ${lang === 'en' ? 'العربية' : 'English'}`}>{lang === 'en' ? 'ع' : 'EN'}</button>
             <button type="button" className="pp-iconbtn" aria-label={t.signOut} onClick={onSignOut}><Icon name="out" flip /></button>
           </div>
@@ -175,8 +187,11 @@ const ParentsApp: React.FC<{ userName?: string; onSignOut: () => void }> = ({ on
           {!showLink && learner && (
             <>
               {(tab === 'home' || tab === 'progress' || tab === 'activity') && <SubjectChips subjects={subjectList} value={subjectKey} onChange={setSubject} />}
-              {status.data && <StatusLine status={status.data} />}
+              {status.data && tab !== 'school' && <StatusLine status={status.data} />}
               <Updated at={fetched} loading={status.loading || screenFetched.loading} onRefresh={refresh} />
+              {tab === 'home' && schoolOn && school.data && <SchoolHomeCard overview={school.data} open={(v) => { setSchoolView(v); go('school'); }} />}
+              {tab === 'school' && school.data && schoolOn && <School learner={learner} refreshKey={refreshKey} overview={school.data} view={schoolView} setView={setSchoolView} onRead={school.reload} nameOf={(id) => list.find((l) => l.studentId === id)?.firstName ?? ''} />}
+              {tab === 'school' && !schoolOn && (school.data || school.error || !school.loading) && <p className="pp-notice">{t.sch.off}</p>}
               {tab === 'home' && <Home learner={learner} refreshKey={refreshKey} go={(k) => go(k as Tab)} onShare={() => setSharing(true)} onFetched={onFetched} subjectKey={subjectKey} overview={subjectList} onPickSubject={(k) => { setSubject(k); window.scrollTo({ top: 0 }); }} />}
               {tab === 'progress' && <Progress learner={learner} refreshKey={refreshKey} onFetched={onFetched} subjectKey={subjectKey} english={!!chosen?.english} />}
               {tab === 'activity' && <Activity learner={learner} refreshKey={refreshKey} onFetched={onFetched} subjectKey={subjectKey} />}

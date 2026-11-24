@@ -31,6 +31,7 @@ const PATHS: Record<string, React.ReactNode> = {
   plus: <path d="M12 5v14M5 12h14" />,
   out: <><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><path d="M21 12H9" /></>,
   close: <path d="M18 6 6 18M6 6l12 12" />,
+  school: <><path d="M2 9 12 4l10 5-10 5z" /><path d="M6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5" /></>,
 };
 export const Icon: React.FC<{ name: keyof typeof PATHS | string; className?: string; flip?: boolean; style?: React.CSSProperties }> = ({ name, className, flip, style }) => (
   <svg className={`pp-icon${flip ? ' pp-flip' : ''}${className ? ` ${className}` : ''}`} viewBox="0 0 24 24" aria-hidden="true" focusable="false" style={style}>{PATHS[name]}</svg>
