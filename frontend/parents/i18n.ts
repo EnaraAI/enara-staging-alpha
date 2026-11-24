@@ -92,7 +92,7 @@ export const T = {
     hiddenBySchool: "A child linked to you is hidden for now: their school switched parent access off. Ask the school.",
     // Parents school app (a). Data comes from the school; ENARA only shows it.
     sch: {
-      title: 'School', today: 'Today', timetable: 'Timetable', attendance: 'Attendance', announcements: 'Announcements', notifications: 'Notifications', fees: 'Fees',
+      title: 'School', today: 'Today', timetable: 'Timetable', attendance: 'Attendance', announcements: 'Announcements', notifications: 'Notifications', fees: 'Fees', none: 'None',
       feeTotal: 'Total', feePaid: 'Paid', feeRemaining: 'Remaining', feeOverdue: 'Overdue', feeNext: 'Next instalment', feeNone: 'Nothing due.', instalment: (n: string) => `Instalment ${n}`, dueOn: (d: string) => `Due ${d}`, paidOn: (d: string) => `Paid ${d}`, receipt: (r: string) => `Receipt ${r}`, egp: (a: string) => `${a} EGP`,
       feeStatus: { due: 'Due', overdue: 'Overdue', paid: 'Paid', waived: 'Waived' } as Record<string, string>, payAtSchool: 'Payment is made at the school. ENARA only shows the school’s fee record; for any question, contact the school office.', noFees: 'The school has not shared fees yet.', feesMainOnly: 'The school shows fees to the main guardian only.', overdueCount: (n: string) => `${n} overdue`, emailFees: 'Email me fee reminders (7 days and 1 day before)', feeDueLine: (amount: string, d: string) => `${amount} EGP due on ${d}`,
       attendanceToday: 'Attendance today', notRecorded: 'Not recorded yet', todayClasses: 'Classes today', noClassesToday: 'No classes today.',
@@ -212,7 +212,7 @@ export const T = {
     hiddenBySchool: 'أحد أبنائك المرتبطين مخفي حاليًا: أوقفت مدرسته وصول أولياء الأمور. تواصل مع المدرسة.',
     // تطبيق المدرسة لأولياء الأمور (أ). البيانات من المدرسة؛ إنارة تعرضها فقط.
     sch: {
-      title: 'المدرسة', today: 'اليوم', timetable: 'الجدول', attendance: 'الحضور', announcements: 'الإعلانات', notifications: 'الإشعارات', fees: 'الرسوم',
+      title: 'المدرسة', today: 'اليوم', timetable: 'الجدول', attendance: 'الحضور', announcements: 'الإعلانات', notifications: 'الإشعارات', fees: 'الرسوم', none: 'لا يوجد',
       feeTotal: 'الإجمالي', feePaid: 'المدفوع', feeRemaining: 'المتبقي', feeOverdue: 'متأخر السداد', feeNext: 'القسط التالي', feeNone: 'لا مستحقات.', instalment: (n: string) => `القسط ${n}`, dueOn: (d: string) => `يستحق ${d}`, paidOn: (d: string) => `دُفع ${d}`, receipt: (r: string) => `إيصال ${r}`, egp: (a: string) => `${a} جنيه`,
       feeStatus: { due: 'مستحق', overdue: 'متأخر', paid: 'مدفوع', waived: 'معفى' } as Record<string, string>, payAtSchool: 'يتم الدفع في المدرسة. إنارة تعرض سجل الرسوم كما سجّلته المدرسة فقط؛ لأي استفسار تواصل مع إدارة المدرسة.', noFees: 'لم تشارك المدرسة الرسوم بعد.', feesMainOnly: 'تعرض المدرسة الرسوم لولي الأمر الأساسي فقط.', overdueCount: (n: string) => `${n} متأخر`, emailFees: 'راسلني بالبريد بتذكير الأقساط (قبل 7 أيام ويوم واحد)', feeDueLine: (amount: string, d: string) => `${amount} جنيه تستحق يوم ${d}`,
       attendanceToday: 'الحضور اليوم', notRecorded: 'لم يُسجَّل بعد', todayClasses: 'حصص اليوم', noClassesToday: 'لا حصص اليوم.',

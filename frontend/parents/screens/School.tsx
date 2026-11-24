@@ -223,7 +223,7 @@ export const SchoolHomeCard: React.FC<{ overview: SchoolOverview; open: (v: Scho
       )}
       {o.sections.announcements && (
         <button type="button" className="pp-list-row pp-card--link" style={{ border: 0, background: 'none' }} onClick={() => open('announcements')}>
-          <p>{t.sch.announcements}</p><span className="pp-meta">{o.announcementsCount ? n(o.announcementsCount) : t.noAlerts}</span>
+          <p>{t.sch.announcements}</p><span className="pp-meta">{o.announcementsCount ? n(o.announcementsCount) : t.sch.none}</span>
         </button>
       )}
       {o.sections.fees && o.fees && (
@@ -233,7 +233,7 @@ export const SchoolHomeCard: React.FC<{ overview: SchoolOverview; open: (v: Scho
       )}
       {o.sections.notifications && (
         <button type="button" className="pp-list-row pp-card--link" style={{ border: 0, background: 'none' }} onClick={() => open('notifications')}>
-          <p>{t.sch.notifications}</p>{o.unreadNotifications ? <span className="pp-badge">{n(o.unreadNotifications)}</span> : <span className="pp-meta">{t.noAlerts}</span>}
+          <p>{t.sch.notifications}</p>{o.unreadNotifications ? <span className="pp-badge">{n(o.unreadNotifications)}</span> : <span className="pp-meta">{t.sch.none}</span>}
         </button>
       )}
     </section>
