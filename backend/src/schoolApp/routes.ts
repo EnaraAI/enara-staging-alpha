@@ -8,6 +8,7 @@ import { feesVisibleTo, schoolSections, setFeesVisibleTo, setSchoolSections } fr
 import { confirmImport, listImports, previewImport, undoImport } from './importer';
 import { COLUMNS } from './importSpec';
 import * as views from './parentViews';
+import { ask, confirmRequest } from './chat';
 import { answerRequest, consentCsv, consentDashboard, consentForms, consentsForParent, createConsentForm, createRequest, requestsForAdmin, requestsForParent, signConsent, withdrawConsentForm } from './requests';
 import { busForParent, busesForAdmin, sendBusNotice, setBusPhonesShared, withdrawBusNotice } from './buses';
 import { attachReceipt, feesForAdmin, feesForParent, markInstalment, receiptForAdmin, receiptForParent } from './fees';
@@ -36,6 +37,8 @@ parentSchoolRoutes.get('/learners/:studentId/requests', h(async (req, res) => { 
 parentSchoolRoutes.post('/learners/:studentId/requests', h(async (req, res) => { const b = ensurePlainObject(req.body); rejectMongoOperators(b); res.status(201).json(await createRequest(await child(req), b)); }));
 parentSchoolRoutes.get('/learners/:studentId/consents', h(async (req, res) => { res.json(await consentsForParent(await child(req))); }));
 parentSchoolRoutes.post('/learners/:studentId/consents/:formId', h(async (req, res) => { const b = ensurePlainObject(req.body); rejectMongoOperators(b); res.status(201).json(await signConsent(await child(req), String(req.params.formId), b, { ip: req.ip, userAgent: String(req.headers['user-agent'] ?? '') })); }));
+parentSchoolRoutes.post('/learners/:studentId/chat', h(async (req, res) => { const b = ensurePlainObject(req.body); rejectMongoOperators(b); res.json(await ask(await child(req), b)); }));
+parentSchoolRoutes.post('/learners/:studentId/chat/request', h(async (req, res) => { const b = ensurePlainObject(req.body); rejectMongoOperators(b); res.status(201).json(await confirmRequest(await child(req), b)); }));
 parentSchoolRoutes.get('/learners/:studentId/announcements', h(async (req, res) => { res.json(await views.announcements(await child(req))); }));
 parentSchoolRoutes.get('/notifications', h(async (req, res) => { res.json(await views.notifications(req.user!.id)); }));
 parentSchoolRoutes.post('/notifications/read', h(async (req, res) => { const b = ensurePlainObject(req.body); rejectMongoOperators(b); res.json(await views.markRead(req.user!.id, b.ids)); }));

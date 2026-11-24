@@ -590,6 +590,13 @@ export const MIGRATIONS: Migration[] = [
       const m = await import('../schoolApp/models');
       for (const model of [m.SchoolRequest, m.SchoolConsentForm, m.SchoolConsent]) await (model as { createIndexes(): Promise<unknown> }).createIndexes();
     },
+  },  {
+    id: '2026-12-06-school-app-e',
+    description: "Parents school app, step (e): indexes of school_chat_logs (new collection), including the 90-day expiry of the assistant's logs. Nothing existing changed.",
+    up: async () => {
+      const m = await import('../schoolApp/models');
+      await m.SchoolChatLog.createIndexes();
+    },
   },
 ];
 
