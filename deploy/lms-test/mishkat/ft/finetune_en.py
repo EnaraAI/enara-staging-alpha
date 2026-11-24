@@ -94,7 +94,9 @@ def finetune(run_id: str) -> dict:
     # with TF32 matmuls (Ampere) for speed.
     torch.backends.cuda.matmul.allow_tf32 = True; torch.backends.cudnn.allow_tf32 = True
     bf16 = True; amp_dtype = None
-    backbone = AutoModel.from_pretrained(BASE).to(dev)  # fp32 master weights; autocast for speed
+    # transformers 5 loads this checkpoint in float16 by default (run 3 diagnostics); training fp16 weights with AdamW overflows on
+    # step 1. Load fp32 master weights explicitly.
+    backbone = AutoModel.from_pretrained(BASE).float().to(dev)
     head = torch.nn.Linear(backbone.config.hidden_size, 6).to(dev)
     params = [{'params': [p for n, p in backbone.named_parameters() if not any(k in n for k in ('bias', 'LayerNorm'))], 'weight_decay': 0.01},
               {'params': [p for n, p in backbone.named_parameters() if any(k in n for k in ('bias', 'LayerNorm'))], 'weight_decay': 0.0},
