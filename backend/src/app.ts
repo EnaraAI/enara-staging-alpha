@@ -53,6 +53,7 @@ import speakingRoutes from './routes/speaking.routes';
 import usageRoutes from './routes/usage.routes';
 import parentsRoutes from './parents/routes';
 import parentsAdminRoutes from './parents/adminRoutes';
+import { parentSchoolRoutes, schoolAppAdminRoutes } from './schoolApp/routes';
 import multiClassRoutes from './routes/multiClass.routes';
 import { ltiRouter, wellKnownRouter } from './integrations/lms/routes';
 import { lmsAdminRouter, lmsConfigProblemRouter } from './integrations/lms/admin/routes';
@@ -362,6 +363,8 @@ export function createApp() {
   app.use('/api/usage', usageRoutes);
   app.use('/api/analytics', analyticsRoutes);
   app.use('/api/parents-admin', parentsAdminRoutes);
+  app.use('/api/parents/school', parentSchoolRoutes); // Parents school app (SCHOOL_APP_*_ENABLED; 404 when all off)
+  app.use('/api/school-app', schoolAppAdminRoutes);
   app.use('/api/parents', parentsRoutes);
   app.use('/api/multi-class', multiClassRoutes);
   // Test-deployment maintenance: 404 unless switched on AND pointed at the test cluster (maintenance/routes.ts).

@@ -2,6 +2,7 @@ import type { Model } from 'mongoose';
 import { Invitation, PasswordReset } from '../models/AccountToken';
 import { AiCall } from '../models/AiCall';
 import { Assessment } from '../models/Assessment';
+import { ParentNotification, SchoolAnnouncement, SchoolDailyAttendance } from '../schoolApp/models';
 import { AssessmentAttempt } from '../models/AssessmentAttempt';
 import { Assignment } from '../models/Assignment';
 import { AttendanceRecord } from '../models/AttendanceRecord';
@@ -88,6 +89,8 @@ const DELETE_BY_STUDENT_ID: [string, Model<any>][] = [ // eslint-disable-line @t
   ['parent_invites', ParentInvite],
   ['assessments_for_this_student_only', Assessment],
   ['attendance_records', AttendanceRecord],
+  ['school_attendance', SchoolDailyAttendance], // parents school app (a)
+  ['parent_notifications', ParentNotification],
   ['diagnostic_sessions', DiagnosticSession],
   ['learner_language_profiles', LearnerLanguageProfile],
   ['learning_events', LearningEvent],
@@ -249,6 +252,7 @@ export async function permanentlyDeleteStudent(s: StudentDoc, actor: Actor): Pro
   // rows are deleted with the student's other records below.
   await endParentLinksForStudent(sid, 'deleted', actor);
   for (const [name, model] of DELETE_BY_STUDENT_ID) removed[name] = (await model.deleteMany({ studentId: sid })).deletedCount;
+  removed.school_announcements_for_this_student_only = (await SchoolAnnouncement.deleteMany({ audience: 'student', audienceValue: sid })).deletedCount;
   // P2: safety alerts are kept for safeguarding (admins only, retention purge).
   const keptAlerts = (await SafetyAlert.updateMany({ studentId: sid }, { $set: { subjectDeleted: true }, $unset: { sessionId: 1 } })).matchedCount;
 
