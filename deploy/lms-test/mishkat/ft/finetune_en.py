@@ -90,7 +90,10 @@ def finetune(run_id: str) -> dict:
     tok = AutoTokenizer.from_pretrained(BASE)
     enc = tok(T, truncation=True, max_length=MAXLEN)['input_ids']
     dev = 'cuda'
-    bf16 = torch.cuda.is_bf16_supported(); amp_dtype = torch.bfloat16 if bf16 else torch.float16
+    # Run 1 (24 Nov): bf16 autocast gave NaN from the first step (DeBERTa-v3 is known to overflow in half precision). Full precision,
+    # with TF32 matmuls (Ampere) for speed.
+    torch.backends.cuda.matmul.allow_tf32 = True; torch.backends.cudnn.allow_tf32 = True
+    bf16 = True; amp_dtype = None
     backbone = AutoModel.from_pretrained(BASE).to(dev)  # fp32 master weights; autocast for speed
     head = torch.nn.Linear(backbone.config.hidden_size, 6).to(dev)
     params = [{'params': [p for n, p in backbone.named_parameters() if not any(k in n for k in ('bias', 'LayerNorm'))], 'weight_decay': 0.01},
@@ -99,7 +102,7 @@ def finetune(run_id: str) -> dict:
     opt = torch.optim.AdamW(params, lr=LR)
     steps = EPOCHS * ((len(tri) + BATCH - 1) // BATCH)
     sched = get_linear_schedule_with_warmup(opt, int(0.06 * steps), steps)
-    scaler = torch.amp.GradScaler('cuda', enabled=not bf16)
+    scaler = torch.amp.GradScaler('cuda', enabled=False)
     Yt = torch.tensor(Y)
 
     def batch(idx):
@@ -109,8 +112,7 @@ def finetune(run_id: str) -> dict:
         return ids.to(dev), am.to(dev), Yt[idx].to(dev)
 
     def forward(ids, am):
-        with torch.autocast('cuda', dtype=amp_dtype):
-            h = backbone(input_ids=ids, attention_mask=am).last_hidden_state
+        h = backbone(input_ids=ids, attention_mask=am).last_hidden_state
         return head(D.mean_pool(h.float(), am))
 
     def validate():
@@ -123,7 +125,7 @@ def finetune(run_id: str) -> dict:
         backbone.train(); head.train()
         return float(se.sum() / n.sum().clamp(min=1)), {c: (round(float(se[j] / n[j]), 4) if n[j] else None) for j, c in enumerate(D.TARGETS)}
 
-    val_hist, best, stopped, step = [], (float('inf'), None, -1), False, 0
+    val_hist, best, stopped, step, bad_steps = [], (float('inf'), None, -1), False, 0, 0
     rng = np.random.default_rng(D.SEED)
     backbone.train(); head.train()
     for ep in range(EPOCHS):
@@ -131,15 +133,22 @@ def finetune(run_id: str) -> dict:
         for k in range(0, len(perm), BATCH):
             ids, am, y = batch(perm[k:k + BATCH])
             loss = D.masked_mse(forward(ids, am), y)
-            opt.zero_grad(set_to_none=True); scaler.scale(loss).backward(); scaler.unscale_(opt)
-            torch.nn.utils.clip_grad_norm_(list(backbone.parameters()) + list(head.parameters()), 1.0)
-            scaler.step(opt); scaler.update(); sched.step(); step += 1; tl += float(loss); tn += 1
+            opt.zero_grad(set_to_none=True)
+            if not torch.isfinite(loss):  # never step on a non-finite loss; stop early (cost guard) if it keeps happening
+                bad_steps += 1; step += 1; sched.step()
+                if bad_steps >= 20 and bad_steps > step // 2: raise RuntimeError(f'non-finite loss in {bad_steps} of the first {step} steps; stopped to save GPU time')
+                continue
+            loss.backward()
+            gn = torch.nn.utils.clip_grad_norm_(list(backbone.parameters()) + list(head.parameters()), 1.0)
+            if not torch.isfinite(gn): bad_steps += 1; opt.zero_grad(set_to_none=True); step += 1; sched.step(); continue
+            opt.step(); sched.step(); step += 1; tl += float(loss.detach()); tn += 1
             if step % 200 == 0: log(f'epoch {ep + 1} step {step}/{steps} train loss {tl / tn:.4f}')
             if time.time() - t0 > TRAIN_BUDGET_MIN * 60: stopped = True; break
         vl, per = validate(); val_hist.append({'epoch': ep + 1, 'valLoss': round(vl, 5), 'trainLoss': round(tl / max(1, tn), 5), 'perTarget': per, 'steps': step, 'partial': stopped})
         log(f'epoch {ep + 1}: val {vl:.4f} ' + json.dumps(per))
         if vl < best[0]: best = (vl, {k_: v.detach().to('cpu', copy=True) for k_, v in backbone.state_dict().items()}, ep + 1)
         if stopped: log(f'training budget ({TRAIN_BUDGET_MIN} min) reached; keeping the best epoch so far'); break
+    if best[1] is None: raise RuntimeError('no epoch gave a finite validation loss; nothing saved')
     backbone.load_state_dict(best[1])
 
     out = f'/vol/en/{run_id}'
