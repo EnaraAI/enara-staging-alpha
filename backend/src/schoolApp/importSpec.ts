@@ -3,7 +3,9 @@
 // section; saved column mappings per school come later). A connector produces the same row objects and goes through the same checks.
 import { SCHOOL_ATTENDANCE_STATUSES } from './models';
 
-export type ImportSection = 'timetable' | 'attendance' | 'announcements' | 'fees';
+export type ImportSection = 'timetable' | 'attendance' | 'announcements' | 'fees' | 'bus_routes' | 'bus_assignments';
+/** The parent-app section an import feeds (both bus sheets feed 'buses'). */
+export const SECTION_OF: Record<ImportSection, 'timetable' | 'attendance' | 'announcements' | 'fees' | 'buses'> = { timetable: 'timetable', attendance: 'attendance', announcements: 'announcements', fees: 'fees', bus_routes: 'buses', bus_assignments: 'buses' };
 export interface Column { key: string; required: boolean; aliases: string[] }
 
 export const COLUMNS: Record<ImportSection, Column[]> = {
@@ -45,6 +47,29 @@ export const COLUMNS: Record<ImportSection, Column[]> = {
     { key: 'paid_date', required: false, aliases: ['paid date', 'payment date', 'تاريخ الدفع', 'تاريخ السداد'] },
     { key: 'receipt_ref', required: false, aliases: ['receipt ref', 'receipt', 'receipt no.', 'reference', 'رقم الإيصال', 'الإيصال'] },
     { key: 'note', required: false, aliases: ['note', 'notes', 'ملاحظة', 'ملاحظات'] },
+  ],
+  // Step (c), sheet 1: one row per stop of a route (the route's details repeat on each row; the first filled value wins).
+  bus_routes: [
+    { key: 'route', required: true, aliases: ['route', 'route name', 'line', 'خط السير', 'الخط', 'المسار'] },
+    { key: 'bus_number', required: false, aliases: ['bus number', 'bus no.', 'bus', 'رقم الحافلة', 'رقم الباص', 'الحافلة'] },
+    { key: 'supervisor', required: false, aliases: ['supervisor', 'supervisor name', 'المشرف', 'اسم المشرف', 'المشرفة'] },
+    { key: 'supervisor_phone', required: false, aliases: ['supervisor phone', 'phone', 'هاتف المشرف', 'رقم المشرف', 'الهاتف'] },
+    { key: 'driver', required: false, aliases: ['driver', 'driver name', 'السائق', 'اسم السائق'] },
+    { key: 'stop', required: true, aliases: ['stop', 'stop name', 'المحطة', 'نقطة التوقف'] },
+    { key: 'stop_order', required: false, aliases: ['stop no.', 'stop order', 'order', 'الترتيب', 'رقم المحطة'] },
+    { key: 'morning', required: false, aliases: ['morning', 'morning time', 'pick-up', 'pickup', 'الصباح', 'موعد الصباح', 'وقت الذهاب'] },
+    { key: 'afternoon', required: false, aliases: ['afternoon', 'afternoon time', 'drop-off', 'dropoff', 'العودة', 'موعد العودة', 'وقت العودة'] },
+    { key: 'map_link', required: false, aliases: ['map link', 'map', 'location', 'رابط الخريطة', 'الموقع'] },
+  ],
+  // Step (c), sheet 2: each child's route and stop.
+  bus_assignments: [
+    { key: 'student', required: true, aliases: ['student id', 'student', 'student email', 'id', 'رقم الطالب', 'الطالب', 'كود الطالب'] },
+    { key: 'student_name', required: false, aliases: ['student name', 'name', 'اسم الطالب', 'الاسم'] },
+    { key: 'route', required: true, aliases: ['route', 'route name', 'line', 'خط السير', 'الخط', 'المسار'] },
+    { key: 'stop', required: true, aliases: ['stop', 'stop name', 'المحطة', 'نقطة التوقف'] },
+    { key: 'direction', required: false, aliases: ['direction', 'trip', 'الاتجاه', 'الرحلة'] },
+    { key: 'valid_from', required: false, aliases: ['valid from', 'from', 'start date', 'من تاريخ', 'بداية'] },
+    { key: 'valid_to', required: false, aliases: ['valid to', 'to', 'end date', 'حتى تاريخ', 'نهاية'] },
   ],
 };
 
@@ -93,6 +118,12 @@ export const parseAudience = (v: string) => AUD[norm(v)] ?? null;
 const FEE: Record<string, string> = { due: 'due', unpaid: 'due', pending: 'due', open: 'due', overdue: 'due', 'مستحق': 'due', 'غير مدفوع': 'due', 'متأخر': 'due', 'لم يدفع': 'due',
   paid: 'paid', 'مدفوع': 'paid', 'تم الدفع': 'paid', 'مسدد': 'paid', 'تم السداد': 'paid', waived: 'waived', exempt: 'waived', 'معفى': 'waived', 'إعفاء': 'waived', 'اعفاء': 'waived' };
 /** Instalment status from a sheet; "overdue" in a sheet means due (ENARA works overdue out from the date). Empty = due. */
+const DIR: Record<string, string> = { both: 'both', 'both ways': 'both', 'ذهاب وعودة': 'both', 'الاثنين': 'both', morning: 'morning', am: 'morning', 'ذهاب': 'morning', 'الصباح': 'morning',
+  afternoon: 'afternoon', pm: 'afternoon', 'عودة': 'afternoon', 'العودة': 'afternoon' };
+/** Trip direction; empty = both. */
+export const parseDirection = (v: string) => (norm(v) ? DIR[norm(v)] ?? null : 'both');
+/** An Egyptian or international phone number, kept as digits with an optional leading +; null when not a phone number. */
+export function parsePhone(v: string): string | null { const s = digits(v).replace(/[\s\-().]/g, ''); return /^\+?\d{8,15}$/.test(s) ? s : null; }
 export const parseFeeStatus = (v: string) => (norm(v) ? FEE[norm(v)] ?? null : 'due');
 /** "1,250.50", "1250", "١٢٥٠ ج.م", "EGP 1,250" -> "1250.5"; null when not a non-negative amount. */
 export function parseAmount(v: string): string | null {
@@ -139,6 +170,17 @@ export function checkRow(section: ImportSection, raw: Record<string, string>): {
     if (out.plan.length > 120) p.push('plan name longer than 120 characters');
     if (out.receipt_ref.length > 80) p.push('receipt reference longer than 80 characters');
     if (out.note.length > 300) p.push('note longer than 300 characters');
+  } else if (section === 'bus_routes') {
+    for (const k of ['morning', 'afternoon'] as const) if (out[k]) { const tm = parseTime(out[k]); if (!tm) p.push(`${k} time "${out[k]}" is not a time`); else out[k] = tm; }
+    if (!out.morning && !out.afternoon) p.push('a stop needs a morning or an afternoon time');
+    if (out.supervisor_phone) { const ph = parsePhone(out.supervisor_phone); if (!ph) p.push(`phone "${out.supervisor_phone}" is not a phone number`); else out.supervisor_phone = ph; }
+    if (out.stop_order) { const o = Number(digits(out.stop_order)); if (!Number.isInteger(o) || o < 1 || o > 100) p.push(`stop order "${out.stop_order}" must be 1-100`); else out.stop_order = String(o); }
+    if (out.map_link && !/^https:\/\/[^\s]+$/.test(out.map_link)) p.push('map link must start with https://');
+    if (out.route.length > 80 || out.stop.length > 120) p.push('route or stop name too long');
+  } else if (section === 'bus_assignments') {
+    const d = parseDirection(out.direction); if (!d) p.push(`direction "${out.direction}" must be both, morning or afternoon`); else out.direction = d;
+    for (const k of ['valid_from', 'valid_to'] as const) if (out[k]) { const dt = parseDate(out[k]); if (!dt) p.push(`${k.replace('_', ' ')} "${out[k]}" not understood`); else out[k] = dt; }
+    if (out.valid_from && out.valid_to && out.valid_from > out.valid_to) p.push('valid to is before valid from');
   }
   return p.length ? { problems: p } : { row: out, problems: [] };
 }

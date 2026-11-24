@@ -362,7 +362,7 @@ router.get('/account', h(async (req, res) => {
     preferences: {
       mock: false, language: profile?.language ?? 'en', alertChannels: profile?.alertChannels ?? ['push', 'whatsapp'], summary: parentEmailsEnabled() ? 'weekly' : 'on_demand',
       // Parents P4: the parent's own on/off for the weekly summary and new results emails (the school's switches apply first).
-      ...(parentEmailsEnabled() ? { emails: { weeklySummary: profile?.emailPrefs?.weeklySummary !== false, newResults: profile?.emailPrefs?.newResults !== false, schoolAttendance: profile?.emailPrefs?.schoolAttendance !== false, schoolAnnouncements: profile?.emailPrefs?.schoolAnnouncements !== false, schoolFees: profile?.emailPrefs?.schoolFees !== false } } : {}),
+      ...(parentEmailsEnabled() ? { emails: { weeklySummary: profile?.emailPrefs?.weeklySummary !== false, newResults: profile?.emailPrefs?.newResults !== false, schoolAttendance: profile?.emailPrefs?.schoolAttendance !== false, schoolAnnouncements: profile?.emailPrefs?.schoolAnnouncements !== false, schoolFees: profile?.emailPrefs?.schoolFees !== false, schoolBus: profile?.emailPrefs?.schoolBus !== false } } : {}),
     },
   });
 }));
@@ -377,6 +377,7 @@ router.put('/account/preferences', h(async (req, res) => {
   if (typeof body.schoolAttendanceEmail === 'boolean') set['emailPrefs.schoolAttendance'] = body.schoolAttendanceEmail;
   if (typeof body.schoolAnnouncementsEmail === 'boolean') set['emailPrefs.schoolAnnouncements'] = body.schoolAnnouncementsEmail;
   if (typeof body.schoolFeesEmail === 'boolean') set['emailPrefs.schoolFees'] = body.schoolFeesEmail;
+  if (typeof body.schoolBusEmail === 'boolean') set['emailPrefs.schoolBus'] = body.schoolBusEmail;
   await ParentProfile.updateOne({ userId: uid(req) }, { $set: set, $setOnInsert: { userId: uid(req) } }, { upsert: true });
   res.json({ ok: true, ...set });
 }));

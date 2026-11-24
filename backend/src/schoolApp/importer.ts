@@ -3,8 +3,8 @@ import { Batch } from '../models/Batch';
 import { Student } from '../models/Student';
 import { recordAudit } from '../services/auditTrail';
 import { parseCsv } from '../parents/csvInvites';
-import { SchoolAnnouncement, SchoolDailyAttendance, SchoolImport, SchoolInstalment, SchoolTimetableEntry, type Source } from './models';
-import { COLUMNS, MAX_ROWS, checkRow, mapHeaders, norm, type ImportSection } from './importSpec';
+import { SchoolAnnouncement, SchoolBusAssignment, SchoolBusRoute, SchoolDailyAttendance, SchoolImport, SchoolInstalment, SchoolTimetableEntry, type Source } from './models';
+import { COLUMNS, MAX_ROWS, SECTION_OF, checkRow, mapHeaders, norm, type ImportSection } from './importSpec';
 import { sectionOn, newId } from './sections';
 import { notifyAbsences, notifyAnnouncements } from './notifications';
 
@@ -13,7 +13,7 @@ import { notifyAbsences, notifyAnnouncements } from './notifications';
 // row objects and gets the same checks and the same writes, with source.kind = 'connector'.
 type Actor = { id: string; role: string; institutionId?: string };
 const UNDO_MS = 24 * 3600_000;
-export const IMPORT_SECTIONS: ImportSection[] = ['timetable', 'attendance', 'announcements', 'fees'];
+export const IMPORT_SECTIONS: ImportSection[] = ['timetable', 'attendance', 'announcements', 'fees', 'bus_routes', 'bus_assignments'];
 const isImportSection = (x: unknown): x is ImportSection => typeof x === 'string' && (IMPORT_SECTIONS as string[]).includes(x);
 
 function scopeOf(actor: Actor, institutionId?: string): string {
@@ -40,6 +40,7 @@ async function resolve(section: ImportSection, institutionId: string, raw: Recor
   const byName = new Map<string, typeof students>(); for (const s of students) { const k = norm(s.name); byName.set(k, [...(byName.get(k) ?? []), s]); }
   const groups = await Batch.find({ institutionId, archivedAt: { $exists: false } }).select('id name').lean();
   const groupByKey = new Map(groups.map((g) => [norm(g.name), g]));
+  const busRoutes = new Map<string, { routeKey: string; routeName: string; stops: { name: string }[] }>(section === 'bus_assignments' ? (await SchoolBusRoute.find({ institutionId }).lean()).map((r) => [r.routeKey, r]) : []);
   const findStudent = (v: string) => byId.get(norm(v)) ?? byEmail.get(norm(v)) ?? ((byName.get(norm(v)) ?? []).length === 1 ? byName.get(norm(v))![0] : undefined);
   raw.forEach((r, i) => {
     const line = i + 2; // row 1 = headers
@@ -50,6 +51,15 @@ async function resolve(section: ImportSection, institutionId: string, raw: Recor
       const g = groupByKey.get(norm(row.class));
       if (!g) { problems.push({ row: line, message: `class "${row.class}" is not a class of this school in ENARA` }); return; }
       row.groupKey = norm(g.name); row.groupName = g.name;
+    } else if (section === 'bus_assignments') {
+      const s = findStudent(row.student);
+      if (!s) { problems.push({ row: line, message: `student "${row.student}" not found in this school` }); return; }
+      row.studentId = s.id;
+      const route = busRoutes.get(norm(row.route));
+      if (!route) { problems.push({ row: line, message: `route "${row.route}" is not a route of this school (import the routes sheet first)` }); return; }
+      const stop = route.stops.find((x) => norm(x.name) === norm(row.stop));
+      if (!stop) { problems.push({ row: line, message: `stop "${row.stop}" is not on route "${route.routeName}"` }); return; }
+      row.routeKey = route.routeKey; row.stop = stop.name;
     } else if (section === 'attendance' || section === 'fees') {
       const s = findStudent(row.student);
       if (!s) { problems.push({ row: line, message: (byName.get(norm(row.student)) ?? []).length > 1 ? `two students are called "${row.student}"; use the student ID` : `student "${row.student}" not found in this school` }); return; }
@@ -68,6 +78,17 @@ async function resolve(section: ImportSection, institutionId: string, raw: Recor
 async function diff(section: ImportSection, institutionId: string, rows: Record<string, string>[]) {
   const counts: Record<string, number> = { new: 0, changed: 0, unchanged: 0, removed: 0 };
   if (section === 'announcements') { counts.new = rows.length; return counts; }
+  if (section === 'bus_routes') {
+    const keys = [...new Set(rows.map((r) => norm(r.route)))];
+    const existing = new Set((await SchoolBusRoute.find({ institutionId, routeKey: { $in: keys } }).select('routeKey').lean()).map((r) => r.routeKey));
+    for (const k of keys) { if (existing.has(k)) counts.changed++; else counts.new++; }
+    return counts;
+  }
+  if (section === 'bus_assignments') {
+    const existing = new Set((await SchoolBusAssignment.find({ institutionId, studentId: { $in: [...new Set(rows.map((r) => r.studentId))] } }).select('studentId direction').lean()).map((a) => `${a.studentId}|${a.direction}`));
+    for (const r of rows) { if (existing.has(`${r.studentId}|${r.direction}`)) counts.changed++; else counts.new++; }
+    return counts;
+  }
   if (section === 'fees') {
     const existing = await SchoolInstalment.find({ institutionId, studentId: { $in: [...new Set(rows.map((r) => r.studentId))] } }).lean();
     const ex = new Map(existing.map((e) => [`${e.studentId}|${e.planKey}|${e.number}`, e]));
@@ -98,8 +119,8 @@ async function diff(section: ImportSection, institutionId: string, rows: Record<
 /** Step 1: check and preview. Nothing is written except the preview itself. */
 export async function previewImport(actor: Actor, body: { section?: unknown; csv?: unknown; fileName?: unknown; institutionId?: unknown }) {
   const institutionId = scopeOf(actor, typeof body.institutionId === 'string' ? body.institutionId : undefined);
-  if (!isImportSection(body.section)) throw new AppError('section must be timetable, attendance, announcements or fees', 400, 'VALIDATION_ERROR');
-  if (!(await sectionOn(institutionId, body.section))) throw new AppError(`The ${body.section} section is off for this school`, 409, 'SECTION_OFF');
+  if (!isImportSection(body.section)) throw new AppError('section must be timetable, attendance, announcements, fees, bus_routes or bus_assignments', 400, 'VALIDATION_ERROR');
+  if (!(await sectionOn(institutionId, SECTION_OF[body.section]))) throw new AppError(`The ${SECTION_OF[body.section]} section is off for this school`, 409, 'SECTION_OFF');
   if (typeof body.csv !== 'string' || !body.csv.trim()) throw new AppError('Upload a CSV file (Excel: Save as CSV UTF-8)', 400, 'VALIDATION_ERROR');
   if (body.csv.length > 3_000_000) throw new AppError('File too large (max 3 MB)', 413, 'TOO_LARGE');
   const { rows, missing } = rowsFromCsv(body.section, body.csv);
@@ -148,14 +169,14 @@ export async function listImports(actor: Actor, institutionId?: string) {
 
 /** Connector entry point (no preview): same checks, same writes, source.kind = 'connector'. Returns what it wrote and the problems. */
 export async function ingest(section: ImportSection, institutionId: string, raw: Record<string, string>[], connectorRef: string) {
-  if (!(await sectionOn(institutionId, section))) throw new AppError(`The ${section} section is off for this school`, 409, 'SECTION_OFF');
+  if (!(await sectionOn(institutionId, SECTION_OF[section]))) throw new AppError(`The ${SECTION_OF[section]} section is off for this school`, 409, 'SECTION_OFF');
   const { good, problems } = await resolve(section, institutionId, raw);
   const written = await write(section, institutionId, good, { kind: 'connector', ref: connectorRef, at: new Date() });
   return { inserted: written.inserted.length, replaced: written.replaced.length, problems };
 }
 
 function modelOf(section: ImportSection) {
-  return section === 'timetable' ? SchoolTimetableEntry : section === 'attendance' ? SchoolDailyAttendance : section === 'fees' ? SchoolInstalment : SchoolAnnouncement;
+  return section === 'timetable' ? SchoolTimetableEntry : section === 'attendance' ? SchoolDailyAttendance : section === 'fees' ? SchoolInstalment : section === 'bus_routes' ? SchoolBusRoute : section === 'bus_assignments' ? SchoolBusAssignment : SchoolAnnouncement;
 }
 
 /** The one write path for imports and connectors. Returns inserted ids and the previous versions of replaced or removed rows. */
@@ -189,6 +210,30 @@ async function write(section: ImportSection, institutionId: string, rows: Record
       }
     }
     await notifyAbsences(institutionId, newAbsences);
+  } else if (section === 'bus_routes') {
+    // A routes file replaces each route it contains (all its stops); other routes stay.
+    const byRoute = new Map<string, Record<string, string>[]>();
+    for (const r of rows) byRoute.set(norm(r.route), [...(byRoute.get(norm(r.route)) ?? []), r]);
+    for (const [routeKey, list] of byRoute) {
+      const first = (k: string) => list.find((r) => r[k])?.[k] || undefined;
+      const stops = list.map((r, i) => ({ name: r.stop, morning: r.morning || undefined, afternoon: r.afternoon || undefined, mapLink: r.map_link || undefined, order: r.stop_order ? Number(r.stop_order) : i + 1 }))
+        .sort((a, b) => a.order - b.order).filter((s, i, all) => all.findIndex((x) => norm(x.name) === norm(s.name)) === i);
+      const doc = { institutionId, routeKey, routeName: list[0].route, busNumber: first('bus_number'), supervisorName: first('supervisor'), supervisorPhone: first('supervisor_phone'), driverName: first('driver'), stops, source };
+      const old = await SchoolBusRoute.findOne({ institutionId, routeKey }).lean();
+      if (old) { replaced.push(old as unknown as Record<string, unknown>); await SchoolBusRoute.replaceOne({ id: old.id }, { ...doc, id: old.id }); }
+      else { const id = newId('sbr'); await SchoolBusRoute.create({ ...doc, id }); inserted.push(id); }
+    }
+  } else if (section === 'bus_assignments') {
+    // One assignment per child and direction; "both" replaces the child's morning and afternoon rows.
+    for (const r of rows) {
+      const dirs = r.direction === 'both' ? ['both', 'morning', 'afternoon'] : [r.direction, 'both'];
+      const olds = await SchoolBusAssignment.find({ institutionId, studentId: r.studentId, direction: { $in: dirs } }).lean();
+      replaced.push(...(olds as unknown as Record<string, unknown>[]));
+      await SchoolBusAssignment.deleteMany({ id: { $in: olds.map((o) => o.id) } });
+      const id = newId('sba');
+      await SchoolBusAssignment.create({ id, institutionId, studentId: r.studentId, routeKey: r.routeKey, stopName: r.stop, direction: r.direction, validFrom: r.valid_from || undefined, validTo: r.valid_to || undefined, source });
+      inserted.push(id);
+    }
   } else if (section === 'fees') {
     // Upsert per student, plan and instalment number. An instalment not in the file is left as it is.
     for (const r of rows) {

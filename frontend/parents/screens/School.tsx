@@ -5,7 +5,7 @@ import { useLive } from '../useLive';
 
 // Parents school app (a): one child's school information, read from the school's own sheets (or, later, its system).
 // ENARA only shows it. Each part names its source and when it was last updated. A section the school has off is not shown.
-export type SchoolView = 'today' | 'timetable' | 'attendance' | 'announcements' | 'fees' | 'notifications';
+export type SchoolView = 'today' | 'timetable' | 'attendance' | 'announcements' | 'fees' | 'buses' | 'notifications';
 
 const STATUS_COLOR: Record<AttendanceStatus, string> = { present: '#047857', absent: '#b42318', late: '#db7706', excused: '#075985' };
 const cairoMonth = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Cairo', year: 'numeric', month: '2-digit' }).format(new Date()).slice(0, 7);
@@ -26,7 +26,7 @@ const StatusTag: React.FC<{ status: AttendanceStatus }> = ({ status }) => {
 export const School: React.FC<{ learner: LearnerChip; refreshKey: number; overview: SchoolOverview; view: SchoolView; setView: (v: SchoolView) => void; onRead: () => void; nameOf: (studentId: string) => string }> = ({ learner, refreshKey, overview, view, setView, onRead, nameOf }) => {
   const { t } = useP();
   const on = overview.sections;
-  const views: SchoolView[] = (['today', 'timetable', 'attendance', 'fees', 'announcements', 'notifications'] as const).filter((v) => v === 'today' || on[v as SchoolSection]);
+  const views: SchoolView[] = (['today', 'timetable', 'attendance', 'buses', 'fees', 'announcements', 'notifications'] as const).filter((v) => v === 'today' || on[v as SchoolSection]);
   const current = views.includes(view) ? view : 'today';
   return (
     <>
@@ -43,6 +43,7 @@ export const School: React.FC<{ learner: LearnerChip; refreshKey: number; overvi
       {current === 'timetable' && <Timetable learner={learner} refreshKey={refreshKey} today={overview.today} />}
       {current === 'attendance' && <Attendance learner={learner} refreshKey={refreshKey} />}
       {current === 'announcements' && <Announcements learner={learner} refreshKey={refreshKey} />}
+      {current === 'buses' && <Bus learner={learner} refreshKey={refreshKey} />}
       {current === 'fees' && <Fees learner={learner} refreshKey={refreshKey} />}
       {current === 'notifications' && <Notifications refreshKey={refreshKey} onRead={onRead} nameOf={nameOf} />}
       <p className="pp-sub" style={{ marginBlockStart: 4 }}>{t.sch.displayOnly}</p>
@@ -180,7 +181,7 @@ const Notifications: React.FC<{ refreshKey: number; onRead: () => void; nameOf: 
               <span className="pp-dot" style={{ background: x.read ? 'transparent' : x.kind === 'absence' ? '#b42318' : x.kind === 'late' ? '#db7706' : '#2f6bff' }} aria-hidden="true" />
               <p>
                 <b dir="auto" style={{ fontWeight: x.read ? 500 : 700 }}>{t.sch.kind[x.kind] ?? x.kind} · {nameOf(x.studentId)}</b>
-                {x.kind === 'fee_due' ? (
+                {x.kind === 'fee_due' || x.kind === 'bus_notice' ? (
                   <span style={{ display: 'block' }} dir="auto">{x.title}</span>
                 ) : x.kind !== 'announcement' && x.date ? (
                   <>
@@ -224,6 +225,12 @@ export const SchoolHomeCard: React.FC<{ overview: SchoolOverview; open: (v: Scho
       {o.sections.announcements && (
         <button type="button" className="pp-list-row pp-card--link" style={{ border: 0, background: 'none' }} onClick={() => open('announcements')}>
           <p>{t.sch.announcements}</p><span className="pp-meta">{o.announcementsCount ? n(o.announcementsCount) : t.sch.none}</span>
+        </button>
+      )}
+      {o.sections.buses && o.bus && (
+        <button type="button" className="pp-list-row pp-card--link" style={{ border: 0, background: 'none' }} onClick={() => open('buses')} data-testid="pp-school-home-bus">
+          <p>{t.sch.busToday}</p>
+          <span className="pp-meta">{o.bus.trips.map((tr) => `${t.sch[tr.direction]} ${tr.time ? n(tr.time) : ''}`).join(' · ')}{o.bus.trips.find((tr) => tr.notice) ? <> · <b style={{ color: '#b42318' }}>{(() => { const nt = o.bus.trips.find((tr) => tr.notice)!.notice!; return nt.kind === 'cancel' ? t.sch.cancelled : t.sch.delay(n(nt.minutes ?? 0)); })()}</b></> : null}</span>
         </button>
       )}
       {o.sections.fees && o.fees && (
@@ -284,6 +291,50 @@ const Fees: React.FC<{ learner: LearnerChip; refreshKey: number }> = ({ learner,
         </>
       )}
       <Source source={f.source} />
+    </>
+  );
+};
+
+/** Step (c): the child's bus today, by trip. Stop times from the school's sheet; no live tracking. */
+const Bus: React.FC<{ learner: LearnerChip; refreshKey: number }> = ({ learner, refreshKey }) => {
+  const { t, n } = useP();
+  const q = useLive(() => schoolApi.bus(learner.studentId), [learner.studentId], refreshKey);
+  const [open, setOpen] = useState<string | null>(null);
+  if (!q.data) return q.error ? (q.error.status === 404 ? <p className="pp-notice">{t.sch.off}</p> : <ErrorBox onRetry={q.reload} />) : <Loading />;
+  return (
+    <>
+      {!q.data.trips.length ? <p className="pp-notice" style={{ display: 'block' }}>{t.sch.noBus}</p> : q.data.trips.map((tr) => (
+        <section key={tr.direction} className="pp-card" aria-labelledby={`pp-bus-${tr.direction}`} data-testid={`pp-bus-${tr.direction}`}>
+          <div className="pp-row">
+            <h2 className="pp-h2" id={`pp-bus-${tr.direction}`}>{t.sch[tr.direction]}</h2>
+            <span className="pp-meta" dir="auto">{tr.route}{tr.busNumber ? ` · ${t.sch.busNumber(tr.busNumber)}` : ''}</span>
+          </div>
+          {tr.notices.map((nt, i) => (
+            <p key={i} className="pp-error" role="alert" data-testid="pp-bus-notice" style={{ margin: 0 }}>
+              <b>{nt.kind === 'cancel' ? t.sch.cancelled : t.sch.delay(n(nt.minutes ?? 0))}</b>{nt.message ? <span dir="auto"> · {nt.message}</span> : null}
+            </p>
+          ))}
+          <div className="pp-row" style={{ fontSize: 15 }}>
+            <span>{t.sch.yourStop}: <b dir="auto">{tr.stop}</b></span>
+            <b className="pp-num" style={{ fontSize: 20 }} data-testid="pp-bus-time">{tr.time ? n(tr.time) : '—'}</b>
+          </div>
+          {tr.mapLink && <a href={tr.mapLink} target="_blank" rel="noopener noreferrer" className="pp-linkbtn">{t.sch.mapLink}</a>}
+          {(tr.supervisor || tr.driver) && (
+            <p className="pp-sub" dir="auto">
+              {tr.supervisor ? `${t.sch.supervisor}: ${tr.supervisor}` : ''}{tr.supervisor && tr.driver ? ' · ' : ''}{tr.driver ? `${t.sch.driver}: ${tr.driver}` : ''}
+            </p>
+          )}
+          {tr.supervisorPhone && <a className="pp-btn" href={`tel:${tr.supervisorPhone}`} data-testid="pp-bus-call"><span dir="ltr">{tr.supervisorPhone}</span> · {t.sch.callSupervisor(tr.supervisor ?? '')}</a>}
+          <button type="button" className="pp-linkbtn" aria-expanded={open === tr.direction} onClick={() => setOpen(open === tr.direction ? null : tr.direction)}>{t.sch.allStops}</button>
+          {open === tr.direction && (
+            <ol className="pp-school-list" data-testid="pp-bus-stops">
+              {tr.stops.map((s) => <li key={s.name} style={s.mine ? { fontWeight: 700 } : undefined}><span className="pp-num">{s.time ? n(s.time) : '—'}</span><span dir="auto">{s.name}</span></li>)}
+            </ol>
+          )}
+        </section>
+      ))}
+      <p className="pp-sub">{t.sch.noGps}</p>
+      <Source source={q.data.source} />
     </>
   );
 };

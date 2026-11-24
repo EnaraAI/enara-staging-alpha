@@ -54,3 +54,14 @@ describe('school app seed: fees (step b)', () => {
     expect(fees.some((f) => f.status === 'due' && f.dueDate === '2026-12-01')).toBe(true); // a reminder 7 days ahead
   });
 });
+
+describe('school app seed: buses (step c)', () => {
+  it('3 routes per school with stop times; riders on real stops; one delay notice today', () => {
+    const routes = of('SchoolBusRoute'), riders = of('SchoolBusAssignment'), notices = of('SchoolBusNotice');
+    expect(routes.length).toBe(9);
+    expect(routes.every((r) => r.stops.length >= 4 && r.stops.every((s: { morning: string; afternoon: string }) => /^\d\d:\d\d$/.test(s.morning) && /^\d\d:\d\d$/.test(s.afternoon)))).toBe(true);
+    expect(riders.length).toBeGreaterThan(30);
+    expect(riders.every((a) => routes.some((r) => r.routeKey === a.routeKey && r.institutionId === a.institutionId && r.stops.some((s: { name: string }) => s.name === a.stopName)))).toBe(true);
+    expect(notices.map((n) => n.date)).toEqual(['2026-11-24', '2026-11-24', '2026-11-24']);
+  });
+});

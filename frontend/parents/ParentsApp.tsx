@@ -196,7 +196,7 @@ const ParentsApp: React.FC<{ userName?: string; onSignOut: () => void }> = ({ on
               {tab === 'progress' && <Progress learner={learner} refreshKey={refreshKey} onFetched={onFetched} subjectKey={subjectKey} english={!!chosen?.english} />}
               {tab === 'activity' && <Activity learner={learner} refreshKey={refreshKey} onFetched={onFetched} subjectKey={subjectKey} />}
               {tab === 'controls' && <Controls learner={learner} refreshKey={refreshKey} />}
-              {tab === 'account' && <Account schoolOn={schoolOn && !!school.data?.sections.notifications} feesOn={!!school.data?.sections.fees} refreshKey={refreshKey} setLang={setLang} onLink={() => go('link')} onPick={(id) => { setSelectedId(id); go('home'); }} onChanged={refresh} onSignOut={onSignOut} />}
+              {tab === 'account' && <Account schoolOn={schoolOn && !!school.data?.sections.notifications} feesOn={!!school.data?.sections.fees} busOn={!!school.data?.sections.buses} refreshKey={refreshKey} setLang={setLang} onLink={() => go('link')} onPick={(id) => { setSelectedId(id); go('home'); }} onChanged={refresh} onSignOut={onSignOut} />}
             </>
           )}
         </main>

@@ -5,7 +5,7 @@ import { Avatar, ErrorBox, Icon, Loading, useP } from '../ui';
 import { useLive } from '../useLive';
 import { AddEmail } from './AddEmail';
 
-export const Account: React.FC<{ refreshKey: number; setLang: (l: Lang) => void; onLink: () => void; onPick: (studentId: string) => void; onChanged: () => void; onSignOut: () => void ; schoolOn?: boolean; feesOn?: boolean }> = ({ refreshKey, setLang, onLink, onPick, onChanged, onSignOut , schoolOn, feesOn }) => {
+export const Account: React.FC<{ refreshKey: number; setLang: (l: Lang) => void; onLink: () => void; onPick: (studentId: string) => void; onChanged: () => void; onSignOut: () => void ; schoolOn?: boolean; feesOn?: boolean; busOn?: boolean }> = ({ refreshKey, setLang, onLink, onPick, onChanged, onSignOut , schoolOn, feesOn, busOn }) => {
   const { t, n, lang } = useP();
   const q = useLive(() => parentsApi.account(), [], refreshKey);
   const [note, setNote] = useState<string | null>(null);
@@ -118,11 +118,11 @@ export const Account: React.FC<{ refreshKey: number; setLang: (l: Lang) => void;
               </label>
             ))}
             {/* Parents school app (a4): school notice emails; in-app notifications are always on. SMS and WhatsApp come later. */}
-            {schoolOn && (['schoolAttendance', 'schoolAnnouncements', ...(feesOn ? ['schoolFees'] as const : [])] as const).map((k) => (
+            {schoolOn && (['schoolAttendance', 'schoolAnnouncements', ...(feesOn ? ['schoolFees'] as const : []), ...(busOn ? ['schoolBus'] as const : [])] as const).map((k) => (
               <label key={k} className="pp-row" style={{ fontSize: 14, minBlockSize: 44 }}>
-                <span>{k === 'schoolAttendance' ? t.sch.emailAttendance : k === 'schoolFees' ? t.sch.emailFees : t.sch.emailAnnouncements}</span>
+                <span>{k === 'schoolAttendance' ? t.sch.emailAttendance : k === 'schoolFees' ? t.sch.emailFees : k === 'schoolBus' ? t.sch.emailBus : t.sch.emailAnnouncements}</span>
                 <input type="checkbox" checked={d.preferences.emails![k] !== false} data-testid={`pp-pref-${k}`}
-                  onChange={(e) => { void parentsApi.savePreferences({ [k === 'schoolAttendance' ? 'schoolAttendanceEmail' : k === 'schoolFees' ? 'schoolFeesEmail' : 'schoolAnnouncementsEmail']: e.target.checked } as never).then(() => q.reload()); }} />
+                  onChange={(e) => { void parentsApi.savePreferences({ [k === 'schoolAttendance' ? 'schoolAttendanceEmail' : k === 'schoolFees' ? 'schoolFeesEmail' : k === 'schoolBus' ? 'schoolBusEmail' : 'schoolAnnouncementsEmail']: e.target.checked } as never).then(() => q.reload()); }} />
               </label>
             ))}
             {schoolOn && <p className="pp-sub">{t.sch.smsLater}</p>}

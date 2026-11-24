@@ -98,6 +98,54 @@ instalmentSchema.index({ institutionId: 1, studentId: 1, planKey: 1, number: 1 }
 instalmentSchema.index({ status: 1, dueDate: 1 });
 export const SchoolInstalment = model<ISchoolInstalment>('SchoolInstalment', instalmentSchema, 'school_instalments');
 
+// ---- buses (step c): routes with their stops and times, each child's route and stop, and delay / cancel notices. Stop times only:
+// no live GPS in this phase.
+export interface BusStop { name: string; morning?: string; afternoon?: string; mapLink?: string; order: number }
+export interface ISchoolBusRoute extends Document {
+  id: string; institutionId: string; routeName: string; routeKey: string; busNumber?: string; supervisorName?: string; supervisorPhone?: string; driverName?: string;
+  stops: BusStop[]; source: Source;
+}
+const busRouteSchema = new Schema<ISchoolBusRoute>({
+  id: { type: String, required: true, unique: true },
+  institutionId: { type: String, required: true, index: true },
+  routeName: { type: String, required: true, maxlength: 80 }, routeKey: { type: String, required: true },
+  busNumber: { type: String, maxlength: 40 }, supervisorName: { type: String, maxlength: 80 }, supervisorPhone: { type: String, maxlength: 30 }, driverName: { type: String, maxlength: 80 },
+  stops: { type: [{ name: { type: String, required: true, maxlength: 120 }, morning: String, afternoon: String, mapLink: { type: String, maxlength: 500 }, order: Number, _id: false }], default: [] },
+  source: { type: sourceSchema, required: true },
+}, { timestamps: true });
+busRouteSchema.index({ institutionId: 1, routeKey: 1 }, { unique: true });
+export const SchoolBusRoute = model<ISchoolBusRoute>('SchoolBusRoute', busRouteSchema, 'school_bus_routes');
+
+export interface ISchoolBusAssignment extends Document {
+  id: string; institutionId: string; studentId: string; routeKey: string; stopName: string; direction: 'both' | 'morning' | 'afternoon'; validFrom?: string; validTo?: string; source: Source;
+}
+const busAssignmentSchema = new Schema<ISchoolBusAssignment>({
+  id: { type: String, required: true, unique: true },
+  institutionId: { type: String, required: true, index: true },
+  studentId: { type: String, required: true, index: true },
+  routeKey: { type: String, required: true }, stopName: { type: String, required: true, maxlength: 120 },
+  direction: { type: String, enum: ['both', 'morning', 'afternoon'], required: true },
+  validFrom: String, validTo: String, // YYYY-MM-DD
+  source: { type: sourceSchema, required: true },
+}, { timestamps: true });
+busAssignmentSchema.index({ institutionId: 1, studentId: 1, direction: 1 }, { unique: true });
+export const SchoolBusAssignment = model<ISchoolBusAssignment>('SchoolBusAssignment', busAssignmentSchema, 'school_bus_assignments');
+
+export interface ISchoolBusNotice extends Document {
+  id: string; institutionId: string; routeKey: string; kind: 'delay' | 'cancel'; direction: 'morning' | 'afternoon'; minutes?: number; message?: string; date: string; createdBy: string; withdrawnAt?: Date; createdAt: Date;
+}
+const busNoticeSchema = new Schema<ISchoolBusNotice>({
+  id: { type: String, required: true, unique: true },
+  institutionId: { type: String, required: true, index: true },
+  routeKey: { type: String, required: true },
+  kind: { type: String, enum: ['delay', 'cancel'], required: true },
+  direction: { type: String, enum: ['morning', 'afternoon'], required: true },
+  minutes: { type: Number, min: 1, max: 600 }, message: { type: String, maxlength: 300 },
+  date: { type: String, required: true }, // the Cairo day it applies to
+  createdBy: { type: String, required: true }, withdrawnAt: Date,
+}, { timestamps: { createdAt: true, updatedAt: false } });
+busNoticeSchema.index({ institutionId: 1, routeKey: 1, date: 1 });
+export const SchoolBusNotice = model<ISchoolBusNotice>('SchoolBusNotice', busNoticeSchema, 'school_bus_notices');
 // ---- receipt files kept in the database (only when SCHOOL_RECEIPTS_STORE=db, the E2E stack, which has no reachable R2). Elsewhere: R2.
 export interface ISchoolReceiptFile extends Document { key: string; institutionId: string; contentType: string; data: Buffer; createdAt: Date }
 const receiptFileSchema = new Schema<ISchoolReceiptFile>({
@@ -129,14 +177,14 @@ export const SchoolImport = model<ISchoolImport>('SchoolImport', importSchema, '
 
 // ---- in-app notifications for parents
 export interface IParentNotification extends Document {
-  id: string; parentUserId: string; studentId?: string; institutionId?: string; kind: 'absence' | 'late' | 'announcement' | 'fee_due';
+  id: string; parentUserId: string; studentId?: string; institutionId?: string; kind: 'absence' | 'late' | 'announcement' | 'fee_due' | 'bus_notice';
   title: string; body: string; refId?: string; date?: string; readAt?: Date; createdAt: Date;
 }
 const notificationSchema = new Schema<IParentNotification>({
   id: { type: String, required: true, unique: true },
   parentUserId: { type: String, required: true, index: true },
   studentId: { type: String, index: true }, institutionId: String,
-  kind: { type: String, enum: ['absence', 'late', 'announcement', 'fee_due'], required: true },
+  kind: { type: String, enum: ['absence', 'late', 'announcement', 'fee_due', 'bus_notice'], required: true },
   title: { type: String, required: true, maxlength: 200 }, body: { type: String, maxlength: 600 },
   refId: String, date: String, readAt: Date, // date: the attendance day (YYYY-MM-DD, Cairo) for absence / late
 }, { timestamps: { createdAt: true, updatedAt: false } });
