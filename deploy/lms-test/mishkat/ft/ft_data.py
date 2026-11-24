@@ -72,3 +72,4 @@ def masked_mse(pred, y):
 def mean_pool(h, mask):  # = mishkat_features.Encoder.embed pooling
     m = mask.unsqueeze(-1).to(h.dtype)
     return (h * m).sum(1) / m.sum(1).clamp(min=1e-6)
+# run 1: after English run 9 (24 Nov)
