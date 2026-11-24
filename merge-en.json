@@ -1,0 +1,306 @@
+{
+ "label": "MODEL-MARKED: development only, not for claims, never for a real school",
+ "lang": "en",
+ "scorerRun": {
+  "recipe": "two_stage",
+  "stage1": [
+   "ellipse",
+   "asap2",
+   "persuade"
+  ],
+  "stage1Essays": 3000,
+  "enaraLabelled": 495
+ },
+ "method": "per criterion, multinomial logistic regression on one-hot marks of the scorer and of v3b (all criteria of the type); 5-fold by question; trained and scored on the Sonnet-Opus agreed marks only",
+ "types": {
+  "essay": {
+   "answers": 233,
+   "questions": 143,
+   "perCriterion": {
+    "task_completion": {
+     "v3b": {
+      "n": 213,
+      "exact": 0.925,
+      "within1": 1.0,
+      "qwk": 0.827,
+      "bias": 0.02
+     },
+     "scorer": {
+      "n": 213,
+      "exact": 0.831,
+      "within1": 0.981,
+      "qwk": 0.456,
+      "bias": -0.03
+     },
+     "split_stepA": {
+      "n": 213,
+      "exact": 0.925,
+      "within1": 1.0,
+      "qwk": 0.827,
+      "bias": 0.02
+     },
+     "learned_merge": {
+      "n": 213,
+      "exact": 0.925,
+      "within1": 0.991,
+      "qwk": 0.736,
+      "bias": 0.06
+     },
+     "mergeMinusBest_qwk_95ci": [
+      -0.266,
+      0.054
+     ],
+     "passesBar": false
+    },
+    "grammar_accuracy": {
+     "v3b": {
+      "n": 211,
+      "exact": 0.896,
+      "within1": 1.0,
+      "qwk": 0.781,
+      "bias": -0.09
+     },
+     "scorer": {
+      "n": 211,
+      "exact": 0.867,
+      "within1": 1.0,
+      "qwk": 0.735,
+      "bias": -0.06
+     },
+     "split_stepA": {
+      "n": 211,
+      "exact": 0.867,
+      "within1": 1.0,
+      "qwk": 0.735,
+      "bias": -0.06
+     },
+     "learned_merge": {
+      "n": 211,
+      "exact": 0.91,
+      "within1": 1.0,
+      "qwk": 0.802,
+      "bias": -0.03
+     },
+     "mergeMinusBest_qwk_95ci": [
+      -0.052,
+      0.08
+     ],
+     "passesBar": true
+    },
+    "vocabulary_range": {
+     "v3b": {
+      "n": 202,
+      "exact": 0.792,
+      "within1": 1.0,
+      "qwk": 0.797,
+      "bias": 0.16
+     },
+     "scorer": {
+      "n": 202,
+      "exact": 0.847,
+      "within1": 1.0,
+      "qwk": 0.859,
+      "bias": 0.02
+     },
+     "split_stepA": {
+      "n": 202,
+      "exact": 0.847,
+      "within1": 1.0,
+      "qwk": 0.859,
+      "bias": 0.02
+     },
+     "learned_merge": {
+      "n": 202,
+      "exact": 0.891,
+      "within1": 1.0,
+      "qwk": 0.903,
+      "bias": -0.01
+     },
+     "mergeMinusBest_qwk_95ci": [
+      0.001,
+      0.087
+     ],
+     "passesBar": true
+    },
+    "organisation": {
+     "v3b": {
+      "n": 182,
+      "exact": 0.846,
+      "within1": 1.0,
+      "qwk": 0.802,
+      "bias": -0.05
+     },
+     "scorer": {
+      "n": 182,
+      "exact": 0.797,
+      "within1": 1.0,
+      "qwk": 0.741,
+      "bias": -0.02
+     },
+     "split_stepA": {
+      "n": 182,
+      "exact": 0.846,
+      "within1": 1.0,
+      "qwk": 0.802,
+      "bias": -0.05
+     },
+     "learned_merge": {
+      "n": 182,
+      "exact": 0.868,
+      "within1": 1.0,
+      "qwk": 0.827,
+      "bias": 0.03
+     },
+     "mergeMinusBest_qwk_95ci": [
+      -0.039,
+      0.089
+     ],
+     "passesBar": true
+    },
+    "mechanics": {
+     "v3b": {
+      "n": 223,
+      "exact": 0.749,
+      "within1": 1.0,
+      "qwk": 0.336,
+      "bias": -0.24
+     },
+     "scorer": {
+      "n": 223,
+      "exact": 0.892,
+      "within1": 1.0,
+      "qwk": 0.488,
+      "bias": -0.06
+     },
+     "split_stepA": {
+      "n": 223,
+      "exact": 0.892,
+      "within1": 1.0,
+      "qwk": 0.488,
+      "bias": -0.06
+     },
+     "learned_merge": {
+      "n": 223,
+      "exact": 0.928,
+      "within1": 1.0,
+      "qwk": 0.352,
+      "bias": 0.04
+     },
+     "mergeMinusBest_qwk_95ci": [
+      -0.394,
+      0.095
+     ],
+     "passesBar": false
+    }
+   }
+  },
+  "short_answer": {
+   "answers": 262,
+   "questions": 114,
+   "perCriterion": {
+    "task_completion": {
+     "v3b": {
+      "n": 239,
+      "exact": 0.782,
+      "within1": 1.0,
+      "qwk": 0.763,
+      "bias": 0.2
+     },
+     "scorer": {
+      "n": 239,
+      "exact": 0.536,
+      "within1": 0.987,
+      "qwk": 0.396,
+      "bias": -0.03
+     },
+     "split_stepA": {
+      "n": 239,
+      "exact": 0.782,
+      "within1": 1.0,
+      "qwk": 0.763,
+      "bias": 0.2
+     },
+     "learned_merge": {
+      "n": 239,
+      "exact": 0.791,
+      "within1": 1.0,
+      "qwk": 0.818,
+      "bias": 0.08
+     },
+     "mergeMinusBest_qwk_95ci": [
+      0.012,
+      0.091
+     ],
+     "passesBar": true
+    },
+    "grammar_accuracy": {
+     "v3b": {
+      "n": 262,
+      "exact": 0.973,
+      "within1": 1.0,
+      "qwk": -0.007,
+      "bias": -0.02
+     },
+     "scorer": {
+      "n": 262,
+      "exact": 0.966,
+      "within1": 1.0,
+      "qwk": -0.007,
+      "bias": -0.03
+     },
+     "split_stepA": {
+      "n": 262,
+      "exact": 0.966,
+      "within1": 1.0,
+      "qwk": -0.007,
+      "bias": -0.03
+     },
+     "learned_merge": {
+      "n": 262,
+      "exact": 0.996,
+      "within1": 1.0,
+      "qwk": 0.0,
+      "bias": 0.0
+     },
+     "mergeMinusBest_qwk_95ci": [
+      0.005,
+      0.016
+     ],
+     "passesBar": true
+    },
+    "mechanics": {
+     "v3b": {
+      "n": 261,
+      "exact": 0.981,
+      "within1": 1.0,
+      "qwk": 0.0,
+      "bias": -0.02
+     },
+     "scorer": {
+      "n": 261,
+      "exact": 0.954,
+      "within1": 1.0,
+      "qwk": 0.0,
+      "bias": -0.05
+     },
+     "split_stepA": {
+      "n": 261,
+      "exact": 0.954,
+      "within1": 1.0,
+      "qwk": 0.0,
+      "bias": -0.05
+     },
+     "learned_merge": {
+      "n": 261,
+      "exact": 1.0,
+      "within1": 1.0,
+      "qwk": null,
+      "bias": 0.0
+     },
+     "mergeMinusBest_qwk_95ci": null,
+     "passesBar": null
+    }
+   }
+  }
+ }
+}
