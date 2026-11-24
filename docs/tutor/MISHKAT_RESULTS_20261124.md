@@ -45,6 +45,31 @@ _24 Nov 2026, 3:20 PM Cairo. **MODEL-MARKED: development only, never for claims,
 | What failed before | Runs 1–3: transformers 5 loads this model in 16-bit by default, and training 16-bit weights overflows at step 1. Fixed in run 4 by loading 32-bit weights |
 | Next | Scores on ENARA answers and on the human-scored ELLIPSE essays, next to run 9 and v3b (about 5:45 PM) |
 
+## English fine-tuned encoder: result (3:33 PM, scored on a Modal GPU in 13 min, $0.23)
+Same stage-1 setup as run 9 (1,000 each from ELLIPSE, ASAP 2.0, PERSUADE); only the encoder differs. QWK vs Sonnet–Opus on ENARA essays.
+
+| Criterion | **Fine-tuned, ENARA only** | Fine-tuned, two-stage | Run 9 (frozen), ENARA only | Run 9 (frozen), two-stage | v3b |
+|---|---|---|---|---|---|
+| Grammar | **0.79** | 0.75 | 0.77 | 0.74 | 0.78 |
+| Spelling/punctuation | **0.64** | 0.47 | 0.53 | 0.49 | 0.34 |
+| Vocabulary | **0.93** | 0.89 | 0.90 | 0.86 | 0.80 |
+| Organisation | 0.77 | 0.76 | 0.68 | 0.74 | **0.80** |
+| Task completion | 0.62 | 0.55 | 0.55 | 0.46 | **0.83** |
+
+| ELLIPSE human-scored (200; two-stage model) | Fine-tuned | Run 9 | v3b |
+|---|---|---|---|
+| Grammar | 0.42 | **0.47** | 0.11 |
+| Spelling | 0.41 | **0.43** | 0.13 |
+| Vocabulary | **0.47** | 0.36 | 0.21 |
+| Organisation | 0.30 | **0.43** | 0.33 |
+
+- **Verdict:**
+  - **The fine-tune helps on ENARA answers:** grammar 0.79, now above v3b (0.78); spelling 0.64 against 0.53; vocabulary 0.93.
+  - **It does not help on the human-scored ELLIPSE essays,** apart from vocabulary.
+  - Run 7's frozen two-stage model still has the best ENARA grammar (0.80).
+- **Length tests:** all pass (short correct answers 99%; truncation 0.00; padding −0.02).
+- **GPU spend today:** about $0.80 in all (fine-tune runs 1–4 and this evaluation; cap $5).
+
 ## English so far (for the coming comparison)
 | QWK | Run 7 (ELLIPSE 2,500) | Run 9 (1,000 each from ELLIPSE, ASAP 2.0, PERSUADE) | v3b |
 |---|---|---|---|
