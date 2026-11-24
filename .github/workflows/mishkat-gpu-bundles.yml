@@ -1,0 +1,45 @@
+# Owner go, 24 Nov 2026: Mishkat split bundles. English = fine-tuned encoder (20261124-828e2db), ENARA-only head; Arabic = run 10
+# (AR-AES + AR-ASAG, two-stage). Trained on a Modal GPU; bundles go to the Modal Volume "mishkat-bundles" (/en, /ar); numbers only to
+# claude/tutor-lms-mishkat-bundles-<lang>. Each language A10G, cap 50 min. The lms-test switch mishkatSplit stays OFF.
+name: Mishkat bundles on GPU
+on:
+  push:
+    branches: ['claude/tutor-lms-dscompare-run']
+    paths: ['deploy/lms-test/mishkat/gpu/**', '.github/workflows/mishkat-gpu-bundles.yml']
+permissions:
+  contents: write
+jobs:
+  bundle:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { lang: en, cfg: '{"lang":"en","encoder":"20261124-828e2db","stage1":"ellipse,asap2,persuade","preMax":3000,"recipe":"stage2_only","aug":false,"egypt":false,"export":true}' }
+          - { lang: ar, cfg: '{"lang":"ar","encoder":"base","stage1":"araes,arasag","preMax":0,"recipe":"two_stage","aug":true,"egypt":false,"export":true}' }
+    env:
+      MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+      MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - name: Data (model-marked) and today's v3b numbers on the human-scored essays
+        run: |
+          git fetch -q --depth 1 origin claude/tutor-lms-mishkat && git worktree add -q mk FETCH_HEAD
+          git fetch -q --depth 1 origin claude/tutor-lms-recal-results && git show FETCH_HEAD:summary.json > v3b-human.json
+      - name: Train and export on a Modal GPU
+        env: { MK_EVAL_DATA: '${{ github.workspace }}/mk/data/mishkat-dev', MK_EVAL_V3B: '${{ github.workspace }}/v3b-human.json' }
+        run: |
+          pip install -q modal
+          CFG=$(python3 -c "import json,sys; c=json.loads(sys.argv[1]); c['sha']=sys.argv[2]; print(json.dumps(c))" '${{ matrix.cfg }}' "$GITHUB_SHA")
+          modal run deploy/lms-test/mishkat/gpu/mishkat_gpu.py --cfg "$CFG" --out-dir out
+      - name: Publish (numbers only)
+        if: always()
+        run: |
+          B=claude/tutor-lms-mishkat-bundles-${{ matrix.lang }}; [ -f out/results/report.json ] || B="$B-failed"
+          P="$RUNNER_TEMP/pub"; mkdir -p "$P"; cp out/results/report.json out/train.log out/gpu-run.json "$P/" 2>/dev/null || true
+          cd "$P" && git init -q && git checkout -q -b r && git add -A && git -c user.name=github-actions -c user.email=github-actions@users.noreply.github.com commit -qm "Mishkat bundle ${{ matrix.lang }} ${GITHUB_SHA::8}"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" "r:$B"
