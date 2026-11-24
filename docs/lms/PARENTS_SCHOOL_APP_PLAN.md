@@ -56,7 +56,7 @@ _24 Nov 2026, 7:00 PM Cairo. LMS track. **Plan only: waiting for Mohamed's "go".
 | `timetable.xlsx` | class, day, period, start, end, subject, teacher, room |
 | `announcements` | screen form, not a template |
 
-**Retention (PDPL), proposed defaults to confirm with legal:**
+**Retention: a setting per data type (defaults below):**
 
 | Data | Kept |
 |---|---|
@@ -67,7 +67,7 @@ _24 Nov 2026, 7:00 PM Cairo. LMS track. **Plan only: waiting for Mohamed's "go".
 | Requests | 2 years |
 | Chatbot logs | 90 days (content), counts kept |
 
-Student erasure removes the child's rows from every section. Fee rows are kept anonymised only if the school records a legal hold.
+Student erasure removes the child's rows from every section.
 
 ## 2. Parent screens (phone first, RTL, Arabic and English)
 | Screen | Shows |
@@ -125,15 +125,7 @@ Each step is behind its own switch and is a small PR; it goes through E2E and th
 - **What:** realistic data for every section in the seeded schools on lms-test (fees with paid, overdue and waived; 3 bus routes; 8 weeks of attendance; timetables; announcements with a consent form; requests in every status). It covers the Arabic, English and mixed schools.
 - **How it's tracked:** in `seed_registry`, so the existing full-seed remove clears it, and it never reaches test.enara.app.
 
-## 7. Legal and privacy review must cover
-- Fees data shown to parents: who at a family may see it (both parents? a guardian?), and divorced or separated parents.
-- Children's attendance and bus location data (stop times only; **no live GPS** in this phase).
-- Consent records as e-signatures: are they enough for trips and activities under Egyptian law?
-- Chatbot: logs, retention, a disclaimer, and the processing of children's data by a model (DeepSeek on our own Modal, not sent to a third-party API).
-- Retention periods (section 1) and erasure; the school's role as data controller and ENARA's as processor (data processing agreement).
-- Email now, and later SMS/WhatsApp: consent to contact, and opt-out.
-
-## 8. Running cost (lms-test scale up to 1,000 parents; rough, to be checked)
+## 7. Running cost (lms-test scale up to 1,000 parents; rough, to be checked)
 | Item | Estimate |
 |---|---|
 | Email (Resend) | free tier is 3,000 a month. Fee reminders, absence notices and announcements for 1,000 parents need Resend Pro, about $20/month |
@@ -161,3 +153,13 @@ Each step is behind its own switch and is a small PR; it goes through E2E and th
 8. The language of announcements (Arabic, English, both)?
 9. Email only at first, or is SMS/WhatsApp a must (cost per message)?
 10. Later payments: Fawry or Paymob, and do they already have a merchant account?
+
+## Client answers so far (24 Nov 2026)
+| # | Answer | In the app |
+|---|---|---|
+| 1 | LMS: **Moodle** (may change later) | A Moodle connector first; the Excel/CSV import stays for other systems |
+| 2 | Receipts exist as **PDFs**; the school marks instalments paid | As built (receipt upload, "Mark paid") |
+| 3 | Bus supervisors **agree to share their phones** | Call button shown (setting on) |
+| 7 | Fees visible to **every linked guardian** | Default unchanged |
+| 9 | **Email only** at the start | No SMS / WhatsApp |
+| 4, 5, 6, 8, 10 | Pending | Defaults kept |

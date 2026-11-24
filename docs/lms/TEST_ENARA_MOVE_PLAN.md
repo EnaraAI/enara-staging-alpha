@@ -26,7 +26,7 @@ _24 Nov 2026, 6:30 PM Cairo. **Plan only: waiting for Mohamed's "go".** Nothing 
 | 9 | Build the styling instead of the Tailwind CDN | **Not done** | `frontend/index.html` still loads `cdn.tailwindcss.com` |
 | 10 | Revoke the "Protection Bypass for Automation" secret on enara-lms-test | **Not verified** | Needs a read-only Vercel check (I can run it; it changes nothing) |
 | 11 | Tutor and avatar on lms-test (`ANAM_API_KEY`, AI on) | **Done** | Variable check today: Anam key ok, AI test-spend cap set, DeepSeek tutor ok |
-| 12 | Children's speaking: parent consent and legal review | **Needs you + legal** | `kidsSpeaking` is on for lms-test only |
+| 12 | Children's speaking: parent consent | **Needs you** | `kidsSpeaking` is on for lms-test only |
 | 13 | Full-seed remove before go-live | **Not done (by design)** | Only for lms-test's database. It is never copied, and the move does not copy data |
 
 **Also done today:**
@@ -67,7 +67,7 @@ _24 Nov 2026, 6:30 PM Cairo. **Plan only: waiting for Mohamed's "go".** Nothing 
 ## 4. Switches on test.enara.app at first
 **Stay off:**
 - `mishkatSplit`;
-- `kidsPack` and `kidsSpeaking` (consent and legal review);
+- `kidsPack` and `kidsSpeaking` (parent consent first);
 - anything that grades from model-marked data;
 - `LMS_GRADE_PASSBACK_ENABLED` (no per-school switch yet, no accuracy bar);
 - `LMS_EMAILS_ENABLED` and `PARENT_EMAILS_ENABLED` until the production sender and the Resend upgrade;
@@ -102,5 +102,5 @@ _24 Nov 2026, 6:30 PM Cairo. **Plan only: waiting for Mohamed's "go".** Nothing 
 5. **Vercel Pro** for the new team, before cutover.
 6. **Backups:** the database backup (Atlas snapshot), or a read-only database user and a secret for the dry-run copy.
 7. **Email:** the production sender and reply-to, and the Resend plan (checklist #2, #5).
-8. **The first real school:** consent and legal review for children's speaking; a real-device session; a final read of the school guide (checklist #7, #8, #12).
+8. **The first real school:** parent consent for children's speaking; a real-device session; a final read of the school guide (checklist #7, #8, #12).
 9. **Your "go"** on each step: 1–2 → 3–6 → 7.
