@@ -1,0 +1,31 @@
+# Dataset probe (owner, 24 Nov 2026): licences and formats of AR-AES, the Zenodo Egyptian short answers, AR-ASAG, PERSUADE, ASAP 2.0.
+# Metadata and counts only (no answer text) to claude/tutor-lms-mishkat-probe.
+name: lms-test Mishkat dataset probe
+on:
+  push:
+    branches: ['claude/tutor-lms-dscompare-run']
+    paths: ['deploy/lms-test/mishkat/probe/**', '.github/workflows/lms-test-mishkat-probe.yml']
+permissions:
+  contents: write
+jobs:
+  probe:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -q pandas openpyxl pyarrow
+      - name: Probe
+        working-directory: deploy/lms-test/mishkat/probe
+        run: python probe.py 2>&1 | tee probe.log
+      - name: Publish (metadata only)
+        if: always()
+        working-directory: deploy/lms-test/mishkat/probe
+        run: |
+          mkdir -p out && cp probe.log out/ 2>/dev/null || true
+          cd out && git init -q && git checkout -q -b claude/tutor-lms-mishkat-probe
+          git config user.name github-actions && git config user.email github-actions@users.noreply.github.com
+          git add -A && git commit -qm "dataset probe ${GITHUB_SHA::8}"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" claude/tutor-lms-mishkat-probe
