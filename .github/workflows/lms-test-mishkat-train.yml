@@ -66,6 +66,7 @@ jobs:
         working-directory: deploy/lms-test/mishkat
         run: |
           B=claude/tutor-lms-mishkat-results-${{ matrix.lang }}
+          [ -f results/report.json ] || B="$B-failed"  # a stopped or crashed run never overwrites the last good report
           mkdir -p results && cp train.log results/ 2>/dev/null || true
           rm -rf results/bundle-*  # the model bundle goes to the artifact above, never to a branch
           cd results && git init -q && git checkout -q -b "$B"
