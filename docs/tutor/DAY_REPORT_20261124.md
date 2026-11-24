@@ -143,24 +143,27 @@ Rolled back: none. Every deploy used the full E2E suite first.
 
 **GPU spend today (Modal A10G):** about **$2.33** in all (fine-tune, evaluations, the English no-cap run, both bundles); cap $5.
 
-## 8. Open items and decisions for you
-1. **Mishkat timeout against latency.**
-   - lms-test waits at most **3 s** for Mishkat, then falls back to v3b alone.
-   - Under 200 answers at once, the warm median is 2.7 s and p95 8.3 s, so many answers would fall back during a burst.
-   - Single answers on a warm container should be far faster; I have not measured that yet.
-   - Options:
-     - (a) raise the timeout to about 10 s;
-     - (b) keep more warm containers in school hours (about $24/month each);
-     - (c) the GPU switch;
-     - (d) accept the fallback.
+## 8. Decisions taken at 6 PM, and single-answer latency
+- **Mishkat timeout on lms-test:** raised from 3 s to **10 s** (PR #110; grading runs after submission).
+- **Single answers on a warm container,** 100 answers one at a time:
 
-   My suggestion: measure single-answer latency first, then choose.
-2. **The `mishkatSplit` switch:** stays off until your "go". The next lms-test deploy loads `MISHKAT_ENDPOINT`.
-3. **lms-test Anthropic key** is rejected by Anthropic. Replace it, or leave it if nothing should call Anthropic.
-4. **Weak passwords on lms-test:** `SEED_USER_PASSWORD` and `API_DOCS_PASSWORD` are shorter than 12 characters.
-5. **The new Vercel team is Hobby.** The usage that blocked the old team can happen again; Pro is the fix (you planned it in a few days).
-6. **A real Moodle LTI launch on lms-test,** done by a person. The automatic check uses the mock LMS only.
-7. **Unchanged from before:**
-   - your review-sheet corrections (then retrain on the GPU, minutes);
-   - the LAILA authors' OK;
-   - the DeepSeek part of the colloquial re-mark of 54 Arabic answers, now possible since lms-test is back up.
+  | | Median | p95 |
+  |---|---|---|
+  | **All** | **0.77 s** | **1.03 s** |
+  | English essays | 0.78 s | 0.99 s |
+  | English short answers | 0.63 s | 0.69 s |
+  | Arabic essays | 0.94 s | 1.14 s |
+  | Arabic short answers | 0.77 s | 0.92 s |
+
+  All 100 answered. Range 0.57–1.21 s.
+- **Anthropic key on lms-test:** left as it is (owner).
+- **The two short passwords:** the owner changes them in Vercel.
+- **Teacher sheet, 50 English + 50 Arabic:** `teacher-marking/ENARA_teacher_marking_sheet_50.xlsx`, with its key kept separately in `key-50.json`.
+- **Switch:** `mishkatSplit` stays off.
+
+## 9. Still open
+1. **The new Vercel team is Hobby;** Pro is the fix.
+2. **A real Moodle LTI launch** on lms-test, done by a person.
+3. **Your review-sheet corrections** (then retrain on the GPU), and teacher marks when they come back.
+4. **The LAILA authors' OK.**
+5. **The DeepSeek part of the colloquial re-mark** (54 Arabic answers).
