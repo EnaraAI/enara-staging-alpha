@@ -9,6 +9,11 @@ T0 = time.time()
 def log(*a): print(f"[{time.strftime('%H:%M:%S')} +{(time.time() - T0) / 60:.1f} min]", *a, flush=True)
 LANG = os.environ['MK_LANG']; DATA = os.environ['MK_DATA']; SEED = 20261123
 ENC = {'en': 'microsoft/deberta-v3-base', 'ar': 'CAMeL-Lab/bert-base-arabic-camelbert-msa'}[LANG]  # = mishkat_features.ENCODERS
+ENC_LABEL = ENC
+if os.environ.get('MK_ENCODER_DIR'):  # a fine-tuned encoder (deploy/lms-test/mishkat/ft): local save_pretrained directory replaces ENC
+    _d = os.path.abspath(os.environ['MK_ENCODER_DIR']); _cf = os.path.join(_d, 'ft-cost.json')
+    _run = os.environ.get('MK_FT_RUN') or (json.load(open(_cf)).get('runId') if os.path.exists(_cf) else None) or os.path.basename(_d)
+    ENC_LABEL = f"{ENC.split('/')[-1]} fine-tuned ({_run})"; ENC = _d
 MAXLEN = 256; PRE_N = int(os.environ.get('MK_PRE_N', '2500'))
 rng = np.random.default_rng(SEED); random.seed(SEED); torch.manual_seed(SEED)
 torch.set_num_threads(max(1, min(4, len(os.sched_getaffinity(0)))))
@@ -22,6 +27,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import mishkat_features as MF
 from mishkat_features import Head
 _E = MF.Encoder(ENC, MAXLEN)
+ENC_TAG = MF.encoder_tag(ENC)  # in the feature-cache file names: base-encoder readings are never reused with a fine-tuned encoder
 def X_of(texts, part): return MF.X_of(texts, LANG, _E, part, log)
 
 # ---------------- stage-1 data (public datasets, never stored) ----------------
@@ -146,14 +152,14 @@ def stats(p, g, k):
     return {'n': int(len(p)), 'exact': round(float((p == g).mean()), 3), 'within1': round(float((abs(p - g) <= 1).mean()), 3), 'qwk': qwk(p, g, k), 'bias': round(float((p - g).mean()), 2)}
 
 # ---------------- run ----------------
-log(f'{LANG}: encoder {ENC}, max {MAXLEN} tokens, stage-1 sample {PRE_N}')
+log(f'{LANG}: encoder {ENC_LABEL} [{ENC_TAG}], max {MAXLEN} tokens, stage-1 sample {PRE_N}')
 pre_texts, pre_Y, pre_ids = stage1(); log(f'stage 1 data: {len(pre_texts)} essays')
 rows, n_corr = enara(); log(f'ENARA model-marked: {len(rows)} labelled answers, owner corrections applied: {n_corr}')
 # Cache of the slow part (encoder + features), keyed by the workflow on the data and this feature version; a later crash or a retrain
 # after owner corrections reuses it. Labels are not cached (corrections must always apply).
 CACHE = os.environ.get('MK_CACHE', 'cache'); os.makedirs(CACHE, exist_ok=True)
 def cached(name, texts, part):
-    f = f'{CACHE}/{LANG}-{name}.npz'
+    f = f'{CACHE}/{LANG}-{ENC_TAG}-{name}.npz'
     if os.path.exists(f):
         d = np.load(f, allow_pickle=True)
         if list(d['keys']) == [str(hash_t(t)) for t in texts]: log(f'{part}: from cache'); return d['X']
@@ -208,7 +214,7 @@ Xh = Z(cached('human', h_texts, 'human re-check essays'))
 V3B = json.load(open(os.environ['MK_V3B']))['results']['ellipse' if LANG == 'en' else 'laila']['perCriterion']
 log(f'stage 1 after removing re-check essays: {len(Xpre)}; human re-check essays: {len(h_texts)}')
 
-report = {'label': 'MODEL-MARKED: development only, not for claims, never for a real school', 'lang': LANG, 'encoder': ENC, 'maxTokens': MAXLEN,
+report = {'label': 'MODEL-MARKED: development only, not for claims, never for a real school', 'lang': LANG, 'encoder': ENC_LABEL, 'maxTokens': MAXLEN,
           'stage1Essays': int(len(Xpre)), 'enaraLabelled': len(rows), 'ownerCorrections': n_corr, 'evaluation': '5-fold cross-validation by question (every answer tested once, never trained on in its fold)', 'types': {}}
 RECIPE = 'two_stage' if LANG == 'en' else 'stage2_only'  # run 2-3: the better recipe per language
 CMP = None
@@ -344,7 +350,9 @@ for typ in ['essay', 'short_answer']:
 # Written to results/bundle-<lang>/ and uploaded by the workflow as an Actions artifact (never committed). Only grammar_accuracy,
 # mechanics (+ vocabulary_range for essays) are listed as served; task_completion and organisation stay with v3b.
 EXPORT_LANGS = [x.strip() for x in os.environ.get('MK_EXPORT_LANGS', 'en').split(',') if x.strip()]
-if os.environ.get('MK_EXPORT') == '1' and LANG in EXPORT_LANGS:
+if os.environ.get('MK_EXPORT') == '1' and os.environ.get('MK_ENCODER_DIR'):
+    log('bundle: not exported with MK_ENCODER_DIR (the service loads encoders by hub name; a fine-tuned encoder is evaluation only for now)')
+elif os.environ.get('MK_EXPORT') == '1' and LANG in EXPORT_LANGS:
     sha = os.environ.get('GITHUB_SHA') or subprocess.run(['git', 'rev-parse', 'HEAD'], capture_output=True, text=True).stdout.strip() or 'nogit'
     version = f"mishkat-{LANG}-{time.strftime('%Y%m%d', time.gmtime())}-{sha[:8]}"
     man = MF.write_bundle(f'results/bundle-{LANG}', LANG, version, ENC, MAXLEN, RECIPE, mu, sd, EXPORT_TYPES, {'augmentation': AUG})
