@@ -180,7 +180,8 @@ function modelOf(section: ImportSection) {
 }
 
 /** The one write path for imports and connectors. Returns inserted ids and the previous versions of replaced or removed rows. */
-async function write(section: ImportSection, institutionId: string, rows: Record<string, string>[], source: Source) {
+async function write(section: ImportSection, institutionId: string, rowsIn: Record<string, string>[], source: Source) {
+  let rows = rowsIn;
   const inserted: string[] = []; const replaced: Record<string, unknown>[] = [];
   if (section === 'timetable') {
     // A timetable file replaces the whole week of each class it contains.
@@ -250,8 +251,17 @@ async function write(section: ImportSection, institutionId: string, rows: Record
       }
     }
   } else {
+    // A connector's post seen before (same external id) updates that announcement; it is not inserted or notified again.
+    const known = new Map((await SchoolAnnouncement.find({ institutionId, externalId: { $in: rows.map((r) => r.external_id).filter(Boolean) } }).lean()).map((a) => [a.externalId!, a]));
+    for (const r of rows.filter((x) => x.external_id && known.has(x.external_id))) {
+      const old = known.get(r.external_id)!;
+      if (old.title === r.title && old.body === r.body) continue;
+      replaced.push(old as unknown as Record<string, unknown>);
+      await SchoolAnnouncement.updateOne({ id: old.id }, { $set: { title: r.title, body: r.body, source } });
+    }
+    rows = rows.filter((x) => !(x.external_id && known.has(x.external_id)));
     const docs = rows.map((r) => ({ id: newId('san'), institutionId, audience: r.audience, audienceValue: r.audience === 'school' ? undefined : r.audience_value, audienceKey: r.audience === 'school' ? undefined : norm(r.audience_value),
-      title: r.title, body: r.body, lang: 'both' as const, publishAt: r.publish ? new Date(`${r.publish}T05:00:00Z`) : new Date(), expiresAt: r.expires ? new Date(`${r.expires}T21:59:59Z`) : undefined, source }));
+      title: r.title, body: r.body, lang: 'both' as const, ...(r.external_id ? { externalId: r.external_id } : {}), publishAt: r.publish ? new Date(`${r.publish}T05:00:00Z`) : new Date(), expiresAt: r.expires ? new Date(`${r.expires}T21:59:59Z`) : undefined, source }));
     if (docs.length) await SchoolAnnouncement.insertMany(docs);
     inserted.push(...docs.map((d) => d.id));
     await notifyAnnouncements(institutionId, docs.filter((d) => d.publishAt.getTime() <= Date.now()).map((d) => d.id));

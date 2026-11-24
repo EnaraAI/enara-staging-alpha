@@ -607,6 +607,14 @@ export const MIGRATIONS: Migration[] = [
       for (const i of idx) if (i.expireAfterSeconds !== undefined && i.name) await coll.dropIndex(i.name);
       await m.SchoolChatLog.createIndexes();
     },
+  },  {
+    id: '2026-12-08-school-app-moodle',
+    description: 'Parents school app, Moodle connector: indexes of school_moodle_sync (new collection) and the unique external id of connector announcements (school_announcements). Nothing existing changed.',
+    up: async () => {
+      const m = await import('../schoolApp/models');
+      await m.SchoolMoodleSync.createIndexes();
+      await m.SchoolAnnouncement.createIndexes();
+    },
   },
 ];
 

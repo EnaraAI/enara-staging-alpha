@@ -33,6 +33,7 @@ export const COLUMNS: Record<ImportSection, Column[]> = {
     { key: 'body', required: true, aliases: ['body', 'text', 'message', 'النص', 'الرسالة'] },
     { key: 'publish', required: false, aliases: ['publish', 'publish date', 'date', 'تاريخ النشر', 'النشر'] },
     { key: 'expires', required: false, aliases: ['expires', 'expiry', 'until', 'ينتهي', 'تاريخ الانتهاء'] },
+    { key: 'external_id', required: false, aliases: ['external id'] }, // set by connectors only
   ],
   // Step (b): one row per instalment. The plan is named per student (for example "Tuition 2026-2027"); its total is the sum of its rows.
   fees: [

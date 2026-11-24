@@ -21,6 +21,8 @@
 //                             read functions and a token for it (throwaway Docker site; the token is fake test data)
 //   quiz-setup --course=SHORT --name=N --user=U --answer=True|False   a 1-question true/false quiz (1 attempt, review allowed),
 //                             and U's finished attempt with that answer (the right answer is True)
+//   school-ws                 parents school app: a read-only service with the Moodle connector's functions and a token
+//   news-post --course=SHORT --subject=S --message=M   a post in the course's Announcements forum
 //   version                   Moodle release
 
 define('CLI_SCRIPT', true);
@@ -137,6 +139,38 @@ switch ($cmd) {
         }
         $token = \core_external\util::generate_token(EXTERNAL_TOKEN_PERMANENT, $service, get_admin()->id, context_system::instance());
         out(['service' => (int) $service->id, 'token' => $token]);
+
+    case 'school-ws':
+        // Parents school app, Moodle connector: a read-only service with the connector's functions (only those this Moodle has; the
+        // Attendance plugin's function is absent on this test site) and a token for it (throwaway Docker site; fake test data).
+        set_config('enablewebservices', 1);
+        $protocols = array_filter(explode(',', (string) get_config('core', 'webserviceprotocols')));
+        if (!in_array('rest', $protocols)) { $protocols[] = 'rest'; set_config('webserviceprotocols', implode(',', $protocols)); }
+        $service = $DB->get_record('external_services', ['shortname' => 'enara_school_read']);
+        if (!$service) {
+            $id = $DB->insert_record('external_services', (object) ['name' => 'ENARA school app (read-only)', 'shortname' => 'enara_school_read', 'enabled' => 1, 'restrictedusers' => 0, 'downloadfiles' => 0, 'uploadfiles' => 0, 'timecreated' => time(), 'component' => null]);
+            $service = $DB->get_record('external_services', ['id' => $id], '*', MUST_EXIST);
+        }
+        $added = [];
+        foreach (['mod_forum_get_forums_by_courses', 'mod_forum_get_forum_discussions', 'core_course_get_contents', 'mod_attendance_get_sessions'] as $fn) {
+            if (!$DB->record_exists('external_functions', ['name' => $fn])) { continue; }
+            if (!$DB->record_exists('external_services_functions', ['externalserviceid' => $service->id, 'functionname' => $fn])) {
+                $DB->insert_record('external_services_functions', (object) ['externalserviceid' => $service->id, 'functionname' => $fn]);
+            }
+            $added[] = $fn;
+        }
+        $token = \core_external\util::generate_token(EXTERNAL_TOKEN_PERMANENT, $service, get_admin()->id, context_system::instance());
+        out(['service' => (int) $service->id, 'token' => $token, 'functions' => $added]);
+
+    case 'news-post':
+        // A post in a course's Announcements forum (what a teacher writes in Moodle).
+        require_once($CFG->dirroot . '/mod/forum/lib.php');
+        $course = course_by_short(opt($opts, 'course'));
+        $forum = forum_get_course_forum($course->id, 'news');
+        $d = (object) ['course' => $course->id, 'forum' => $forum->id, 'name' => opt($opts, 'subject'), 'message' => '<p>' . s(opt($opts, 'message')) . '</p>',
+            'messageformat' => FORMAT_HTML, 'messagetrust' => 0, 'mailnow' => 0, 'groupid' => -1, 'timestart' => 0, 'timeend' => 0, 'pinned' => 0, 'attachments' => null];
+        $id = forum_add_discussion($d, null, null, get_admin()->id);
+        out(['discussion' => (int) $id, 'forum' => (int) $forum->id]);
 
     case 'quiz-setup':
         // Core APIs only (no test data generators: they need PHPUnit, which a normal Moodle site does not have).

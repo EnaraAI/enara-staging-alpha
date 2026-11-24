@@ -8,6 +8,7 @@ import { feesVisibleTo, schoolSections, setFeesVisibleTo, setSchoolSections } fr
 import { confirmImport, listImports, previewImport, undoImport } from './importer';
 import { COLUMNS } from './importSpec';
 import * as views from './parentViews';
+import { moodleConnections, runMoodleSyncNow, saveMoodleToken, setMoodleEnabled } from './moodleSync';
 import { ask, confirmRequest } from './chat';
 import { answerRequest, consentCsv, consentDashboard, consentForms, consentsForParent, createConsentForm, createRequest, requestsForAdmin, requestsForParent, signConsent, withdrawConsentForm } from './requests';
 import { busForParent, busesForAdmin, sendBusNotice, setBusPhonesShared, withdrawBusNotice } from './buses';
@@ -102,6 +103,12 @@ schoolAppAdminRoutes.post('/consents', h(async (req, res) => { const b = ensureP
 schoolAppAdminRoutes.get('/consents/:id', h(async (req, res) => { res.json(await consentDashboard(actor(req), String(req.params.id))); }));
 schoolAppAdminRoutes.get('/consents/:id/export', h(async (req, res) => { const csv = await consentCsv(actor(req), String(req.params.id)); res.setHeader('Content-Type', 'text/csv; charset=utf-8'); res.setHeader('Content-Disposition', `attachment; filename="consent-${String(req.params.id)}.csv"`); res.setHeader('Cache-Control', 'private, no-store'); res.send(csv); }));
 schoolAppAdminRoutes.post('/consents/:id/withdraw', h(async (req, res) => { res.json(await withdrawConsentForm(actor(req), String(req.params.id))); }));
+
+// The Moodle connector: per LMS connection, a read-only token (write-only here), the school's on/off, and "Sync now".
+schoolAppAdminRoutes.get('/moodle', h(async (req, res) => { res.json(await moodleConnections(actor(req), typeof req.query.institutionId === 'string' ? req.query.institutionId : undefined)); }));
+schoolAppAdminRoutes.put('/moodle/:platformId/token', h(async (req, res) => { const b = ensurePlainObject(req.body); rejectMongoOperators(b); res.json(await saveMoodleToken(actor(req), String(req.params.platformId), b.token)); }));
+schoolAppAdminRoutes.put('/moodle/:platformId', h(async (req, res) => { const b = ensurePlainObject(req.body); rejectMongoOperators(b); res.json(await setMoodleEnabled(actor(req), String(req.params.platformId), b.enabled)); }));
+schoolAppAdminRoutes.post('/moodle/:platformId/run', h(async (req, res) => { res.json(await runMoodleSyncNow(actor(req), String(req.params.platformId))); }));
 
 // Announcements written on the screen (no file). Audience: school, grade, group (class) or student.
 schoolAppAdminRoutes.get('/announcements', h(async (req, res) => {
