@@ -15,7 +15,7 @@ import { SchoolReceiptFile } from './models';
 const dbStore = () => process.env.SCHOOL_RECEIPTS_STORE === 'db';
 export const receiptStore = {
   save: async (key: string, data: Buffer, contentType: string, institutionId: string) => (dbStore() ? void (await SchoolReceiptFile.create({ key, data, contentType, institutionId })) : saveUpload(key, data, contentType)),
-  read: async (key: string) => { if (!dbStore()) return readUpload(key); const f = await SchoolReceiptFile.findOne({ key }).lean(); return f ? { body: Buffer.from(f.data as unknown as Buffer), contentType: f.contentType } : null; },
+  read: async (key: string) => { if (!dbStore()) return readUpload(key); const f = await SchoolReceiptFile.findOne({ key }).lean(); if (!f) return null; const d = f.data as unknown as Buffer | { buffer: ArrayBuffer | Buffer }; return { body: Buffer.isBuffer(d) ? d : Buffer.from((d as { buffer: Buffer }).buffer), contentType: f.contentType }; }, // lean() gives a BSON Binary, not a Buffer
   remove: async (key: string) => (dbStore() ? void (await SchoolReceiptFile.deleteOne({ key })) : deleteUpload(key)),
 };
 
