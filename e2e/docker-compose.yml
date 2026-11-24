@@ -185,6 +185,8 @@ services:
       SCHOOL_APP_NOTIFICATIONS_ENABLED: "true"
       # Step (b): fees (display only; the school marks paid). Scenario 31.
       SCHOOL_APP_FEES_ENABLED: "true"
+      # The suite signs in from one address many times (UI sign-ins and restarted workers); production keeps 20 per 15 minutes.
+      LOGIN_RATE_LIMIT_MAX: "200"
       ENROLLMENT_DUAL_WRITE: "true"
       ENROLLMENT_READ_FROM: student_app,teacher_rosters,assessments,analytics,profile_context,credits,attendance
       ENROLLMENT_MULTI_CLASS: "true"
