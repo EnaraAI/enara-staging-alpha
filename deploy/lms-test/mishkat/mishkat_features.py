@@ -68,6 +68,9 @@ class Encoder:  # name: a Hugging Face hub name OR a local directory written by 
         if tok is None or model is None:
             from transformers import AutoTokenizer, AutoModel
             tok, model = AutoTokenizer.from_pretrained(name), AutoModel.from_pretrained(name)
+        # On a GPU (the Modal evaluation of the fine-tuned encoder) the model runs there in fp32; on CPU nothing changes.
+        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        if self.device == 'cuda': model = model.float().to('cuda')
         self.name, self.maxlen, self.tok, self.model = name, maxlen, tok, model.eval()
     def embed(self, texts, part='', log=None, batch=16):
         import time
@@ -75,8 +78,9 @@ class Encoder:  # name: a Hugging Face hub name OR a local directory written by 
         with torch.no_grad():
             for i in range(0, n, batch):
                 b = self.tok(list(texts[i:i + batch]), truncation=True, max_length=self.maxlen, padding=True, return_tensors='pt')
+                if self.device != 'cpu': b = {k: v.to(self.device) for k, v in b.items()}
                 h = self.model(**b).last_hidden_state; m = b['attention_mask'].unsqueeze(-1).float()
-                out.append(((h * m).sum(1) / m.sum(1)).numpy())
+                out.append(((h * m).sum(1) / m.sum(1)).float().cpu().numpy())
                 if log and ((i // batch + 1) % 25 == 0 or i + batch >= n): log(f'encoder {part}: {min(i + batch, n)}/{n}, ~{(time.time() - t1) / min(i + batch, n) * (n - min(i + batch, n)) / 60:.1f} min left')
         return np.vstack(out).astype(np.float32)
 def X_of(texts, lang, encoder, part='', log=None):
