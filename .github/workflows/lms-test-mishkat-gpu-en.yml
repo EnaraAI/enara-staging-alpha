@@ -1,5 +1,5 @@
 # Owner, 24 Nov 2026 3:35 PM ("Yes"): English run 10 (ELLIPSE 2,500 + ASAP 2.0 + PERSUADE, no cap, frozen base encoder) on a Modal
-# GPU instead of hours on CPU. Same train_mishkat.py; numbers only to claude/tutor-lms-mishkat-results-en. A10G, cap 30 min.
+# GPU instead of hours on CPU. Same train_mishkat.py; numbers only to claude/tutor-lms-mishkat-results-en. A10G, cap 50 min.
 name: lms-test Mishkat English on GPU
 on:
   push:
@@ -11,7 +11,7 @@ jobs:
   gpu:
     if: github.repository == 'EnaraAI/enara-staging-alpha'
     runs-on: ubuntu-latest
-    timeout-minutes: 50
+    timeout-minutes: 70
     env:
       MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
       MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
