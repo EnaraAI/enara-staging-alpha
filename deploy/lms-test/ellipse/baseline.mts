@@ -178,8 +178,8 @@ for (const ds of (cfg.datasets ?? []).filter((d) => d.startsWith('mishkat-'))) {
 // the same 300 answers as Mishkat's sample (every k-th valid row). v3b (one run per answer) as a short answer; numbers only. ----
 if ((cfg.datasets ?? []).includes('egypt')) {
   const { gradeOpenRun } = await import(join(LIVE, 'src/assessment/grading-engine/graders/domains/index.ts'));
-  const meta = await (await fetch('https://zenodo.org/api/records/18630360')).json() as { files: { key: string; links: { self: string } }[]; metadata: { license?: unknown } };
-  const csvText = await (await fetch(meta.files.find((f) => f.key.endsWith('.csv'))!.links.self)).text();
+  const meta = await (await fetch('https://zenodo.org/api/records/18630360', { headers: { 'User-Agent': 'research-probe' } })).json() as { files: { key: string; links: { self: string } }[]; metadata: { license?: unknown } };
+  const csvText = await (await fetch(meta.files.find((f) => f.key.endsWith('.csv'))!.links.self, { headers: { 'User-Agent': 'research-probe' } })).text();
   const all = csvJson(csvText, ['id', 'TeacherAnswer', 'StudentAnswer', 'degree']);
   const valid = all.filter((r) => r.StudentAnswer && r.StudentAnswer.trim() && Number.isFinite(Number(r.degree)) && Number(r.degree) >= 0 && Number(r.degree) <= 5);
   const k = Math.max(1, Math.floor(valid.length / 300)); const sample = valid.map((r, i) => ({ r, i })).filter((x) => x.i % k === 0).slice(0, 300);
