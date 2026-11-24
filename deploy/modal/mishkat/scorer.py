@@ -29,7 +29,9 @@ class LangBundle:
             head = F.Head(sh['in'], sh['out']); head.load_state_dict(torch.load(p / t['head'], map_location='cpu', weights_only=True)); head.eval()
             served = [c for c in t['served'] if c in t['criteria'] and c in F.SERVABLE.get(typ, []) and c not in F.NEVER_SERVED]
             self.heads[typ], self.types[typ] = head, {'criteria': t['criteria'], 'served': served}
-        self.encoder = encoder or F.Encoder(man['encoder'], man['maxTokens'])
+        enc = man['encoder']
+        if (p / enc).is_dir(): enc = str(p / enc)  # a fine-tuned encoder shipped inside the bundle
+        self.encoder = encoder or F.Encoder(enc, man['maxTokens'])
 
     def features(self, texts):
         """Normalised feature matrix, exactly as training's Z(X_of(...))."""

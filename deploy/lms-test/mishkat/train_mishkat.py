@@ -27,7 +27,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import mishkat_features as MF
 from mishkat_features import Head
 _E = MF.Encoder(ENC, MAXLEN)
-ENC_TAG = MF.encoder_tag(ENC)  # in the feature-cache file names: base-encoder readings are never reused with a fine-tuned encoder
+ENC_TAG = MF.encoder_tag(ENC) + 'f32'  # in the feature-cache file names: base-encoder readings are never reused with a fine-tuned encoder
 def X_of(texts, part): return MF.X_of(texts, LANG, _E, part, log)
 
 # ---------------- stage-1 data (public datasets, never stored) ----------------
@@ -180,8 +180,6 @@ def cached(name, texts, part):
     keys = [str(hash_t(t)) for t in texts]
     have = {}
     files = sorted(glob.glob(f'{CACHE}/{LANG}-{ENC_TAG}-*.npz'))
-    if not os.path.isdir(ENC):  # the base encoder: also the caches written before files carried an encoder tag ("<lang>-<name>.npz")
-        files += [g for g in sorted(glob.glob(f'{CACHE}/{LANG}-*.npz')) if os.path.basename(g).count('-') == 1]
     for g in files:
         try:
             d = np.load(g, allow_pickle=True)
@@ -332,7 +330,7 @@ for typ in ['essay', 'short_answer']:
         if acc['pad']: v = float(np.mean(acc['pad'])); t['padding'] = {'n': len(acc['pad']) // 2, 'meanRiseGrammarSpelling': round(v, 3), 'pass': v <= 0.1}
         return t
     tests = tests_of(tests_acc['two_stage']); tests_s2 = tests_of(tests_acc['stage2_only'])
-    bar = {c: bool(per[c]['vsMedian']['two_stage']['within1'] >= 0.85 and (per[c]['vsMedian']['two_stage']['qwk'] or 0) >= (per[c]['vsMedian']['v3b_deepseek']['qwk'] or 0)) for c in crit}
+    bar = {c: bool(per[c]['vsMedian'][RECIPE]['within1'] >= 0.85 and (per[c]['vsMedian'][RECIPE]['qwk'] or 0) >= (per[c]['vsMedian']['v3b_deepseek']['qwk'] or 0)) for c in crit}
     entry = {'answers': len(T), 'questions': len(groups), 'perCriterion': per, 'lengthTests': tests, 'lengthTests_stage2only': tests_s2, 'lengthAugmentation': AUG, 'passesBar': bar}
     report['oof'][typ] = {rows[i]['id']: {c: int(preds[RECIPE][n, j]) for j, c in enumerate(crit)} for n, i in enumerate(T)}
     # final model of the chosen recipe on all ENARA answers of this type (+ length copies), for scoring other answers
@@ -383,12 +381,14 @@ for typ in ['essay', 'short_answer']:
 # Written to results/bundle-<lang>/ and uploaded by the workflow as an Actions artifact (never committed). Only grammar_accuracy,
 # mechanics (+ vocabulary_range for essays) are listed as served; task_completion and organisation stay with v3b.
 EXPORT_LANGS = [x.strip() for x in os.environ.get('MK_EXPORT_LANGS', 'en').split(',') if x.strip()]
-if os.environ.get('MK_EXPORT') == '1' and os.environ.get('MK_ENCODER_DIR'):
-    log('bundle: not exported with MK_ENCODER_DIR (the service loads encoders by hub name; a fine-tuned encoder is evaluation only for now)')
-elif os.environ.get('MK_EXPORT') == '1' and LANG in EXPORT_LANGS:
+if os.environ.get('MK_EXPORT') == '1' and LANG in EXPORT_LANGS:
     sha = os.environ.get('GITHUB_SHA') or subprocess.run(['git', 'rev-parse', 'HEAD'], capture_output=True, text=True).stdout.strip() or 'nogit'
     version = f"mishkat-{LANG}-{time.strftime('%Y%m%d', time.gmtime())}-{sha[:8]}"
-    man = MF.write_bundle(f'results/bundle-{LANG}', LANG, version, ENC, MAXLEN, RECIPE, mu, sd, EXPORT_TYPES, {'augmentation': AUG})
+    enc_ref = ENC
+    if os.environ.get('MK_ENCODER_DIR'):  # a fine-tuned encoder travels inside the bundle ("encoder/"), so the service loads exactly it
+        import shutil
+        shutil.copytree(ENC, f'results/bundle-{LANG}/encoder', ignore=shutil.ignore_patterns('ft-cost.json'), dirs_exist_ok=True); enc_ref = 'encoder'
+    man = MF.write_bundle(f'results/bundle-{LANG}', LANG, version, enc_ref, MAXLEN, RECIPE, mu, sd, EXPORT_TYPES, {'augmentation': AUG, 'encoderLabel': ENC_LABEL})
     log(f'bundle {version}: ' + json.dumps({t: v['served'] for t, v in man['types'].items()}))
     report['bundle'] = {'version': version, 'served': {t: v['served'] for t, v in man['types'].items()}}
 elif os.environ.get('MK_EXPORT') == '1': log(f'bundle: {LANG} not in MK_EXPORT_LANGS={EXPORT_LANGS}; not exported')

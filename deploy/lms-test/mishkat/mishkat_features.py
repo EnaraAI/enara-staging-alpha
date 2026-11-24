@@ -69,8 +69,10 @@ class Encoder:  # name: a Hugging Face hub name OR a local directory written by 
             from transformers import AutoTokenizer, AutoModel
             tok, model = AutoTokenizer.from_pretrained(name), AutoModel.from_pretrained(name)
         # On a GPU (the Modal evaluation of the fine-tuned encoder) the model runs there in fp32; on CPU nothing changes.
+        # Always fp32 (24 Nov): transformers 5 loads these checkpoints in float16 by default, which is slow on CPU and would make the
+        # service's CPU features differ from the GPU training features.
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
-        if self.device == 'cuda': model = model.float().to('cuda')
+        model = model.float().to(self.device)
         self.name, self.maxlen, self.tok, self.model = name, maxlen, tok, model.eval()
     def embed(self, texts, part='', log=None, batch=16):
         import time
