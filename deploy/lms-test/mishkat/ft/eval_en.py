@@ -9,7 +9,7 @@ HERE = pathlib.Path(__file__).resolve().parent            # deploy/lms-test/mish
 CODE = HERE.parent                                         # deploy/lms-test/mishkat
 DATA = os.environ.get('MK_EVAL_DATA', '')                  # the model-marked dev data (mk/data/mishkat-dev), set by the workflow
 V3B = os.environ.get('MK_EVAL_V3B', '')                    # today's v3b numbers on the human-scored essays
-TIMEOUT_MIN, USD_PER_GPU_HOUR = 30, 1.10
+TIMEOUT_MIN, USD_PER_GPU_HOUR = 50, 1.10  # run 1 of the no-cap English run hit 30 min (7,500 essays); owner cap $5 for the day
 RUN_ID_RE = re.compile(r'^(\d{8}-[0-9a-f]{7}|base)$')  # 'base' = the frozen hub encoder (no fine-tune)
 
 image = (
@@ -22,7 +22,7 @@ image = (
 )
 if DATA: image = image.add_local_dir(DATA, '/root/data')
 if V3B: image = image.add_local_file(V3B, '/root/v3b-human.json')
-vol = modal.Volume.from_name('mishkat-ft')
+vol = modal.Volume.from_name('mishkat-ft')  # also holds the evaluation's feature cache (numbers only), so a stopped run resumes
 app = modal.App('mishkat-ft-eval-en', image=image)
 
 @app.function(gpu='A10G', timeout=TIMEOUT_MIN * 60, volumes={'/vol': vol}, retries=0, cpu=4.0, memory=16384)
@@ -31,10 +31,25 @@ def evaluate(run_id: str, pre_max: str = '3000') -> dict:
     t0 = time.time()
     env = {**os.environ, 'MK_LANG': 'en', 'MK_STAGE1': 'ellipse,asap2,persuade', 'MK_EGYPT': '0', 'MK_AUG': '0', 'MK_DATA': '/root/data',
            'MK_BASELINE': '/root/v3b-human.json', 'MK_V3B': '/root/v3b-human.json', 'MK_COMPARE': '/root/data/claude-compare/compare-en.json',
-           'MK_EXPORT': '0', 'MK_CACHE': '/tmp/cache', 'MK_PRE_MAX': pre_max,
+           'MK_EXPORT': '0', 'MK_CACHE': f'/vol/cache/en-{run_id}', 'MK_PRE_MAX': pre_max,
            **({} if run_id == 'base' else {'MK_ENCODER_DIR': f'/vol/en/{run_id}', 'MK_FT_RUN': run_id})}
-    p = subprocess.run(['python', 'train_mishkat.py'], cwd='/root/mk', env=env, capture_output=True, text=True)
-    log = (p.stdout + p.stderr)[-200_000:]
+    os.makedirs(env['MK_CACHE'], exist_ok=True)
+    # Stream the training log live (progress lines show in GitHub), and commit the Volume every 2 min so cached readings survive a stop.
+    import threading
+    stop = threading.Event()
+    def committer():
+        while not stop.wait(120):
+            try: vol.commit()
+            except Exception: pass
+    threading.Thread(target=committer, daemon=True).start()
+    p = subprocess.Popen(['python', '-u', 'train_mishkat.py'], cwd='/root/mk', env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    lines = []
+    for line in p.stdout:
+        print(line, end='', flush=True); lines.append(line)
+    p.wait(); stop.set()
+    try: vol.commit()
+    except Exception: pass
+    log = ''.join(lines)[-200_000:]
     rep = pathlib.Path('/root/mk/results/report.json')
     secs = time.time() - t0
     return {'ok': p.returncode == 0 and rep.exists(), 'report': rep.read_text() if rep.exists() else None, 'log': log,
