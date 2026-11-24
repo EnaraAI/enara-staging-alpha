@@ -9,10 +9,11 @@ import { readXlsx, toCsv, writeXlsx } from './schoolApp/xlsx';
 //   - Announcements written on the screen, and withdraw.
 // Hidden while every SCHOOL_APP_*_ENABLED switch is off (the status call answers 404).
 type Lang = 'en' | 'ar';
-type Section = 'timetable' | 'announcements' | 'attendance' | 'notifications' | 'fees';
-type ImportSection = 'timetable' | 'attendance' | 'announcements' | 'fees';
-const SECTIONS: Section[] = ['timetable', 'attendance', 'announcements', 'notifications', 'fees'];
-const IMPORTS: ImportSection[] = ['timetable', 'attendance', 'announcements', 'fees'];
+type Section = 'timetable' | 'announcements' | 'attendance' | 'notifications' | 'fees' | 'buses';
+type ImportSection = 'timetable' | 'attendance' | 'announcements' | 'fees' | 'bus_routes' | 'bus_assignments';
+const SECTION_OF: Record<ImportSection, Section> = { timetable: 'timetable', attendance: 'attendance', announcements: 'announcements', fees: 'fees', bus_routes: 'buses', bus_assignments: 'buses' };
+const SECTIONS: Section[] = ['timetable', 'attendance', 'announcements', 'notifications', 'fees', 'buses'];
+const IMPORTS: ImportSection[] = ['timetable', 'attendance', 'announcements', 'fees', 'bus_routes', 'bus_assignments'];
 interface Status { feesVisibleTo?: 'all' | 'owner'; institutionId: string | null; available: Record<Section, boolean>; sections: Record<Section, boolean>; templates: Partial<Record<ImportSection, { key: string; required: boolean; header: string; headerAr: string | null }[]>> }
 interface Roster { groups: { name: string; students: { id: string; name: string; grade: string | null }[] }[]; withoutGroup: { id: string; name: string; grade: string | null }[] }
 interface Preview { importId: string; section: ImportSection; counts: Record<string, number>; problems: { row: number; message: string }[] }
@@ -22,7 +23,8 @@ interface Ann { id: string; audience: string; audienceValue: string | null; titl
 const TEXT = {
   en: {
     title: 'School app for parents', sub: 'Information the school shares with parents. ENARA only shows it; the school is the source.',
-    sections: 'Sections parents see', section: { timetable: 'Timetable', attendance: 'Attendance', announcements: 'Announcements', notifications: 'In-app notifications (absence, lateness, announcements, fee reminders)', fees: 'Fees (display only: the school records payments)' } as Record<string, string>,
+    sections: 'Sections parents see', section: { timetable: 'Timetable', attendance: 'Attendance', announcements: 'Announcements', notifications: 'In-app notifications (absence, lateness, announcements, fee reminders)', fees: 'Fees (display only: the school records payments)', buses: 'Buses (stop times; no live tracking)', bus_routes: 'Bus routes and stops', bus_assignments: 'Bus: each child’s route and stop' } as Record<string, string>,
+    bus: { title: 'Buses today', phones: 'Supervisors agreed to share their phone numbers with parents', route: 'Route', kind: 'Notice', delay: 'Delay', cancel: 'Cancelled', direction: 'Trip', morning: 'Morning', afternoon: 'Afternoon', minutes: 'Minutes late', message: 'Message (optional)', send: 'Send to parents', sent: (n: string) => `Sent to the parents of ${n} children.`, routes: 'Routes', stops: 'stops', students: 'children', noRoutes: 'Import the routes sheet first.', today: 'Notices today', withdraw: 'Withdraw', withdrawn: 'Withdrawn', none: 'No notices today.' },
     fees: { title: 'Fees and instalments', visibility: 'Who in a family sees fees', all: 'Every linked guardian', owner: 'The main guardian only', filter: { overdue: 'Overdue', due: 'Due', paid: 'Paid', all: 'All' } as Record<string, string>, student: 'Student', plan: 'Plan', no: 'No.', amount: 'Amount (EGP)', due: 'Due date', status: 'Status', markPaid: 'Mark paid', waive: 'Waive', reopen: 'Mark due', receiptRef: 'Receipt no.', attach: 'Attach receipt', view: 'Receipt', attachHelp: 'PDF, PNG or JPEG, up to 700 KB.', tooBig: 'The file is larger than 700 KB.', none: 'No instalments here.', st: { due: 'Due', overdue: 'Overdue', paid: 'Paid', waived: 'Waived' } as Record<string, string>, totals: (p: string, r: string, o: string) => `Paid ${p} · Remaining ${r} · Overdue ${o} (EGP)`, note: 'ENARA never takes payments. Mark an instalment paid after the school receives the money; parents see it at once.' },
     notOnSite: 'not available yet', save: 'Save', saved: 'Saved.', failed: 'Could not save. Try again.',
     upload: 'Upload a file', template: 'Excel template', templateCsv: 'CSV template', fileHelp: 'Excel (.xlsx) or CSV. The first sheet is read; the first row is the column names (English or Arabic).',
@@ -37,7 +39,8 @@ const TEXT = {
   },
   ar: {
     title: 'تطبيق المدرسة لأولياء الأمور', sub: 'معلومات تشاركها المدرسة مع أولياء الأمور. إنارة تعرضها فقط؛ والمدرسة هي المصدر.',
-    sections: 'الأقسام التي يراها أولياء الأمور', section: { timetable: 'الجدول', attendance: 'الحضور', announcements: 'الإعلانات', notifications: 'الإشعارات داخل التطبيق (الغياب والتأخر والإعلانات وتذكير الأقساط)', fees: 'الرسوم (عرض فقط: المدرسة تسجّل المدفوعات)' } as Record<string, string>,
+    sections: 'الأقسام التي يراها أولياء الأمور', section: { timetable: 'الجدول', attendance: 'الحضور', announcements: 'الإعلانات', notifications: 'الإشعارات داخل التطبيق (الغياب والتأخر والإعلانات وتذكير الأقساط)', fees: 'الرسوم (عرض فقط: المدرسة تسجّل المدفوعات)', buses: 'الحافلات (مواعيد المحطات؛ دون تتبع مباشر)', bus_routes: 'خطوط الحافلات ومحطاتها', bus_assignments: 'الحافلات: خط كل طفل ومحطته' } as Record<string, string>,
+    bus: { title: 'الحافلات اليوم', phones: 'وافق المشرفون على مشاركة أرقام هواتفهم مع أولياء الأمور', route: 'الخط', kind: 'الإشعار', delay: 'تأخير', cancel: 'إلغاء', direction: 'الرحلة', morning: 'الذهاب', afternoon: 'العودة', minutes: 'دقائق التأخير', message: 'رسالة (اختيارية)', send: 'إرسال إلى أولياء الأمور', sent: (n: string) => `أُرسل إلى أولياء أمور ${n} من الأطفال.`, routes: 'الخطوط', stops: 'محطات', students: 'أطفال', noRoutes: 'استورد كشف الخطوط أولًا.', today: 'إشعارات اليوم', withdraw: 'سحب', withdrawn: 'مسحوب', none: 'لا إشعارات اليوم.' },
     fees: { title: 'الرسوم والأقساط', visibility: 'من يرى الرسوم في الأسرة', all: 'كل أولياء الأمور المرتبطين', owner: 'ولي الأمر الأساسي فقط', filter: { overdue: 'متأخر', due: 'مستحق', paid: 'مدفوع', all: 'الكل' } as Record<string, string>, student: 'الطالب', plan: 'الخطة', no: 'رقم', amount: 'المبلغ (جنيه)', due: 'تاريخ الاستحقاق', status: 'الحالة', markPaid: 'تسجيل الدفع', waive: 'إعفاء', reopen: 'إعادة إلى مستحق', receiptRef: 'رقم الإيصال', attach: 'إرفاق الإيصال', view: 'الإيصال', attachHelp: 'PDF أو PNG أو JPEG، حتى 700 كيلوبايت.', tooBig: 'الملف أكبر من 700 كيلوبايت.', none: 'لا أقساط هنا.', st: { due: 'مستحق', overdue: 'متأخر', paid: 'مدفوع', waived: 'معفى' } as Record<string, string>, totals: (p: string, r: string, o: string) => `المدفوع ${p} · المتبقي ${r} · المتأخر ${o} (جنيه)`, note: 'إنارة لا تستقبل أي مدفوعات. سجّل دفع القسط بعد أن تستلم المدرسة المبلغ؛ ويظهر لأولياء الأمور فورًا.' },
     notOnSite: 'غير متاح بعد', save: 'حفظ', saved: 'تم الحفظ.', failed: 'تعذّر الحفظ. حاول مرة أخرى.',
     upload: 'رفع ملف', template: 'قالب Excel', templateCsv: 'قالب CSV', fileHelp: 'ملف Excel (‎.xlsx) أو CSV. تُقرأ الورقة الأولى؛ والصف الأول أسماء الأعمدة (بالعربية أو الإنجليزية).',
@@ -68,6 +71,8 @@ function exampleRows(section: ImportSection, roster: Roster | null): Record<stri
   const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Cairo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
   if (section === 'timetable') return g ? [{ class: g.name, day: 'Sunday', period: '1', start: '08:00', end: '08:45', subject: 'Mathematics', teacher: '', room: '' }, { class: g.name, day: 'Sunday', period: '2', start: '08:50', end: '09:35', subject: 'English', teacher: '', room: '' }] : [];
   if (section === 'attendance') return s ? [{ date: today, student: s.id, status: 'present', period: '', note: '' }] : [];
+  if (section === 'bus_routes') return [{ route: 'Route 1', bus_number: '12', supervisor: '', supervisor_phone: '', driver: '', stop: 'First stop', stop_order: '1', morning: '06:45', afternoon: '14:30', map_link: '' }, { route: 'Route 1', bus_number: '12', supervisor: '', supervisor_phone: '', driver: '', stop: 'Second stop', stop_order: '2', morning: '07:00', afternoon: '14:15', map_link: '' }];
+  if (section === 'bus_assignments') return s ? [{ student: s.id, student_name: s.name, route: 'Route 1', stop: 'First stop', direction: 'both', valid_from: '', valid_to: '' }] : [];
   if (section === 'fees') return s ? [1, 2, 3].map((i) => ({ student: s.id, student_name: s.name, plan: 'Tuition 2026-2027', academic_year: '2026-2027', number: String(i), amount: '15000', due_date: ['2026-09-15', '2026-12-15', '2027-03-15'][i - 1], status: i === 1 ? 'paid' : 'due', paid_date: i === 1 ? '2026-09-10' : '', receipt_ref: i === 1 ? 'R-1001' : '', note: '' })) : [];
   return [{ audience: 'school', audience_value: '', title: 'Example', body: 'Text of the announcement', publish: today, expires: '' }];
 }
@@ -118,7 +123,8 @@ export const SchoolAppAdmin: React.FC<{ lang: Lang }> = ({ lang }) => {
         {note && <p className="text-sm text-slate-600" role="status">{note}</p>}
       </fieldset>
 
-      {IMPORTS.filter((s) => status.templates[s] && status.available[s]).map((s) => <ImportCard key={s} lang={lang} section={s} on={!!status.sections[s]} template={status.templates[s]!} roster={roster} onDone={reloadImports} />)}
+      {IMPORTS.filter((s) => status.templates[s] && status.available[SECTION_OF[s]]).map((s) => <ImportCard key={s} lang={lang} section={s} on={!!status.sections[SECTION_OF[s]]} template={status.templates[s]!} roster={roster} onDone={reloadImports} />)}
+      {status.sections.buses && <BusesAdmin lang={lang} />}
       {status.sections.fees && <FeesAdmin lang={lang} visibleTo={status.feesVisibleTo ?? 'all'} />}
 
       <div className="space-y-2" data-testid="sa-log">
@@ -349,6 +355,54 @@ const FeesAdmin: React.FC<{ lang: Lang; visibleTo: 'all' | 'owner' }> = ({ lang,
         </div>
       ) : <p className="text-sm text-slate-500">{t.none}</p>)}
       {msg && <p className="text-sm text-slate-700" role="status">{msg}</p>}
+    </div>
+  );
+};
+
+interface BusAdminData { busPhonesShared: boolean; routes: { routeKey: string; routeName: string; busNumber: string | null; supervisor: string | null; stops: number; students: number }[]; noticesToday: { id: string; routeKey: string; kind: 'delay' | 'cancel'; direction: 'morning' | 'afternoon'; minutes: number | null; message: string | null; withdrawn: boolean; at: string }[] }
+/** Step (c): today's bus notices (delay / cancel) to parents of children on that trip, and the phone-sharing setting. */
+const BusesAdmin: React.FC<{ lang: Lang }> = ({ lang }) => {
+  const t = TEXT[lang].bus;
+  const [data, setData] = useState<BusAdminData | null>(null);
+  const [f, setF] = useState({ route: '', kind: 'delay', direction: 'morning', minutes: '15', message: '' });
+  const [msg, setMsg] = useState<string | null>(null);
+  const load = useCallback(() => apiRequest<BusAdminData>('GET', '/api/school-app/buses').then((d) => { setData(d); setF((x) => ({ ...x, route: x.route || d.routes[0]?.routeName || '' })); }).catch(() => setData(null)), []);
+  useEffect(() => { void load(); }, [load]);
+  if (!data) return null;
+  const send = async (e: React.FormEvent) => {
+    e.preventDefault(); setMsg(null);
+    try { const r = await apiRequest<{ students: number }>('POST', '/api/school-app/buses/notices', { route: f.route, kind: f.kind, direction: f.direction, minutes: f.kind === 'delay' ? Number(f.minutes) : undefined, message: f.message }); setMsg(t.sent(String(r.students))); setF({ ...f, message: '' }); void load(); }
+    catch (err) { setMsg(errText(err, TEXT[lang].failed)); }
+  };
+  const field = 'mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm';
+  return (
+    <div className="rounded-lg border border-slate-200 p-4 space-y-3" data-testid="sa-buses">
+      <h3 className="text-base font-semibold text-slate-900">{t.title}</h3>
+      <label className="flex items-center gap-3 text-sm">
+        <input type="checkbox" className="h-5 w-5" checked={data.busPhonesShared} onChange={async (e) => { try { await apiRequest('PUT', '/api/school-app/buses/phones', { busPhonesShared: e.target.checked }); void load(); } catch (err) { setMsg(errText(err, TEXT[lang].failed)); } }} data-testid="sa-bus-phones" />
+        <span>{t.phones}</span>
+      </label>
+      {!data.routes.length ? <p className="text-sm text-slate-500">{t.noRoutes}</p> : (
+        <>
+          <p className="text-sm text-slate-700">{t.routes}: {data.routes.map((r) => `${r.routeName}${r.busNumber ? ` (${r.busNumber})` : ''}: ${r.stops} ${t.stops}, ${r.students} ${t.students}`).join(' · ')}</p>
+          <form className="grid gap-3 sm:grid-cols-2" onSubmit={send}>
+            <label className="text-sm">{t.route}<select className={field} value={f.route} onChange={(e) => setF({ ...f, route: e.target.value })} data-testid="sa-bus-route">{data.routes.map((r) => <option key={r.routeKey} value={r.routeName}>{r.routeName}</option>)}</select></label>
+            <label className="text-sm">{t.direction}<select className={field} value={f.direction} onChange={(e) => setF({ ...f, direction: e.target.value })} data-testid="sa-bus-direction"><option value="morning">{t.morning}</option><option value="afternoon">{t.afternoon}</option></select></label>
+            <label className="text-sm">{t.kind}<select className={field} value={f.kind} onChange={(e) => setF({ ...f, kind: e.target.value })} data-testid="sa-bus-kind"><option value="delay">{t.delay}</option><option value="cancel">{t.cancel}</option></select></label>
+            {f.kind === 'delay' && <label className="text-sm">{t.minutes}<input type="number" min={1} max={600} className={field} value={f.minutes} onChange={(e) => setF({ ...f, minutes: e.target.value })} required data-testid="sa-bus-minutes" /></label>}
+            <label className="text-sm sm:col-span-2">{t.message}<input className={field} dir="auto" maxLength={300} value={f.message} onChange={(e) => setF({ ...f, message: e.target.value })} data-testid="sa-bus-message" /></label>
+            <div className="sm:col-span-2"><button type="submit" className={primary} data-testid="sa-bus-send">{t.send}</button></div>
+          </form>
+        </>
+      )}
+      {msg && <p className="text-sm text-slate-700" role="status" data-testid="sa-bus-msg">{msg}</p>}
+      <h4 className="text-sm font-semibold text-slate-800">{t.today}</h4>
+      {data.noticesToday.length ? data.noticesToday.map((nt) => (
+        <div key={nt.id} className="flex items-center justify-between gap-3 border-t border-slate-100 pt-2 text-sm" data-testid="sa-bus-notice">
+          <span>{data.routes.find((r) => r.routeKey === nt.routeKey)?.routeName ?? nt.routeKey} · {t[nt.direction]} · {nt.kind === 'cancel' ? t.cancel : `${t.delay} ${nt.minutes}`}{nt.message ? ` · ${nt.message}` : ''}</span>
+          {nt.withdrawn ? <span className="text-xs text-slate-500">{t.withdrawn}</span> : <button type="button" className={btn} onClick={async () => { await apiRequest('POST', `/api/school-app/buses/notices/${encodeURIComponent(nt.id)}/withdraw`, {}).catch(() => undefined); void load(); }}>{t.withdraw}</button>}
+        </div>
+      )) : <p className="text-sm text-slate-500">{t.none}</p>}
     </div>
   );
 };

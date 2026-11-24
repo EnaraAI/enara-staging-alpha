@@ -15,9 +15,9 @@ import type { SchoolDef } from './content';
 //   - The import log (one confirmed import per section) and the school's sections turned on.
 export interface SeedStudent { id: string; name: string; first: string; school: SchoolDef; group: string; archived: boolean }
 export interface SeedLink { parentUserId: string; studentId: string; institutionId: string }
-type Add = (model: 'SchoolTimetableEntry' | 'SchoolDailyAttendance' | 'SchoolAnnouncement' | 'SchoolImport' | 'ParentNotification' | 'SchoolInstalment', key: string, doc: Record<string, unknown>) => void;
+type Add = (model: 'SchoolTimetableEntry' | 'SchoolDailyAttendance' | 'SchoolAnnouncement' | 'SchoolImport' | 'ParentNotification' | 'SchoolInstalment' | 'SchoolBusRoute' | 'SchoolBusAssignment' | 'SchoolBusNotice', key: string, doc: Record<string, unknown>) => void;
 
-export const SCHOOL_APP_SECTIONS_ON = { timetable: true, announcements: true, attendance: true, notifications: true, fees: true };
+export const SCHOOL_APP_SECTIONS_ON = { timetable: true, announcements: true, attendance: true, notifications: true, fees: true, buses: true };
 export const schoolAppSeeded = (s: SchoolDef) => s.portal === 'free';
 
 const sid = (p: string, key: string) => `${p}-${createHash('sha1').update(`enara-full-v1:school-app:${key}`).digest('hex').slice(0, 16)}`;
@@ -170,6 +170,33 @@ export function addSchoolAppSeed(input: { now: Date; add: Add; schools: SchoolDe
           source: feeSource, createdAt: feeSource.at, updatedAt: feeSource.at });
       }
     }
+    // ---- buses (step c): 3 routes with 4-5 stops each; about half of the current students ride; one delay notice today.
+    const busSource = imp('bus_routes', lang === 'ar' ? 'خطوط-الحافلات.xlsx' : 'bus-routes.xlsx', 20, 0);
+    const AREAS = lang === 'ar'
+      ? [['ميدان الحجاز', 'شارع النزهة', 'ميدان تريومف', 'شارع الثورة', 'بوابة المدرسة'], ['المعادي الجديدة', 'دجلة', 'كورنيش المعادي', 'شارع 9'], ['التجمع الخامس', 'شارع التسعين', 'الرحاب', 'مدينتي', 'بوابة المدرسة']]
+      : [['Hegaz Square', 'Nozha Street', 'Triumph Square', 'Thawra Street', 'School gate'], ['New Maadi', 'Degla', 'Maadi Corniche', 'Street 9'], ['Fifth Settlement', '90th Street', 'Rehab', 'Madinaty', 'School gate']];
+    const routeNames = lang === 'ar' ? ['الخط 1: مصر الجديدة', 'الخط 2: المعادي', 'الخط 3: التجمع'] : ['Route 1: Heliopolis', 'Route 2: Maadi', 'Route 3: New Cairo'];
+    const sups = lang === 'ar' ? ['أ. منى سامي', 'أ. هالة فريد', 'أ. نهى عادل'] : ['Ms Mona Samy', 'Ms Hala Farid', 'Ms Noha Adel'];
+    const routes = routeNames.map((name, ri) => {
+      const stops = AREAS[ri].map((st, si) => {
+        const m = 6 * 60 + 30 + si * 12, a = 14 * 60 + 15 + (AREAS[ri].length - 1 - si) * 12;
+        const hm = (x: number) => `${String(Math.floor(x / 60)).padStart(2, '0')}:${String(x % 60).padStart(2, '0')}`;
+        return { name: st, morning: hm(m), afternoon: hm(a), order: si + 1 };
+      });
+      const routeKey = norm(name);
+      add('SchoolBusRoute', `${S}:route:${ri}`, { id: sid('sbr', `${S}:${ri}`), institutionId: school.id, routeName: name, routeKey, busNumber: String(10 + ri * 7), supervisorName: sups[ri],
+        supervisorPhone: `0100000${S.length}${ri}0${ri + 1}`.slice(0, 11), driverName: lang === 'ar' ? 'السائق' : undefined, stops, source: busSource, createdAt: busSource.at, updatedAt: busSource.at });
+      return { routeKey, stops };
+    });
+    const assignSource = imp('bus_assignments', lang === 'ar' ? 'ركاب-الحافلات.xlsx' : 'bus-riders.xlsx', 20, 0);
+    for (const s of students.filter((x) => x.school.id === school.id && !x.archived)) {
+      if (R() >= 0.5) continue;
+      const ri = Math.floor(R() * routes.length); const r = routes[ri];
+      const stop = r.stops[Math.floor(R() * (r.stops.length - 1))];
+      const dir = R() < 0.85 ? 'both' : R() < 0.5 ? 'morning' : 'afternoon';
+      add('SchoolBusAssignment', `${s.id}:bus`, { id: sid('sba', s.id), institutionId: school.id, studentId: s.id, routeKey: r.routeKey, stopName: stop.name, direction: dir, validFrom: '2026-09-01', validTo: '2027-06-30', source: assignSource, createdAt: assignSource.at, updatedAt: assignSource.at });
+    }
+    add('SchoolBusNotice', `${S}:notice`, { id: sid('sbn', S), institutionId: school.id, routeKey: routes[1].routeKey, kind: 'delay', direction: 'afternoon', minutes: 15, message: lang === 'ar' ? 'زحام على الكورنيش.' : 'Traffic on the Corniche.', date: today, createdBy: admin, createdAt: new Date(now.getTime() - 30 * 60_000) });
     void today;
   }
 }
