@@ -25,7 +25,7 @@ export interface Controls { learner: LearnerHeader; controls: { weeklyGoalMin: n
 /** lms-test: parent emails are blocked until a later step (backend parents/emailBlock.ts). */
 export interface ParentEmailState { blocked: boolean; code?: string; message?: { en: string; ar: string } }
 export interface Report { learner: LearnerHeader; shareEmail?: ParentEmailState; report: { weekStart: string; status: WeeklyStatus['status']; minutesDone: number; goalMinutes: number; streak: number; level: Level; learned: { mock: boolean; items: Bi[] }; tryAtHome: { mock: boolean; text: Bi } } }
-export interface Account { learners: LearnerChip[]; pending: { linkId: string }[]; guardians: { byLearner: { studentId: string; canManage: boolean; items: { linkId: string; name: string; role: LinkRole; isYou: boolean }[] }[] }; plan: AccountPlan; preferences: { language: 'en' | 'ar'; alertChannels: string[]; emails?: { weeklySummary: boolean; newResults: boolean } }; signIn?: { method: 'code' | 'password' | 'google'; hasEmail: boolean; emailSignin?: boolean; email?: string; emailVerified?: boolean; suggestedEmail?: string }; hiddenBySchool?: number }
+export interface Account { learners: LearnerChip[]; pending: { linkId: string }[]; guardians: { byLearner: { studentId: string; canManage: boolean; items: { linkId: string; name: string; role: LinkRole; isYou: boolean }[] }[] }; plan: AccountPlan; preferences: { language: 'en' | 'ar'; alertChannels: string[]; emails?: { weeklySummary: boolean; newResults: boolean; schoolAttendance?: boolean; schoolAnnouncements?: boolean } }; signIn?: { method: 'code' | 'password' | 'google'; hasEmail: boolean; emailSignin?: boolean; email?: string; emailVerified?: boolean; suggestedEmail?: string }; hiddenBySchool?: number }
 // Parents P1: with PARENT_SETTINGS_ENABLED the plan is "Provided by <school>" (no price); otherwise the mock plan.
 export type AccountPlan = { mock: true; name: Bi; price: string; learners: number; renewsOn: string; payment: Bi } | { mock: false; kind: 'school'; providedBy: string[] };
 
@@ -58,7 +58,7 @@ export const parentsApi = {
   saveControls: (id: string, body: Partial<Controls['controls']>) => apiRequest<Controls>('PUT', `${L(id)}/controls`, body),
   setGuardianRole: (id: string, linkId: string, role: 'full' | 'view') => apiRequest('PUT', `${L(id)}/guardians/${encodeURIComponent(linkId)}`, { role }),
   account: () => apiRequest<Account>('GET', '/api/parents/account'),
-  savePreferences: (body: { language?: 'en' | 'ar'; weeklySummaryEmail?: boolean; newResultsEmail?: boolean }) => apiRequest('PUT', '/api/parents/account/preferences', body),
+  savePreferences: (body: { language?: 'en' | 'ar'; weeklySummaryEmail?: boolean; newResultsEmail?: boolean; schoolAttendanceEmail?: boolean; schoolAnnouncementsEmail?: boolean }) => apiRequest('PUT', '/api/parents/account/preferences', body),
   previewCode: (code: string) => apiRequest<{ learner: string; school: string | null }>('POST', '/api/parents/link/preview', { code }),
   confirmCode: (code: string) => apiRequest<{ studentId: string; role: LinkRole }>('POST', '/api/parents/link/confirm', { code }),
   unlink: (linkId: string) => apiRequest('DELETE', `/api/parents/links/${encodeURIComponent(linkId)}`),

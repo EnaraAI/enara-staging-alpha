@@ -6,9 +6,10 @@ import { ParentNotification, SchoolAnnouncement } from './models';
 import { sectionOn, newId } from './sections';
 import { announcementIsFor } from './audience';
 import { norm } from './importSpec';
+import { emailSchoolNotices, type NoticeDoc } from './emails';
 
 // Parents school app (a): in-app notifications. Created only when the school's "notifications" section is on, for parents with an
-// ACTIVE link to the child. Never fails an import (errors are logged). Email follows in step a4 (per-parent setting).
+// ACTIVE link to the child. Never fails an import (errors are logged). Step a4: each new notification is also emailed (emails.ts: the parent's own setting; never twice).
 async function activeParents(studentIds: string[]) {
   if (!studentIds.length) return new Map<string, string[]>();
   const links = await ParentLearnerLink.find({ studentId: { $in: studentIds }, status: 'active' }).select('parentUserId studentId').lean();
@@ -31,6 +32,7 @@ export async function notifyAbsences(institutionId: string, rows: { studentId: s
       body: 'From the school attendance register.',
     })));
     await insertQuietly(docs);
+    await emailSchoolNotices(docs as unknown as NoticeDoc[]);
   } catch (error) { logger.error('school_app_notify_absences_failed', { error: serializeError(error) }); }
 }
 
@@ -47,5 +49,6 @@ export async function notifyAnnouncements(institutionId: string, announcementIds
       for (const p of parents.get(s.id) ?? []) docs.push({ id: newId('pn'), parentUserId: p, studentId: s.id, institutionId, kind: 'announcement', refId: `${a.id}:${s.id}`, title: a.title, body: a.body.slice(0, 280) });
     }
     await insertQuietly(docs);
+    await emailSchoolNotices(docs as unknown as NoticeDoc[]);
   } catch (error) { logger.error('school_app_notify_announcements_failed', { error: serializeError(error) }); }
 }

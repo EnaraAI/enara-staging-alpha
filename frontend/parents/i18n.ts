@@ -102,7 +102,7 @@ export const T = {
       noAnnouncements: 'No announcements right now.', newAnnouncements: (n: string) => `${n} announcements`, until: (d: string) => `Until ${d}`, forAll: 'Whole school', forGrade: 'This grade', forGroup: 'This class', forStudent: 'Only for your child',
       noNotifications: 'No notifications yet.', unread: (n: string) => `${n} unread`, markAllRead: 'Mark all as read', wasAbsent: (name: string, d: string) => `${name} was absent on ${d}.`, wasLate: (name: string, d: string) => `${name} was late on ${d}.`, fromRegister: "From the school's attendance register.", bell: (n: string) => `Notifications, ${n} unread`,
       kind: { absence: 'Absence', late: 'Late arrival', announcement: 'Announcement' } as Record<string, string>,
-      off: 'The school has not shared this.', displayOnly: 'This information comes from the school. For any correction, contact the school.',
+      off: 'The school has not shared this.', emailAttendance: 'Email me about absence and lateness', emailAnnouncements: 'Email me school announcements', smsLater: 'SMS and WhatsApp: coming later. In-app notifications are always on.', displayOnly: 'This information comes from the school. For any correction, contact the school.',
     },
     // Parents P3
     waitingForTeacher: 'Waiting for the teacher',
@@ -220,7 +220,7 @@ export const T = {
       noAnnouncements: 'لا توجد إعلانات الآن.', newAnnouncements: (n: string) => `${n} إعلانات`, until: (d: string) => `حتى ${d}`, forAll: 'كل المدرسة', forGrade: 'هذا الصف', forGroup: 'هذا الفصل', forStudent: 'لطفلك فقط',
       noNotifications: 'لا توجد إشعارات بعد.', unread: (n: string) => `${n} غير مقروءة`, markAllRead: 'تعليم الكل كمقروء', wasAbsent: (name: string, d: string) => `تغيّب ${name} يوم ${d}.`, wasLate: (name: string, d: string) => `تأخّر ${name} يوم ${d}.`, fromRegister: 'من سجل الحضور في المدرسة.', bell: (n: string) => `الإشعارات، ${n} غير مقروءة`,
       kind: { absence: 'غياب', late: 'تأخر', announcement: 'إعلان' } as Record<string, string>,
-      off: 'لم تشارك المدرسة هذه المعلومات.', displayOnly: 'هذه المعلومات من المدرسة. لأي تصحيح تواصل مع المدرسة.',
+      off: 'لم تشارك المدرسة هذه المعلومات.', emailAttendance: 'راسلني بالبريد عند الغياب والتأخر', emailAnnouncements: 'راسلني بالبريد بإعلانات المدرسة', smsLater: 'الرسائل النصية وواتساب: لاحقًا. إشعارات التطبيق مفعّلة دائمًا.', displayOnly: 'هذه المعلومات من المدرسة. لأي تصحيح تواصل مع المدرسة.',
     },
     // Parents P3
     waitingForTeacher: 'بانتظار المعلم',

@@ -1,0 +1,58 @@
+{
+  "id": null,
+  "name": "Enara – Parents: school notice (AR)",
+  "subject": "{{{HEADLINE}}}",
+  "from": "The Enara Team <noreply@test.enara.app>",
+  "variables": [
+    {
+      "key": "NAME",
+      "type": "string",
+      "fallback_value": "بك",
+      "sample": "Sara"
+    },
+    {
+      "key": "CHILD_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "Omar"
+    },
+    {
+      "key": "SCHOOL_NAME",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "Al Noor School"
+    },
+    {
+      "key": "HEADLINE",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "Omar was absent on Tuesday 24 Nov"
+    },
+    {
+      "key": "MESSAGE",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "From the school's attendance register."
+    },
+    {
+      "key": "ACTION_URL",
+      "type": "string",
+      "fallback_value": null,
+      "sample": "https://enara.app/parents/school"
+    }
+  ],
+  "status": "draft",
+  "approvedOn": null,
+  "alias": "parent-school-notice",
+  "language": "ar",
+  "languages": [
+    "en",
+    "ar"
+  ],
+  "number": "S1",
+  "group": "parents",
+  "recipient": "Parent",
+  "trigger": "Parents school app (a4): an absence or lateness recorded by the school, or a school announcement for the child",
+  "delivery": "instant",
+  "frequency": "One per notification (deduplicated); the parent can turn each kind off; the school's notifications section must be on"
+}
