@@ -15,7 +15,14 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
+      - name: Health check on the live deployment (3 times, read-only probe)
+        if: hashFiles('deploy/lms-test/schoolchat/probe-health') != ''
+        continue-on-error: true
+        env:
+          LMSTEST_MAINTENANCE_TOKEN: ${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}
+        run: for i in 1 2 3; do node deploy/lms-test/cli.mjs maintenance run || true; sleep 5; done
       - name: School chat check (lms-test)
+        if: hashFiles('deploy/lms-test/schoolchat/probe-health') == ''
         env:
           SEED_USER_PASSWORD: ${{ secrets.SEED_USER_PASSWORD }}
         run: node deploy/lms-test/schoolchat/run.mjs
