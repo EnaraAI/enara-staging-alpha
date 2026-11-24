@@ -182,9 +182,11 @@ export function createApp() {
   // Parents Portal: sign-up and link-code redemption, per IP (the per-account lockout is in parents/codes.ts).
   app.use('/api/parents/register', makeLimiter('parent-register', 60 * 60 * 1000, 10, 'Too many registration attempts'));
   app.use('/api/parents/google', makeLimiter('parent-google', 15 * 60 * 1000, 30, 'Too many sign-in attempts'));
-  app.use('/api/parents/link', makeLimiter('parent-link', 15 * 60 * 1000, 30, 'Too many code attempts'));
+  // PARENT_CODE_RATE_LIMIT_MAX: 30 per 15 minutes per address unless set (the E2E stack, where every parent signs in from one address, sets it higher).
+  const parentCodeMax = Math.max(1, Number(process.env.PARENT_CODE_RATE_LIMIT_MAX) || 30);
+  app.use('/api/parents/link', makeLimiter('parent-link', 15 * 60 * 1000, parentCodeMax, 'Too many code attempts'));
   // Parents P1 code-first entry (public: no account, so no per-account lockout) and device sessions.
-  app.use('/api/parents/start', makeLimiter('parent-start', 15 * 60 * 1000, 30, 'Too many code attempts'));
+  app.use('/api/parents/start', makeLimiter('parent-start', 15 * 60 * 1000, parentCodeMax, 'Too many code attempts'));
   app.use('/api/parents/device/session', makeLimiter('parent-device', 15 * 60 * 1000, 60, 'Too many sign-in attempts'));
   // Parents P2: 6-digit email codes (sign-in, add your email, merge); per address limits are in parents/emailSignin.ts.
   app.use('/api/parents/email', makeLimiter('parent-email', 15 * 60 * 1000, 60, 'Too many code requests'));

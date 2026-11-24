@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import { norm } from '../../schoolApp/importSpec';
+import { consentTextHash } from '../../schoolApp/consentHash';
 import type { SchoolDef } from './content';
 
 // Parents school app (a5): the school data for the seeded schools (docs/lms/PARENTS_SCHOOL_APP_PLAN.md, section 6). Planned like the
@@ -15,9 +16,9 @@ import type { SchoolDef } from './content';
 //   - The import log (one confirmed import per section) and the school's sections turned on.
 export interface SeedStudent { id: string; name: string; first: string; school: SchoolDef; group: string; archived: boolean }
 export interface SeedLink { parentUserId: string; studentId: string; institutionId: string }
-type Add = (model: 'SchoolTimetableEntry' | 'SchoolDailyAttendance' | 'SchoolAnnouncement' | 'SchoolImport' | 'ParentNotification' | 'SchoolInstalment' | 'SchoolBusRoute' | 'SchoolBusAssignment' | 'SchoolBusNotice', key: string, doc: Record<string, unknown>) => void;
+type Add = (model: 'SchoolTimetableEntry' | 'SchoolDailyAttendance' | 'SchoolAnnouncement' | 'SchoolImport' | 'ParentNotification' | 'SchoolInstalment' | 'SchoolBusRoute' | 'SchoolBusAssignment' | 'SchoolBusNotice' | 'SchoolRequest' | 'SchoolConsentForm' | 'SchoolConsent', key: string, doc: Record<string, unknown>) => void;
 
-export const SCHOOL_APP_SECTIONS_ON = { timetable: true, announcements: true, attendance: true, notifications: true, fees: true, buses: true };
+export const SCHOOL_APP_SECTIONS_ON = { timetable: true, announcements: true, attendance: true, notifications: true, fees: true, buses: true, requests: true, consents: true };
 export const schoolAppSeeded = (s: SchoolDef) => s.portal === 'free';
 
 const sid = (p: string, key: string) => `${p}-${createHash('sha1').update(`enara-full-v1:school-app:${key}`).digest('hex').slice(0, 16)}`;
@@ -197,6 +198,33 @@ export function addSchoolAppSeed(input: { now: Date; add: Add; schools: SchoolDe
       add('SchoolBusAssignment', `${s.id}:bus`, { id: sid('sba', s.id), institutionId: school.id, studentId: s.id, routeKey: r.routeKey, stopName: stop.name, direction: dir, validFrom: '2026-09-01', validTo: '2027-06-30', source: assignSource, createdAt: assignSource.at, updatedAt: assignSource.at });
     }
     add('SchoolBusNotice', `${S}:notice`, { id: sid('sbn', S), institutionId: school.id, routeKey: routes[1].routeKey, kind: 'delay', direction: 'afternoon', minutes: 15, message: lang === 'ar' ? 'زحام على الكورنيش.' : 'Traffic on the Corniche.', date: today, createdBy: admin, createdAt: new Date(now.getTime() - 30 * 60_000) });
+    // ---- requests and consent (step d): requests in every status from linked parents; one school-wide trip form, answered by some.
+    const linked = links.filter((l) => l.institutionId === school.id);
+    const REQ = en
+      ? [['certificate', 'An enrolment certificate in English for the embassy, please.'], ['teacher_meeting', 'Could we meet the class teacher about reading next week?'], ['early_leave', 'My child needs to leave at 12:00 on Thursday for a doctor’s appointment.'], ['other', 'Is there a lost-and-found box? A blue water bottle went missing.']]
+      : [['certificate', 'أرجو إصدار شهادة قيد باللغة الإنجليزية لتقديمها إلى السفارة.'], ['teacher_meeting', 'نرجو تحديد موعد مع معلم الفصل لمناقشة مستوى القراءة الأسبوع القادم.'], ['early_leave', 'يحتاج طفلي إلى الانصراف الساعة الثانية عشرة يوم الخميس لموعد طبي.'], ['other', 'هل يوجد مكان للمفقودات؟ فُقدت زجاجة ماء زرقاء.']];
+    const REPLY = en ? { in_progress: 'We are preparing it.', done: 'Ready at the office from Sunday.', refused: 'We need a written note signed by the doctor first.' } : { in_progress: 'جارٍ التجهيز.', done: 'جاهزة في الإدارة اعتبارًا من الأحد.', refused: 'نحتاج أولًا إلى خطاب موقّع من الطبيب.' };
+    const STATUSES = ['new', 'in_progress', 'done', 'refused', 'done', 'new'] as const;
+    linked.slice(0, 12).forEach((l, i) => {
+      const [type, details] = REQ[i % REQ.length]; const status = STATUSES[i % STATUSES.length];
+      const created = new Date(now.getTime() - (2 + i) * DAY);
+      const history: { at: Date; by: string; status: string; note?: string }[] = [{ at: created, by: 'parent', status: 'new' }];
+      if (status !== 'new') history.push({ at: new Date(created.getTime() + 20 * 3_600_000), by: 'school', status, note: REPLY[status] });
+      add('SchoolRequest', `${S}:req:${i}`, { id: sid('srq', `${S}:${i}`), institutionId: school.id, studentId: l.studentId, parentUserId: l.parentUserId, type, details, status,
+        ...(status !== 'new' ? { reply: REPLY[status] } : {}), history, via: 'screen', createdAt: created, updatedAt: history[history.length - 1].at });
+    });
+    const formDoc = en
+      ? { title: 'Science museum trip', body: 'The school visits the Child Museum on Thursday 3 December, 9:00 to 13:00, by school bus with teachers. Please answer by 1 December.', titleAr: 'رحلة إلى متحف الطفل', bodyAr: 'تزور المدرسة متحف الطفل يوم الخميس 3 ديسمبر من التاسعة حتى الواحدة، بحافلة المدرسة مع المعلمين. يُرجى الرد قبل 1 ديسمبر.' }
+      : { title: 'رحلة إلى متحف الطفل', body: 'تزور المدرسة متحف الطفل يوم الخميس 3 ديسمبر من التاسعة حتى الواحدة، بحافلة المدرسة مع المعلمين. يُرجى الرد قبل 1 ديسمبر.' };
+    const options = [{ key: 'agree', label: en ? 'I agree' : 'أوافق', labelAr: 'أوافق' }, { key: 'decline', label: en ? 'I do not agree' : 'لا أوافق', labelAr: 'لا أوافق' }];
+    const form = { ...formDoc, options, deadline: cairoDate(new Date(now.getTime() + 7 * DAY)) };
+    const formId = sid('scf', S); const formAt = new Date(now.getTime() - 3 * DAY); const textHash = consentTextHash(form);
+    add('SchoolConsentForm', `${S}:form`, { id: formId, institutionId: school.id, ...form, audience: 'school', textHash, createdBy: admin, createdAt: formAt, updatedAt: formAt });
+    linked.forEach((l, i) => {
+      if (i % 3 === 2) return; // about a third have not answered
+      const at = new Date(formAt.getTime() + (1 + i) * 3_600_000);
+      add('SchoolConsent', `${S}:consent:${i}`, { id: sid('scs', `${S}:${l.studentId}:${l.parentUserId}`), formId, institutionId: school.id, studentId: l.studentId, parentUserId: l.parentUserId, choice: i % 7 === 4 ? 'decline' : 'agree', textHash, device: 'Mozilla/5.0 (iPhone)', at });
+    });
     void today;
   }
 }

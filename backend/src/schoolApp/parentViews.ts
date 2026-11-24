@@ -41,6 +41,13 @@ export async function schoolOverview(ctx: LearnerContext, now = new Date()) {
   if (sections.announcements && who) out.announcementsCount = await SchoolAnnouncement.countDocuments(announcementFilter({ ...who, institutionId: schoolOf(ctx) }, now));
   if (sections.fees) { const f = await feesSummary(ctx, now); if (f) out.fees = f; }
   if (sections.buses) { const b = await busSummary(ctx, now); if (b) out.bus = b; }
+  if (sections.requests) out.openRequests = await (await import('./models')).SchoolRequest.countDocuments({ institutionId: schoolOf(ctx), studentId: ctx.student.id, status: { $in: ['new', 'in_progress'] } });
+  if (sections.consents && who) {
+    const m = await import('./models'); const { announcementIsFor } = await import('./audience');
+    const forms = (await m.SchoolConsentForm.find({ institutionId: schoolOf(ctx), withdrawnAt: { $exists: false }, deadline: { $gte: today } }).select('id audience audienceValue audienceKey').lean()).filter((f) => announcementIsFor(f, who));
+    const answered = new Set((await m.SchoolConsent.find({ formId: { $in: forms.map((f) => f.id) }, studentId: ctx.student.id }).select('formId').lean()).map((a) => a.formId));
+    out.consentsPending = forms.filter((f) => !answered.has(f.id)).length;
+  }
   if (sections.notifications) out.unreadNotifications = await ParentNotification.countDocuments({ parentUserId: ctx.link.parentUserId, studentId: ctx.student.id, readAt: { $exists: false } });
   return out;
 }

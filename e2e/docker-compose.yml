@@ -187,8 +187,14 @@ services:
       SCHOOL_APP_FEES_ENABLED: "true"
       # Step (c): buses (stop times; no live GPS). Scenario 34.
       SCHOOL_APP_BUSES_ENABLED: "true"
+      # Step (d): requests and consent forms. Scenario 36.
+      SCHOOL_APP_REQUESTS_ENABLED: "true"
+      # Step (e): the parents' assistant (code answers here: no AI provider in this stack). Scenario 38.
+      SCHOOL_APP_CHAT_ENABLED: "true"
       # The suite signs in from one address many times (UI sign-ins and restarted workers); production keeps 20 per 15 minutes.
       LOGIN_RATE_LIMIT_MAX: "200"
+      # Same for parent codes: the school app scenarios link many parents from this one address; production keeps 30 per 15 minutes.
+      PARENT_CODE_RATE_LIMIT_MAX: "300"
       # R2 here is a placeholder that cannot be reached: fee receipts are kept in the database in this stack only (step b3).
       SCHOOL_RECEIPTS_STORE: db
       ENROLLMENT_DUAL_WRITE: "true"

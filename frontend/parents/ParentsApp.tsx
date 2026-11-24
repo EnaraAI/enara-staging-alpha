@@ -15,6 +15,7 @@ import { ShareSheet } from './screens/ShareSheet';
 import { AddEmail } from './screens/AddEmail';
 import { ALL, SubjectChips } from './screens/Subjects';
 import { School, SchoolHomeCard, type SchoolView } from './screens/School';
+import { SchoolChat } from './screens/SchoolChat';
 
 // ENARA Parents Portal: a parent mode inside the ENARA app, under /parents.
 // Mobile-first; English and Arabic with full RTL; week starts Saturday;
@@ -196,11 +197,12 @@ const ParentsApp: React.FC<{ userName?: string; onSignOut: () => void }> = ({ on
               {tab === 'progress' && <Progress learner={learner} refreshKey={refreshKey} onFetched={onFetched} subjectKey={subjectKey} english={!!chosen?.english} />}
               {tab === 'activity' && <Activity learner={learner} refreshKey={refreshKey} onFetched={onFetched} subjectKey={subjectKey} />}
               {tab === 'controls' && <Controls learner={learner} refreshKey={refreshKey} />}
-              {tab === 'account' && <Account schoolOn={schoolOn && !!school.data?.sections.notifications} feesOn={!!school.data?.sections.fees} busOn={!!school.data?.sections.buses} refreshKey={refreshKey} setLang={setLang} onLink={() => go('link')} onPick={(id) => { setSelectedId(id); go('home'); }} onChanged={refresh} onSignOut={onSignOut} />}
+              {tab === 'account' && <Account schoolOn={schoolOn && !!school.data?.sections.notifications} feesOn={!!school.data?.sections.fees} busOn={!!school.data?.sections.buses} requestsOn={!!(school.data?.sections.requests || school.data?.sections.consents)} refreshKey={refreshKey} setLang={setLang} onLink={() => go('link')} onPick={(id) => { setSelectedId(id); go('home'); }} onChanged={refresh} onSignOut={onSignOut} />}
             </>
           )}
         </main>
         {!showLink && learner && nav}
+        {!showLink && learner && school.data?.sections.chat && <SchoolChat learner={learner} />}
         {sharing && learner && <ShareSheet learner={learner} onClose={() => setSharing(false)} />}
       </div>
     </ParentsCtx.Provider>
