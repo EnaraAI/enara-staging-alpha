@@ -1,0 +1,114 @@
+# Owner, 24 Nov 2026: "the deploy freeze is lifted. Deploy everything that is merged into lms-test-live but not yet deployed
+# (PRs #102-#105 ...), one PR at a time, with the health check after each and automatic rollback on failure."
+# Deploys ONE merge commit of lms-test-live (deploy/lms-test-step/target.txt: "<pr> <sha>") to the enara-lms-test project in the
+# NEW Vercel team, with the same steps as lms-deploy.yml: guard, record production, flags, deploy, wait, site, migrations,
+# health check, rollback on failure, one line. The pipeline scripts come from PR #107 (new team); the app from the target commit.
+name: lms-test deploy one merged PR
+on:
+  push:
+    branches: ['claude/tutor-lms-dscompare-run']
+    paths: ['deploy/lms-test-step/target.txt']
+permissions:
+  contents: write
+concurrency: { group: lms-test-deploy, cancel-in-progress: false }
+jobs:
+  deploy:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      VERCEL_ORG_ID: team_fHEDYVPWJ218PaXEBwnBMFvk
+      VERCEL_PROJECT_ID: prj_tuRpwEJLz1dEQOj6RSEk2xUpqtIn
+      VERCEL_TELEMETRY_DISABLED: '1'
+      VERCEL_CLI: vercel@65.9.0
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN_NEW }}
+      LMSTEST_MAINTENANCE_TOKEN: ${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { path: ops }
+      - name: Target
+        id: t
+        run: |
+          read -r PR SHA < ops/deploy/lms-test-step/target.txt
+          [[ "$SHA" =~ ^[0-9a-f]{40}$ ]] || { echo "bad sha"; exit 1; }
+          echo "pr=$PR" >> "$GITHUB_OUTPUT"; echo "sha=$SHA" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v4
+        with: { ref: '${{ steps.t.outputs.sha }}', path: app, fetch-depth: 0 }
+      - name: The commit is on lms-test-live; pipeline scripts for the new team (PR #107)
+        working-directory: app
+        run: |
+          set -euo pipefail
+          git fetch -q origin lms-test-live
+          git merge-base --is-ancestor "${{ steps.t.outputs.sha }}" FETCH_HEAD || { echo "not on lms-test-live"; exit 1; }
+          git fetch -q origin claude/tutor-lms-vercel-newteam
+          for f in cli.mjs lib.mjs; do git show FETCH_HEAD:deploy/lms-test/$f > deploy/lms-test/$f; done
+          grep -q team_fHEDYVPWJ218PaXEBwnBMFvk deploy/lms-test/lib.mjs
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - name: Guard
+        id: guard
+        working-directory: app
+        run: node deploy/lms-test/cli.mjs guard
+      - name: Record the current production deployment (for rollback)
+        id: prev
+        working-directory: app
+        run: node deploy/lms-test/cli.mjs current-production
+      - name: Link and flags (this commit's deploy/lms-test.flags.json)
+        id: flags
+        working-directory: app
+        run: |
+          mkdir -p .vercel && printf '{"projectId":"%s","orgId":"%s"}\n' "$VERCEL_PROJECT_ID" "$VERCEL_ORG_ID" > .vercel/project.json
+          node deploy/lms-test/cli.mjs apply-flags
+      - name: vercel deploy --prod
+        id: vdeploy
+        working-directory: app
+        run: |
+          set -uo pipefail
+          echo "started=true" >> "$GITHUB_OUTPUT"
+          if ! url=$(npx --yes "$VERCEL_CLI" deploy --prod --yes --token "$VERCEL_TOKEN" 2>vercel-deploy.log); then tail -n 40 vercel-deploy.log || true; echo "reason=vercel deploy failed" >> "$GITHUB_OUTPUT"; exit 1; fi
+          echo "url=$(tail -n 1 <<<"$url")" >> "$GITHUB_OUTPUT"
+      - name: Check the new deployment
+        id: dep
+        working-directory: app
+        run: node deploy/lms-test/cli.mjs deployment "${{ steps.vdeploy.outputs.url }}"
+      - name: Wait until lms-test serves it
+        id: serving
+        working-directory: app
+        run: node deploy/lms-test/cli.mjs wait-serving "${{ steps.dep.outputs.new_url }}" --timeout 300
+      - name: Site up, tool keys published
+        id: site
+        working-directory: app
+        run: node deploy/lms-test/cli.mjs check-site
+      - name: Migrations
+        id: migrate
+        working-directory: app
+        run: node deploy/lms-test/cli.mjs maintenance migrate
+      - name: Health check setup
+        id: setup
+        working-directory: app
+        run: node deploy/lms-test/cli.mjs maintenance setup
+      - name: Health check run
+        id: health
+        working-directory: app
+        run: node deploy/lms-test/cli.mjs maintenance run
+      - name: Passed
+        id: passed
+        run: echo "ok=true" >> "$GITHUB_OUTPUT"
+      - name: Roll back to the previous production deployment
+        id: rollback
+        if: (failure() || cancelled()) && steps.vdeploy.outputs.started == 'true' && steps.prev.outputs.prev_id != ''
+        working-directory: app
+        run: node deploy/lms-test/cli.mjs rollback "${{ steps.prev.outputs.prev_id }}" "${{ steps.prev.outputs.prev_url }}"
+      - name: One line
+        if: always()
+        env:
+          REASON: ${{ steps.guard.outputs.reason || steps.prev.outputs.reason || steps.flags.outputs.reason || steps.vdeploy.outputs.reason || steps.dep.outputs.reason || steps.serving.outputs.reason || steps.site.outputs.reason || steps.migrate.outputs.reason || steps.setup.outputs.reason || steps.health.outputs.reason }}
+        run: |
+          if [ "${{ steps.passed.outputs.ok }}" = true ]; then o="deployed, health check passed, migrations: ${{ steps.migrate.outputs.migrations_applied }}"
+          elif [ "${{ steps.vdeploy.outputs.started }}" != true ]; then o="NOT deployed: ${REASON:-stopped}"
+          elif [ "${{ steps.rollback.outcome }}" = success ]; then o="FAILED, rolled back: ${REASON:-stopped}"
+          else o="FAILED, ROLLBACK FAILED: ${REASON:-stopped}"; fi
+          line="PR #${{ steps.t.outputs.pr }} (${{ steps.t.outputs.sha }}): $o"
+          echo "$line" | tee -a "$GITHUB_STEP_SUMMARY"
+          mkdir -p res && echo "$line" > res/line.txt && cd res && git init -q && git checkout -q -b r && git add . && git -c user.name=github-actions -c user.email=github-actions@users.noreply.github.com commit -qm "deploy PR ${{ steps.t.outputs.pr }}"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" "r:claude/tutor-lms-deploy-step-${{ steps.t.outputs.pr }}"
