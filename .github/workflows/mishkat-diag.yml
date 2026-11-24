@@ -1,0 +1,29 @@
+# Read-only diagnosis of the Mishkat service: app state and container logs while one /health request is made. No secrets printed.
+name: Mishkat service diagnosis
+on:
+  push:
+    branches: ['claude/tutor-lms-dscompare-run']
+    paths: ['deploy/modal/mishkat-diag/**', '.github/workflows/mishkat-diag.yml']
+permissions:
+  contents: read
+jobs:
+  diag:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+      MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+    steps:
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -q modal
+      - name: App state
+        run: modal app list 2>&1 | grep -iE "mishkat|State|---" | head -20
+      - name: Container logs while /health is called
+        run: |
+          (timeout 240 modal app logs mishkat > logs.txt 2>&1 &)
+          sleep 5
+          curl -sS -m 200 -o /dev/null -w 'health HTTP %{http_code} in %{time_total}s\n' https://enaraai--mishkat-web.us-east.modal.run/health || true
+          sleep 20
+          grep -vE "Authorization|Bearer|MISHKAT_TOKEN" logs.txt | tail -80
