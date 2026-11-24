@@ -14,6 +14,7 @@ import { mockLmsRouter } from './mockLms';
 import { runHealthCheck, setupHealthCheck } from './healthCheck';
 import { avatarUsageReport, parseAvatarIds } from './avatarUsageReport';
 import { llmCheck, llmCompare, llmPing, tutorEval } from './llmCheck';
+import { runEnvCheck } from './envCheck';
 
 // Maintenance for the LMS TEST deployment only (lms-test.enara.app): 404 unless
 // switched on AND MONGODB_URI is the test cluster AND a maintenance token is
@@ -57,6 +58,17 @@ router.post('/health-check/run', async (req, res, next) => {
     const out = await runHealthCheck({ authorization: String(req.headers.authorization) });
     logger.info('maintenance_health_run', { ok: out.ok, failed: out.steps.filter((s) => !s.ok).map((s) => s.name).join(',') });
     res.json(out); // 200 either way: the body's ok and steps say what failed
+  } catch (e) {
+    next(e);
+  }
+});
+
+// One test of every environment variable (envCheck.ts, docs/lms/ENV_CHECK_PLAN.md): read-only calls, names and states only.
+router.post('/env-check', async (_req, res, next) => {
+  try {
+    const out = await runEnvCheck();
+    logger.info('maintenance_env_check', { ok: out.ok, notOk: out.checks.filter((c) => c.state !== 'ok').map((c) => `${c.name}:${c.state}`).join(',') });
+    res.json(out); // 200 either way: ok and each check's state say what failed
   } catch (e) {
     next(e);
   }

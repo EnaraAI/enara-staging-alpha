@@ -241,6 +241,18 @@ async function checkSite() {
   }
 }
 
+/** One test of every environment variable (read-only, names and states only). Fails only on a required check; others warn. */
+async function envCheck() {
+  const r = await site('/api/maintenance/env-check', { method: 'POST', auth: true, body: {} });
+  if (r.status !== 200 || !Array.isArray(r.json?.checks)) throw new Error(`env-check: HTTP ${r.status}`);
+  summary(['', '| Env check | variables | state | required |', '|---|---|---|---|', ...r.json.checks.map((c) => `| ${c.name} | ${c.vars.join(', ')} | ${c.state === 'ok' ? 'ok' : `**${c.state}**`}${c.note ? ` (${c.note})` : ''} | ${c.required ? 'yes' : ''} |`)].join('\n'));
+  for (const c of r.json.checks) {
+    console.log(`${c.state === 'ok' ? 'ok  ' : c.required ? 'FAIL' : 'warn'} ${c.name} [${c.vars.join(', ')}] ${c.state}${c.note ? ` (${c.note})` : ''}`);
+    if (c.state !== 'ok' && c.state !== 'not_configured' && !c.required) console.log(`::warning::env-check: ${c.name} is ${c.state}`);
+  }
+  if (!r.json.ok) throw new Error(`env-check: required ${r.json.checks.filter((c) => c.required && c.state !== 'ok').map((c) => c.name).join(', ')} not ok`);
+}
+
 async function report() {
   const outcome = process.env.OUTCOME || 'not_deployed';
   const line = resultLine({ title: process.env.PR_TITLE, outcome, reason: process.env.REASON });
@@ -299,6 +311,9 @@ try {
     }
     case 'check-site':
       await checkSite();
+      break;
+    case 'env-check':
+      await envCheck();
       break;
     case 'maintenance':
       await maintenance(args[0]);
