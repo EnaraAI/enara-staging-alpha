@@ -160,6 +160,10 @@ describe('client', () => {
     expect((init.headers as Record<string, string>).Authorization).toBe('Bearer tok');
     expect(JSON.parse(String(init.body))).toEqual({ lang: 'ar', type: 'short_answer', text: 'نص' });
   });
+  it('the default timeout is 10 s (grading runs after submission)', async () => {
+    const { MISHKAT_TIMEOUT_MS } = await import('../../src/assessment/grading-engine/mishkat/client');
+    expect(MISHKAT_TIMEOUT_MS).toBe(10_000);
+  });
   it('timeout: unavailable (no retry)', async () => {
     const f = vi.fn((_u: string, init: RequestInit) => new Promise<Response>((_, rej) => init.signal!.addEventListener('abort', () => rej(new Error('aborted')))));
     expect(await scoreWithMishkat({ lang: 'en', type: 'essay', text: 'x' }, { env, fetchImpl: f as unknown as typeof fetch, timeoutMs: 20 })).toEqual({ status: 'unavailable', reason: 'timeout' });
