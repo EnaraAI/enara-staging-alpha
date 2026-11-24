@@ -1,0 +1,23 @@
+# Read-only: run lms-test's variable check (includes Mishkat en/ar) now, and again after 8 idle minutes (Mishkat cold start).
+name: lms-test variable check (warm and cold Mishkat)
+on:
+  push:
+    branches: ['claude/tutor-lms-dscompare-run']
+    paths: ['deploy/lms-test-step/envcheck.txt', '.github/workflows/lms-test-envcheck.yml']
+permissions:
+  contents: read
+jobs:
+  check:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env: { LMSTEST_MAINTENANCE_TOKEN: '${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}' }
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: lms-test-live }
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - name: Now (service just used = warm)
+        run: node deploy/lms-test/cli.mjs env-check 2>&1 | grep -E "Mishkat" || true
+      - name: After 8 idle minutes (service scaled to 0 = cold)
+        run: sleep 480 && node deploy/lms-test/cli.mjs env-check 2>&1 | grep -E "Mishkat" || true
