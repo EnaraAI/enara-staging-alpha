@@ -9,11 +9,11 @@ import { readXlsx, toCsv, writeXlsx } from './schoolApp/xlsx';
 //   - Announcements written on the screen, and withdraw.
 // Hidden while every SCHOOL_APP_*_ENABLED switch is off (the status call answers 404).
 type Lang = 'en' | 'ar';
-type Section = 'timetable' | 'announcements' | 'attendance' | 'notifications';
-type ImportSection = 'timetable' | 'attendance' | 'announcements';
-const SECTIONS: Section[] = ['timetable', 'attendance', 'announcements', 'notifications'];
-const IMPORTS: ImportSection[] = ['timetable', 'attendance', 'announcements'];
-interface Status { institutionId: string | null; available: Record<Section, boolean>; sections: Record<Section, boolean>; templates: Record<ImportSection, { key: string; required: boolean; header: string; headerAr: string | null }[]> }
+type Section = 'timetable' | 'announcements' | 'attendance' | 'notifications' | 'fees';
+type ImportSection = 'timetable' | 'attendance' | 'announcements' | 'fees';
+const SECTIONS: Section[] = ['timetable', 'attendance', 'announcements', 'notifications', 'fees'];
+const IMPORTS: ImportSection[] = ['timetable', 'attendance', 'announcements', 'fees'];
+interface Status { feesVisibleTo?: 'all' | 'owner'; institutionId: string | null; available: Record<Section, boolean>; sections: Record<Section, boolean>; templates: Partial<Record<ImportSection, { key: string; required: boolean; header: string; headerAr: string | null }[]>> }
 interface Roster { groups: { name: string; students: { id: string; name: string; grade: string | null }[] }[]; withoutGroup: { id: string; name: string; grade: string | null }[] }
 interface Preview { importId: string; section: ImportSection; counts: Record<string, number>; problems: { row: number; message: string }[] }
 interface ImportRow { id: string; section: ImportSection; fileName?: string; status: string; counts?: Record<string, number>; createdAt: string; confirmedAt?: string; canUndo: boolean }
@@ -22,7 +22,8 @@ interface Ann { id: string; audience: string; audienceValue: string | null; titl
 const TEXT = {
   en: {
     title: 'School app for parents', sub: 'Information the school shares with parents. ENARA only shows it; the school is the source.',
-    sections: 'Sections parents see', section: { timetable: 'Timetable', attendance: 'Attendance', announcements: 'Announcements', notifications: 'In-app notifications (absence, lateness, announcements)' } as Record<string, string>,
+    sections: 'Sections parents see', section: { timetable: 'Timetable', attendance: 'Attendance', announcements: 'Announcements', notifications: 'In-app notifications (absence, lateness, announcements, fee reminders)', fees: 'Fees (display only: the school records payments)' } as Record<string, string>,
+    fees: { title: 'Fees and instalments', visibility: 'Who in a family sees fees', all: 'Every linked guardian', owner: 'The main guardian only', filter: { overdue: 'Overdue', due: 'Due', paid: 'Paid', all: 'All' } as Record<string, string>, student: 'Student', plan: 'Plan', no: 'No.', amount: 'Amount (EGP)', due: 'Due date', status: 'Status', markPaid: 'Mark paid', waive: 'Waive', reopen: 'Mark due', receiptRef: 'Receipt no.', none: 'No instalments here.', st: { due: 'Due', overdue: 'Overdue', paid: 'Paid', waived: 'Waived' } as Record<string, string>, totals: (p: string, r: string, o: string) => `Paid ${p} · Remaining ${r} · Overdue ${o} (EGP)`, note: 'ENARA never takes payments. Mark an instalment paid after the school receives the money; parents see it at once.' },
     notOnSite: 'not available yet', save: 'Save', saved: 'Saved.', failed: 'Could not save. Try again.',
     upload: 'Upload a file', template: 'Excel template', templateCsv: 'CSV template', fileHelp: 'Excel (.xlsx) or CSV. The first sheet is read; the first row is the column names (English or Arabic).',
     preview: 'Preview', counts: { new: 'New', changed: 'Changed', unchanged: 'Unchanged', removed: 'Removed', rejected: 'Rejected', total: 'Rows' } as Record<string, string>,
@@ -36,7 +37,8 @@ const TEXT = {
   },
   ar: {
     title: 'تطبيق المدرسة لأولياء الأمور', sub: 'معلومات تشاركها المدرسة مع أولياء الأمور. إنارة تعرضها فقط؛ والمدرسة هي المصدر.',
-    sections: 'الأقسام التي يراها أولياء الأمور', section: { timetable: 'الجدول', attendance: 'الحضور', announcements: 'الإعلانات', notifications: 'الإشعارات داخل التطبيق (الغياب والتأخر والإعلانات)' } as Record<string, string>,
+    sections: 'الأقسام التي يراها أولياء الأمور', section: { timetable: 'الجدول', attendance: 'الحضور', announcements: 'الإعلانات', notifications: 'الإشعارات داخل التطبيق (الغياب والتأخر والإعلانات وتذكير الأقساط)', fees: 'الرسوم (عرض فقط: المدرسة تسجّل المدفوعات)' } as Record<string, string>,
+    fees: { title: 'الرسوم والأقساط', visibility: 'من يرى الرسوم في الأسرة', all: 'كل أولياء الأمور المرتبطين', owner: 'ولي الأمر الأساسي فقط', filter: { overdue: 'متأخر', due: 'مستحق', paid: 'مدفوع', all: 'الكل' } as Record<string, string>, student: 'الطالب', plan: 'الخطة', no: 'رقم', amount: 'المبلغ (جنيه)', due: 'تاريخ الاستحقاق', status: 'الحالة', markPaid: 'تسجيل الدفع', waive: 'إعفاء', reopen: 'إعادة إلى مستحق', receiptRef: 'رقم الإيصال', none: 'لا أقساط هنا.', st: { due: 'مستحق', overdue: 'متأخر', paid: 'مدفوع', waived: 'معفى' } as Record<string, string>, totals: (p: string, r: string, o: string) => `المدفوع ${p} · المتبقي ${r} · المتأخر ${o} (جنيه)`, note: 'إنارة لا تستقبل أي مدفوعات. سجّل دفع القسط بعد أن تستلم المدرسة المبلغ؛ ويظهر لأولياء الأمور فورًا.' },
     notOnSite: 'غير متاح بعد', save: 'حفظ', saved: 'تم الحفظ.', failed: 'تعذّر الحفظ. حاول مرة أخرى.',
     upload: 'رفع ملف', template: 'قالب Excel', templateCsv: 'قالب CSV', fileHelp: 'ملف Excel (‎.xlsx) أو CSV. تُقرأ الورقة الأولى؛ والصف الأول أسماء الأعمدة (بالعربية أو الإنجليزية).',
     preview: 'معاينة', counts: { new: 'جديد', changed: 'معدَّل', unchanged: 'دون تغيير', removed: 'محذوف', rejected: 'مرفوض', total: 'الصفوف' } as Record<string, string>,
@@ -66,6 +68,7 @@ function exampleRows(section: ImportSection, roster: Roster | null): Record<stri
   const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Cairo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
   if (section === 'timetable') return g ? [{ class: g.name, day: 'Sunday', period: '1', start: '08:00', end: '08:45', subject: 'Mathematics', teacher: '', room: '' }, { class: g.name, day: 'Sunday', period: '2', start: '08:50', end: '09:35', subject: 'English', teacher: '', room: '' }] : [];
   if (section === 'attendance') return s ? [{ date: today, student: s.id, status: 'present', period: '', note: '' }] : [];
+  if (section === 'fees') return s ? [1, 2, 3].map((i) => ({ student: s.id, student_name: s.name, plan: 'Tuition 2026-2027', academic_year: '2026-2027', number: String(i), amount: '15000', due_date: ['2026-09-15', '2026-12-15', '2027-03-15'][i - 1], status: i === 1 ? 'paid' : 'due', paid_date: i === 1 ? '2026-09-10' : '', receipt_ref: i === 1 ? 'R-1001' : '', note: '' })) : [];
   return [{ audience: 'school', audience_value: '', title: 'Example', body: 'Text of the announcement', publish: today, expires: '' }];
 }
 
@@ -115,7 +118,8 @@ export const SchoolAppAdmin: React.FC<{ lang: Lang }> = ({ lang }) => {
         {note && <p className="text-sm text-slate-600" role="status">{note}</p>}
       </fieldset>
 
-      {IMPORTS.map((s) => <ImportCard key={s} lang={lang} section={s} on={!!status.sections[s]} template={status.templates[s]} roster={roster} onDone={reloadImports} />)}
+      {IMPORTS.filter((s) => status.templates[s] && status.available[s]).map((s) => <ImportCard key={s} lang={lang} section={s} on={!!status.sections[s]} template={status.templates[s]!} roster={roster} onDone={reloadImports} />)}
+      {status.sections.fees && <FeesAdmin lang={lang} visibleTo={status.feesVisibleTo ?? 'all'} />}
 
       <div className="space-y-2" data-testid="sa-log">
         <h3 className="text-base font-semibold text-slate-900">{t.log}</h3>
@@ -144,7 +148,7 @@ export const SchoolAppAdmin: React.FC<{ lang: Lang }> = ({ lang }) => {
   );
 };
 
-const ImportCard: React.FC<{ lang: Lang; section: ImportSection; on: boolean; template: Status['templates'][ImportSection]; roster: Roster | null; onDone: () => void }> = ({ lang, section, on, template, roster, onDone }) => {
+const ImportCard: React.FC<{ lang: Lang; section: ImportSection; on: boolean; template: NonNullable<Status['templates'][ImportSection]>; roster: Roster | null; onDone: () => void }> = ({ lang, section, on, template, roster, onDone }) => {
   const t = TEXT[lang];
   const [preview, setPreview] = useState<Preview | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
@@ -263,6 +267,70 @@ const Announcements: React.FC<{ lang: Lang; roster: Roster | null }> = ({ lang, 
           {a.withdrawn ? <span className="text-xs text-slate-500">{t.withdrawn}</span> : <button type="button" className={btn} data-testid="sa-ann-withdraw" onClick={async () => { try { await apiRequest('POST', `/api/school-app/announcements/${encodeURIComponent(a.id)}/withdraw`, {}); void load(); } catch (e) { setMsg(errText(e, t.failed)); } }}>{t.withdraw}</button>}
         </div>
       )) : <p className="text-sm text-slate-500">{t.none}</p>}
+    </div>
+  );
+};
+
+interface Inst { id: string; studentId: string; studentName: string; planName: string; number: number; amount: number; dueDate: string; status: 'due' | 'overdue' | 'paid' | 'waived'; paidDate: string | null; receiptRef: string | null }
+/** Step (b): the school's fee list, "mark paid" (with the receipt number), and who in a family sees fees. ENARA never takes payments. */
+const FeesAdmin: React.FC<{ lang: Lang; visibleTo: 'all' | 'owner' }> = ({ lang, visibleTo }) => {
+  const t = TEXT[lang].fees;
+  const [filter, setFilter] = useState<'overdue' | 'due' | 'paid' | 'all'>('overdue');
+  const [data, setData] = useState<{ totals: { paid: number; remaining: number; overdue: number }; instalments: Inst[] } | null>(null);
+  const [vis, setVis] = useState(visibleTo);
+  const [refs, setRefs] = useState<Record<string, string>>({});
+  const [msg, setMsg] = useState<string | null>(null);
+  const load = useCallback(() => apiRequest<{ totals: { paid: number; remaining: number; overdue: number }; instalments: Inst[] }>('GET', `/api/school-app/fees${filter === 'all' ? '' : `?status=${filter}`}`).then(setData).catch(() => setData(null)), [filter]);
+  useEffect(() => { void load(); }, [load]);
+  const mark = async (i: Inst, status: 'paid' | 'waived' | 'due') => {
+    setMsg(null);
+    try { await apiRequest('POST', `/api/school-app/fees/instalments/${encodeURIComponent(i.id)}/mark`, { status, receiptRef: refs[i.id] }); void load(); }
+    catch (e) { setMsg(errText(e, TEXT[lang].failed)); }
+  };
+  const saveVis = async (v: 'all' | 'owner') => { setVis(v); try { await apiRequest('PUT', '/api/school-app/fees/visibility', { feesVisibleTo: v }); setMsg(TEXT[lang].saved); } catch (e) { setMsg(errText(e, TEXT[lang].failed)); } };
+  const fmt = (a: number) => a.toLocaleString('en-US', { maximumFractionDigits: 2 });
+  return (
+    <div className="rounded-lg border border-slate-200 p-4 space-y-3" data-testid="sa-fees">
+      <h3 className="text-base font-semibold text-slate-900">{t.title}</h3>
+      <p className="text-xs text-slate-500">{t.note}</p>
+      <label className="flex flex-wrap items-center gap-3 text-sm">{t.visibility}
+        <select className="rounded border border-slate-300 px-2 py-1" value={vis} onChange={(e) => void saveVis(e.target.value as 'all' | 'owner')} data-testid="sa-fees-visibility">
+          <option value="all">{t.all}</option><option value="owner">{t.owner}</option>
+        </select>
+      </label>
+      <div className="flex flex-wrap gap-2" role="group">
+        {(['overdue', 'due', 'paid', 'all'] as const).map((f) => <button key={f} type="button" className={filter === f ? primary : btn} aria-pressed={filter === f} onClick={() => setFilter(f)} data-testid={`sa-fees-filter-${f}`}>{t.filter[f]}</button>)}
+      </div>
+      {data && <p className="text-sm text-slate-700" data-testid="sa-fees-totals">{t.totals(fmt(data.totals.paid), fmt(data.totals.remaining), fmt(data.totals.overdue))}</p>}
+      {data && (data.instalments.length ? (
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="text-slate-500"><tr>{[t.student, t.plan, t.no, t.amount, t.due, t.status, ''].map((h, i) => <th key={i} className="py-2 pe-3 text-start font-semibold">{h}</th>)}</tr></thead>
+            <tbody>
+              {data.instalments.map((i) => (
+                <tr key={i.id} className="border-t border-slate-100" data-testid="sa-fee-row" data-status={i.status}>
+                  <td className="py-2 pe-3" dir="auto">{i.studentName}</td>
+                  <td className="py-2 pe-3" dir="auto">{i.planName}</td>
+                  <td className="py-2 pe-3">{i.number}</td>
+                  <td className="py-2 pe-3">{fmt(i.amount)}</td>
+                  <td className="py-2 pe-3">{i.dueDate}</td>
+                  <td className="py-2 pe-3">{t.st[i.status]}{i.paidDate ? ` · ${i.paidDate}` : ''}{i.receiptRef ? ` · ${i.receiptRef}` : ''}</td>
+                  <td className="py-2">
+                    {(i.status === 'due' || i.status === 'overdue') ? (
+                      <div className="flex flex-wrap gap-2">
+                        <input aria-label={t.receiptRef} placeholder={t.receiptRef} className="w-28 rounded border border-slate-300 px-2 py-1" value={refs[i.id] ?? ''} onChange={(e) => setRefs({ ...refs, [i.id]: e.target.value })} data-testid="sa-fee-ref" />
+                        <button type="button" className={primary} onClick={() => void mark(i, 'paid')} data-testid="sa-fee-paid">{t.markPaid}</button>
+                        <button type="button" className={btn} onClick={() => void mark(i, 'waived')}>{t.waive}</button>
+                      </div>
+                    ) : <button type="button" className={btn} onClick={() => void mark(i, 'due')}>{t.reopen}</button>}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : <p className="text-sm text-slate-500">{t.none}</p>)}
+      {msg && <p className="text-sm text-slate-700" role="status">{msg}</p>}
     </div>
   );
 };

@@ -92,16 +92,18 @@ export const T = {
     hiddenBySchool: "A child linked to you is hidden for now: their school switched parent access off. Ask the school.",
     // Parents school app (a). Data comes from the school; ENARA only shows it.
     sch: {
-      title: 'School', today: 'Today', timetable: 'Timetable', attendance: 'Attendance', announcements: 'Announcements', notifications: 'Notifications',
+      title: 'School', today: 'Today', timetable: 'Timetable', attendance: 'Attendance', announcements: 'Announcements', notifications: 'Notifications', fees: 'Fees',
+      feeTotal: 'Total', feePaid: 'Paid', feeRemaining: 'Remaining', feeOverdue: 'Overdue', feeNext: 'Next instalment', feeNone: 'Nothing due.', instalment: (n: string) => `Instalment ${n}`, dueOn: (d: string) => `Due ${d}`, paidOn: (d: string) => `Paid ${d}`, receipt: (r: string) => `Receipt ${r}`, egp: (a: string) => `${a} EGP`,
+      feeStatus: { due: 'Due', overdue: 'Overdue', paid: 'Paid', waived: 'Waived' } as Record<string, string>, payAtSchool: 'Payment is made at the school. ENARA only shows the school’s fee record; for any question, contact the school office.', noFees: 'The school has not shared fees yet.', feesMainOnly: 'The school shows fees to the main guardian only.', overdueCount: (n: string) => `${n} overdue`, emailFees: 'Email me fee reminders (7 days and 1 day before)', feeDueLine: (amount: string, d: string) => `${amount} EGP due on ${d}`,
       attendanceToday: 'Attendance today', notRecorded: 'Not recorded yet', todayClasses: 'Classes today', noClassesToday: 'No classes today.',
       status: { present: 'Present', absent: 'Absent', late: 'Late', excused: 'Excused' } as Record<string, string>,
       period: (p: string) => `Period ${p}`, teacher: 'Teacher', room: 'Room', group: (g: string) => `Class ${g}`, noTimetable: 'The school has not shared a timetable yet.',
       source: (label: string, when: string) => `From the school's ${label} · updated ${when}`, sourceNone: (label: string) => `From the school's ${label}`,
-      srcLabel: { timetable: 'timetable', attendance: 'attendance sheet', announcements: 'announcements' } as Record<string, string>,
+      srcLabel: { timetable: 'timetable', attendance: 'attendance sheet', announcements: 'announcements', fees: 'fee record' } as Record<string, string>,
       month: 'Month', prevMonth: 'Previous month', nextMonth: 'Next month', noAttendance: 'No attendance recorded this month.', counts: (p: string, a: string, l: string, e: string) => `Present ${p} · Absent ${a} · Late ${l} · Excused ${e}`,
       noAnnouncements: 'No announcements right now.', newAnnouncements: (n: string) => `${n} announcements`, until: (d: string) => `Until ${d}`, forAll: 'Whole school', forGrade: 'This grade', forGroup: 'This class', forStudent: 'Only for your child',
       noNotifications: 'No notifications yet.', unread: (n: string) => `${n} unread`, markAllRead: 'Mark all as read', wasAbsent: (name: string, d: string) => `${name} was absent on ${d}.`, wasLate: (name: string, d: string) => `${name} was late on ${d}.`, fromRegister: "From the school's attendance register.", bell: (n: string) => `Notifications, ${n} unread`,
-      kind: { absence: 'Absence', late: 'Late arrival', announcement: 'Announcement' } as Record<string, string>,
+      kind: { absence: 'Absence', late: 'Late arrival', announcement: 'Announcement', fee_due: 'Fee reminder' } as Record<string, string>,
       off: 'The school has not shared this.', emailAttendance: 'Email me about absence and lateness', emailAnnouncements: 'Email me school announcements', smsLater: 'SMS and WhatsApp: coming later. In-app notifications are always on.', displayOnly: 'This information comes from the school. For any correction, contact the school.',
     },
     // Parents P3
@@ -210,16 +212,18 @@ export const T = {
     hiddenBySchool: 'أحد أبنائك المرتبطين مخفي حاليًا: أوقفت مدرسته وصول أولياء الأمور. تواصل مع المدرسة.',
     // تطبيق المدرسة لأولياء الأمور (أ). البيانات من المدرسة؛ إنارة تعرضها فقط.
     sch: {
-      title: 'المدرسة', today: 'اليوم', timetable: 'الجدول', attendance: 'الحضور', announcements: 'الإعلانات', notifications: 'الإشعارات',
+      title: 'المدرسة', today: 'اليوم', timetable: 'الجدول', attendance: 'الحضور', announcements: 'الإعلانات', notifications: 'الإشعارات', fees: 'الرسوم',
+      feeTotal: 'الإجمالي', feePaid: 'المدفوع', feeRemaining: 'المتبقي', feeOverdue: 'متأخر السداد', feeNext: 'القسط التالي', feeNone: 'لا مستحقات.', instalment: (n: string) => `القسط ${n}`, dueOn: (d: string) => `يستحق ${d}`, paidOn: (d: string) => `دُفع ${d}`, receipt: (r: string) => `إيصال ${r}`, egp: (a: string) => `${a} جنيه`,
+      feeStatus: { due: 'مستحق', overdue: 'متأخر', paid: 'مدفوع', waived: 'معفى' } as Record<string, string>, payAtSchool: 'يتم الدفع في المدرسة. إنارة تعرض سجل الرسوم كما سجّلته المدرسة فقط؛ لأي استفسار تواصل مع إدارة المدرسة.', noFees: 'لم تشارك المدرسة الرسوم بعد.', feesMainOnly: 'تعرض المدرسة الرسوم لولي الأمر الأساسي فقط.', overdueCount: (n: string) => `${n} متأخر`, emailFees: 'راسلني بالبريد بتذكير الأقساط (قبل 7 أيام ويوم واحد)', feeDueLine: (amount: string, d: string) => `${amount} جنيه تستحق يوم ${d}`,
       attendanceToday: 'الحضور اليوم', notRecorded: 'لم يُسجَّل بعد', todayClasses: 'حصص اليوم', noClassesToday: 'لا حصص اليوم.',
       status: { present: 'حاضر', absent: 'غائب', late: 'متأخر', excused: 'غياب بعذر' } as Record<string, string>,
       period: (p: string) => `الحصة ${p}`, teacher: 'المعلم', room: 'القاعة', group: (g: string) => `الفصل ${g}`, noTimetable: 'لم تشارك المدرسة الجدول بعد.',
       source: (label: string, when: string) => `من ${label} المدرسة · آخر تحديث ${when}`, sourceNone: (label: string) => `من ${label} المدرسة`,
-      srcLabel: { timetable: 'جدول', attendance: 'كشف حضور', announcements: 'إعلانات' } as Record<string, string>,
+      srcLabel: { timetable: 'جدول', attendance: 'كشف حضور', announcements: 'إعلانات', fees: 'سجل رسوم' } as Record<string, string>,
       month: 'الشهر', prevMonth: 'الشهر السابق', nextMonth: 'الشهر التالي', noAttendance: 'لا يوجد حضور مسجَّل هذا الشهر.', counts: (p: string, a: string, l: string, e: string) => `حاضر ${p} · غائب ${a} · متأخر ${l} · بعذر ${e}`,
       noAnnouncements: 'لا توجد إعلانات الآن.', newAnnouncements: (n: string) => `${n} إعلانات`, until: (d: string) => `حتى ${d}`, forAll: 'كل المدرسة', forGrade: 'هذا الصف', forGroup: 'هذا الفصل', forStudent: 'لطفلك فقط',
       noNotifications: 'لا توجد إشعارات بعد.', unread: (n: string) => `${n} غير مقروءة`, markAllRead: 'تعليم الكل كمقروء', wasAbsent: (name: string, d: string) => `تغيّب ${name} يوم ${d}.`, wasLate: (name: string, d: string) => `تأخّر ${name} يوم ${d}.`, fromRegister: 'من سجل الحضور في المدرسة.', bell: (n: string) => `الإشعارات، ${n} غير مقروءة`,
-      kind: { absence: 'غياب', late: 'تأخر', announcement: 'إعلان' } as Record<string, string>,
+      kind: { absence: 'غياب', late: 'تأخر', announcement: 'إعلان', fee_due: 'تذكير بالرسوم' } as Record<string, string>,
       off: 'لم تشارك المدرسة هذه المعلومات.', emailAttendance: 'راسلني بالبريد عند الغياب والتأخر', emailAnnouncements: 'راسلني بالبريد بإعلانات المدرسة', smsLater: 'الرسائل النصية وواتساب: لاحقًا. إشعارات التطبيق مفعّلة دائمًا.', displayOnly: 'هذه المعلومات من المدرسة. لأي تصحيح تواصل مع المدرسة.',
     },
     // Parents P3
