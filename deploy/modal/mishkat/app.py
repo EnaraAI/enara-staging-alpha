@@ -52,6 +52,15 @@ def web():
 
     torch.set_num_threads(2)
     reg = scorer.Registry('/bundles')
+    # Load both bundles (encoders included) and run one tiny answer per language and type when the container starts, so the first real
+    # answer does not pay the load (24 Nov 2026: the first English answer after idle timed out at lms-test's 10 s).
+    for _lang in ('en', 'ar'):
+        try:
+            _b = reg.get(_lang)
+            if _b:
+                for _t in _b.heads: _b.score(_t, 'Warm up.' if _lang == 'en' else 'تهيئة.')
+                print(f'warm: {_lang} {_b.version}', flush=True)
+        except Exception as e: print(f'warm: {_lang} failed: {type(e).__name__}', flush=True)
     api = FastAPI(title='mishkat', docs_url=None, redoc_url=None, openapi_url=None)
 
     @api.post('/score')
