@@ -74,7 +74,8 @@ export function deploymentProblems(dep) {
 // ------------------------------------------------------------------ flags
 
 // PARENT_ added for Parents P1-P5 (docs/parents/P1_NOTES.md); the secret-looking names below are still refused.
-const FLAG_NAME = /^(LMS|ENROLLMENT|GRADE_LEDGER|MAINTENANCE_ENDPOINTS|MOODLE_TEST_WS|PARENT)_[A-Z0-9_]{1,60}$/;
+// SCHOOL_APP_ added for the parents school app (docs/lms/PARENTS_SCHOOL_APP_PLAN.md).
+const FLAG_NAME = /^(LMS|ENROLLMENT|GRADE_LEDGER|MAINTENANCE_ENDPOINTS|MOODLE_TEST_WS|PARENT|SCHOOL_APP)_[A-Z0-9_]{1,60}$/;
 // Tutor engine (owner-approved): exactly this one name, not an ENARA_ prefix. Its value is a
 // comma list of engine switches (backend/src/services/engineV2.ts); FLAG_VALUE still applies.
 const EXTRA_FLAG_NAMES = ['ENARA_ENGINE_V2', 'TUTOR_LLM_PROVIDER', 'TUTOR_LLM_MODEL', 'TUTOR_LLM_ENDPOINT', 'TUTOR_LLM_PRICE_IN', 'TUTOR_LLM_PRICE_OUT', 'TUTOR_LLM_GRADE_REASONING', 'TUTOR_LLM_WARM_MIN'];

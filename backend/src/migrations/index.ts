@@ -562,6 +562,14 @@ export const MIGRATIONS: Migration[] = [
       logger.info('assessment_seeds_applied', r);
     },
   },
+  {
+    id: '2026-12-02-school-app-a',
+    description: 'Parents school app, step (a): indexes of school_timetable, school_attendance, school_announcements, school_imports and parent_notifications (new collections). Nothing existing changed.',
+    up: async () => {
+      const m = await import('../schoolApp/models');
+      for (const model of [m.SchoolTimetableEntry, m.SchoolDailyAttendance, m.SchoolAnnouncement, m.SchoolImport, m.ParentNotification]) await (model as { createIndexes(): Promise<unknown> }).createIndexes();
+    },
+  },
 ];
 
 type TtlCollection = { collectionName: string; indexes(): Promise<{ key: Record<string, unknown>; expireAfterSeconds?: number }[]>; createIndex(key: Record<string, 1>, opts: { expireAfterSeconds: number }): Promise<unknown> };

@@ -24,6 +24,9 @@ export interface IInstitution extends Document {
   // an ENARA admin only. Unset = 'free' (D1). 'off' hides this school's
   // children from their parents (links are kept, not ended). Read through
   // parents/schoolAccess.ts only.
+  // Parents school app (docs/lms/PARENTS_SCHOOL_APP_PLAN.md): the sections this school turned on for its parents (read through
+  // schoolApp/sections.ts; each also needs its SCHOOL_APP_*_ENABLED site switch). Unset = all off.
+  schoolApp?: { sections?: { timetable?: boolean; announcements?: boolean; attendance?: boolean; notifications?: boolean }; updatedAt?: Date; updatedBy?: string };
   parentPortal?: {
     access?: 'off' | 'free'; updatedAt?: Date; updatedBy?: string;
     // Parents P2 (PARENT_CODE_TOOLS_ENABLED), set by the school admin: how long
@@ -73,6 +76,7 @@ const institutionSchema = new Schema<IInstitution>(
     emailLanguage: { type: String, enum: ['ar', 'en'] },
     features: { type: Map, of: Boolean, default: undefined },
     parentPortal: { type: { access: { type: String, enum: ['off', 'free'] }, updatedAt: Date, updatedBy: String, codeTtlDays: { type: Number, min: 1, max: 60 }, teachersMayIssueCodes: Boolean, showResults: { type: String, enum: ['immediately', 'after_release'] }, emails: { type: { linkConfirmed: Boolean, weeklySummary: Boolean, newResults: Boolean, linkEnded: Boolean, _id: false }, default: undefined }, csvInvites: Boolean, _id: false }, default: undefined },
+    schoolApp: { type: { sections: { type: { timetable: Boolean, announcements: Boolean, attendance: Boolean, notifications: Boolean, _id: false }, default: undefined }, updatedAt: Date, updatedBy: String, _id: false }, default: undefined },
     documentRetention: { type: { pilotEndsAt: Date, retentionDays: { type: Number, min: 1, max: 3650 }, _id: false }, default: undefined },
     learningSettings: {
       diagnosticMaxQuestions: { type: Number, min: 3, max: 30 },
