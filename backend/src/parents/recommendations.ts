@@ -92,49 +92,49 @@ export function fallbackRec(f: Focus, ctx: { name: string; subject: Bi; family: 
         kind: f.kind, ai: false,
         do: { en: `Spend 5 minutes on ${q(t)} together: ${act.en}.`, ar: `خصّصا ٥ دقائق لـ ${q(t)}: ${act.ar}.` },
         why: { en: `${n} keeps finding ${q(f.detail ?? t)} hard in ${sub.en}.`, ar: `ما زال ${q(f.detail ?? t)} صعبًا على ${n} في ${sub.ar}.` },
-        say: say('Show me how you do this one. Talk me through it.', 'وريني إزاي بتحلها، واشرحلي خطوة خطوة.', `What is the trick to ${q(t)}? I never really got it.`, `إيه السر في ${q(t)}؟ أنا عمري ما فهمتها كويس.`),
+        say: say('Show me how you do this one. Talk me through it.', 'أرني كيف تحلّها، واشرحها لي خطوة خطوة.', `What is the trick to ${q(t)}? I never really got it.`, `ما سرّ ${q(t)}؟ لم أفهمها جيدًا قط.`),
       };
     case 'outcome':
       return {
         kind: f.kind, ai: false,
         do: { en: `Pick ${q(t)} for a short practice: ${act.en}.`, ar: `اختارا ${q(t)} لتدريب قصير: ${act.ar}.` },
         why: { en: `It is the part of ${sub.en} ${n} is least sure of so far.`, ar: `هذا هو الجزء الأقل ثباتًا عند ${n} في ${sub.ar} حتى الآن.` },
-        say: say('Can you teach me this? I want to learn it too.', 'ممكن تعلّمني دي؟ أنا كمان عايز أتعلمها.', `Which bit of ${q(t)} feels hardest right now?`, `أنهي جزء في ${q(t)} حاسس إنه الأصعب دلوقتي؟`),
+        say: say('Can you teach me this? I want to learn it too.', 'هل تعلّمني هذا؟ أريد أن أتعلّمه أنا أيضًا.', `Which bit of ${q(t)} feels hardest right now?`, `أيّ جزء من ${q(t)} تشعر أنه الأصعب الآن؟`),
       };
     case 'result':
       return {
         kind: f.kind, ai: false,
         do: { en: 'Look at the result together, find the question that felt hardest, and try one like it.', ar: 'راجعا النتيجة معًا، وحدّدا أصعب سؤال، وجرّبا سؤالًا مثله.' },
         why: { en: `The latest released ${sub.en} result, ${q(t)}, was ${f.score}%.`, ar: `آخر نتيجة معلنة في ${sub.ar}، ${q(t)}، كانت ${f.score}٪.` },
-        say: say('You worked hard on that. Which question was the trickiest?', 'إنت تعبت فيه. أنهي سؤال كان أصعب واحد؟', 'What would you do differently next time?', 'لو هتعيده، هتعمل إيه بشكل مختلف؟'),
+        say: say('You worked hard on that. Which question was the trickiest?', 'لقد بذلت جهدًا كبيرًا. أيّ سؤال كان الأصعب؟', 'What would you do differently next time?', 'ماذا ستفعل بطريقة مختلفة في المرة القادمة؟'),
       };
     case 'routine':
       return {
         kind: f.kind, ai: false,
         do: { en: `Agree on one 10-minute ${sub.en} session with the tutor on a day that suits you both.`, ar: `اتفقا على جلسة واحدة مدتها ١٠ دقائق في ${sub.ar} مع المعلم الذكي في يوم يناسبكما.` },
         why: { en: `${n} has not practised ${sub.en} with the tutor yet this week.`, ar: `لم يتدرّب ${n} على ${sub.ar} مع المعلم الذكي هذا الأسبوع بعد.` },
-        say: say(`Shall we do 10 minutes of ${sub.en} after dinner?`, `نعمل ١٠ دقايق ${sub.ar} بعد العشا؟`, `When this week works for 10 minutes of ${sub.en}?`, `إمتى الأسبوع ده يناسبك ١٠ دقايق ${sub.ar}؟`),
+        say: say(`Shall we do 10 minutes of ${sub.en} after dinner?`, `هل نتدرّب ١٠ دقائق على ${sub.ar} بعد العشاء؟`, `When this week works for 10 minutes of ${sub.en}?`, `متى يناسبك هذا الأسبوع أن نتدرّب ١٠ دقائق على ${sub.ar}؟`),
       };
     case 'due':
       return {
         kind: f.kind, ai: false,
         do: { en: 'Ask when they plan to do it, and offer a quiet 15 minutes.', ar: 'اسأله متى ينوي إنجازه، واعرض عليه ١٥ دقيقة هادئة.' },
         why: { en: `${q(t)} is due ${dueWords(f.dueAt!, 'en')}.`, ar: `موعد تسليم ${q(t)} هو ${dueWords(f.dueAt!, 'ar')}.` },
-        say: say('Do you want me to sit with you while you do it?', 'تحب أقعد جنبك وإنت بتعمله؟', 'Is there anything you need for it?', 'محتاج أي حاجة عشانه؟'),
+        say: say('Do you want me to sit with you while you do it?', 'هل تحب أن أجلس بجانبك وأنت تنجزه؟', 'Is there anything you need for it?', 'هل تحتاج إلى شيء لإنجازه؟'),
       };
     case 'celebrate':
       return {
         kind: f.kind, ai: false,
         do: { en: `Ask them to show you one question from ${q(t)} they got right and how they solved it.`, ar: `اطلب منه أن يريك سؤالًا واحدًا من ${q(t)} أجاب عنه صح، وكيف حلّه.` },
         why: { en: `${n} did well in ${sub.en}: ${f.score}% on ${q(t)}.`, ar: `${n} أبلى بلاءً حسنًا في ${sub.ar}: ${f.score}٪ في ${q(t)}.` },
-        say: say('Well done! Can you teach me how you did that one?', 'برافو! ممكن تعلّمني إزاي حليتها؟', 'Nice result. What helped you most?', 'نتيجة حلوة. إيه أكتر حاجة ساعدتك؟'),
+        say: say('Well done! Can you teach me how you did that one?', 'أحسنت! هل تعلّمني كيف حللتها؟', 'Nice result. What helped you most?', 'نتيجة جميلة. ما أكثر شيء ساعدك؟'),
       };
     default:
       return {
         kind: 'next', ai: false,
         do: { en: 'Ask what they think it will be about, and one thing they already know.', ar: 'اسأله عمّا يتوقع أن يكون موضوعه، وعن شيء واحد يعرفه عنه.' },
         why: { en: `Next in ${sub.en}: ${q(t)}.`, ar: `التالي في ${sub.ar}: ${q(t)}.` },
-        say: say(`What do you think ${q(t)} will be about?`, `تفتكر ${q(t)} هيكون عن إيه؟`, `Anything you already know about ${q(t)}?`, `تعرف حاجة عن ${q(t)} من قبل؟`),
+        say: say(`What do you think ${q(t)} will be about?`, `عمّ تتوقع أن يكون ${q(t)}؟`, `Anything you already know about ${q(t)}?`, `هل تعرف شيئًا عن ${q(t)} من قبل؟`),
       };
   }
 }
@@ -173,7 +173,7 @@ const SYSTEM = [
   'You get the suggestions already written in English ("en") and Arabic ("ar"). Rewrite each one in fresh, warm, plain words.',
   'Keep exactly the same meaning, the same activity idea, the same facts, names, topics, numbers and dates. Add nothing new. Never give the answer to any school work.',
   'Keep each field about as short as the original. Plain sentences: no lists, no Markdown, no links, no emojis.',
-  'English fields in English only. Arabic fields in simple Arabic (Modern Standard or Egyptian); topic names in quotes may stay as given.',
+  'English fields in English only. Arabic fields in simple Modern Standard Arabic (fusha) only, never colloquial; topic names in quotes may stay as given.',
   'Reply with JSON only, the same number of items in the same order: {"items":[{"do":{"en":"","ar":""},"why":{"en":"","ar":""},"say":{"en":"","ar":""}}]}',
 ].join('\n');
 

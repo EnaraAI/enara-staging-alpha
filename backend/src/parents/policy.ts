@@ -104,8 +104,8 @@ export function visibilityNotice(tier: Tier, parents: { name: string; role: Pare
         ? `${parents.map((p) => p.name).join(' and ')} can see your progress, session summaries and your full conversations with ENARA, including safety alerts.${tier === '13plus' ? ' Any setting they change is a suggestion until you accept it.' : ''}`
         : 'No parent is linked to your account.',
       ar: parents.length
-        ? `يقدر ${parents.map((p) => p.name).join(' و')} يشوف تقدّمك وملخصات الجلسات ومحادثاتك كاملة مع إنارة، ومعاها تنبيهات الأمان.${tier === '13plus' ? ' أي إعداد يغيّره يبقى اقتراح لحد ما توافق عليه.' : ''}`
-        : 'مفيش وليّ أمر مربوط بحسابك.',
+        ? `يستطيع ${parents.map((p) => p.name).join(' و')} رؤية تقدّمك وملخصات الجلسات ومحادثاتك كاملة مع إنارة، بما في ذلك تنبيهات الأمان.${tier === '13plus' ? ' أي إعداد يغيّره يبقى اقتراحًا إلى أن توافق عليه.' : ''}`
+        : 'لا يوجد ولي أمر مرتبط بحسابك.',
     },
   };
 }
