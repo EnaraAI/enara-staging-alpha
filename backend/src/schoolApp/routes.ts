@@ -8,6 +8,7 @@ import { feesVisibleTo, schoolSections, setFeesVisibleTo, setSchoolSections } fr
 import { confirmImport, listImports, previewImport, undoImport } from './importer';
 import { COLUMNS } from './importSpec';
 import * as views from './parentViews';
+import { busForParent, busesForAdmin, sendBusNotice, setBusPhonesShared, withdrawBusNotice } from './buses';
 import { attachReceipt, feesForAdmin, feesForParent, markInstalment, receiptForAdmin, receiptForParent } from './fees';
 import { SchoolAnnouncement } from './models';
 import { Batch } from '../models/Batch';
@@ -29,6 +30,7 @@ parentSchoolRoutes.get('/learners/:studentId/attendance', h(async (req, res) => 
 parentSchoolRoutes.get('/learners/:studentId/fees', h(async (req, res) => { res.json(await feesForParent(await child(req))); }));
 const sendFile = (res: Response, f: { body: Buffer; contentType: string; fileName: string }) => { res.setHeader('Content-Type', f.contentType); res.setHeader('Content-Disposition', `attachment; filename="${f.fileName}"`); res.setHeader('Cache-Control', 'private, no-store'); res.setHeader('X-Content-Type-Options', 'nosniff'); res.send(f.body); };
 parentSchoolRoutes.get('/learners/:studentId/fees/:instalmentId/receipt', h(async (req, res) => { sendFile(res, await receiptForParent(await child(req), String(req.params.instalmentId))); }));
+parentSchoolRoutes.get('/learners/:studentId/bus', h(async (req, res) => { res.json(await busForParent(await child(req))); }));
 parentSchoolRoutes.get('/learners/:studentId/announcements', h(async (req, res) => { res.json(await views.announcements(await child(req))); }));
 parentSchoolRoutes.get('/notifications', h(async (req, res) => { res.json(await views.notifications(req.user!.id)); }));
 parentSchoolRoutes.post('/notifications/read', h(async (req, res) => { const b = ensurePlainObject(req.body); rejectMongoOperators(b); res.json(await views.markRead(req.user!.id, b.ids)); }));
@@ -72,6 +74,16 @@ schoolAppAdminRoutes.put('/fees/visibility', h(async (req, res) => {
   const b = ensurePlainObject(req.body); rejectMongoOperators(b);
   const id = schoolId(req, b.institutionId); if (!id) throw new AppError('A school is required', 400, 'VALIDATION_ERROR');
   res.json(await setFeesVisibleTo(actor(req), id, b.feesVisibleTo));
+}));
+
+// Step (c): buses. Routes and children come from the two bus sheets (imports); the school sends delay / cancel notices for today.
+schoolAppAdminRoutes.get('/buses', h(async (req, res) => { res.json(await busesForAdmin(actor(req), typeof req.query.institutionId === 'string' ? req.query.institutionId : undefined)); }));
+schoolAppAdminRoutes.post('/buses/notices', h(async (req, res) => { const b = ensurePlainObject(req.body); rejectMongoOperators(b); res.status(201).json(await sendBusNotice(actor(req), b)); }));
+schoolAppAdminRoutes.post('/buses/notices/:id/withdraw', h(async (req, res) => { res.json(await withdrawBusNotice(actor(req), String(req.params.id))); }));
+schoolAppAdminRoutes.put('/buses/phones', h(async (req, res) => {
+  const b = ensurePlainObject(req.body); rejectMongoOperators(b);
+  const id = schoolId(req, b.institutionId); if (!id) throw new AppError('A school is required', 400, 'VALIDATION_ERROR');
+  res.json(await setBusPhonesShared(actor(req), id, b.busPhonesShared));
 }));
 
 // Announcements written on the screen (no file). Audience: school, grade, group (class) or student.

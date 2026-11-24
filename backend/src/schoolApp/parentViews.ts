@@ -6,6 +6,7 @@ import { schoolSections } from './sections';
 import { announcementFilter, whoIs } from './audience';
 import type { Section } from './flags';
 import { feesSummary } from './fees';
+import { busSummary } from './buses';
 
 // Parents school app (a): what a parent sees for ONE child. Every function takes the LearnerContext from parents/service.requireLearner
 // (active link, child still at the link's school, school parent access on), so a parent can only ever read their own child's data.
@@ -39,6 +40,7 @@ export async function schoolOverview(ctx: LearnerContext, now = new Date()) {
   }
   if (sections.announcements && who) out.announcementsCount = await SchoolAnnouncement.countDocuments(announcementFilter({ ...who, institutionId: schoolOf(ctx) }, now));
   if (sections.fees) { const f = await feesSummary(ctx, now); if (f) out.fees = f; }
+  if (sections.buses) { const b = await busSummary(ctx, now); if (b) out.bus = b; }
   if (sections.notifications) out.unreadNotifications = await ParentNotification.countDocuments({ parentUserId: ctx.link.parentUserId, studentId: ctx.student.id, readAt: { $exists: false } });
   return out;
 }

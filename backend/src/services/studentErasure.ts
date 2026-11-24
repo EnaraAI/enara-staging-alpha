@@ -2,7 +2,7 @@ import type { Model } from 'mongoose';
 import { Invitation, PasswordReset } from '../models/AccountToken';
 import { AiCall } from '../models/AiCall';
 import { Assessment } from '../models/Assessment';
-import { ParentNotification, SchoolAnnouncement, SchoolDailyAttendance, SchoolInstalment } from '../schoolApp/models';
+import { ParentNotification, SchoolAnnouncement, SchoolBusAssignment, SchoolDailyAttendance, SchoolInstalment } from '../schoolApp/models';
 import { AssessmentAttempt } from '../models/AssessmentAttempt';
 import { Assignment } from '../models/Assignment';
 import { AttendanceRecord } from '../models/AttendanceRecord';
@@ -90,6 +90,7 @@ const DELETE_BY_STUDENT_ID: [string, Model<any>][] = [ // eslint-disable-line @t
   ['assessments_for_this_student_only', Assessment],
   ['attendance_records', AttendanceRecord],
   ['school_attendance', SchoolDailyAttendance], // parents school app (a)
+  ['school_bus_assignments', SchoolBusAssignment], // parents school app (c)
   ['school_instalments', SchoolInstalment], // parents school app (b); its receipt files are deleted with the stored files
   ['parent_notifications', ParentNotification],
   ['diagnostic_sessions', DiagnosticSession],

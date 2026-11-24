@@ -5,10 +5,11 @@
 //   SCHOOL_APP_ATTENDANCE_ENABLED     (a) daily attendance from the school
 //   SCHOOL_APP_NOTIFICATIONS_ENABLED  (a) in-app notifications (+ email when the parent and school allow it)
 //   SCHOOL_APP_FEES_ENABLED           (b) fees and instalments (display only; the school marks paid; no payment in ENARA)
+//   SCHOOL_APP_BUSES_ENABLED          (c) bus routes, stops and times, the child's stop, delay / cancel notices (no live GPS)
 //   later steps: SCHOOL_APP_BUSES_ENABLED (c), SCHOOL_APP_REQUESTS_ENABLED (d), SCHOOL_APP_CHAT_ENABLED (e)
 const on = (name: string) => /^(true|1|yes)$/i.test((process.env[name] ?? '').trim());
 
-export const SECTIONS = ['timetable', 'announcements', 'attendance', 'notifications', 'fees'] as const;
+export const SECTIONS = ['timetable', 'announcements', 'attendance', 'notifications', 'fees', 'buses'] as const;
 export type Section = (typeof SECTIONS)[number];
 const ENV: Record<Section, string> = {
   timetable: 'SCHOOL_APP_TIMETABLE_ENABLED',
@@ -16,6 +17,7 @@ const ENV: Record<Section, string> = {
   attendance: 'SCHOOL_APP_ATTENDANCE_ENABLED',
   notifications: 'SCHOOL_APP_NOTIFICATIONS_ENABLED',
   fees: 'SCHOOL_APP_FEES_ENABLED',
+  buses: 'SCHOOL_APP_BUSES_ENABLED',
 };
 export const siteSectionOn = (s: Section) => on(ENV[s]);
 export const anySiteSectionOn = () => SECTIONS.some(siteSectionOn);
