@@ -79,11 +79,11 @@ jobs:
           path: deploy/lms-test/mishkat/cache
           key: mishkat-ftfeat-v1-en-${{ hashFiles('mk/data/mishkat-dev/pool-*.json') }}
           restore-keys: mishkat-ftfeat-v1-en-${{ hashFiles('mk/data/mishkat-dev/pool-*.json') }}-
-      - name: Train and evaluate (CPU, fine-tuned encoder)
+      - name: Train and evaluate on a Modal GPU (fine-tuned encoder; A10G, hard cap 30 min)
         if: steps.gate.outputs.skip == '0'
-        working-directory: deploy/lms-test/mishkat
-        env: { HF_HUB_DISABLE_PROGRESS_BARS: '1', TRANSFORMERS_VERBOSITY: error, MK_LANG: en, MK_STAGE1: 'ellipse,asap2,persuade', MK_EGYPT: '0', MK_AUG: '0', MK_DATA: '${{ github.workspace }}/mk/data/mishkat-dev', MK_BASELINE: '${{ github.workspace }}/v3b-human.json', MK_V3B: '${{ github.workspace }}/v3b-human.json', MK_COMPARE: '${{ github.workspace }}/mk/data/mishkat-dev/claude-compare/compare-en.json', MK_EXPORT: '0', MK_ENCODER_DIR: '${{ github.workspace }}/ft-en', MK_FT_RUN: '${{ steps.ft.outputs.run_id }}' }
-        run: python train_mishkat.py 2>&1 | tee train.log
+        timeout-minutes: 45
+        env: { MK_EVAL_DATA: '${{ github.workspace }}/mk/data/mishkat-dev', MK_EVAL_V3B: '${{ github.workspace }}/v3b-human.json' }
+        run: modal run deploy/lms-test/mishkat/ft/eval_en.py --run-id "${{ steps.ft.outputs.run_id }}" --out-dir deploy/lms-test/mishkat
       - name: Save feature cache (also after a crash)
         if: always() && steps.gate.outputs.skip == '0'
         uses: actions/cache/save@v4
@@ -97,9 +97,10 @@ jobs:
           cp deploy/lms-test/mishkat/results/report.json "$P/" 2>/dev/null || true
           cp deploy/lms-test/mishkat/train.log "$P/" 2>/dev/null || true
           cp ft-cost.json "$P/" 2>/dev/null || true
+          cp deploy/lms-test/mishkat/eval-cost.json "$P/" 2>/dev/null || true
           ls "$P" | grep -q . || { echo "nothing to publish"; exit 0; }
           cd "$P" && git init -q && git checkout -q -b "$B"
           git config user.name github-actions && git config user.email github-actions@users.noreply.github.com
-          git add report.json train.log ft-cost.json 2>/dev/null || git add -A
+          git add -A
           git commit -qm "Mishkat English fine-tune ${{ steps.ft.outputs.run_id }}"
           git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" "$B"
