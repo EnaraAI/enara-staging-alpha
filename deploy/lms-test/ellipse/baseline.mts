@@ -174,6 +174,30 @@ for (const ds of (cfg.datasets ?? []).filter((d) => d.startsWith('mishkat-'))) {
   results[ds] = { n: rows.length, marked: rows.filter((r) => r.marks).length, modelCalls: relayCalls - calls0, perAnswer: rows };
   console.log(ds, 'done', (results[ds] as { marked: number }).marked, 'of', rows.length);
 }
+// ---- Egyptian test set (owner, 24 Nov 2026): Zenodo 10.5281/zenodo.18630360, CC BY 4.0, never trained on. Downloaded at run time;
+// the same 300 answers as Mishkat's sample (every k-th valid row). v3b (one run per answer) as a short answer; numbers only. ----
+if ((cfg.datasets ?? []).includes('egypt')) {
+  const { gradeOpenRun } = await import(join(LIVE, 'src/assessment/grading-engine/graders/domains/index.ts'));
+  const meta = await (await fetch('https://zenodo.org/api/records/18630360')).json() as { files: { key: string; links: { self: string } }[]; metadata: { license?: unknown } };
+  const csvText = await (await fetch(meta.files.find((f) => f.key.endsWith('.csv'))!.links.self)).text();
+  const all = csvJson(csvText, ['id', 'TeacherAnswer', 'StudentAnswer', 'degree']);
+  const valid = all.filter((r) => r.StudentAnswer && r.StudentAnswer.trim() && Number.isFinite(Number(r.degree)) && Number(r.degree) >= 0 && Number(r.degree) <= 5);
+  const k = Math.max(1, Math.floor(valid.length / 300)); const sample = valid.map((r, i) => ({ r, i })).filter((x) => x.i % k === 0).slice(0, 300);
+  const rows: Record<string, unknown>[] = []; let j = 0; const calls0 = relayCalls;
+  const worker = async () => {
+    while (j < sample.length) {
+      const { r, i } = sample[j++];
+      const stem = `أجب عن سؤال في مادة علم الاجتماع. الإجابة النموذجية للمعلم: ${r.TeacherAnswer}`;
+      const g = await gradeOpenRun({ attempt: { id: `egypt-${i}` }, item: { questionId: `egypt-${r.id}`, stem, type: 'short_answer', domain: 'language', language: 'ar' }, answer: r.StudentAnswer, uiLanguage: 'ar', run: 1, options: { store: false, allowFallback: false } }).catch(() => null);
+      const ok = g && g.status === 'proposed';
+      rows.push({ index: i, human: Number(r.degree), v3b: ok ? Object.fromEntries(g!.criterionScores.map((c: { criterionId: string; points: number }) => [c.criterionId, c.points])) : null, status: g?.status ?? 'error' });
+    }
+  };
+  await Promise.all(Array.from({ length: cfg.concurrency }, worker));
+  rows.sort((a, b) => Number(a.index) - Number(b.index));
+  results.egypt = { licence: meta.metadata.license, validRows: valid.length, k, n: rows.length, marked: rows.filter((r) => r.v3b).length, modelCalls: relayCalls - calls0, perAnswer: rows };
+  console.log('egypt done', (results.egypt as { marked: number }).marked, 'of', rows.length);
+}
 const summary = { grader: "today's engine language essay grader (engine-v2), DeepSeek on lms-test via llm-compare; no fallback", relayErrors, results };
 mkdirSync('out', { recursive: true });
 writeFileSync('out/summary.json', JSON.stringify(summary, null, 1));
