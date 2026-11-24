@@ -3,7 +3,7 @@
 //   POST <MISHKAT_ENDPOINT>   Authorization: Bearer <MISHKAT_TOKEN>   Content-Type: application/json
 //   request  {"lang":"ar"|"en","type":"essay"|"short_answer","text":"<the learner's answer>"}
 //   response {"version":"<model version>","scores":{"<criterion>":<raw continuous score>},"criteria":["<criterion ids this model covers for lang+type>"]}
-// Both settings are secrets the owner sets; when either is missing the client says "unavailable". It never throws: a timeout (3 s),
+// Both settings are secrets the owner sets; when either is missing the client says "unavailable". It never throws: a timeout (10 s),
 // an HTTP error, a network error or a reply that does not match the contract are all "unavailable", and grading goes on with v3b
 // alone. No retries on the grading path. Nothing is logged here (the caller logs the reason; never the text or the token).
 
@@ -15,7 +15,9 @@ export type MishkatResult =
   | { status: 'ok'; version: string; scores: Record<string, number>; criteria: string[] }
   | { status: 'unavailable'; reason: MishkatUnavailable };
 
-export const MISHKAT_TIMEOUT_MS = 3_000;
+// 10 s (owner, 24 Nov 2026): grading runs after submission, so the learner does not wait; the service's warm median under 200 answers
+// at once was 2.7 s and its p95 8.3 s, which 3 s would have cut off (v3b alone).
+export const MISHKAT_TIMEOUT_MS = 10_000;
 const MAX_TEXT = 20_000;
 
 /** Checks a reply against the contract; null when it does not match. Exported for tests. */
