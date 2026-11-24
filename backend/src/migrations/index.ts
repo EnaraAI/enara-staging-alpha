@@ -597,6 +597,16 @@ export const MIGRATIONS: Migration[] = [
       const m = await import('../schoolApp/models');
       await m.SchoolChatLog.createIndexes();
     },
+  },  {
+    id: '2026-12-07-school-app-retention',
+    description: "Parents school app: the assistant's logs are kept by the 'chat' retention setting (daily job), so the fixed 90-day expiry index on school_chat_logs is replaced by a plain index. Nothing else changed.",
+    up: async () => {
+      const m = await import('../schoolApp/models');
+      const coll = m.SchoolChatLog.collection;
+      const idx = await coll.indexes().catch(() => [] as { name?: string; expireAfterSeconds?: number }[]);
+      for (const i of idx) if (i.expireAfterSeconds !== undefined && i.name) await coll.dropIndex(i.name);
+      await m.SchoolChatLog.createIndexes();
+    },
   },
 ];
 

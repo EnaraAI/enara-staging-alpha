@@ -48,7 +48,7 @@ schoolAppAdminRoutes.use(anyOn, authMiddleware, requireRole('admin', 'enara-admi
 const schoolId = (req: AuthRequest, q?: unknown) => (req.user!.role === 'enara-admin' && typeof q === 'string' ? q : req.user!.institutionId);
 schoolAppAdminRoutes.get('/status', h(async (req, res) => {
   const id = schoolId(req, req.query.institutionId);
-  res.json({ institutionId: id ?? null, available: Object.fromEntries(SECTIONS.map((s) => [s, siteSectionOn(s)])), sections: await schoolSections(id), feesVisibleTo: await feesVisibleTo(id),
+  res.json({ institutionId: id ?? null, available: Object.fromEntries(SECTIONS.map((s) => [s, siteSectionOn(s)])), sections: await schoolSections(id), feesVisibleTo: await feesVisibleTo(id), retentionDays: (await import('./retention')).retentionDays(),
     templates: Object.fromEntries(Object.entries(COLUMNS).map(([k, cols]) => [k, cols.map((c) => ({ key: c.key, required: c.required, header: c.aliases[0], headerAr: c.aliases.find((a) => /[؀-ۿ]/.test(a)) ?? null }))])) });
 }));
 // The school's classes (ENARA groups) with their students' IDs and names: what the templates' "class" and "student" columns accept.

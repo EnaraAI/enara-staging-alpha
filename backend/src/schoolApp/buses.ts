@@ -10,8 +10,8 @@ import { emailSchoolNotices, type NoticeDoc } from './emails';
 import { norm } from './importSpec';
 
 // Parents school app, step (c): buses. Routes with stops and times, each child's stop, and the school's delay / cancel notices for today.
-// Stop times only: no live GPS in this phase. The supervisor's phone is shown only when the school confirms supervisors agreed to share
-// it with parents (busPhonesShared; plan question 3).
+// Stop times only: no live GPS in this phase. The supervisor's phone and call button are shown unless the school turns sharing off
+// (busPhonesShared; client answer 3: supervisors agree to share).
 const cairoDate = (d = new Date()) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Cairo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(d);
 type Actor = { id: string; role: string; institutionId?: string };
 const scope = (actor: Actor, institutionId?: string) => {
@@ -21,7 +21,7 @@ const scope = (actor: Actor, institutionId?: string) => {
 };
 export async function busPhonesShared(institutionId: string | undefined) {
   if (!institutionId) return false;
-  return (await Institution.findOne({ id: institutionId }).select('schoolApp.busPhonesShared').lean())?.schoolApp?.busPhonesShared === true;
+  return (await Institution.findOne({ id: institutionId }).select('schoolApp.busPhonesShared').lean())?.schoolApp?.busPhonesShared !== false; // on unless turned off
 }
 const valid = (a: { validFrom?: string; validTo?: string }, today: string) => (!a.validFrom || a.validFrom <= today) && (!a.validTo || a.validTo >= today);
 
@@ -117,7 +117,7 @@ export async function setBusPhonesShared(actor: Actor, institutionId: string, va
   if (typeof value !== 'boolean') throw new AppError('busPhonesShared must be true or false', 400, 'VALIDATION_ERROR');
   const inst = await Institution.findOne({ id: school });
   if (!inst) throw new AppError('Institution not found', 404, 'NOT_FOUND');
-  const before = inst.schoolApp?.busPhonesShared === true;
+  const before = inst.schoolApp?.busPhonesShared !== false;
   inst.schoolApp = { ...(inst.schoolApp ?? {}), busPhonesShared: value, updatedAt: new Date(), updatedBy: actor.id };
   inst.markModified('schoolApp'); await inst.save();
   await recordAudit('school_app_bus_phones_changed', actor, { institutionId: school, type: 'institution', id: school }, { from: before, to: value });
