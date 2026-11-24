@@ -1,0 +1,59 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[14:55:36 +0.2 min] ar: encoder CAMeL-Lab/bert-base-arabic-camelbert-msa [6d7d27e2f32], max 256 tokens, stage-1 sample 2500
+/root/mk/train_mishkat.py:93: Pandas4Warning: Starting with pandas version 4.0 all arguments of mean will be keyword-only.
+  sc = df[fa].astype(float).mean(1)
+[14:55:36 +0.2 min] AR-AES: 2046 essays, text column found, final-score columns [' Final_Score_A', 'Final_Score_B'], range 0.0-10.0
+[14:55:36 +0.2 min] AR-ASAG: 2132 answers, score range 0.0-5.0
+[14:55:36 +0.2 min] stage 1 data: 4178 essays
+[14:55:36 +0.2 min] ENARA model-marked: 482 labelled answers, owner corrections applied: 0
+[14:55:36 +0.2 min] stage-1 essays: 0 of 4178 from cache, 4178 to read
+[14:55:38 +0.2 min] encoder stage-1 essays (400/4178 new): 400/400, ~0.0 min left
+[14:56:33 +1.1 min] encoder stage-1 essays (800/4178 new): 400/400, ~0.0 min left
+[14:57:26 +2.0 min] encoder stage-1 essays (1200/4178 new): 400/400, ~0.0 min left
+[14:58:24 +3.0 min] encoder stage-1 essays (1600/4178 new): 400/400, ~0.0 min left
+[14:59:14 +3.8 min] encoder stage-1 essays (2000/4178 new): 400/400, ~0.0 min left
+[15:00:04 +4.6 min] encoder stage-1 essays (2400/4178 new): 400/400, ~0.0 min left
+[15:00:18 +4.9 min] encoder stage-1 essays (2800/4178 new): 400/400, ~0.0 min left
+[15:00:28 +5.0 min] encoder stage-1 essays (3200/4178 new): 400/400, ~0.0 min left
+[15:00:37 +5.2 min] encoder stage-1 essays (3600/4178 new): 400/400, ~0.0 min left
+[15:00:46 +5.3 min] encoder stage-1 essays (4000/4178 new): 400/400, ~0.0 min left
+[15:00:55 +5.5 min] encoder stage-1 essays (4178/4178 new): 178/178, ~0.0 min left
+[15:00:59 +5.6 min] ENARA answers: 0 of 482 from cache, 482 to read
+[15:01:00 +5.6 min] encoder ENARA answers (400/482 new): 400/400, ~0.0 min left
+[15:01:13 +5.8 min] encoder ENARA answers (482/482 new): 82/82, ~0.0 min left
+[15:01:17 +5.9 min] length-augmented copies: 0 of 1736 from cache, 1736 to read
+[15:01:18 +5.9 min] encoder length-augmented copies (400/1736 new): 400/400, ~0.0 min left
+[15:01:38 +6.2 min] encoder length-augmented copies (800/1736 new): 400/400, ~0.0 min left
+[15:01:55 +6.5 min] encoder length-augmented copies (1200/1736 new): 400/400, ~0.0 min left
+[15:02:09 +6.7 min] encoder length-augmented copies (1600/1736 new): 400/400, ~0.0 min left
+[15:02:41 +7.3 min] encoder length-augmented copies (1736/1736 new): 136/136, ~0.0 min left
+[15:02:53 +7.5 min] length augmentation: 1736 copies
+[15:03:02 +7.6 min] human re-check essays: 0 of 200 from cache, 200 to read
+[15:03:03 +7.6 min] encoder human re-check essays (200/200 new): 200/200, ~0.0 min left
+[15:04:01 +8.6 min] stage 1 after removing re-check essays: 4178; human re-check essays: 200
+[15:04:01 +8.6 min] Claude comparison answers: 0 of 16 from cache, 16 to read
+[15:04:01 +8.6 min] encoder Claude comparison answers (16/16 new): 16/16, ~0.0 min left
+[15:04:03 +8.6 min] encoder truncation test fold 1: 31/31, ~0.0 min left
+[15:04:03 +8.6 min] encoder padding test fold 1: 41/41, ~0.0 min left
+[15:04:06 +8.7 min] essay fold 1/5: train 162, val 19, test 41
+[15:04:06 +8.7 min] encoder truncation test fold 2: 29/29, ~0.0 min left
+[15:04:07 +8.7 min] encoder padding test fold 2: 44/44, ~0.0 min left
+[15:04:11 +8.8 min] essay fold 2/5: train 153, val 25, test 44
+[15:04:12 +8.8 min] encoder truncation test fold 3: 31/31, ~0.0 min left
+[15:04:14 +8.8 min] encoder padding test fold 3: 44/44, ~0.0 min left
+[15:04:18 +8.9 min] essay fold 3/5: train 155, val 23, test 44
+[15:04:19 +8.9 min] encoder truncation test fold 4: 27/27, ~0.0 min left
+[15:04:20 +8.9 min] encoder padding test fold 4: 45/45, ~0.0 min left
+[15:04:24 +9.0 min] essay fold 4/5: train 152, val 25, test 45
+[15:04:24 +9.0 min] encoder truncation test fold 5: 32/32, ~0.0 min left
+[15:04:25 +9.0 min] encoder padding test fold 5: 48/48, ~0.0 min left
+[15:04:29 +9.1 min] essay fold 5/5: train 153, val 21, test 48
+[15:04:29 +9.1 min] essay {"task_completion": [0.641, 0.626, 0.762], "grammar_accuracy": [0.795, 0.813, 0.808], "vocabulary_range": [0.937, 0.916, 0.843], "organisation": [0.835, 0.818, 0.883], "mechanics": [0.872, 0.864, 0.781]} {"truncation": {"n": 150, "meanDropGrammarSpelling": 0.023, "pass": true}, "padding": {"n": 222, "meanRiseGrammarSpelling": 0.011, "pass": true}} {"truncation": {"n": 150, "meanDropGrammarSpelling": 0.032, "pass": true}, "padding": {"n": 222, "meanRiseGrammarSpelling": 0.027, "pass": true}}
+[15:04:31 +9.1 min] short_answer fold 1/5: train 188, val 24, test 48
+[15:04:32 +9.1 min] short_answer fold 2/5: train 190, val 24, test 46
+[15:04:33 +9.1 min] short_answer fold 3/5: train 179, val 27, test 54
+[15:04:35 +9.1 min] short_answer fold 4/5: train 183, val 24, test 53
+[15:04:35 +9.2 min] short_answer fold 5/5: train 179, val 22, test 59
+[15:04:36 +9.2 min] short_answer {"task_completion": [0.377, 0.36, 0.727], "grammar_accuracy": [0.733, 0.727, 0.587], "mechanics": [null, null, 0.0]} {"shortCorrectNotScoredDown": {"n": 144, "share": 0.965, "pass": true}} {"shortCorrectNotScoredDown": {"n": 144, "share": 0.958, "pass": true}}
+[15:04:36 +9.2 min] bundle mishkat-ar-20261124-222e908b: {"essay": ["grammar_accuracy", "mechanics", "vocabulary_range"], "short_answer": ["grammar_accuracy", "mechanics"]}
+[15:04:36 +9.2 min] done
