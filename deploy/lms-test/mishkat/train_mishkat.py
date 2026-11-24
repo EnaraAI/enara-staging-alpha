@@ -35,8 +35,8 @@ def sh(c): subprocess.run(c, shell=True, check=True, stdout=subprocess.DEVNULL, 
 STAGE1 = [x for x in os.environ.get('MK_STAGE1', 'ellipse' if LANG == 'en' else 'laila').split(',') if x]
 PRE_EXTRA = int(os.environ.get('MK_PRE_EXTRA', '2500'))
 # Owner, 24 Nov: stage 1 stops at 3000 essays in total, split evenly across its sources.
-PRE_MAX = int(os.environ.get('MK_PRE_MAX', '3000'))
-if STAGE1: PRE_N, PRE_EXTRA = min(PRE_N, PRE_MAX // len(STAGE1)), min(PRE_EXTRA, PRE_MAX // len(STAGE1))
+PRE_MAX = int(os.environ.get('MK_PRE_MAX', '3000'))  # 0 = no cap (owner, 24 Nov 2:10 PM: English ELLIPSE 2,500 + ASAP 2.0 + PERSUADE, no cap)
+if STAGE1 and PRE_MAX > 0: PRE_N, PRE_EXTRA = min(PRE_N, PRE_MAX // len(STAGE1)), min(PRE_EXTRA, PRE_MAX // len(STAGE1))
 def _norm(v, lo, hi): return ((np.asarray(v, dtype=np.float32) - lo) / (hi - lo) * 2).astype(np.float32)
 def _get(url, path):
     if not os.path.exists(path): subprocess.run(['curl', '-sSfL', '-o', path, url], check=True)
@@ -74,6 +74,18 @@ def stage1():
             b = lambda v: np.where(v <= 1, 0, np.where(v <= 3, 1, 2))
             Y = np.stack([np.clip(np.rint(df.relevance), 0, 2), b(df.grammar), b(df.vocabulary), b(df.organization), b(df.mechanics), _norm(df.holistic, 0, max(1, float(df.holistic.max())))], 1).astype(np.float32)
             add(df.essay.tolist(), Y, df.essay_id.astype(str).tolist(), PRE_N)
+        elif src == 'arasag':  # AR-ASAG (Mendeley Data, CC BY 4.0; GitHub copy by the authors): Arabic short answers, average of 2 graders as holistic
+            raw = _get('https://raw.githubusercontent.com/leilaouahrani/AR-ASAG-Dataset/master/TXT-%20Version/Questions-%20Model%20Answers%20-%20Student%20Answers%20-%20Grade1-%20Grade2-%20%20Average%20Gold.txt', '/tmp/arasag.txt')
+            texts, scores = [], []
+            for line in open(raw, encoding='utf-8', errors='replace').read().splitlines()[1:]:
+                f_ = [x.strip() for x in line.split('\t')]
+                nums = []
+                while f_ and re.fullmatch(r'-?\d+(\.\d+)?', f_[-1].replace(',', '.')): nums.insert(0, float(f_.pop().replace(',', '.')))
+                if len(nums) >= 1 and f_ and f_[-1]: texts.append(f_[-1]); scores.append(nums[-1])
+            sc = np.array(scores, dtype=np.float32)
+            Y = np.full((len(texts), 6), np.nan, dtype=np.float32); Y[:, 5] = _norm(sc, float(sc.min()), float(sc.max())) if len(sc) else sc
+            log(f'AR-ASAG: {len(texts)} answers, score range {float(sc.min()) if len(sc) else "?"}-{float(sc.max()) if len(sc) else "?"}')
+            add(texts, Y, [f'arasag-{i}' for i in range(len(texts))], PRE_EXTRA)
         elif src == 'araes':  # AR-AES (Hugging Face Rnghazawi-NLP/AR-AES), CC BY 4.0: question-specific rubric; the final score (mean of 2 raters) as holistic
             df = pd.read_csv(_get('https://huggingface.co/datasets/Rnghazawi-NLP/AR-AES/resolve/main/ARAES%20Dataset%20-%20Essays%20and%20Marks.csv', '/tmp/araes.csv'))
             tcol = [c for c in df.columns if df[c].astype(str).str.len().mean() > 100][0]
@@ -162,12 +174,28 @@ rows, n_corr = enara(); log(f'ENARA model-marked: {len(rows)} labelled answers, 
 # after owner corrections reuses it. Labels are not cached (corrections must always apply).
 CACHE = os.environ.get('MK_CACHE', 'cache'); os.makedirs(CACHE, exist_ok=True)
 def cached(name, texts, part):
+    """Encoder readings per text (by hash), reused from any earlier run's cache and saved every 400 texts, so a bigger or
+    changed set only computes the new texts and a stopped run resumes where it was."""
     f = f'{CACHE}/{LANG}-{ENC_TAG}-{name}.npz'
-    if os.path.exists(f):
-        d = np.load(f, allow_pickle=True)
-        if list(d['keys']) == [str(hash_t(t)) for t in texts]: log(f'{part}: from cache'); return d['X']
-    X = X_of(texts, part); np.savez(f, X=X, keys=np.array([str(hash_t(t)) for t in texts])); return X
-import hashlib
+    keys = [str(hash_t(t)) for t in texts]
+    have = {}
+    files = sorted(glob.glob(f'{CACHE}/{LANG}-{ENC_TAG}-*.npz'))
+    if not os.path.isdir(ENC):  # the base encoder: also the caches written before files carried an encoder tag ("<lang>-<name>.npz")
+        files += [g for g in sorted(glob.glob(f'{CACHE}/{LANG}-*.npz')) if os.path.basename(g).count('-') == 1]
+    for g in files:
+        try:
+            d = np.load(g, allow_pickle=True)
+            for k, x in zip(d['keys'], d['X']): have.setdefault(str(k), x)
+        except Exception: pass
+    todo = [i for i, k in enumerate(keys) if k not in have]
+    log(f'{part}: {len(texts) - len(todo)} of {len(texts)} from cache, {len(todo)} to read')
+    for a in range(0, len(todo), 400):
+        idx = todo[a:a + 400]
+        Xn = X_of([texts[i] for i in idx], f'{part} ({a + len(idx)}/{len(todo)} new)')
+        for i, x in zip(idx, Xn): have[keys[i]] = x
+        np.savez(f, X=np.array([have[k] for k in keys if k in have]), keys=np.array([k for k in keys if k in have]))
+    X = np.array([have[k] for k in keys]); np.savez(f, X=X, keys=np.array(keys)); return X
+import hashlib, glob
 def hash_t(t): return hashlib.sha1(t.encode('utf-8')).hexdigest()[:16]
 Xpre = cached('stage1', pre_texts, 'stage-1 essays')
 Xen = cached('enara', [r['answer'] for r in rows], 'ENARA answers')
@@ -219,7 +247,7 @@ log(f'stage 1 after removing re-check essays: {len(Xpre)}; human re-check essays
 
 report = {'label': 'MODEL-MARKED: development only, not for claims, never for a real school', 'lang': LANG, 'encoder': ENC_LABEL, 'maxTokens': MAXLEN,
           'stage1Essays': int(len(Xpre)), 'enaraLabelled': len(rows), 'ownerCorrections': n_corr, 'evaluation': '5-fold cross-validation by question (every answer tested once, never trained on in its fold)', 'types': {}}
-RECIPE = 'two_stage' if LANG == 'en' else 'stage2_only'  # run 2-3: the better recipe per language
+RECIPE = os.environ.get('MK_RECIPE', 'two_stage')  # owner, 24 Nov 2:10 PM: Arabic adopts the AR-AES two-stage recipe (both languages two-stage)
 CMP = None
 if os.environ.get('MK_COMPARE') and os.path.exists(os.environ['MK_COMPARE']):  # answers Claude graded earlier
     CMP = json.load(open(os.environ['MK_COMPARE']))

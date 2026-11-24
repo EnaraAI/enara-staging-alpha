@@ -11,13 +11,13 @@ jobs:
   train:
     if: github.repository == 'EnaraAI/enara-staging-alpha'
     runs-on: ubuntu-latest
-    timeout-minutes: 300
+    timeout-minutes: 355
     strategy:
       fail-fast: false
       matrix:
         include:  # run 8 (24 Nov): more stage-1 corpora; Egyptian test set for Arabic
-          - { lang: en, stage1: 'ellipse,asap2,persuade' }
-          - { lang: ar, stage1: 'araes' }
+          - { lang: en, stage1: 'ellipse,asap2,persuade', premax: '0' }   # owner 24 Nov 2:10 PM: ELLIPSE 2,500 + ASAP 2.0 + PERSUADE, no cap
+          - { lang: ar, stage1: 'araes,arasag', premax: '0' }             # AR-AES two-stage (adopted) + AR-ASAG (CC BY 4.0)
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -43,7 +43,7 @@ jobs:
           restore-keys: mishkat-feat-v1-${{ matrix.lang }}-${{ hashFiles('mk/data/mishkat-dev/pool-*.json') }}-
       - name: Train and evaluate
         working-directory: deploy/lms-test/mishkat
-        env: { HF_HUB_DISABLE_PROGRESS_BARS: '1', TRANSFORMERS_VERBOSITY: error, MK_LANG: '${{ matrix.lang }}', MK_STAGE1: '${{ matrix.stage1 }}', MK_EGYPT: "${{ matrix.lang == 'ar' && '1' || '0' }}", MK_AUG: "${{ matrix.lang == 'ar' && '1' || '0' }}", MK_DATA: '${{ github.workspace }}/mk/data/mishkat-dev', MK_BASELINE: '${{ github.workspace }}/v3b-human.json', MK_V3B: '${{ github.workspace }}/v3b-human.json', MK_COMPARE: '${{ github.workspace }}/mk/data/mishkat-dev/claude-compare/compare-${{ matrix.lang }}.json', MK_EXPORT: '1', MK_EXPORT_LANGS: 'en' }
+        env: { HF_HUB_DISABLE_PROGRESS_BARS: '1', TRANSFORMERS_VERBOSITY: error, MK_LANG: '${{ matrix.lang }}', MK_STAGE1: '${{ matrix.stage1 }}', MK_PRE_MAX: '${{ matrix.premax }}', MK_EGYPT: "${{ matrix.lang == 'ar' && '1' || '0' }}", MK_AUG: "${{ matrix.lang == 'ar' && '1' || '0' }}", MK_DATA: '${{ github.workspace }}/mk/data/mishkat-dev', MK_BASELINE: '${{ github.workspace }}/v3b-human.json', MK_V3B: '${{ github.workspace }}/v3b-human.json', MK_COMPARE: '${{ github.workspace }}/mk/data/mishkat-dev/claude-compare/compare-${{ matrix.lang }}.json', MK_EXPORT: '1', MK_EXPORT_LANGS: 'en' }
         run: python train_mishkat.py 2>&1 | tee train.log
       - name: Save feature cache (also after a crash)
         if: always()
