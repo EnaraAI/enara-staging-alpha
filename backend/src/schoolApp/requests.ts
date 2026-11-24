@@ -19,7 +19,7 @@ import { norm, parseAudience, parseDate } from './importSpec';
 //   changes its status; the parent is notified. The chatbot (step e) creates requests only through createRequest, after the parent confirms.
 //   Consent: the school publishes a form (title, text, choices, deadline) to the school, a grade, a class or one child. A guardian taps a
 //   choice and "I agree"; the record keeps the time, the device, a hash of the network address and a hash of the exact text, and every
-//   answer is kept (the latest one counts). Whether this is enough for trips under Egyptian law is for legal review (plan section 7).
+//   answer is kept (the latest one counts).
 const cairoDate = (d = new Date()) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Cairo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(d);
 type Actor = { id: string; role: string; institutionId?: string };
 const scope = (actor: Actor, institutionId?: string) => {

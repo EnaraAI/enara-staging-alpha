@@ -213,8 +213,8 @@ const consentSchema = new Schema<ISchoolConsent>({
 consentSchema.index({ formId: 1, studentId: 1, at: -1 });
 export const SchoolConsent = model<ISchoolConsent>('SchoolConsent', consentSchema, 'school_consents');
 
-// ---- the parents' assistant (step e): question, the sources used and the answer, kept 90 days (then deleted by the database); never
-// used for training. Counts stay in the usage ledger.
+// ---- the parents' assistant (step e): question, the sources used and the answer; kept for the 'chat' retention setting (retention.ts,
+// default 90 days); never used for training. Counts stay in the usage ledger.
 export interface ISchoolChatLog extends Document {
   id: string; institutionId: string; studentId: string; parentUserId: string; question: string; answer: string; sources: string[]; engine: 'code' | 'model'; refused?: string; createdAt: Date;
 }
@@ -226,7 +226,7 @@ const chatLogSchema = new Schema<ISchoolChatLog>({
   question: { type: String, required: true, maxlength: 1000 }, answer: { type: String, required: true, maxlength: 4000 },
   sources: { type: [String], default: [] }, engine: { type: String, enum: ['code', 'model'], required: true }, refused: String,
 }, { timestamps: { createdAt: true, updatedAt: false } });
-chatLogSchema.index({ createdAt: 1 }, { expireAfterSeconds: 90 * 86_400 });
+chatLogSchema.index({ createdAt: 1 });
 chatLogSchema.index({ parentUserId: 1, createdAt: -1 });
 export const SchoolChatLog = model<ISchoolChatLog>('SchoolChatLog', chatLogSchema, 'school_chat_logs');
 

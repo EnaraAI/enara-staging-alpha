@@ -21,7 +21,7 @@ import { digits } from './importSpec';
 //      used. Never Anthropic (no Anthropic spending): no DeepSeek, no model.
 //   3. It never acts. It may OFFER "Open a request to the office?"; the request is created only by a separate call after the parent taps
 //      confirm (createRequest, via 'chat').
-//   Logs: question, sources and answer, kept 90 days; never used for training.
+//   Logs: question, sources and answer, kept for the 'chat' retention setting (retention.ts); never used for training.
 export type Topic = 'fees' | 'buses' | 'timetable' | 'attendance' | 'announcements' | 'consents' | 'requests' | 'help';
 type Lang = 'en' | 'ar';
 type Source = 'fees' | 'buses' | 'timetable' | 'attendance' | 'announcements' | 'consents' | 'requests';
