@@ -15,7 +15,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        lang: [en, ar]  # run 5: both; Arabic with length copies; scores the answers Claude graded earlier
+        include:  # run 8 (24 Nov): more stage-1 corpora; Egyptian test set for Arabic
+          - { lang: en, stage1: 'ellipse,asap2,persuade' }
+          - { lang: ar, stage1: 'araes' }
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -41,7 +43,7 @@ jobs:
           restore-keys: mishkat-feat-v1-${{ matrix.lang }}-${{ hashFiles('mk/data/mishkat-dev/pool-*.json') }}-
       - name: Train and evaluate
         working-directory: deploy/lms-test/mishkat
-        env: { HF_HUB_DISABLE_PROGRESS_BARS: '1', TRANSFORMERS_VERBOSITY: error, MK_LANG: '${{ matrix.lang }}', MK_AUG: "${{ matrix.lang == 'ar' && '1' || '0' }}", MK_DATA: '${{ github.workspace }}/mk/data/mishkat-dev', MK_BASELINE: '${{ github.workspace }}/v3b-human.json', MK_V3B: '${{ github.workspace }}/v3b-human.json', MK_COMPARE: '${{ github.workspace }}/mk/data/mishkat-dev/claude-compare/compare-${{ matrix.lang }}.json', MK_EXPORT: '1', MK_EXPORT_LANGS: 'en' }
+        env: { HF_HUB_DISABLE_PROGRESS_BARS: '1', TRANSFORMERS_VERBOSITY: error, MK_LANG: '${{ matrix.lang }}', MK_STAGE1: '${{ matrix.stage1 }}', MK_EGYPT: "${{ matrix.lang == 'ar' && '1' || '0' }}", MK_AUG: "${{ matrix.lang == 'ar' && '1' || '0' }}", MK_DATA: '${{ github.workspace }}/mk/data/mishkat-dev', MK_BASELINE: '${{ github.workspace }}/v3b-human.json', MK_V3B: '${{ github.workspace }}/v3b-human.json', MK_COMPARE: '${{ github.workspace }}/mk/data/mishkat-dev/claude-compare/compare-${{ matrix.lang }}.json', MK_EXPORT: '1', MK_EXPORT_LANGS: 'en' }
         run: python train_mishkat.py 2>&1 | tee train.log
       - name: Save feature cache (also after a crash)
         if: always()

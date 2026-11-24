@@ -26,33 +26,67 @@ def X_of(texts, part): return MF.X_of(texts, LANG, _E, part, log)
 
 # ---------------- stage-1 data (public datasets, never stored) ----------------
 def sh(c): subprocess.run(c, shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+STAGE1 = [x for x in os.environ.get('MK_STAGE1', 'ellipse' if LANG == 'en' else 'laila').split(',') if x]
+PRE_EXTRA = int(os.environ.get('MK_PRE_EXTRA', '2500'))
+def _norm(v, lo, hi): return ((np.asarray(v, dtype=np.float32) - lo) / (hi - lo) * 2).astype(np.float32)
+def _get(url, path):
+    if not os.path.exists(path): subprocess.run(['curl', '-sSfL', '-o', path, url], check=True)
+    return path
 def stage1():
-    if LANG == 'en':
-        sh('git clone -q --depth 1 https://github.com/scrosseye/ELLIPSE-Corpus.git /tmp/ellipse')
-        df = pd.read_csv('/tmp/ellipse/ELLIPSE_Final_github_train.csv', encoding_errors='replace')
-        b = lambda v: np.where(v <= 2.5, 0, np.where(v <= 3.5, 1, 2))
-        Y = np.full((len(df), 5), np.nan, dtype=np.float32)
-        Y[:, 1] = b((df.Grammar + df.Syntax) / 2); Y[:, 2] = b((df.Vocabulary + df.Phraseology) / 2); Y[:, 3] = b(df.Cohesion); Y[:, 4] = b(df.Conventions)
-        texts = df.full_text.tolist(); ids = df.text_id_kaggle.astype(str).tolist()
-    else:
-        sh('git clone -q --depth 1 https://gitlab.com/bigirqu/laila.git /tmp/laila')
-        df = pd.read_csv('/tmp/laila/essays_and_scores/all_essays_with_indivdual_rater_scores.csv', dtype={'essay_id': str})
-        b = lambda v: np.where(v <= 1, 0, np.where(v <= 3, 1, 2))
-        Y = np.stack([np.clip(np.rint(df.relevance), 0, 2), b(df.grammar), b(df.vocabulary), b(df.organization), b(df.mechanics)], 1).astype(np.float32)
-        texts = df.essay.tolist(); ids = df.essay_id.astype(str).tolist()
-    idx = rng.permutation(len(texts))[:PRE_N]
-    return [texts[i] for i in idx], Y[idx], [ids[i] for i in idx]
+    # Corpora downloaded at run time, never stored. Columns: the 5 ENARA criteria (0-2, NaN when the corpus lacks one) + holistic (0-2).
+    T_, Y_, I_ = [], [], []
+    def add(texts, Y, ids, n):
+        idx = rng.permutation(len(texts))[:n]; T_.extend(texts[i] for i in idx); Y_.append(Y[idx]); I_.extend(ids[i] for i in idx)
+    for src in STAGE1:
+        if src == 'ellipse':
+            if not os.path.exists('/tmp/ellipse'): sh('git clone -q --depth 1 https://github.com/scrosseye/ELLIPSE-Corpus.git /tmp/ellipse')
+            df = pd.read_csv('/tmp/ellipse/ELLIPSE_Final_github_train.csv', encoding_errors='replace')
+            b = lambda v: np.where(v <= 2.5, 0, np.where(v <= 3.5, 1, 2))
+            Y = np.full((len(df), 6), np.nan, dtype=np.float32)
+            Y[:, 1] = b((df.Grammar + df.Syntax) / 2); Y[:, 2] = b((df.Vocabulary + df.Phraseology) / 2); Y[:, 3] = b(df.Cohesion); Y[:, 4] = b(df.Conventions); Y[:, 5] = _norm(df.Overall, 1, 5)
+            add(df.full_text.tolist(), Y, df.text_id_kaggle.astype(str).tolist(), PRE_N)
+        elif src == 'asap2':  # ASAP 2.0, CC BY 4.0: holistic 1-6 only
+            z = zipfile.ZipFile(_get('https://raw.githubusercontent.com/scrosseye/ASAP_2.0/main/ASAP_2_Final_github_train.zip', '/tmp/asap2_train.zip'))
+            df = pd.read_csv(io.BytesIO(z.read([n for n in z.namelist() if n.endswith('.csv')][0])))
+            Y = np.full((len(df), 6), np.nan, dtype=np.float32); Y[:, 5] = _norm(df.score, 1, 6)
+            add(df.full_text.tolist(), Y, ('asap2-' + df.essay_id.astype(str)).tolist(), PRE_EXTRA)
+        elif src == 'persuade':  # PERSUADE 2.0 (official repo's Google Drive link), CC BY 4.0: holistic 1-6 only
+            if not os.path.exists('/tmp/persuade_train'): subprocess.run('pip install -q gdown && gdown -q 13phHyDzIsb0MHyJr6q-B-qIa9P2tM135 -O /tmp/persuade_train', shell=True, check=True)
+            p_ = '/tmp/persuade_train'
+            if zipfile.is_zipfile(p_):
+                z = zipfile.ZipFile(p_); df = pd.read_csv(io.BytesIO(z.read([n for n in z.namelist() if n.endswith('.csv')][0])), low_memory=False)
+            else: df = pd.read_csv(p_, low_memory=False)
+            df = df.drop_duplicates('essay_id').dropna(subset=['full_text', 'holistic_essay_score'])
+            Y = np.full((len(df), 6), np.nan, dtype=np.float32); Y[:, 5] = _norm(df.holistic_essay_score, 1, 6)
+            add(df.full_text.tolist(), Y, ('persuade-' + df.essay_id.astype(str)).tolist(), PRE_EXTRA)
+        elif src == 'laila':
+            if not os.path.exists('/tmp/laila'): sh('git clone -q --depth 1 https://gitlab.com/bigirqu/laila.git /tmp/laila')
+            df = pd.read_csv('/tmp/laila/essays_and_scores/all_essays_with_indivdual_rater_scores.csv', dtype={'essay_id': str})
+            b = lambda v: np.where(v <= 1, 0, np.where(v <= 3, 1, 2))
+            Y = np.stack([np.clip(np.rint(df.relevance), 0, 2), b(df.grammar), b(df.vocabulary), b(df.organization), b(df.mechanics), _norm(df.holistic, 0, max(1, float(df.holistic.max())))], 1).astype(np.float32)
+            add(df.essay.tolist(), Y, df.essay_id.astype(str).tolist(), PRE_N)
+        elif src == 'araes':  # AR-AES (Hugging Face Rnghazawi-NLP/AR-AES), CC BY 4.0: question-specific rubric; the final score (mean of 2 raters) as holistic
+            df = pd.read_csv(_get('https://huggingface.co/datasets/Rnghazawi-NLP/AR-AES/resolve/main/ARAES%20Dataset%20-%20Essays%20and%20Marks.csv', '/tmp/araes.csv'))
+            tcol = [c for c in df.columns if df[c].astype(str).str.len().mean() > 100][0]
+            fa = [c for c in df.columns if 'final' in c.lower()]
+            sc = df[fa].astype(float).mean(1)
+            Y = np.full((len(df), 6), np.nan, dtype=np.float32); Y[:, 5] = _norm(sc, float(sc.min()), float(sc.max()))
+            log(f'AR-AES: {len(df)} essays, text column found, final-score columns {fa}, range {float(sc.min())}-{float(sc.max())}')
+            add(df[tcol].astype(str).tolist(), Y, ('araes-' + df.index.astype(str)).tolist(), PRE_EXTRA)
+    return T_, np.vstack(Y_), I_
 
 # ---------------- human re-check: the same 200 human-scored essays as this morning's v3b measurement ----------------
 def human():
     ids = [str(x) for x in json.load(open(os.environ['MK_BASELINE']))['results']['ellipse' if LANG == 'en' else 'laila']['sampledIds']]
     if LANG == 'en':
+        if not os.path.exists('/tmp/ellipse'): sh('git clone -q --depth 1 https://github.com/scrosseye/ELLIPSE-Corpus.git /tmp/ellipse')
         pw = re.search(r'password for the zip file is \*\*(\S+?)\*\*', open('/tmp/ellipse/README.md').read()).group(1)  # public; never printed
         z = zipfile.ZipFile('/tmp/ellipse/ELLIPSE_Final_github_test.zip'); df = pd.read_csv(io.BytesIO(z.read(z.namelist()[0], pwd=pw.encode())), encoding_errors='replace')
         df = df.set_index(df.text_id_kaggle.astype(str)).loc[ids]
         b = lambda v: np.where(v <= 2.5, 0, np.where(v <= 3.5, 1, 2))
         Y = {'grammar_accuracy': b((df.Grammar + df.Syntax) / 2), 'vocabulary_range': b((df.Vocabulary + df.Phraseology) / 2), 'organisation': b(df.Cohesion), 'mechanics': b(df.Conventions)}
         return df.full_text.tolist(), Y, ids
+    if not os.path.exists('/tmp/laila'): sh('git clone -q --depth 1 https://gitlab.com/bigirqu/laila.git /tmp/laila')
     df = pd.read_csv('/tmp/laila/essays_and_scores/all_essays_with_indivdual_rater_scores.csv', dtype={'essay_id': str}).set_index('essay_id').loc[ids]
     b = lambda v: np.where(v <= 1, 0, np.where(v <= 3, 1, 2))
     Y = {'task_completion': np.clip(np.rint(df.relevance), 0, 2).astype(int), 'grammar_accuracy': b(df.grammar), 'vocabulary_range': b(df.vocabulary), 'organisation': b(df.organization), 'mechanics': b(df.mechanics)}
@@ -77,7 +111,10 @@ def enara():
 
 # ---------------- the head: pre-train (stage 1), fine-tune (stage 2) ----------------
 # Head: imported from mishkat_features (the service builds the same module)
+def _padY(Y, k):
+    return Y if Y is None or Y.shape[1] >= k else np.hstack([Y, np.full((len(Y), k - Y.shape[1]), np.nan, dtype=np.float32)])
 def fit(model, X, Y, epochs, lr, Xv=None, Yv=None):
+    kout = [m for m in model.modules() if isinstance(m, torch.nn.Linear)][-1].out_features; Y = _padY(Y, kout); Yv = _padY(Yv, kout) if Yv is not None else None
     opt = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=1e-4); Xt = torch.tensor(X); Yt = torch.tensor(Y); best = (1e9, copy.deepcopy(model.state_dict())); bad = 0
     for ep in range(epochs):
         model.train(); perm = torch.randperm(len(Xt))
@@ -93,9 +130,11 @@ def fit(model, X, Y, epochs, lr, Xv=None, Yv=None):
                 if bad >= 8: break
     if Xv is not None: model.load_state_dict(best[1])
     return model
+NCRIT = [None]
 def predict(model, X):
     model.eval()
-    with torch.no_grad(): return model(torch.tensor(X)).numpy()
+    with torch.no_grad(): out = model(torch.tensor(X)).numpy()
+    return out[:, :NCRIT[0]] if NCRIT[0] else out
 
 def qwk(a, b, k):
     O = np.zeros((k, k))
@@ -176,21 +215,34 @@ CMP = None
 if os.environ.get('MK_COMPARE') and os.path.exists(os.environ['MK_COMPARE']):  # answers Claude graded earlier
     CMP = json.load(open(os.environ['MK_COMPARE']))
     Xcmp = Z(cached('compare', [c['answer'] for c in CMP], 'Claude comparison answers')) if CMP else None
-report['recipe'] = RECIPE; report['oof'] = {}; report['compareScores'] = {}
+report['recipe'] = RECIPE; report['oof'] = {}; report['compareScores'] = {}; report['stage1'] = STAGE1
+# Egyptian test set, NEVER trained on (owner, 24 Nov 2026): Zenodo 10.5281/zenodo.18630360 (v3 of 18630259), CC BY 4.0, Egyptian
+# secondary-school sociology short answers, human degree 0-5 (mean of two graders). Downloaded at run time; numbers only.
+EGY = None
+if os.environ.get('MK_EGYPT') == '1' and LANG == 'ar':
+    try:
+        meta = json.loads(subprocess.run(['curl', '-sSfL', 'https://zenodo.org/api/records/18630360'], capture_output=True, text=True, check=True).stdout)
+        f_ = [f for f in meta['files'] if f['key'].endswith('.csv')][0]
+        EGY = pd.read_csv(io.StringIO(subprocess.run(['curl', '-sSfL', f_['links']['self']], capture_output=True, text=True, check=True).stdout))
+        EGY = EGY[(EGY.degree >= 0) & (EGY.degree <= 5)].dropna(subset=['StudentAnswer']).reset_index(drop=True)
+        report['egyptLicence'] = meta['metadata'].get('license'); log(f'Egyptian test set: {len(EGY)} answers, licence {report["egyptLicence"]}')
+        Xegy = Z(cached('egypt', EGY.StudentAnswer.astype(str).tolist(), 'Egyptian test answers'))
+    except Exception as e: log(f'Egyptian test set unavailable: {type(e).__name__}'); EGY = None
 EXPORT_TYPES = {}  # final model per type, for the service bundle (MK_EXPORT=1)
 rnd_of = lambda P, crit, mx: np.stack([np.clip(np.rint(P[:, j]), 0, mx[c]) for j, c in enumerate(crit)], 1).astype(int)
 for typ in ['essay', 'short_answer']:
     crit = CR if typ == 'essay' else SHORT_CR; ix = [CR.index(c) for c in crit]; mx = MAX[typ]
-    Ypre = pre_Y[:, ix].copy()
+    NCRIT[0] = len(crit)
+    Ypre = pre_Y[:, ix + [5]].copy()  # + holistic (auxiliary, stage 1 only)
     if typ == 'short_answer':  # short answers: grammar and spelling are 0-1 (1 unless the meaning is blocked)
-        for j, c in enumerate(crit):
+        for j, c in enumerate(crit):  # (the holistic column, last, stays as is)
             if mx[c] == 1: Ypre[:, j] = np.where(np.isnan(Ypre[:, j]), np.nan, (Ypre[:, j] >= 1).astype(np.float32))
     T = [i for i, r in enumerate(rows) if r['type'] == typ]
     groups = sorted({rows[i]['group'] for i in T}); random.Random(SEED).shuffle(groups)  # shuffled, so validation groups mix subjects
     fold_of = {rows[i]['group']: rows[i]['fold'] for i in T}
     Y_of = lambda idx: np.array([[rows[i]['label'][c] for c in crit] for i in idx], dtype=np.float32)
     d = Xpre.shape[1]
-    torch.manual_seed(SEED); s1 = fit(Head(d, len(crit)), Xpre, Ypre, 15, 1e-3)
+    torch.manual_seed(SEED); s1 = fit(Head(d, len(crit) + 1), Xpre, Ypre, 15, 1e-3)
     oof = {'two_stage': np.zeros((len(rows), len(crit))), 'stage2_only': np.zeros((len(rows), len(crit))), 'stage1_only': predict(s1, Xen)}
     tests_acc = {r_: {'short': [], 'trunc': [], 'pad': []} for r_ in ('two_stage', 'stage2_only')}
     for k in range(K):
@@ -206,7 +258,7 @@ for typ in ['essay', 'short_answer']:
                     if c in ('grammar_accuracy', 'mechanics'): Ya[m_, j] = rows[aug_src[n]]['label'][c]
             Xtr, Ytr = np.vstack([Xtr, Xaug[sel_a]]), np.vstack([Ytr, Ya])
         s2 = fit(copy.deepcopy(s1), Xtr, Ytr, 80, 3e-4, Xen[va], Y_of(va))
-        torch.manual_seed(SEED + k); s2o = fit(Head(d, len(crit)), Xtr, Ytr, 80, 1e-3, Xen[va], Y_of(va))
+        torch.manual_seed(SEED + k); s2o = fit(Head(d, len(crit) + 1), Xtr, Ytr, 80, 1e-3, Xen[va], Y_of(va))
         P = predict(s2, Xen[te]); oof['two_stage'][te] = P; oof['stage2_only'][te] = predict(s2o, Xen[te])
         gi, mi = crit.index('grammar_accuracy'), crit.index('mechanics')
         Xc = Xp = None
@@ -255,8 +307,24 @@ for typ in ['essay', 'short_answer']:
             for j, c in enumerate(crit):
                 if c in ('grammar_accuracy', 'mechanics'): Ya[m_, j] = rows[aug_src[n]]['label'][c]
         Xtr, Ytr = np.vstack([Xtr, Xaug[sel_a]]), np.vstack([Ytr, Ya])
-    torch.manual_seed(SEED); final = fit(copy.deepcopy(s1) if RECIPE == 'two_stage' else Head(d, len(crit)), Xtr, Ytr, 80, 3e-4 if RECIPE == 'two_stage' else 1e-3, Xen[va], Y_of(va))
-    EXPORT_TYPES[typ] = {'model': final, 'criteria': crit, 'max': mx, 'passesBar': bar}
+    torch.manual_seed(SEED); final = fit(copy.deepcopy(s1) if RECIPE == 'two_stage' else Head(d, len(crit) + 1), Xtr, Ytr, 80, 3e-4 if RECIPE == 'two_stage' else 1e-3, Xen[va], Y_of(va))
+    _fin = copy.deepcopy(final); _last = [m for m in _fin.modules() if isinstance(m, torch.nn.Linear)][-1]
+    with torch.no_grad():
+        _new = torch.nn.Linear(_last.in_features, len(crit)); _new.weight.copy_(_last.weight[:len(crit)]); _new.bias.copy_(_last.bias[:len(crit)])
+    _fin.net[-1] = _new
+    EXPORT_TYPES[typ] = {'model': _fin, 'criteria': crit, 'max': mx, 'passesBar': bar}
+    if EGY is not None and typ == 'short_answer':
+        Praw = predict(final, Xegy); Pe = rnd_of(Praw, crit, mx); h = EGY.degree.values.astype(float)
+        hb = np.where(h <= 1, 0, np.where(h <= 3.5, 1, 2))  # 0-5 -> ENARA 0-2 task completion
+        rk = lambda v: pd.Series(v).rank().values
+        sp = lambda a, b: round(float(np.corrcoef(rk(a), rk(b))[0, 1]), 3)
+        report['egypt'] = {'n': int(len(EGY)), 'questions': int(EGY.id.nunique()), 'mapping': 'human 0-1 -> 0, 1.5-3.5 -> 1, 4-5 -> 2',
+                           'task_completion_vs_human': stats(Pe[:, 0], hb, 3), 'spearman_raw_task_vs_human': sp(Praw[:, 0], h),
+                           'spearman_raw_grammar_vs_human': sp(Praw[:, 1], h), 'meanHuman0to2': round(float(hb.mean()), 2), 'meanMishkatTask': round(float(Pe[:, 0].mean()), 2),
+                           'note': 'human marks are content scores; Mishkat does not see the question or the model answer'}
+        samp = np.arange(0, len(EGY), max(1, len(EGY) // 300))[:300]  # every k-th row (same rule in the v3b job)
+        report['egyptSample'] = {int(i): {'mishkat': {c: int(Pe[i, j]) for j, c in enumerate(crit)}, 'human': float(h[i])} for i in samp}
+        log('Egypt: ' + json.dumps(report['egypt']))
     if CMP:
         ci = [n for n, c in enumerate(CMP) if c['type'] == typ]
         if ci:
