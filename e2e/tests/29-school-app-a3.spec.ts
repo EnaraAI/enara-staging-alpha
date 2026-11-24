@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { readFileSync } from 'fs';
 import { enaraApi, enaraUiSession, login } from '../lib/enara';
+import { shot } from '../lib/state';
 
 // Scenario 29 (docs/lms/PARENTS_SCHOOL_APP_PLAN.md, step a3): the school admin's screens on the staff Parents page.
 //   1. School A's admin sees the school app card with the section switches.
@@ -33,6 +34,8 @@ test.describe.serial('29 · Parents school app (a3): school admin screens', () =
     await expect(pv).toBeVisible({ timeout: 30_000 });
     await expect(pv.getByTestId('sa-count-total')).toContainText('2');
     await expect(pv.getByTestId('sa-count-rejected')).toContainText('0');
+    await card.scrollIntoViewIfNeeded();
+    await shot(page, 'school-a3-01-admin-preview');
     await page.getByTestId('sa-confirm-timetable').click();
     await expect(page.getByTestId('sa-msg-timetable')).toHaveText('Imported.');
     const row = page.locator('[data-testid="sa-log-row"][data-section="timetable"]').first();
@@ -48,6 +51,7 @@ test.describe.serial('29 · Parents school app (a3): school admin screens', () =
     await expect(pa.getByTestId('sa-count-rejected')).toContainText('1');
     await expect(pa.getByTestId('sa-problem')).toHaveCount(1);
     await expect(pa.getByTestId('sa-problem')).toContainText('3');
+    await shot(page, 'school-a3-02-bad-row');
     await page.getByTestId('sa-confirm-attendance').click();
     await expect(page.getByTestId('sa-msg-attendance')).toHaveText('Imported.');
     await expect(page.locator('[data-testid="sa-log-row"][data-section="attendance"]').first()).toHaveAttribute('data-status', 'confirmed');
@@ -58,6 +62,7 @@ test.describe.serial('29 · Parents school app (a3): school admin screens', () =
     await page.getByTestId('sa-ann-body').fill('Bring a packed lunch.');
     await page.getByTestId('sa-ann-publish').click();
     await expect(page.getByTestId('sa-ann-msg')).toHaveText('Published.');
+    await shot(page, 'school-a3-03-announcements');
     const ann = page.getByTestId('sa-ann-row').filter({ hasText: title });
     await expect(ann).toBeVisible();
     await ann.getByTestId('sa-ann-withdraw').click();

@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { enaraApi, login } from '../lib/enara';
 import { ENARA } from '../lib/env';
+import { shot } from '../lib/state';
 
 // Scenario 28 (docs/lms/PARENTS_SCHOOL_APP_PLAN.md, step a2): the parent school screens, on a phone (390 px).
 //   1. A parent links with a code; then the school imports today's timetable, an absence and a school-wide announcement.
@@ -50,6 +51,7 @@ test.describe.serial('28 · Parents school app (a2): parent screens', () => {
     await expect(home).toContainText('Absent');
     await expect(home).toContainText(`Science ${RUN}`);
     await expect(page.getByTestId('pp-bell').locator('.pp-badge')).toBeVisible();
+    await shot(page, 'school-a2-01-home-card');
 
     await page.locator('.pp-nav').getByRole('button', { name: 'School' }).click();
     await expect(page).toHaveURL(/\/parents\/school$/);
@@ -57,17 +59,21 @@ test.describe.serial('28 · Parents school app (a2): parent screens', () => {
     await expect(page.locator('.pp-school-today')).toContainText(`Science ${RUN}`);
     await expect(page.locator('.pp-school-today')).toContainText('Ms Mona');
     await expect(page.getByTestId('pp-school-source')).toContainText("From the school's timetable · updated");
+    await shot(page, 'school-a2-02-timetable');
 
     await page.getByTestId('pp-school-attendance').click();
     await expect(page.getByTestId('pp-att-row').filter({ hasText: `note ${RUN}` })).toContainText('Absent');
     await expect(page.getByTestId('pp-school-source')).toContainText('attendance sheet');
+    await shot(page, 'school-a2-03-attendance');
 
     await page.getByTestId('pp-school-announcements').click();
     await expect(page.getByTestId('pp-announcement').filter({ hasText: `Sports day ${RUN}` })).toContainText('Whole school');
+    await shot(page, 'school-a2-04-announcements');
 
     await page.getByTestId('pp-bell').click();
     await expect(page.getByTestId('pp-notification').filter({ hasText: 'was absent on' }).first()).toBeVisible();
     await expect(page.getByTestId('pp-notification').filter({ hasText: `Sports day ${RUN}` })).toBeVisible();
+    await shot(page, 'school-a2-05-notifications');
     await page.getByTestId('pp-notif-markall').click();
     await expect(page.getByTestId('pp-notif-unread')).toContainText('0 unread');
     await expect(page.getByTestId('pp-bell').locator('.pp-badge')).toHaveCount(0);
@@ -83,7 +89,11 @@ test.describe.serial('28 · Parents school app (a2): parent screens', () => {
       await page.getByTestId(`pp-school-${v}`).click();
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
       expect(overflow, `no sideways scroll on ${v} (Arabic)`).toBeLessThanOrEqual(0);
+      await shot(page, `school-a2-ar-${v}`);
     }
+    await page.locator('.pp-nav').getByRole('button', { name: 'الرئيسية' }).click();
+    await expect(page.getByTestId('pp-school-home')).toBeVisible();
+    await shot(page, 'school-a2-ar-home-card');
     await page.locator('.pp-langbtn').click(); // back to English for later runs on this browser
 
     // The school turns every section off: everything school-related disappears for the parent.
