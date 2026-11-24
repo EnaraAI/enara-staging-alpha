@@ -174,7 +174,8 @@ export function createApp() {
   );
   app.use(cors(corsOptions()));
 
-  app.use('/api/auth/login', makeLimiter('login', 15 * 60 * 1000, 20, 'Too many login attempts'));
+  // LOGIN_RATE_LIMIT_MAX: 20 per 15 minutes per address unless set (the E2E stack, which signs in from one address many times, sets it higher).
+  app.use('/api/auth/login', makeLimiter('login', 15 * 60 * 1000, Math.max(1, Number(process.env.LOGIN_RATE_LIMIT_MAX) || 20), 'Too many login attempts'));
   app.use('/api/auth/register', makeLimiter('register', 60 * 60 * 1000, 10, 'Too many registration attempts'));
   app.use('/api/auth/demo-login', makeLimiter('demo-login', 60 * 1000, 10, 'Too many demo login attempts'));
   app.use('/api/auth/password-reset', makeLimiter('password-reset', 15 * 60 * 1000, 10, 'Too many password reset requests'));

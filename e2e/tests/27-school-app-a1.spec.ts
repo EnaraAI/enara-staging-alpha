@@ -18,7 +18,7 @@ test.describe.serial('27 · Parents school app (a1): timetable, attendance, anno
   test('the school turns the sections on; a School A child in a class is picked', async () => {
     const admin = await login('admin.a');
     const r = await enaraApi.put('/api/school-app/sections', admin, { timetable: true, announcements: true, attendance: true, notifications: true });
-    expect(r.sections).toEqual({ timetable: true, announcements: true, attendance: true, notifications: true });
+    expect(r.sections).toMatchObject({ timetable: true, announcements: true, attendance: true, notifications: true }); // later steps add sections
     const roster = await enaraApi.get('/api/school-app/roster', admin);
     const g = (roster.groups as { name: string; students: { id: string }[] }[]).find((x) => x.students.length >= 2);
     expect(g, 'a School A class with at least two students').toBeTruthy();
