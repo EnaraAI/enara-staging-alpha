@@ -1,0 +1,21 @@
+# Parents school app (e): the assistant on lms-test with DeepSeek (seed reload + school-chat-check). Counts and seed answers only.
+name: lms-test school chat check
+on:
+  push:
+    branches: ['claude/tutor-lms-dscompare-run']
+    paths: ['deploy/lms-test/schoolchat/trigger.txt', '.github/workflows/lms-test-schoolchat.yml']
+permissions:
+  contents: read
+jobs:
+  check:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: School chat check (lms-test)
+        env:
+          LMSTEST_MAINTENANCE_TOKEN: ${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}
+        run: node deploy/lms-test/schoolchat/run.mjs
