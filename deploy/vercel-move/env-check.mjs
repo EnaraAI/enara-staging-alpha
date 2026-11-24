@@ -20,7 +20,7 @@ function formatProblem(name, v, engineFeatures) {
   if (/(_ORIGINS)$/.test(name)) { for (const o of v.split(',').map((s) => s.trim()).filter(Boolean)) { try { new URL(o); } catch { if (!o.includes('*')) return 'an origin is not a URL'; } } }
   if (/(_MS|_SECONDS|_SIZE|_LIMIT|_USD|_MAX|_MIN|_TIMEOUT|_DAYS|_PERCENT)$/.test(name) && !/^-?\d+(\.\d+)?$/.test(v)) return 'not a number';
   if (/(_ENABLED|^ENARA_STAGING)$/.test(name) && !/^(true|false|1|0)$/.test(v)) return 'not true/false';
-  if (name === 'ENARA_ENGINE_V2' && engineFeatures) { const bad = v.split(',').map((s) => s.trim()).filter((s) => s && s !== 'all' && !engineFeatures.has(s)); if (bad.length) return `unknown features: ${bad.join(', ')}`; }
+  if (name === 'ENARA_ENGINE_V2' && engineFeatures) { const bad = v.split(',').map((s) => s.trim()).filter((s) => s && s !== 'all' && !engineFeatures.has(s) && !engineFeatures.has(`bundle:${s}`)); if (bad.length) return `unknown features: ${bad.join(', ')}`; }
   return null;
 }
 async function probe(url) { try { const r = await fetch(url, { redirect: 'manual', signal: AbortSignal.timeout(30000) }); const j = await r.json().catch(() => null); return { status: r.status, checks: j?.checks ?? null }; } catch { return { status: 0, checks: null }; } }
@@ -34,7 +34,7 @@ for (const p0 of projects.sort((a, b) => a.name.localeCompare(b.name))) {
   const sha = dep?.meta?.githubCommitSha;
   L(); L(`## ${p.name} (${domains.join(', ')})`);
   let code = null, engineFeatures = null;
-  if (sha) { try { code = codeOf(sha); const m = code.match(/export type EngineV2Feature = ([^;]+);/); if (m) engineFeatures = new Set([...m[1].matchAll(/'([^']+)'/g)].map((x) => x[1])); } catch (e) { L(`Live commit ${sha.slice(0, 8)} not readable here (${e.message.split('\n')[0]})`); } }
+  if (sha) { try { code = codeOf(sha); const m = code.match(/export type EngineV2Feature = ([^;]+);/); if (m) engineFeatures = new Set([...m[1].matchAll(/'([^']+)'/g)].map((x) => x[1]), ...[...code.matchAll(/v\.includes\('([a-z0-9]+)'\) && [A-Z0-9_]+\.includes\(feature\)/g)].map((x) => `bundle:${x[1]}`)); } catch (e) { L(`Live commit ${sha.slice(0, 8)} not readable here (${e.message.split('\n')[0]})`); } }
   L(`Live code: ${sha ? `commit ${sha.slice(0, 8)}` : 'not deployed from git (names in code cannot be compared)'}`);
   const rows = []; let bad = 0;
   const names = new Set();
