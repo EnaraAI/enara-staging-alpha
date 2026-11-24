@@ -1,0 +1,96 @@
+# Mishkat English encoder FULL fine-tune on Modal (GPU A10G), then the usual CPU evaluation (train_mishkat.py) with that encoder.
+# Development only. Needs the repo secrets MODAL_TOKEN_ID / MODAL_TOKEN_SECRET; without them the job says so and ends green, nothing
+# spent. Secret values are never printed. Cost guard: the Modal function is hard-capped at 50 min (A10G assumed ~$1.10/h -> <= ~$0.92
+# GPU per run; owner limit $5). The fine-tuned weights stay on the Modal Volume "mishkat-ft" (/en/<run-id>) and on this runner only:
+# never committed, never uploaded as an artifact. Numbers only (report.json, train.log, ft-cost.json) to
+# claude/tutor-lms-mishkat-ft-results-en.
+name: lms-test Mishkat English fine-tune (Modal)
+on:
+  workflow_dispatch:
+  push:
+    branches: ['claude/tutor-lms-dscompare-run']
+    paths: ['deploy/lms-test/mishkat/ft/**']
+permissions:
+  contents: write
+concurrency: { group: mishkat-ft-en, cancel-in-progress: false }
+jobs:
+  ft:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    env:
+      MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+      MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+    steps:
+      - name: Modal secrets set?
+        id: gate
+        run: |
+          if [ -z "$MODAL_TOKEN_ID" ] || [ -z "$MODAL_TOKEN_SECRET" ]; then
+            echo "Modal secrets not set; skipping (nothing spent)"; echo "::notice::Modal secrets not set; skipping (nothing spent)"; echo "skip=1" >> "$GITHUB_OUTPUT"
+          else echo "skip=0" >> "$GITHUB_OUTPUT"; fi
+      - if: steps.gate.outputs.skip == '0'
+        uses: actions/checkout@v4
+      - if: steps.gate.outputs.skip == '0'
+        uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - name: Fine-tune the English encoder on Modal (A10G, hard cap 50 min)
+        id: ft
+        if: steps.gate.outputs.skip == '0'
+        timeout-minutes: 75
+        run: |
+          pip install -q modal
+          RUN_ID="$(date -u +%Y%m%d)-${GITHUB_SHA::7}"; echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"; echo "run id $RUN_ID"
+          modal run deploy/lms-test/mishkat/ft/finetune_en.py --run-id "$RUN_ID" --out "$GITHUB_WORKSPACE/ft-cost.json"
+      - name: Fetch the fine-tuned encoder from the Modal Volume (runner only)
+        if: steps.gate.outputs.skip == '0'
+        run: |
+          modal volume get mishkat-ft "/en/${{ steps.ft.outputs.run_id }}" ./ft-get
+          D=$(dirname "$(find ./ft-get -name config.json | head -1)")
+          [ -f "$D/config.json" ] || { echo "::error::no config.json in the downloaded encoder"; exit 1; }
+          mv "$D" ./ft-en && ls -la ./ft-en
+      - name: Mishkat data (model-marked) and today's v3b numbers on the human-scored essays
+        if: steps.gate.outputs.skip == '0'
+        run: |
+          git fetch -q --depth 1 origin claude/tutor-lms-mishkat && git worktree add -q mk FETCH_HEAD
+          git fetch -q --depth 1 origin claude/tutor-lms-recal-results && git show FETCH_HEAD:summary.json > v3b-human.json
+      - name: Word lists (SCOWL en_US) and a check
+        if: steps.gate.outputs.skip == '0'
+        run: |
+          sudo apt-get install -y -q hunspell hunspell-en-us hunspell-ar >/dev/null
+          printf '^This sentense has a mistake\n' | hunspell -a -d en_US | grep -c '^&'
+      - name: Libraries
+        if: steps.gate.outputs.skip == '0'
+        run: |
+          pip install -q torch --index-url https://download.pytorch.org/whl/cpu
+          pip install -q numpy pandas scipy transformers sentencepiece protobuf tiktoken
+      - name: Feature cache (fine-tuned encoder readings; file names carry the encoder hash)
+        if: steps.gate.outputs.skip == '0'
+        uses: actions/cache/restore@v4
+        with:
+          path: deploy/lms-test/mishkat/cache
+          key: mishkat-ftfeat-v1-en-${{ hashFiles('mk/data/mishkat-dev/pool-*.json') }}
+          restore-keys: mishkat-ftfeat-v1-en-${{ hashFiles('mk/data/mishkat-dev/pool-*.json') }}-
+      - name: Train and evaluate (CPU, fine-tuned encoder)
+        if: steps.gate.outputs.skip == '0'
+        working-directory: deploy/lms-test/mishkat
+        env: { HF_HUB_DISABLE_PROGRESS_BARS: '1', TRANSFORMERS_VERBOSITY: error, MK_LANG: en, MK_STAGE1: 'ellipse,asap2,persuade', MK_EGYPT: '0', MK_AUG: '0', MK_DATA: '${{ github.workspace }}/mk/data/mishkat-dev', MK_BASELINE: '${{ github.workspace }}/v3b-human.json', MK_V3B: '${{ github.workspace }}/v3b-human.json', MK_COMPARE: '${{ github.workspace }}/mk/data/mishkat-dev/claude-compare/compare-en.json', MK_EXPORT: '0', MK_ENCODER_DIR: '${{ github.workspace }}/ft-en', MK_FT_RUN: '${{ steps.ft.outputs.run_id }}' }
+        run: python train_mishkat.py 2>&1 | tee train.log
+      - name: Save feature cache (also after a crash)
+        if: always() && steps.gate.outputs.skip == '0'
+        uses: actions/cache/save@v4
+        with:
+          path: deploy/lms-test/mishkat/cache
+          key: mishkat-ftfeat-v1-en-${{ hashFiles('mk/data/mishkat-dev/pool-*.json') }}-${{ github.run_id }}
+      - name: Publish (numbers only; never the model weights)
+        if: always() && steps.gate.outputs.skip == '0'
+        run: |
+          B=claude/tutor-lms-mishkat-ft-results-en; P="$RUNNER_TEMP/pub"; rm -rf "$P"; mkdir -p "$P"
+          cp deploy/lms-test/mishkat/results/report.json "$P/" 2>/dev/null || true
+          cp deploy/lms-test/mishkat/train.log "$P/" 2>/dev/null || true
+          cp ft-cost.json "$P/" 2>/dev/null || true
+          ls "$P" | grep -q . || { echo "nothing to publish"; exit 0; }
+          cd "$P" && git init -q && git checkout -q -b "$B"
+          git config user.name github-actions && git config user.email github-actions@users.noreply.github.com
+          git add report.json train.log ft-cost.json 2>/dev/null || git add -A
+          git commit -qm "Mishkat English fine-tune ${{ steps.ft.outputs.run_id }}"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" "$B"

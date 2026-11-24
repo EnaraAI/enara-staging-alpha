@@ -49,7 +49,21 @@ def feats(texts, lang):
     return np.array(rows, dtype=np.float32).reshape(len(rows), len(FEATURE_NAMES))
 
 # ---------------- encoder: mean-pooled last hidden state, max MAXLEN tokens ----------------
-class Encoder:
+def encoder_tag(name):
+    """Short hash identifying the encoder WEIGHTS, for cache file names (so cached readings of one encoder are never reused with another).
+    A hub name hashes the name; a local directory (e.g. a fine-tuned encoder) hashes its config and weight files, since the same path
+    can hold different weights from run to run."""
+    import hashlib
+    h = hashlib.sha1()
+    if os.path.isdir(name):
+        for f in sorted(os.listdir(name)):
+            if f == 'config.json' or f.endswith(('.safetensors', '.bin')):
+                h.update(f.encode())
+                with open(os.path.join(name, f), 'rb') as fh:
+                    for chunk in iter(lambda: fh.read(1 << 22), b''): h.update(chunk)
+    else: h.update(name.encode())
+    return h.hexdigest()[:8]
+class Encoder:  # name: a Hugging Face hub name OR a local directory written by save_pretrained (model + tokenizer)
     def __init__(self, name, maxlen=MAXLEN, tok=None, model=None):
         if tok is None or model is None:
             from transformers import AutoTokenizer, AutoModel
