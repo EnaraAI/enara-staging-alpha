@@ -63,8 +63,10 @@ jobs:
         env: { VERCEL_TOKEN_NEW: '${{ secrets.VERCEL_TOKEN_NEW }}', URL: '${{ steps.dep.outputs.url }}' }
         run: |
           set -euo pipefail
-          curl -sS --max-time 120 "$URL/health"; echo
-          code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 120 -X POST "$URL/score" -H 'Content-Type: application/json' -d '{"lang":"en","type":"essay","text":"x"}')
+          # first start after a deploy pulls the image (torch + two encoders): allow up to 10 minutes
+          ok=0; for i in $(seq 1 20); do if curl -sS --max-time 60 "$URL/health"; then ok=1; echo; break; fi; echo " (health not ready, try $i)"; sleep 10; done
+          [ $ok = 1 ] || { echo "::error::service health did not answer in 10 minutes"; exit 1; }
+          code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 120 -X POST "$URL/score" -H 'Content-Type: application/json' -d '{"lang":"en","type":"essay","text":"x"}' || true)
           echo "score without a token: HTTP $code (401 expected)"; [ "$code" = 401 ]
           VAL="$URL/score" node deploy/modal/mishkat-secrets/set_vercel_env.mjs MISHKAT_ENDPOINT plain
       - name: Load test, 200 answers at once (cold, then warm); numbers only

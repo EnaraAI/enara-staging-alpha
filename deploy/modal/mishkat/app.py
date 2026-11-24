@@ -35,7 +35,7 @@ app = modal.App('mishkat', image=image)
     volumes={'/bundles': bundles},
     secrets=[modal.Secret.from_name('mishkat-auth')],  # key MISHKAT_TOKEN
     gpu='A10G' if MISHKAT_GPU else None,
-    cpu=2.0, memory=6144, timeout=60,
+    cpu=2.0, memory=6144, timeout=300,   # per request; the first answer in a new container loads both encoders
     min_containers=0, max_containers=10,
     scaledown_window=300,   # stay warm 5 min after the last request
 )
