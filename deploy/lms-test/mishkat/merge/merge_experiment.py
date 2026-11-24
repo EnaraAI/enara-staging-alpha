@@ -60,3 +60,4 @@ for typ, crit in CRIT.items():
         print(typ, c, {n: per[c][n]['qwk'] for n in cand}, 'CI', per[c]['mergeMinusBest_qwk_95ci'], 'bar', per[c]['passesBar'], flush=True)
     out['types'][typ] = {'answers': len(ids), 'questions': len(G), 'perCriterion': per}
 os.makedirs(os.path.dirname(OUT) or '.', exist_ok=True); json.dump(out, open(OUT, 'w'), indent=1)
+# rerun for English (run 9 report)
