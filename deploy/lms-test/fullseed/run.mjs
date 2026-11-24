@@ -1,4 +1,4 @@
-// Owner (22 Nov 2026): load the full data set on lms-test (POST /api/maintenance/full-seed). Prints counts only: no passwords, no
+// Owner (22 Nov 2026; school app data re-run 24 Nov 10:15 PM Cairo: fees, buses, requests, consent): load the full data set on lms-test (POST /api/maintenance/full-seed). Prints counts only: no passwords, no
 // user list (that is in docs/lms/SEED_USERS.md). ACTION=run|remove|status|rerun|run-school-app (parents school app data only).
 const SITE = 'https://lms-test.enara.app';
 const H = { Authorization: `Bearer ${process.env.LMSTEST_MAINTENANCE_TOKEN}`, 'Content-Type': 'application/json' };
