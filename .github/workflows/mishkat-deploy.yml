@@ -38,24 +38,32 @@ jobs:
           pip install -q torch --index-url https://download.pytorch.org/whl/cpu
           pip install -q numpy pytest
           python -m pytest -q deploy/modal/mishkat/test_scorer.py
-      - name: Newest bundle artifact per language (from the training workflow)
-        if: steps.gate.outputs.skip == '0'
-        env: { GH_TOKEN: '${{ github.token }}' }
-        run: |
-          for L in en ar; do
-            RUN=$(gh api "repos/$GITHUB_REPOSITORY/actions/artifacts?name=mishkat-bundle-$L&per_page=20" --jq '[.artifacts[] | select(.expired == false)][0].workflow_run.id // empty')
-            if [ -z "$RUN" ]; then echo "$L: no bundle artifact (not exported or expired)"; continue; fi
-            gh run download "$RUN" -R "$GITHUB_REPOSITORY" -n "mishkat-bundle-$L" -D "bundles/$L"
-            jq -r '"\(.lang): \(.version), served \(.types | map_values(.served) | tostring)"' "bundles/$L/manifest.json"
-          done
-          ls bundles/*/manifest.json >/dev/null 2>&1 || echo "::warning::no bundle artifact found; deploying the service code only (every request will get 404)"
-      - name: Upload bundles to the Modal Volume and deploy
+      - name: Bundles on the Modal Volume (written by "Mishkat bundles on GPU"), and the service secret
         if: steps.gate.outputs.skip == '0'
         run: |
           pip install -q modal
-          modal volume create mishkat-bundles >/dev/null 2>&1 || true
-          for d in bundles/*; do
-            [ -f "$d/manifest.json" ] || continue
-            L=$(basename "$d"); modal volume put --force mishkat-bundles "$d" "/$L"; echo "uploaded $L"
-          done
-          modal deploy deploy/modal/mishkat/app.py
+          for L in en ar; do echo "$L:"; modal volume ls mishkat-bundles "/$L" 2>/dev/null | grep -E "manifest.json|encoder|\.pt" || echo "  no bundle"; done
+          # names only: the service needs the Modal secret "mishkat-auth" (key MISHKAT_TOKEN), which the owner creates
+          if ! modal secret list 2>/dev/null | grep -q "mishkat-auth"; then
+            echo "::error::Modal secret 'mishkat-auth' (key MISHKAT_TOKEN) is missing; the owner creates it in Modal, then re-run"; exit 1
+          fi
+      - name: Deploy the service
+        id: dep
+        if: steps.gate.outputs.skip == '0'
+        run: |
+          modal deploy deploy/modal/mishkat/app.py 2>&1 | tee deploy.log
+          URL=$(grep -oE 'https://[a-z0-9-]+--mishkat-web[a-z0-9-]*\.modal\.run' deploy.log | head -1)
+          [ -n "$URL" ] || { echo "::error::no service URL in the deploy output"; exit 1; }
+          echo "url=$URL" >> "$GITHUB_OUTPUT"; echo "service: $URL"
+      - uses: actions/setup-node@v4
+        if: steps.gate.outputs.skip == '0'
+        with: { node-version: '22' }
+      - name: Check the service (health; no token = refused) and point lms-test at it (MISHKAT_ENDPOINT, plain)
+        if: steps.gate.outputs.skip == '0'
+        env: { VERCEL_TOKEN_NEW: '${{ secrets.VERCEL_TOKEN_NEW }}', URL: '${{ steps.dep.outputs.url }}' }
+        run: |
+          set -euo pipefail
+          curl -sS --max-time 120 "$URL/health"; echo
+          code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 120 -X POST "$URL/score" -H 'Content-Type: application/json' -d '{"lang":"en","type":"essay","text":"x"}')
+          echo "score without a token: HTTP $code (401 expected)"; [ "$code" = 401 ]
+          VAL="$URL/score" node deploy/modal/mishkat-secrets/set_vercel_env.mjs MISHKAT_ENDPOINT plain
