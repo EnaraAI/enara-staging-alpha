@@ -1,4 +1,4 @@
-# Mishkat scoring service (Modal, CPU)
+# Mishkat scoring service (Modal; CPU by default, one-line GPU switch)
 
 Scores one written answer (English or Arabic, essay or short answer) on the language criteria Mishkat is allowed to score. It returns raw numbers only; the backend decides levels, the boundary fallback and the v3b merge (see `docs/tutor/MISHKAT_SPLIT_PLAN.md`). Labels are MODEL-MARKED: development / lms-test only.
 
@@ -53,3 +53,21 @@ Local test, no Modal or model download: `python -m pytest -q deploy/modal/mishka
 - Warm: about 0.2-0.4 s per answer (one encoder pass of at most 256 tokens + hunspell). Cold start: roughly 10-20 s (container, torch import, encoder load; both encoders are baked into the image), to be measured on the first day. The backend's 3 s timeout means the first answer after an idle period falls back to v3b; a warm-up ping to `/health` when a grading session starts avoids that.
 - At lms-test volume this is a few dollars a month (CPU-seconds while a container is up, mostly the 5-minute warm windows).
 - Training and serving should use the same torch/transformers versions; the bundle records them under `libs` in `manifest.json`.
+
+## Scaling and hardware (owner, 24 Nov 2026)
+
+- **Autoscaling:** 0 to 10 containers. Each container takes up to 8 answers at once; Modal adds a container when more than 4 per container are queued or running (`@modal.concurrent(max_inputs=8, target_inputs=4)`, `max_containers=10`). A container stays 5 min after its last answer.
+- **School hours:** one container is kept warm Sunday–Thursday, 8 am – 4 pm Cairo time (`school_hours_warm` runs hourly 8:00–15:00 and sets `min_containers=1`; `school_hours_cool` at 16:00 sets it back to 0). Hourly, so a redeploy during the day (which resets the autoscaler) is corrected within the hour. Outside those hours nothing runs while idle.
+- **Bundles:** English = `mishkat-en-20261124-222e908b` (DeBERTa-v3 fine-tuned 20261124-828e2db, shipped inside the bundle; ENARA-only head). Arabic = `mishkat-ar-20261124-222e908b` (CAMeLBERT-MSA, AR-AES + AR-ASAG two-stage). Encoders run in fp32 on CPU and GPU alike.
+- **GPU switch:** one line in `app.py`: `MISHKAT_GPU = False` → `True` runs each container on one A10G (CUDA build of torch); redeploy to apply. Off by default.
+
+### Cost (Modal list prices on 24 Nov 2026: A10 $0.000306/s; CPU $0.0000131 per physical core per s; memory $0.00000222 per GiB per s; re-check before relying on them)
+
+| | CPU (default: 2 cores, 6 GiB) | GPU switch on (A10G + 2 cores, 6 GiB) |
+|---|---|---|
+| One container, per hour | **about $0.14** | **about $1.25** (about 9x) |
+| School-hours warm container (8 h x 5 days, about 172 h a month) | **about $24 / month** | **about $215 / month** |
+| Burst at the 10-container ceiling, per hour | about $1.42 | about $12.50 |
+| Idle outside school hours | $0 | $0 |
+
+The cost per answer depends on throughput, measured by the load test (`deploy/modal/mishkat-loadtest`, run after every deploy; results on `claude/tutor-lms-mishkat-service`).

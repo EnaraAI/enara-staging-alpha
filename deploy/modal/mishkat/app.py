@@ -8,13 +8,18 @@ HERE = Path(__file__).resolve().parent
 FEATURES = HERE.parents[1] / 'lms-test' / 'mishkat' / 'mishkat_features.py'  # the training script's own feature code
 ENCODERS = ['microsoft/deberta-v3-base', 'CAMeL-Lab/bert-base-arabic-camelbert-msa']  # = mishkat_features.ENCODERS
 
+# ---- the one-line hardware switch (owner, 24 Nov 2026): False = CPU (default), True = one A10G GPU per container. Cost: README.md.
+MISHKAT_GPU = False
+
+_torch = (modal.Image.debian_slim(python_version='3.11').apt_install('hunspell', 'hunspell-en-us', 'hunspell-ar')
+          .pip_install('torch') if MISHKAT_GPU else
+          modal.Image.debian_slim(python_version='3.11').apt_install('hunspell', 'hunspell-en-us', 'hunspell-ar')
+          .pip_install('torch', index_url='https://download.pytorch.org/whl/cpu'))
 image = (
-    modal.Image.debian_slim(python_version='3.11')
-    .apt_install('hunspell', 'hunspell-en-us', 'hunspell-ar')
-    .pip_install('torch', index_url='https://download.pytorch.org/whl/cpu')
+    _torch
     .pip_install('numpy', 'transformers', 'sentencepiece', 'protobuf', 'tiktoken', 'fastapi[standard]')
     .env({'HF_HOME': '/models', 'TOKENIZERS_PARALLELISM': 'false', 'HF_HUB_DISABLE_PROGRESS_BARS': '1', 'TRANSFORMERS_VERBOSITY': 'error'})
-    # bake the encoders into the image, so a cold start does not download ~1 GB
+    # bake the hub encoders into the image, so a cold start does not download ~1 GB (the fine-tuned English encoder is in its bundle)
     .run_commands('python -c "import sys; from transformers import AutoTokenizer, AutoModel; '
                   '[(AutoTokenizer.from_pretrained(m), AutoModel.from_pretrained(m)) for m in sys.argv[1:]]" ' + ' '.join(ENCODERS))
     .add_local_file(FEATURES, '/root/mishkat_features.py')
@@ -23,13 +28,18 @@ image = (
 bundles = modal.Volume.from_name('mishkat-bundles', create_if_missing=True)
 app = modal.App('mishkat', image=image)
 
+# Autoscaling (owner, 24 Nov 2026): 0 to 10 containers, scaled on the request queue: each container takes up to 8 answers at once and
+# the autoscaler adds containers when more than 4 per container are waiting or running. One container is kept warm during school hours
+# (Cairo, Sunday-Thursday, 8 am - 4 pm) by the two scheduled functions at the bottom; outside them nothing runs while idle.
 @app.function(
     volumes={'/bundles': bundles},
     secrets=[modal.Secret.from_name('mishkat-auth')],  # key MISHKAT_TOKEN
-    cpu=2.0, memory=4096, timeout=60,
-    min_containers=0,       # nothing runs (or costs) while idle
-    scaledown_window=300,   # stay warm 5 min after the last request; a cold start is ~10-20 s (image + torch + encoder load, to be measured)
+    gpu='A10G' if MISHKAT_GPU else None,
+    cpu=2.0, memory=6144, timeout=60,
+    min_containers=0, max_containers=10,
+    scaledown_window=300,   # stay warm 5 min after the last request
 )
+@modal.concurrent(max_inputs=8, target_inputs=4)
 @modal.asgi_app()
 def web():
     import os, time, torch
@@ -60,3 +70,20 @@ def web():
         return {'ok': True, 'loaded': sorted(reg.cache)}
 
     return api
+
+
+# ---- school-hours warm container (Cairo time). Every hour from 8:00 to 15:00, Sunday-Thursday, keep 1 container warm (hourly, so a
+# redeploy during the day, which resets the autoscaler, is corrected within the hour); at 16:00 back to 0.
+def _set_min(n: int):
+    f = modal.Function.from_name('mishkat', 'web')
+    try: f.autoscaler.update(min_containers=n)       # Modal >= 1.6
+    except AttributeError: f.update_autoscaler(min_containers=n)
+    print(f'mishkat web: min_containers={n}', flush=True)
+
+@app.function(schedule=modal.Cron('0 8-15 * * 0-4', timezone='Africa/Cairo'), cpu=0.125, memory=256, timeout=60)
+def school_hours_warm():
+    _set_min(1)
+
+@app.function(schedule=modal.Cron('0 16 * * 0-4', timezone='Africa/Cairo'), cpu=0.125, memory=256, timeout=60)
+def school_hours_cool():
+    _set_min(0)

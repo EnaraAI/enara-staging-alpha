@@ -8,7 +8,7 @@ on:
   push:
     paths: ['deploy/modal/mishkat/**']
 permissions:
-  contents: read
+  contents: write
   actions: read
 concurrency: { group: mishkat-deploy, cancel-in-progress: false }
 jobs:
@@ -67,3 +67,11 @@ jobs:
           code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 120 -X POST "$URL/score" -H 'Content-Type: application/json' -d '{"lang":"en","type":"essay","text":"x"}')
           echo "score without a token: HTTP $code (401 expected)"; [ "$code" = 401 ]
           VAL="$URL/score" node deploy/modal/mishkat-secrets/set_vercel_env.mjs MISHKAT_ENDPOINT plain
+      - name: Load test, 200 answers at once (cold, then warm); numbers only
+        if: steps.gate.outputs.skip == '0'
+        env: { URL: '${{ steps.dep.outputs.url }}' }
+        run: |
+          git fetch -q --depth 1 origin claude/tutor-lms-mishkat && git worktree add -q mk FETCH_HEAD
+          MK_EVAL_DATA="$GITHUB_WORKSPACE/mk/data/mishkat-dev" modal run deploy/modal/mishkat-loadtest/loadtest.py --url "$URL/score" --out loadtest.json
+          mkdir -p pub && cp loadtest.json pub/ && cd pub && git init -q && git checkout -q -b r && git add -A && git -c user.name=github-actions -c user.email=github-actions@users.noreply.github.com commit -qm "Mishkat service load test ${GITHUB_SHA::8}"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" r:claude/tutor-lms-mishkat-service
