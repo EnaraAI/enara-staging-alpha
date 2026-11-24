@@ -5,7 +5,9 @@ from pathlib import Path
 import modal
 
 HERE = Path(__file__).resolve().parent
-FEATURES = HERE.parents[1] / 'lms-test' / 'mishkat' / 'mishkat_features.py'  # the training script's own feature code
+# The training script's own feature code. Only resolvable on the machine that builds the image; inside the container this module sits
+# at /root (no parents[1]), where the path is never used (the file is already in the image).
+FEATURES = (HERE.parents[1] / 'lms-test' / 'mishkat' / 'mishkat_features.py') if len(HERE.parents) > 1 else HERE / 'mishkat_features.py'
 ENCODERS = ['microsoft/deberta-v3-base', 'CAMeL-Lab/bert-base-arabic-camelbert-msa']  # = mishkat_features.ENCODERS
 
 # ---- the one-line hardware switch (owner, 24 Nov 2026): False = CPU (default), True = one A10G GPU per container. Cost: README.md.
