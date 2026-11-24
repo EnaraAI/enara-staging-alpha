@@ -1,5 +1,7 @@
 import { request, type APIRequestContext, type Frame, type Page, expect } from '@playwright/test';
-import { ENARA, secrets } from './env';
+import fs from 'fs';
+import path from 'path';
+import { ENARA, RUN_DIR, secrets } from './env';
 
 // ENARA's API, as the operator (maintenance routes) or as a seeded account.
 export const SEED_DOMAIN = 'lms-test.example';
@@ -34,12 +36,16 @@ export async function maintenance<T = any>(method: 'GET' | 'POST', path: string,
 }
 
 const tokens = new Map<string, string>();
+// Tokens are also kept in the run folder, so a worker restarted after a failed test does not sign in again (the login rate limit).
+const TOKEN_FILE = () => path.join(RUN_DIR, 'login-tokens.json');
+const readTokens = (): Record<string, string> => { try { return JSON.parse(fs.readFileSync(TOKEN_FILE(), 'utf8')); } catch { return {}; } };
 /** A session token for a seeded account (admin.a, admin.b, enara.admin, teacher.a1 ...). */
 export async function login(key: string): Promise<string> {
-  const cached = tokens.get(key);
-  if (cached) return cached;
+  const cached = tokens.get(key) ?? readTokens()[key];
+  if (cached) { tokens.set(key, cached); return cached; }
   const r = await call<{ token: string }>('POST', '/api/auth/login', { body: { email: seedEmail(key), password: secrets.enaraPassword } });
   tokens.set(key, r.token);
+  try { fs.mkdirSync(RUN_DIR, { recursive: true }); fs.writeFileSync(TOKEN_FILE(), JSON.stringify({ ...readTokens(), [key]: r.token })); } catch { /* the in-memory copy still works */ }
   return r.token;
 }
 
