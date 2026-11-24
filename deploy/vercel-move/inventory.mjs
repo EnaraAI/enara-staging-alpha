@@ -1,8 +1,8 @@
 // Vercel move, step 1 (owner go, 24 Nov 2026): READ-ONLY inventory of the old account. Writes Markdown with NAMES ONLY.
 // Every field is whitelisted: an env entry contributes key/target/type/branch only, never its value (plain values appear in API lists).
 import { writeFileSync } from 'node:fs';
-const TOKEN = process.env.VERCEL_TOKEN_OLD;
-if (!TOKEN) { console.log('VERCEL_TOKEN_OLD is not set'); process.exit(1); }
+const TOKEN = process.env.INV_WHICH === 'new' ? process.env.VERCEL_TOKEN_NEW : process.env.VERCEL_TOKEN_OLD;
+if (!TOKEN) { console.log('token not set'); process.exit(1); }
 const API = 'https://api.vercel.com';
 async function get(path) {
   const r = await fetch(API + path, { headers: { Authorization: `Bearer ${TOKEN}` } });

@@ -15,10 +15,12 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: '22' }
-      - name: Inventory
-        env: { VERCEL_TOKEN_OLD: '${{ secrets.VERCEL_TOKEN_OLD }}' }
-        run: mkdir -p out && cd out && node ../deploy/vercel-move/inventory.mjs
+      - name: Inventory, old team and new team
+        env: { VERCEL_TOKEN_OLD: '${{ secrets.VERCEL_TOKEN_OLD }}', VERCEL_TOKEN_NEW: '${{ secrets.VERCEL_TOKEN_NEW }}' }
+        run: |
+          mkdir -p out/new && cd out && node ../deploy/vercel-move/inventory.mjs
+          cd new && INV_WHICH=new node ../../deploy/vercel-move/inventory.mjs
       - name: Publish (names only)
         run: |
-          cd out && git init -q && git checkout -q -b r && git add VERCEL_MOVE.md && git -c user.name=github-actions -c user.email=github-actions@users.noreply.github.com commit -qm "Vercel inventory ${GITHUB_SHA::8}"
+          cd out && git init -q && git checkout -q -b r && git add VERCEL_MOVE.md new/VERCEL_MOVE.md && git -c user.name=github-actions -c user.email=github-actions@users.noreply.github.com commit -qm "Vercel inventory ${GITHUB_SHA::8}"
           git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" r:claude/tutor-lms-vercel-move-results
