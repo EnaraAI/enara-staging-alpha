@@ -18,7 +18,7 @@ export interface SeedStudent { id: string; name: string; first: string; school: 
 export interface SeedLink { parentUserId: string; studentId: string; institutionId: string }
 type Add = (model: 'SchoolTimetableEntry' | 'SchoolDailyAttendance' | 'SchoolAnnouncement' | 'SchoolImport' | 'ParentNotification' | 'SchoolInstalment' | 'SchoolBusRoute' | 'SchoolBusAssignment' | 'SchoolBusNotice' | 'SchoolRequest' | 'SchoolConsentForm' | 'SchoolConsent', key: string, doc: Record<string, unknown>) => void;
 
-export const SCHOOL_APP_SECTIONS_ON = { timetable: true, announcements: true, attendance: true, notifications: true, fees: true, buses: true, requests: true, consents: true };
+export const SCHOOL_APP_SECTIONS_ON = { timetable: true, announcements: true, attendance: true, notifications: true, fees: true, buses: true, requests: true, consents: true, chat: true };
 export const schoolAppSeeded = (s: SchoolDef) => s.portal === 'free';
 
 const sid = (p: string, key: string) => `${p}-${createHash('sha1').update(`enara-full-v1:school-app:${key}`).digest('hex').slice(0, 16)}`;
