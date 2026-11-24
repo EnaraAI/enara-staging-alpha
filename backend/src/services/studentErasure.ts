@@ -304,7 +304,11 @@ export async function permanentlyDeleteStudent(s: StudentDoc, actor: Actor): Pro
   // student (and the school's fee receipts, step b3): speaking-exam and pronunciation audio is transcribed in memory and
   // never stored, and tutor voice is streamed (ARCHIVE_NOTES.md, PDPL P1).
   const files = { deleted: 0, failed: 0, failedKeys: [] as string[] };
-  for (const key of [s.photoKey, s.pendingPhotoKey, ...receiptKeys].filter((k): k is string => !!k)) {
+  for (const key of receiptKeys) {
+    try { await (await import('../schoolApp/fees')).receiptStore.remove(key); files.deleted++; }
+    catch (error) { files.failed++; files.failedKeys.push(key); logger.warn('student_erasure_file_failed', { studentId: sid, key, error: serializeError(error) }); }
+  }
+  for (const key of [s.photoKey, s.pendingPhotoKey].filter((k): k is string => !!k)) {
     try {
       await deleteUpload(key);
       files.deleted++;
