@@ -1,0 +1,48 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[12:40:07 +0.1 min] ar: encoder CAMeL-Lab/bert-base-arabic-camelbert-msa [6d7d27e2], max 256 tokens, stage-1 sample 2500
+/home/runner/work/enara-staging-alpha/enara-staging-alpha/deploy/lms-test/mishkat/train_mishkat.py:93: Pandas4Warning: Starting with pandas version 4.0 all arguments of mean will be keyword-only.
+  sc = df[fa].astype(float).mean(1)
+[12:40:07 +0.1 min] AR-AES: 2046 essays, text column found, final-score columns [' Final_Score_A', 'Final_Score_B'], range 0.0-10.0
+[12:40:07 +0.1 min] AR-ASAG: 2132 answers, score range 0.0-5.0
+[12:40:07 +0.1 min] stage 1 data: 4178 essays
+[12:40:07 +0.1 min] ENARA model-marked: 482 labelled answers, owner corrections applied: 0
+[12:40:07 +0.1 min] stage-1 essays: 2046 of 4178 from cache, 2132 to read
+[12:40:36 +0.6 min] encoder stage-1 essays (400/2132 new): 400/400, ~0.0 min left
+[12:41:15 +1.3 min] encoder stage-1 essays (800/2132 new): 400/400, ~0.0 min left
+[12:41:56 +1.9 min] encoder stage-1 essays (1200/2132 new): 400/400, ~0.0 min left
+[12:42:37 +2.6 min] encoder stage-1 essays (1600/2132 new): 400/400, ~0.0 min left
+[12:43:17 +3.3 min] encoder stage-1 essays (2000/2132 new): 400/400, ~0.0 min left
+[12:43:39 +3.7 min] encoder stage-1 essays (2132/2132 new): 132/132, ~0.0 min left
+[12:43:44 +3.7 min] ENARA answers: 482 of 482 from cache, 0 to read
+[12:43:44 +3.7 min] length-augmented copies: 1736 of 1736 from cache, 0 to read
+[12:43:44 +3.7 min] length augmentation: 1736 copies
+[12:43:48 +3.8 min] human re-check essays: 200 of 200 from cache, 0 to read
+[12:43:48 +3.8 min] stage 1 after removing re-check essays: 4178; human re-check essays: 200
+[12:43:48 +3.8 min] Claude comparison answers: 16 of 16 from cache, 0 to read
+[12:43:55 +3.9 min] Egyptian test set: 6597 answers, licence {'id': 'cc-by-4.0'}
+[12:43:55 +3.9 min] Egyptian test answers: 6597 of 6597 from cache, 0 to read
+[12:44:02 +4.0 min] encoder truncation test fold 1: 31/31, ~0.0 min left
+[12:44:13 +4.2 min] encoder padding test fold 1: 41/41, ~0.0 min left
+[12:44:17 +4.3 min] essay fold 1/5: train 162, val 19, test 41
+[12:44:21 +4.4 min] encoder truncation test fold 2: 29/29, ~0.0 min left
+[12:44:33 +4.6 min] encoder padding test fold 2: 44/44, ~0.0 min left
+[12:44:42 +4.7 min] essay fold 2/5: train 153, val 25, test 44
+[12:44:47 +4.8 min] encoder truncation test fold 3: 31/31, ~0.0 min left
+[12:45:01 +5.0 min] encoder padding test fold 3: 44/44, ~0.0 min left
+[12:45:11 +5.2 min] essay fold 3/5: train 155, val 23, test 44
+[12:45:16 +5.3 min] encoder truncation test fold 4: 27/27, ~0.0 min left
+[12:45:29 +5.5 min] encoder padding test fold 4: 45/45, ~0.0 min left
+[12:45:36 +5.6 min] essay fold 4/5: train 152, val 25, test 45
+[12:45:41 +5.7 min] encoder truncation test fold 5: 32/32, ~0.0 min left
+[12:45:56 +5.9 min] encoder padding test fold 5: 48/48, ~0.0 min left
+[12:46:03 +6.1 min] essay fold 5/5: train 153, val 21, test 48
+[12:46:04 +6.1 min] essay {"task_completion": [0.636, 0.647, 0.762], "grammar_accuracy": [0.8, 0.796, 0.808], "vocabulary_range": [0.93, 0.908, 0.843], "organisation": [0.837, 0.793, 0.883], "mechanics": [0.862, 0.873, 0.781]} {"truncation": {"n": 150, "meanDropGrammarSpelling": 0.02, "pass": true}, "padding": {"n": 222, "meanRiseGrammarSpelling": 0.011, "pass": true}} {"truncation": {"n": 150, "meanDropGrammarSpelling": 0.033, "pass": true}, "padding": {"n": 222, "meanRiseGrammarSpelling": 0.027, "pass": true}}
+[12:46:07 +6.1 min] short_answer fold 1/5: train 188, val 24, test 48
+[12:46:08 +6.1 min] short_answer fold 2/5: train 190, val 24, test 46
+[12:46:09 +6.2 min] short_answer fold 3/5: train 179, val 27, test 54
+[12:46:11 +6.2 min] short_answer fold 4/5: train 183, val 24, test 53
+[12:46:12 +6.2 min] short_answer fold 5/5: train 179, val 22, test 59
+[12:46:12 +6.2 min] Egypt: {"n": 6597, "questions": 22, "mapping": "human 0-1 -> 0, 1.5-3.5 -> 1, 4-5 -> 2", "task_completion_vs_human": {"n": 6597, "exact": 0.341, "within1": 0.986, "qwk": 0.214, "bias": -0.24}, "spearman_raw_task_vs_human": 0.401, "spearman_raw_grammar_vs_human": -0.311, "meanHuman0to2": 1.25, "meanMishkatTask": 1.0, "note": "human marks are content scores; Mishkat does not see the question or the model answer"}
+[12:46:12 +6.2 min] short_answer {"task_completion": [0.415, 0.402, 0.727], "grammar_accuracy": [0.722, 0.749, 0.587], "mechanics": [null, null, 0.0]} {"shortCorrectNotScoredDown": {"n": 144, "share": 0.972, "pass": true}} {"shortCorrectNotScoredDown": {"n": 144, "share": 0.972, "pass": true}}
+[12:46:12 +6.2 min] bundle: ar not in MK_EXPORT_LANGS=['en']; not exported
+[12:46:13 +6.2 min] done
