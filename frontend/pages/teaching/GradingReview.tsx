@@ -115,7 +115,8 @@ function AnswerReview({ item, attemptId, mode, onChanged, conversation }: { item
         )}
         {q.type === 'engine' ? (item.keyText ? <p className="text-xs text-slate-600 mt-1">Answer key: <b>{String(item.keyText)}</b></p> : null) : q.type !== 'open-response' && <p className="text-xs text-slate-600 mt-1">Answer key: <b>{String(q.correctAnswer)}</b></p>}
         {q.modelAnswer && <p className="text-xs text-slate-600 mt-1" dir="auto">Model answer (never shown to students): {q.modelAnswer}</p>}
-        {a.method && <p className="text-xs text-slate-600 mt-1">Graded by {a.grader === 'code' && (a.criteria || []).some((c: any) => c.scoredBy === 'code') ? 'code rules (no model call)' : METHOD[a.method] ?? a.method}</p>}
+        {a.engine && <p className="text-xs text-slate-600 mt-1" data-testid="graded-by-mishkat">Graded by Mishkat (v3b + trained scorer, {String(a.engine)})</p>}
+        {a.method && !a.engine && <p className="text-xs text-slate-600 mt-1">Graded by {a.grader === 'code' && (a.criteria || []).some((c: any) => c.scoredBy === 'code') ? 'code rules (no model call)' : METHOD[a.method] ?? a.method}</p>}
       </div>
 
       {a.method === 'ai' && ev?.status === 'proposed' && (

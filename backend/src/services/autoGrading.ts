@@ -374,6 +374,7 @@ export async function processAttempt(attemptId: string, now = new Date()): Promi
           scoreExplanation: blank ? 'Waiting for your teacher.' : g.scoreExplanation,
           strengths: g.strengths, improvements: g.improvements,
           criteria: g.criteria, errorCodes: g.errorCodes, confidence: g.confidence, flagged: g.flagged, flagReasons: g.flagReasons, grader: g.grader,
+          ...(g.engine ? { engine: g.engine } : {}),
           ...(blank ? {} : { feedbackText: g.feedback }),
         } as IAttemptAnswer);
         history.push({ at: now, by: GRADER, action: g.flagged ? 'engine_flagged' : 'engine_evaluated', questionId: q.id, to: g.points, reason: g.flagged ? g.flagReasons.join(', ') : g.grader === 'code' ? `code: ${g.criteria[0]?.rule ?? ''}` : `runs: ${g.runs.map((r) => r.points).join(', ')}` });

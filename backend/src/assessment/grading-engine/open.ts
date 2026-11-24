@@ -30,6 +30,8 @@ export interface OpenGrade {
   criterionScores: CriterionScore[];
   // modelPoints: v3b's own score on a criterion Mishkat scored (the teacher's "v3b's view"; never shown to the learner).
   criteria: { code: string; points: number; max: number; reasonCode: string; scoredBy?: 'code' | 'model' | 'mishkat'; rule?: string; reason?: string; modelPoints?: number }[];
+  // The Mishkat engine id (`<scorer version>+v3b`) when v3b and the trained scorer both graded this answer; absent otherwise.
+  engine?: string;
   errorCodes: string[];
   confidence: number;
   flagged: boolean;

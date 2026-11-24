@@ -11,6 +11,7 @@ const row = new Schema(
     model: { type: Schema.Types.Mixed, default: null }, modelTotal: { type: Number, default: null },
     flagged: Boolean, flagReasons: [String], confidence: Number, latencyMs: Number, errorCodes: [String], goldErrorCodes: [String],
     error: { type: String, default: null }, modelName: String,
+    engine: { type: String, default: null }, // the Mishkat engine id when it graded the answer (switch mishkatSplit)
     createdAt: { type: Date, default: Date.now },
   },
   { collection: 'assessment_bench_results' },
