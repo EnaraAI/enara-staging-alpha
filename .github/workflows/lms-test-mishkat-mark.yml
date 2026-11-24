@@ -1,5 +1,5 @@
 # Mishkat marker (a): DeepSeek (lms-test, llm-compare) marks the model-marked dev pool with the live v3b language rubric, one run per
-# answer, nothing stored. Run 3: re-mark 54 Arabic answers with colloquial words under the owner's rule (engine-v3c). Per-answer marks to claude/tutor-lms-mishkat-remark-ds (synthetic data; model-marked, development only).
+# answer, nothing stored. Run 4: v3b on 300 answers of the Egyptian test set (Zenodo, downloaded at run time). Per-answer marks to claude/tutor-lms-mishkat-egypt-ds (synthetic data; model-marked, development only).
 name: lms-test Mishkat marker DeepSeek
 on:
   push:
@@ -25,7 +25,7 @@ jobs:
         env:
           LMSTEST_MAINTENANCE_TOKEN: ${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}
           LIVE_BACKEND: ${{ github.workspace }}/live/backend
-          BASELINE_CONFIG: '{"datasets":["mishkat-remark-colloq-ar"],"concurrency":4}'
+          BASELINE_CONFIG: '{"datasets":["egypt"],"concurrency":4}'
         run: |
           export TUTOR_LLM_MODEL="$(node -e "const f=require('${{ github.workspace }}/live/deploy/lms-test.flags.json');console.log(f.features.find(x=>x.flags.TUTOR_LLM_MODEL).flags.TUTOR_LLM_MODEL)")"
           ${{ github.workspace }}/live/backend/node_modules/.bin/tsx baseline.mts 2>&1 | grep -vE "full_text|essay text" | tee run.log
@@ -34,7 +34,7 @@ jobs:
         working-directory: deploy/lms-test/ellipse
         run: |
           mkdir -p out && cp run.log out/ 2>/dev/null || true
-          cd out && git init -q && git checkout -q -b claude/tutor-lms-mishkat-remark-ds
+          cd out && git init -q && git checkout -q -b claude/tutor-lms-mishkat-egypt-ds
           git config user.name github-actions && git config user.email github-actions@users.noreply.github.com
           git add -A && git commit -qm "mishkat marker ds ${GITHUB_SHA::8}"
-          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" claude/tutor-lms-mishkat-remark-ds
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" claude/tutor-lms-mishkat-egypt-ds
