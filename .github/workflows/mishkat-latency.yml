@@ -1,0 +1,31 @@
+# Mishkat single-answer latency on a warm container (owner, 24 Nov 2026): 100 answers one at a time after 3 warm-up answers.
+# Runs inside Modal with the service secret; numbers only to claude/tutor-lms-mishkat-service (latency.json).
+name: Mishkat single-answer latency
+on:
+  push:
+    branches: ['claude/tutor-lms-dscompare-run']
+    paths: ['deploy/modal/mishkat-loadtest/**', '.github/workflows/mishkat-latency.yml']
+permissions:
+  contents: write
+jobs:
+  latency:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+      MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - name: 100 answers one at a time on a warm container
+        run: |
+          pip install -q modal
+          git fetch -q --depth 1 origin claude/tutor-lms-mishkat && git worktree add -q mk FETCH_HEAD
+          MK_EVAL_DATA="$GITHUB_WORKSPACE/mk/data/mishkat-dev" modal run deploy/modal/mishkat-loadtest/loadtest.py --url "https://enaraai--mishkat-web.us-east.modal.run/score" --n 100 --mode single --out latency.json
+      - name: Publish (numbers only)
+        run: |
+          git fetch -q origin claude/tutor-lms-mishkat-service && git worktree add -q pub FETCH_HEAD && cp latency.json pub/ && cd pub && git checkout -q -b r && git add latency.json
+          git -c user.name=github-actions -c user.email=github-actions@users.noreply.github.com commit -qm "Mishkat single-answer latency ${GITHUB_SHA::8}"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" r:claude/tutor-lms-mishkat-service

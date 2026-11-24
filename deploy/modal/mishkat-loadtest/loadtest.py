@@ -13,7 +13,7 @@ app = modal.App('mishkat-loadtest', image=image)
 def pct(xs, p): xs = sorted(xs); return xs[min(len(xs) - 1, int(round(p / 100 * (len(xs) - 1))))]
 
 @app.function(secrets=[modal.Secret.from_name('mishkat-auth')], timeout=1200, cpu=2.0, memory=2048)
-def run(url: str, n: int = 200) -> dict:
+def run(url: str, n: int = 200, mode: str = 'burst') -> dict:
     import httpx
     items = []
     for lang in ('en', 'ar'):
@@ -38,9 +38,22 @@ def run(url: str, n: int = 200) -> dict:
             xs = [r['ms'] for r in res if r['code'] == 200 and r['lang'] == lang]
             if xs: out['byLang'][lang] = {'n': len(xs), 'medianMs': round(statistics.median(xs)), 'p95Ms': round(pct(xs, 95))}
         return out
+    if mode == 'single':
+        # Single answers on a warm container (owner, 24 Nov 2026): 3 warm-up answers, then n answers one at a time.
+        async def seq():
+            async with httpx.AsyncClient(timeout=120) as c:
+                for it in sample[:3]: await one(c, it)
+                return [await one(c, it) for it in sample]
+        res = asyncio.run(seq()); out = {'mode': 'single, warm, one at a time', 'answers': n, 'ok': sum(1 for r in res if r['code'] == 200)}
+        def stat(xs): return {'n': len(xs), 'medianMs': round(statistics.median(xs)), 'p95Ms': round(pct(xs, 95)), 'minMs': round(min(xs)), 'maxMs': round(max(xs))} if xs else None
+        out['all'] = stat([r['ms'] for r in res if r['code'] == 200])
+        for lang in ('en', 'ar'):
+            for typ in ('essay', 'short_answer'):
+                out[f'{lang}/{typ}'] = stat([r['ms'] for r in res if r['code'] == 200 and r['lang'] == lang and r['type'] == typ])
+        return out
     cold = asyncio.run(round_()); warm = asyncio.run(round_())
     return {'cold': cold, 'warm': warm}
 
 @app.local_entrypoint()
-def main(url: str, out: str = 'loadtest.json'):
-    r = run.remote(url); json.dump(r, open(out, 'w'), indent=1); print(json.dumps(r, indent=1))
+def main(url: str, out: str = 'loadtest.json', n: int = 200, mode: str = 'burst'):
+    r = run.remote(url, n, mode); json.dump(r, open(out, 'w'), indent=1); print(json.dumps(r, indent=1))
