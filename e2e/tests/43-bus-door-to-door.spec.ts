@@ -65,6 +65,8 @@ test.describe.serial('43 · Door to door: home pickup point, school confirms, su
     await expect(row.getByTestId('bus-home-state')).toContainText('Confirmed');
     await shot(staff.page, 'bus-43-02-school-confirms');
     await page.reload();
+    // A reload opens the School screen on its first view, not the bus: open the bus section again (its tab, or its tile).
+    await page.getByTestId('pp-school-buses').or(page.getByTestId('pp-school-home-bus')).first().click({ timeout: 30_000 });
     await expect(page.getByTestId('pp-pickup').getByTestId('pp-pickup-status')).toContainText('Confirmed by the school', { timeout: 30_000 });
 
     // 3. The supervisor's trip: next home, "5 minutes away", Picked up.
