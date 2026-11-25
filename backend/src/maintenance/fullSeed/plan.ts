@@ -214,7 +214,7 @@ export function buildPlan(now: Date, opts: PlanOptions = {}): FullSeedPlan {
       schoolStudents.push(rec);
     }
     // Several classes: a few strong students also join the next group's Maths / English class.
-    for (const s of schoolStudents.filter((x) => x.ability > 0.85 && !x.archived).slice(0, si === 0 ? 5 : si === 1 ? 3 : 0)) {
+    for (const s of schoolStudents.filter((x) => x.ability > 0.85 && !x.archived).slice(0, FAM ? 0 : si === 0 ? 5 : si === 1 ? 3 : 0)) {
       const gi = school.groups.findIndex((g) => `GRP-${S}-${g.key}` === s.group); const next = school.groups[gi + 1]; if (!next) continue;
       const cls = classes.find((c) => c.group === `GRP-${S}-${next.key}` && (c.subject === 'MATH' || c.subject === 'ENG')); if (!cls) continue;
       cls.extra.push(s.id); s.classes.push(cls.id); s.state += ', in 2 groups\' classes';
@@ -228,7 +228,7 @@ export function buildPlan(now: Date, opts: PlanOptions = {}): FullSeedPlan {
         add('ClassEnrollment', `${s.id}:${c}`, { id: `enr-${s.id.toLowerCase()}-${c.toLowerCase()}`, institutionId: school.id, studentId: s.id, scope: 'class', targetId: c, role: 'learner', status: 'active', source: 'manual', extraVia: 'multi_class', startedAt: ago(30), createdBy: admin.id, createdAt: ago(30), updatedAt: ago(30) });
       }
     }
-    if (school.groups.length > 1) {
+    if (school.groups.length > 1 && !FAM) { // (the planned family's children are neither moved nor paused)
       const moved = schoolStudents.find((s) => !s.archived && s.group === `GRP-${S}-${school.groups[1].key}`)!;
       add('ClassEnrollment', `${moved.id}:moved-from`, { id: `enr-${moved.id.toLowerCase()}-previous`, institutionId: school.id, studentId: moved.id, scope: 'group', targetId: `GRP-${S}-${school.groups[0].key}`, role: 'learner', status: 'removed', source: 'manual', startedAt: ago(school.createdDaysAgo - 6), endedAt: ago(35), endedBy: admin.id, createdBy: admin.id, createdAt: ago(school.createdDaysAgo - 6), updatedAt: ago(35) });
       moved.state += ', moved group (old enrollment removed)'; users.find((u) => u.key === moved.key)!.state = moved.state;
@@ -257,7 +257,7 @@ export function buildPlan(now: Date, opts: PlanOptions = {}): FullSeedPlan {
         expiresAt: new Date(st.at.getTime() + 7 * DAY), acceptedAt: st.at, acceptedUserId: st.id, origin: 'live', createdAt: new Date(st.at.getTime() - DAY) });
       users.push({ key: `${S}.inv-accepted`, role: 'invitation (teacher)', name: st.name, email: st.email, schoolId: school.id, school: school.name, state: 'invitation accepted (now a teacher)', userId: '' });
     }
-    if (si === 0) { inv('inv-teacher', 'teacher', 'pending', ago(-5)); inv('inv-expired', 'teacher', 'pending', ago(3)); inv('inv-revoked', 'academic_manager', 'revoked', ago(10)); }
+    if (si === 0 && !FAM) { inv('inv-teacher', 'teacher', 'pending', ago(-5)); inv('inv-expired', 'teacher', 'pending', ago(3)); inv('inv-revoked', 'academic_manager', 'revoked', ago(10)); }
     if (si === 1) { inv('inv-student', 'student', 'pending', ago(-6)); inv('inv-old', 'teacher', 'pending', ago(20)); }
     if (si === 2) {
       inv('inv-admin2', 'admin', 'pending', ago(-4));

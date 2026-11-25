@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { maintenance } from '../lib/enara';
+import { enaraApi, maintenance } from '../lib/enara';
 import { ENARA, secrets } from '../lib/env';
 import { shot } from '../lib/state';
 
@@ -14,14 +14,14 @@ test.describe.serial('44 · Family account: 3 children, 5 subjects each', () => 
     expect(out.children).toEqual(['Youssef Hassan (Grade 3)', 'Laila Hassan (Grade 6)', 'Omar Hassan (Grade 9)']);
     expect(JSON.stringify(out)).not.toContain(secrets.enaraPassword);
 
+    // Sign in with the family's email and password (the account's real sign-in), then open the parents app with that session.
+    const login = await enaraApi.post<{ token: string; user: Record<string, unknown> }>('/api/auth/login', '', { email: PARENT, password: secrets.enaraPassword });
+    expect(login.user).toMatchObject({ role: 'parent', name: 'Mona Hassan' });
     const context = await browser.newContext({ ignoreHTTPSErrors: true, viewport: { width: 390, height: 844 } });
+    await context.addInitScript(([t, u]) => { localStorage.setItem('enara_token', t); localStorage.setItem('enara_user', u); localStorage.setItem('enara_ui_role', 'parent'); }, [login.token, JSON.stringify(login.user)] as const);
     const page = await context.newPage();
     page.on('pageerror', (e) => console.log('[pageerror family]', String(e).slice(0, 400)));
-    await page.goto(`${ENARA}/`);
-    await page.getByRole('tab', { name: 'Parents', exact: true }).click();
-    await page.locator('#si-email').fill(PARENT);
-    await page.locator('#si-pass').fill(secrets.enaraPassword);
-    await page.getByRole('button', { name: 'Continue' }).click();
+    await page.goto(`${ENARA}/parents`);
 
     const chips = page.locator('.pp-switcher .pp-chip:not(.pp-chip--add)');
     await expect(chips).toHaveCount(3, { timeout: 45_000 });

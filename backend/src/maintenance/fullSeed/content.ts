@@ -167,14 +167,15 @@ SUBJECTS.SOC = {
   avatarLessons: ['Speaking: life by the Nile', 'Speaking: my neighbourhood'],
 };
 
-/** The family school (owner "go" 25 Nov 2026): three grades, every child takes 5 subjects. Planned on its own (familyPlan.ts). */
+/** The family school (owner "go" 25 Nov 2026): three grades, every child takes 5 subjects. Planned on its own (familyPlan.ts).
+ *  Owner, 25 Nov 2026: only Mona and her three children (one seat a grade, so no other students or parents); staff stay. */
 export const FAMILY_SCHOOL: SchoolDef = {
   id: 'SCH-ANIS', name: 'Al Nour International School', status: 'active', portal: 'free', results: 'after_release', emailLanguage: 'en', pathwayMode: 'teacher_controlled',
   createdDaysAgo: 75, onboarding: 'running: every class in use', releasePolicy: 'manual',
   groups: [
-    { key: 'G3', name: 'Grade 3', age: 8, size: 10, subjects: ['ARB', 'ENG', 'MATH', 'SCI', 'SOC'] },
-    { key: 'G6', name: 'Grade 6', age: 11, size: 10, subjects: ['ARB', 'ENG', 'MATH', 'SCI', 'SOC'] },
-    { key: 'G9', name: 'Grade 9', age: 14, size: 10, subjects: ['ARB', 'ENG', 'MATH', 'SCI', 'SOC'] },
+    { key: 'G3', name: 'Grade 3', age: 8, size: 1, subjects: ['ARB', 'ENG', 'MATH', 'SCI', 'SOC'] },
+    { key: 'G6', name: 'Grade 6', age: 11, size: 1, subjects: ['ARB', 'ENG', 'MATH', 'SCI', 'SOC'] },
+    { key: 'G9', name: 'Grade 9', age: 14, size: 1, subjects: ['ARB', 'ENG', 'MATH', 'SCI', 'SOC'] },
   ],
 };
 

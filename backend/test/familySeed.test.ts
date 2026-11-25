@@ -85,6 +85,11 @@ describe('the family plan', () => {
     expect(new Set(emails).size).toBe(emails.length);
     expect(docsOf('User').filter((u) => u.role === 'parent' && / Hassan$/.test(u.name))).toHaveLength(1);
     expect(docsOf('Student').filter((s) => / Hassan$/.test(s.name))).toHaveLength(3);
+    // Owner: only Mona and her three children (no other students or parents); the school's staff stay.
+    expect(docsOf('Student')).toHaveLength(3);
+    expect(docsOf('User').filter((u) => u.role === 'parent')).toHaveLength(1);
+    expect(docsOf('User').filter((u) => ['admin', 'teacher', 'academic_manager'].includes(u.role)).length).toBeGreaterThanOrEqual(3);
+    expect(docsOf('ClassEnrollment').every((e) => e.status === 'active')).toBe(true);
     for (const [m, f] of [['Student', 'id'], ['CourseInstance', 'id'], ['AssessmentAttempt', 'id'], ['TutorSession', 'id'], ['SchoolDailyAttendance', 'id'], ['ParentNotification', 'id']] as const) {
       const vals = docsOf(m).map((d) => d[f]);
       expect(new Set(vals).size, m).toBe(vals.length);
