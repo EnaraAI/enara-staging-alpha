@@ -13,6 +13,7 @@ import { ask, confirmRequest } from './chat';
 import { answerRequest, consentCsv, consentDashboard, consentForms, consentsForParent, createConsentForm, createRequest, requestsForAdmin, requestsForParent, signConsent, withdrawConsentForm } from './requests';
 import { busForParent, busesForAdmin, sendBusNotice, setBusPhonesShared, withdrawBusNotice } from './buses';
 import * as live from './busLive';
+import * as homes from './busHomes';
 import { attachReceipt, feesForAdmin, feesForParent, markInstalment, receiptForAdmin, receiptForParent } from './fees';
 import { SchoolAnnouncement } from './models';
 import { Batch } from '../models/Batch';
@@ -37,6 +38,10 @@ parentSchoolRoutes.get('/learners/:studentId/fees/:instalmentId/receipt', h(asyn
 parentSchoolRoutes.get('/learners/:studentId/bus', h(async (req, res) => { res.json(await busForParent(await child(req))); }));
 // Live bus map: the bus's latest position while a trip of the child's route runs (nothing otherwise). Polled every ~15 s.
 parentSchoolRoutes.get('/learners/:studentId/bus/live', h(async (req, res) => { res.setHeader('Cache-Control', 'no-store'); res.json(await live.liveForParent(await child(req))); }));
+// Door to door: the child's pickup point (home). The parent sets it; the school confirms it before the bus uses it.
+parentSchoolRoutes.get('/learners/:studentId/bus/home', h(async (req, res) => { res.setHeader('Cache-Control', 'no-store'); res.json(await homes.homeForParent(await child(req))); }));
+parentSchoolRoutes.put('/learners/:studentId/bus/home', h(async (req, res) => { const b = ensurePlainObject(req.body); rejectMongoOperators(b); res.json(await homes.setHomeByParent(await child(req), b)); }));
+parentSchoolRoutes.delete('/learners/:studentId/bus/home/pending', h(async (req, res) => { res.json(await homes.cancelPendingByParent(await child(req))); }));
 parentSchoolRoutes.get('/learners/:studentId/requests', h(async (req, res) => { res.json(await requestsForParent(await child(req))); }));
 parentSchoolRoutes.post('/learners/:studentId/requests', h(async (req, res) => { const b = ensurePlainObject(req.body); rejectMongoOperators(b); res.status(201).json(await createRequest(await child(req), b)); }));
 parentSchoolRoutes.get('/learners/:studentId/consents', h(async (req, res) => { res.json(await consentsForParent(await child(req))); }));
@@ -60,6 +65,10 @@ schoolAppAdminRoutes.post('/bus-live/supervisors/:id/code', h(async (req, res) =
 schoolAppAdminRoutes.post('/bus-live/supervisors/:id/sign-out', h(async (req, res) => { res.json(await live.signOutSupervisor(actor(req), String(req.params.id), body(req).institutionId)); }));
 schoolAppAdminRoutes.put('/bus-live/stops', h(async (req, res) => { res.json(await live.setStopPin(actor(req), body(req))); }));
 schoolAppAdminRoutes.post('/bus-live/trips/:id/stop', h(async (req, res) => { res.json(await live.adminEndTrip(actor(req), String(req.params.id), body(req).institutionId)); }));
+schoolAppAdminRoutes.get('/bus-live/homes', h(async (req, res) => { res.setHeader('Cache-Control', 'no-store'); res.json(await homes.homesForAdmin(actor(req), req.query.institutionId)); }));
+schoolAppAdminRoutes.put('/bus-live/homes/door-to-door', h(async (req, res) => { res.json(await homes.setDoorToDoor(actor(req), body(req))); }));
+schoolAppAdminRoutes.put('/bus-live/homes/order', h(async (req, res) => { res.json(await homes.setHomesOrder(actor(req), body(req))); }));
+schoolAppAdminRoutes.post('/bus-live/homes/:studentId', h(async (req, res) => { res.json(await homes.schoolHome(actor(req), String(req.params.studentId), body(req))); }));
 const schoolId = (req: AuthRequest, q?: unknown) => (req.user!.role === 'enara-admin' && typeof q === 'string' ? q : req.user!.institutionId);
 schoolAppAdminRoutes.get('/status', h(async (req, res) => {
   const id = schoolId(req, req.query.institutionId);
@@ -162,3 +171,4 @@ busSupervisorRoutes.post('/trips', h(async (req, res) => { const s = await sup(r
 busSupervisorRoutes.post('/trips/:id/position', h(async (req, res) => { const s = await sup(req); const b = ensurePlainObject(req.body); rejectMongoOperators(b); res.json(await live.sendPosition(s, String(req.params.id), b)); }));
 busSupervisorRoutes.post('/trips/:id/end', h(async (req, res) => { res.json(await live.supervisorEndTrip(await sup(req), String(req.params.id))); }));
 busSupervisorRoutes.post('/trips/:id/notice', h(async (req, res) => { const s = await sup(req); const b = ensurePlainObject(req.body); rejectMongoOperators(b); res.status(201).json(await live.supervisorNotice(s, String(req.params.id), b)); }));
+busSupervisorRoutes.post('/trips/:id/stops', h(async (req, res) => { const s = await sup(req); const b = ensurePlainObject(req.body); rejectMongoOperators(b); res.json(await live.supervisorStop(s, String(req.params.id), b)); }));

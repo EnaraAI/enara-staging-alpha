@@ -6,7 +6,8 @@ import './bus.css';
 // never an ENARA session). Start a trip for an assigned route; while it runs, the phone sends its position every 15 seconds and
 // keeps the screen awake. On a phone browser the page must stay open (iPhones stop location in the background): it says so.
 type Lang = 'en' | 'ar';
-type Me = { supervisor: { name: string }; liveOn: boolean; windows: { from: string; to: string }[]; inWindowNow: boolean; routes: { routeKey: string; routeName: string; busNumber: string | null; liveOn: boolean }[]; trip: { id: string; routeKey: string; direction: 'morning' | 'afternoon'; startedAt: string; endsBy: string } | null };
+type Me = { supervisor: { name: string }; liveOn: boolean; windows: { from: string; to: string }[]; inWindowNow: boolean; routes: { routeKey: string; routeName: string; busNumber: string | null; liveOn: boolean }[]; trip: { id: string; routeKey: string; direction: 'morning' | 'afternoon'; startedAt: string; endsBy: string; homes?: Home[] | null } | null };
+type Home = { studentId: string; firstName: string; note: string; lat: number; lng: number; status: 'picked' | 'dropped' | 'absent' | null; at: string | null };
 const TOKEN_KEY = 'enara_bus_token';
 const LANG_KEY = 'enara_bus_lang';
 const read = (k: string) => { try { return localStorage.getItem(k); } catch { return null; } };
@@ -24,6 +25,7 @@ const T = {
     noticeSent: 'Parents were told.', end: 'End trip', endConfirm: 'End the trip and stop sharing your location?', ended: 'Trip ended. Location sharing stopped.', endsBy: (t: string) => `Stops by itself at ${t}`,
     signOut: 'Sign out of this phone', signedOut: 'Signed out by the school. Ask the office for a new code.', privacy: 'Your location is shared only during a trip, only with parents of children on this bus, and deleted when the trip ends.',
     accuracy: (m: number) => `accuracy about ${m} m`, lang: 'العربية',
+    nextHome: 'Next home', allDone: 'Every home on this trip is done.', pickedBtn: 'Picked up', droppedBtn: 'Dropped off', absentBtn: 'Not riding today', directions: 'Directions', homesList: 'Homes on this trip', st: { picked: 'picked up', dropped: 'dropped off', absent: 'not riding' } as Record<string, string>,
     noRoutes: 'No bus route is assigned to you yet. Ask the school office to assign your route in the Bus supervisors tab, then tap Refresh.', refresh: 'Refresh',
   },
   ar: {
@@ -37,6 +39,7 @@ const T = {
     noticeSent: 'تم إبلاغ أولياء الأمور.', end: 'إنهاء الرحلة', endConfirm: 'إنهاء الرحلة وإيقاف مشاركة موقعك؟', ended: 'انتهت الرحلة وتوقفت مشاركة الموقع.', endsBy: (t: string) => `تتوقف تلقائيًا الساعة ${t}`,
     signOut: 'الخروج من هذا الهاتف', signedOut: 'أخرجتك المدرسة. اطلب رمزًا جديدًا من المكتب.', privacy: 'يُشارك موقعك أثناء الرحلة فقط، ومع أولياء أمور أطفال هذه الحافلة فقط، ويُحذف عند انتهاء الرحلة.',
     accuracy: (m: number) => `الدقة نحو ${m} م`, lang: 'English',
+    nextHome: 'البيت التالي', allDone: 'انتهت كل البيوت في هذه الرحلة.', pickedBtn: 'تم الاستلام', droppedBtn: 'تم التوصيل', absentBtn: 'لن يركب اليوم', directions: 'الاتجاهات', homesList: 'بيوت هذه الرحلة', st: { picked: 'تم الاستلام', dropped: 'تم التوصيل', absent: 'لن يركب' } as Record<string, string>,
     noRoutes: 'لم يُخصَّص لك خط سير بعد. اطلب من مكتب المدرسة تخصيص خطك من صفحة مشرفي الحافلات، ثم اضغط تحديث.', refresh: 'تحديث',
   },
 };
@@ -79,7 +82,7 @@ const BusApp: React.FC = () => {
       <h1 className="bus-h1">{t.hello(me.supervisor.name)}</h1>
       {note && <p className="bus-note" role="status">{note}</p>}
       {me.trip ? (
-        <Trip t={t} lang={lang} token={token} me={me} onEnded={(msg) => { setNote(msg); void refresh(); }} onSignedOut={() => signOut(t.signedOut)} />
+        <Trip t={t} lang={lang} token={token} me={me} onEnded={(msg) => { setNote(msg); void refresh(); }} onSignedOut={() => signOut(t.signedOut)} onRefresh={() => void refresh()} />
       ) : (
         <>
           {!me.liveOn && <p className="bus-warn" data-testid="bus-off">{t.off}</p>}
@@ -143,7 +146,7 @@ const SignIn: React.FC<{ t: (typeof T)['en']; note: string | null; onDone: (toke
 };
 
 /** A running trip: watches the phone's location, sends the latest every 15 s, keeps the screen awake, notices and End trip. */
-const Trip: React.FC<{ t: (typeof T)['en']; lang: Lang; token: string; me: Me; onEnded: (msg: string) => void; onSignedOut: () => void }> = ({ t, lang, token, me, onEnded, onSignedOut }) => {
+const Trip: React.FC<{ t: (typeof T)['en']; lang: Lang; token: string; me: Me; onEnded: (msg: string) => void; onSignedOut: () => void; onRefresh: () => void }> = ({ t, lang, token, me, onEnded, onSignedOut, onRefresh }) => {
   const trip = me.trip!;
   const route = me.routes.find((r) => r.routeKey === trip.routeKey);
   const latest = useRef<GeolocationPosition | null>(null);
@@ -209,6 +212,7 @@ const Trip: React.FC<{ t: (typeof T)['en']; lang: Lang; token: string; me: Me; o
       {gps === 'denied' && <p className="bus-err" role="alert">{t.denied} <button type="button" className="bus-link" onClick={() => setAttempt((a) => a + 1)}>{t.tryAgain}</button></p>}
       {gps === 'error' && <p className="bus-err" role="alert">{t.gpsError} <button type="button" className="bus-link" onClick={() => setAttempt((a) => a + 1)}>{t.tryAgain}</button></p>}
       {stalled && <p className="bus-warn" role="alert">{t.stalled}</p>}
+      {trip.homes && <Homes t={t} lang={lang} token={token} trip={trip} onDone={onRefresh} />}
       <h2 className="bus-h2">{t.late}</h2>
       <div className="bus-four">
         {[5, 10, 15, 20].map((m) => <button key={m} type="button" className="bus-btn" onClick={() => void notice({ kind: 'delay', minutes: m })} data-testid={`bus-late-${m}`}>{t.minutes(m)}</button>)}
@@ -217,6 +221,36 @@ const Trip: React.FC<{ t: (typeof T)['en']; lang: Lang; token: string; me: Me; o
       {msg && <p className="bus-note" role="status" data-testid="bus-msg">{msg}</p>}
       <button type="button" className="bus-btn bus-btn--end" onClick={() => void end()} data-testid="bus-end">{t.end}</button>
     </section>
+  );
+};
+
+/** Door to door: the next home (child's first name and the parents' note), one-tap Picked up / Dropped off / Not riding today. */
+const Homes: React.FC<{ t: (typeof T)['en']; lang: Lang; token: string; trip: NonNullable<Me['trip']>; onDone: () => void }> = ({ t, lang, token, trip, onDone }) => {
+  const [busy, setBusy] = useState(false);
+  const homes = trip.homes ?? [];
+  const next = homes.find((h) => !h.status);
+  const mark = async (studentId: string, status: 'done' | 'absent') => {
+    setBusy(true);
+    try { await call('POST', `/api/bus/trips/${encodeURIComponent(trip.id)}/stops`, { studentId, status }, token); } finally { setBusy(false); onDone(); }
+  };
+  return (
+    <>
+      <h2 className="bus-h2">{t.nextHome}</h2>
+      {next ? (
+        <div className="bus-next" data-testid="bus-next-home" data-student={next.studentId}>
+          <b className="bus-route" dir="auto">{next.firstName}</b>
+          {next.note && <p className="bus-muted" dir="auto">{next.note}</p>}
+          <a className="bus-link" href={`https://www.google.com/maps/dir/?api=1&destination=${next.lat},${next.lng}`} target="_blank" rel="noopener noreferrer">{t.directions}</a>
+          <div className="bus-two">
+            <button type="button" className="bus-btn bus-btn--go" disabled={busy} onClick={() => void mark(next.studentId, 'done')} data-testid="bus-home-done">{trip.direction === 'morning' ? t.pickedBtn : t.droppedBtn}</button>
+            <button type="button" className="bus-btn" disabled={busy} onClick={() => void mark(next.studentId, 'absent')} data-testid="bus-home-absent">{t.absentBtn}</button>
+          </div>
+        </div>
+      ) : <p className="bus-note" data-testid="bus-homes-done">{t.allDone}</p>}
+      <details className="bus-list"><summary>{t.homesList} ({homes.length})</summary>
+        <ol>{homes.map((h) => <li key={h.studentId}><span dir="auto">{h.firstName}</span>{h.status ? ` · ${t.st[h.status]}${h.at ? ` ${hm(h.at, lang)}` : ''}` : ''}</li>)}</ol>
+      </details>
+    </>
   );
 };
 
