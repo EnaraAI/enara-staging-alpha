@@ -17,6 +17,11 @@ describe('topics and request offers (English and Arabic)', () => {
     expect(topicOf('متى يصل الباص؟')).toBe('buses');
     expect(topicOf('Was he absent this week?')).toBe('attendance');
     expect(topicOf('ما هو جدول الحصص اليوم؟')).toBe('timetable');
+    // Owner's walk, 25 Nov 2026: «مواد» without «ال» and other Egyptian ways to ask about today's classes.
+    expect(topicOf('ابني عند مواد اي النهاردة')).toBe('timetable');
+    expect(topicOf('عنده ماده ايه بكره؟')).toBe('timetable');
+    expect(topicOf('بياخد إيه النهارده؟')).toBe('timetable');
+    expect(topicOf('الدروس بكرة إيه؟')).toBe('timetable');
     expect(topicOf('What is the capital of France?')).toBe('help');
     // Egyptian colloquial questions (the reply is still fusha)
     expect(topicOf('فاضل علينا كام فلوس؟')).toBe('fees');

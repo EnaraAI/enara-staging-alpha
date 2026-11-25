@@ -38,7 +38,8 @@ const TOPICS: [Topic, RegExp][] = [
   ['fees', /\b(fee|fees|instal+ments?|tuition|pay|paid|payment|due|owe|receipt)\b|مصروف|مصاريف|رسوم|قسط|أقساط|اقساط|دفع|سداد|مستحق|إيصال|ايصال|فلوس|ندفع|هندفع|هدفع|باقي علي|فاضل علي/i],
   ['buses', /\b(bus|buses|pick ?up|drop ?off|stop|route|driver|supervisor)\b|حافلة|الحافلة|باص|أتوبيس|اتوبيس|أوتوبيس|اوتوبيس|محطة|سائق|السواق|سواق|مشرف/i],
   ['attendance', /\b(absent|absence|attendance|late|present|missed school)\b|غياب|غائب|حضور|تأخر|تأخير|متأخر|غاب|غابت|مجاش|ماجاش|ما جاش|مجتش|ماجتش|مراحش|ما راحش|مراحتش|اتأخر|اتأخرت|إتأخر/i],
-  ['timetable', /\b(timetable|schedule|class(es)?|lesson|period|subject)\b|جدول|حصة|حصص|مادة|المواد|الحصه|حصه/i],
+  // Egyptian forms too: «عنده مواد إيه النهارده», «بياخد إيه بكرة», «الدروس»: a parent's question about classes is a timetable question.
+  ['timetable', /\b(timetable|schedule|class(es)?|lesson|period|subject)\b|جدول|حصة|حصص|مادة|ماده|مواد|المواد|الحصه|حصه|دروس|الدروس|درس|بياخد|هياخد|بيدرس|هيدرس|بتاخد|هتاخد/i],
   ['consents', /\b(consent|sign|permission|form)\b|موافقة|توقيع|نموذج|إذن/i],
   ['requests', /\b(request|certificate|meeting|leave early|early leave)\b|طلب|طلبات|شهادة|شهاده|مقابلة|مقابله|انصراف|أقابل|اقابل|بدري/i],
   ['announcements', /\b(announcement|news|event|trip|notice)\b|إعلان|إعلانات|اعلان|خبر|رحلة/i],
