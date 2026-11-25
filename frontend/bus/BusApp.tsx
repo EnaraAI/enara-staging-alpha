@@ -24,6 +24,7 @@ const T = {
     noticeSent: 'Parents were told.', end: 'End trip', endConfirm: 'End the trip and stop sharing your location?', ended: 'Trip ended. Location sharing stopped.', endsBy: (t: string) => `Stops by itself at ${t}`,
     signOut: 'Sign out of this phone', signedOut: 'Signed out by the school. Ask the office for a new code.', privacy: 'Your location is shared only during a trip, only with parents of children on this bus, and deleted when the trip ends.',
     accuracy: (m: number) => `accuracy about ${m} m`, lang: 'العربية',
+    noRoutes: 'No bus route is assigned to you yet. Ask the school office to assign your route in the Bus supervisors tab, then tap Refresh.', refresh: 'Refresh',
   },
   ar: {
     title: 'حافلة إنارة', signInTitle: 'دخول مشرف الحافلة', signInBody: 'اكتب الرمز الذي أعطته لك المدرسة. يبدو هكذا: BUS-ABCD-EFGH. سيتذكرك هذا الهاتف.',
@@ -36,6 +37,7 @@ const T = {
     noticeSent: 'تم إبلاغ أولياء الأمور.', end: 'إنهاء الرحلة', endConfirm: 'إنهاء الرحلة وإيقاف مشاركة موقعك؟', ended: 'انتهت الرحلة وتوقفت مشاركة الموقع.', endsBy: (t: string) => `تتوقف تلقائيًا الساعة ${t}`,
     signOut: 'الخروج من هذا الهاتف', signedOut: 'أخرجتك المدرسة. اطلب رمزًا جديدًا من المكتب.', privacy: 'يُشارك موقعك أثناء الرحلة فقط، ومع أولياء أمور أطفال هذه الحافلة فقط، ويُحذف عند انتهاء الرحلة.',
     accuracy: (m: number) => `الدقة نحو ${m} م`, lang: 'English',
+    noRoutes: 'لم يُخصَّص لك خط سير بعد. اطلب من مكتب المدرسة تخصيص خطك من صفحة مشرفي الحافلات، ثم اضغط تحديث.', refresh: 'تحديث',
   },
 };
 
@@ -83,6 +85,12 @@ const BusApp: React.FC = () => {
           {!me.liveOn && <p className="bus-warn" data-testid="bus-off">{t.off}</p>}
           {me.liveOn && !me.inWindowNow && <p className="bus-warn" data-testid="bus-hours">{t.hours(me.windows.map((w) => `${w.from}–${w.to}`).join(', '))}</p>}
           <h2 className="bus-h2">{t.routes}</h2>
+          {me.routes.length === 0 && (
+            <div className="bus-warn" role="status" data-testid="bus-no-routes">
+              <p style={{ margin: 0 }}>{t.noRoutes}</p>
+              <button type="button" className="bus-btn" style={{ marginBlockStart: 10, inlineSize: '100%' }} onClick={() => void refresh()}>{t.refresh}</button>
+            </div>
+          )}
           {me.routes.map((r) => (
             <section key={r.routeKey} className="bus-card" data-testid="bus-route" data-route={r.routeKey}>
               <b className="bus-route" dir="auto">{r.routeName}{r.busNumber ? ` · ${r.busNumber}` : ''}</b>
