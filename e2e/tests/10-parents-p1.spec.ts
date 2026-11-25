@@ -62,6 +62,9 @@ test.describe.serial('10 · Parents P1: code-first entry, two children in two sc
     await page.goto(`${ENARA}/parents`);
     const start = page.getByTestId('parent-code-start');
     await expect(start).toBeVisible();
+    // Glow logo (owner "go" 25 Nov 2026): "Enara Parents" on the welcome card; the parents icon and manifest are served.
+    await expect(start.getByTestId('glow-logo-parents')).toBeVisible();
+    for (const f of ['/parents-icon.svg', '/parents.webmanifest']) expect((await page.request.get(`${ENARA}${f}`)).status()).toBe(200);
     await expect(start.getByTestId('secret-code-warning')).toContainText("This code is secret. Anyone who has it can see your child's data. Don't share it.");
     await expect(page.getByTestId('parent-have-account')).toHaveText(/Already have an account\? Sign in with your email first/);
     await shot(page, '10-parents-code-entry');
@@ -74,6 +77,7 @@ test.describe.serial('10 · Parents P1: code-first entry, two children in two sc
     await start.getByRole('button', { name: 'Yes, open ENARA Parents' }).click();
     await expect(chips(page)).toHaveCount(1, { timeout: 30_000 });
     await expect(chips(page).first()).toContainText(state.firstA!);
+    await expect(page.locator('.pp-header').getByRole('img', { name: 'Enara Parents' })).toBeVisible();
     expect(page.url()).toBe(`${ENARA}/parents`);
     const device = await page.evaluate(() => localStorage.getItem('enara_parent_device'));
     expect(device).toMatch(/^pds_/);
