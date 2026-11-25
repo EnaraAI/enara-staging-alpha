@@ -17,6 +17,11 @@ describe('topics and request offers (English and Arabic)', () => {
     expect(topicOf('متى يصل الباص؟')).toBe('buses');
     expect(topicOf('Was he absent this week?')).toBe('attendance');
     expect(topicOf('ما هو جدول الحصص اليوم؟')).toBe('timetable');
+    // Owner's walk, 25 Nov 2026: «مواد» without «ال» and other Egyptian ways to ask about today's classes.
+    expect(topicOf('ابني عند مواد اي النهاردة')).toBe('timetable');
+    expect(topicOf('عنده ماده ايه بكره؟')).toBe('timetable');
+    expect(topicOf('بياخد إيه النهارده؟')).toBe('timetable');
+    expect(topicOf('الدروس بكرة إيه؟')).toBe('timetable');
     expect(topicOf('What is the capital of France?')).toBe('help');
     // Egyptian colloquial questions (the reply is still fusha)
     expect(topicOf('فاضل علينا كام فلوس؟')).toBe('fees');
@@ -73,6 +78,11 @@ describe('the model reply checks', () => {
   it('refuses a reply in the wrong language, and colloquial Arabic', () => {
     expect(checkModelReply('{"answer":"المتبقي 30000 جنيه.","sources":["fees"]}', ctx, 'How much is left?').refused).toBe('wrong_language');
     expect(checkModelReply('{"answer":"Omar has 30,000 EGP remaining.","sources":["fees"]}', ctx, 'كم المتبقي؟').refused).toBe('wrong_language');
+    // An Arabic timetable answer keeps the school's English subject and teacher names (owner's walk, 25 Nov 2026).
+    const tt: ChatContext = { ...ctx, facts: [...ctx.facts, { source: 'timetable', updatedAt: '2026-11-25T08:00:00.000Z', data: { days: [{ day: 3, periods: [{ subject: 'Maths', teacher: 'Ms Salma', room: '12' }, { subject: 'English', teacher: 'Mr Adel', room: '7' }, { subject: 'Science', teacher: 'Ms Mona', room: 'Lab 2' }] }] } }] };
+    expect(checkModelReply('{"answer":"حصص Omar اليوم الأربعاء: Maths مع Ms Salma، ثم English مع Mr Adel، ثم Science مع Ms Mona في Lab 2.","sources":["timetable"]}', tt, 'ابني عند مواد اي النهاردة').refused).toBeUndefined();
+    // English words that are not in the school's data still count: a reply that is really English is still refused.
+    expect(checkModelReply('{"answer":"Today Omar has Maths, then English and Science with his teachers.","sources":["timetable"]}', tt, 'ابني عند مواد اي النهاردة').refused).toBe('wrong_language');
     expect(checkModelReply('{"answer":"يصل الباص الساعة 7.","sources":[]}', ctx, 'متى يصل 7؟').refused).toBe('colloquial');
     expect(checkModelReply('{"answer":"المتبقي من الرسوم 30,000 جنيه.","sources":["fees"]}', ctx, 'كم المتبقي من الرسوم؟')).toMatchObject({ sources: ['fees'] });
   });
