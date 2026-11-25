@@ -27,6 +27,7 @@ const TEXT = {
     pins: 'Stops on the map', pinHelp: 'Pick a stop, then tap its place on the map. Parents see their stop and an arrival estimate.', route: 'Route', clearPin: 'Clear pin', pinned: 'on the map', notPinned: 'not on the map',
     running: 'Running now', none: 'No trip is running.', stopTrip: 'Stop trip', confirmStop: 'Stop this trip? Location sharing ends now.', lastUpdate: (s: string) => `last update ${s}`, noPos: 'no position yet',
     history: 'Trip history', started: 'Started', ended: 'Ended', who: 'Supervisor', how: { ended: 'ended by supervisor', auto: 'stopped after 2 hours', admin: 'stopped by the school', off: 'live map switched off' } as Record<string, string>,
+    noRoute: 'No route yet: this supervisor sees nothing until you tick a route (Edit routes).', pickRoute: 'Tick at least one route.',
     morning: 'Morning', afternoon: 'Afternoon', failed: 'Something went wrong. Try again.', loading: 'Loading…', mapAria: 'Map',
   },
   ar: {
@@ -41,6 +42,7 @@ const TEXT = {
     pins: 'المحطات على الخريطة', pinHelp: 'اختر محطة ثم اضغط مكانها على الخريطة. يرى أولياء الأمور محطتهم والوقت المتوقع للوصول.', route: 'الخط', clearPin: 'إزالة الدبوس', pinned: 'على الخريطة', notPinned: 'ليست على الخريطة',
     running: 'الرحلات الجارية', none: 'لا توجد رحلة جارية.', stopTrip: 'إيقاف الرحلة', confirmStop: 'إيقاف هذه الرحلة؟ تتوقف مشاركة الموقع الآن.', lastUpdate: (s: string) => `آخر تحديث ${s}`, noPos: 'لا موقع بعد',
     history: 'سجل الرحلات', started: 'البداية', ended: 'النهاية', who: 'المشرف', how: { ended: 'أنهاها المشرف', auto: 'توقفت بعد ساعتين', admin: 'أوقفتها المدرسة', off: 'أُوقفت الخريطة المباشرة' } as Record<string, string>,
+    noRoute: 'لا خط بعد: لن يرى هذا المشرف شيئًا حتى تختار خطًا (تعديل الخطوط).', pickRoute: 'اختر خطًا واحدًا على الأقل.',
     morning: 'الذهاب', afternoon: 'العودة', failed: 'حدث خطأ. حاول مرة أخرى.', loading: 'جارٍ التحميل…', mapAria: 'خريطة',
   },
 };
@@ -136,7 +138,8 @@ const Supervisors: React.FC<P> = ({ t, lang = 'en', v, act = async () => undefin
           </div>
           {editing === s.id ? (
             <div className="flex flex-wrap gap-3">{v.routes.map((r) => <label key={r.routeKey} className="flex items-center gap-2 text-sm"><input type="checkbox" checked={s.routeKeys.includes(r.routeKey)} onChange={() => void act(() => apiRequest('PUT', `/api/school-app/bus-live/supervisors/${encodeURIComponent(s.id)}`, { routeKeys: toggle(s.routeKeys, r.routeKey) }))} /><span dir="auto">{r.routeName}</span></label>)}</div>
-          ) : <p className="text-sm text-slate-700" dir="auto">{t.assign}: {s.routeKeys.map(routeName).join('، ') || '—'}</p>}
+          ) : s.routeKeys.length ? <p className="text-sm text-slate-700" dir="auto">{t.assign}: {s.routeKeys.map(routeName).join('، ')}</p>
+            : <p className="rounded-lg bg-amber-50 p-2 text-sm text-amber-900" data-testid="bus-sup-no-route">{t.noRoute}</p>}
         </article>
       ))}
       {code && (
@@ -154,7 +157,8 @@ const Supervisors: React.FC<P> = ({ t, lang = 'en', v, act = async () => undefin
           <label className="text-sm">{t.phone}<input className={field} dir="ltr" value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value })} maxLength={30} data-testid="bus-sup-phone" /></label>
         </div>
         <fieldset className="flex flex-wrap gap-3"><legend className="text-sm">{t.assign}</legend>{v.routes.map((r) => <label key={r.routeKey} className="flex items-center gap-2 text-sm"><input type="checkbox" checked={f.routeKeys.includes(r.routeKey)} onChange={() => setF({ ...f, routeKeys: toggle(f.routeKeys, r.routeKey) })} data-testid={`bus-sup-route-${r.routeKey}`} /><span dir="auto">{r.routeName}</span></label>)}</fieldset>
-        <button type="submit" className={primary} data-testid="bus-sup-add">{t.add}</button>
+        {f.routeKeys.length === 0 && v.routes.length > 0 && <p className="text-xs text-amber-800">{t.pickRoute}</p>}
+        <button type="submit" className={primary} disabled={f.routeKeys.length === 0 && v.routes.length > 0} data-testid="bus-sup-add">{t.add}</button>
       </form>
     </section>
   );
