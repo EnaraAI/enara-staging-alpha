@@ -9,7 +9,7 @@ import { shadowReport } from '../services/enrollmentShadowReport';
 import { cleanDanglingClassMembers, planDanglingClassMembers } from '../services/danglingClassMembers';
 import { maintenanceAllowed, maintenanceAuthorised } from './guards';
 import { seedLmsTest } from './lmsTestSeed';
-import { fullSeedStatus, removeFullSeed, runFullSeed, runSchoolAppSeed, SeedRefused } from './fullSeed/run';
+import { fullSeedStatus, removeFullSeed, runFamilySeed, runFullSeed, runSchoolAppSeed, SeedRefused } from './fullSeed/run';
 import { mockLmsRouter } from './mockLms';
 import { runHealthCheck, setupHealthCheck } from './healthCheck';
 import { avatarUsageReport, parseAvatarIds } from './avatarUsageReport';
@@ -126,12 +126,20 @@ router.post('/full-seed', async (req, res, next) => {
       res.json(out);
       return;
     }
+    // The family account (owner "go" 25 Nov 2026): run-family (the parent's password in the body, never logged), remove-family, family-status.
+    if (action === 'family-status') { const { FAMILY_BATCH } = await import('./fullSeed/familyPlan'); res.json(await fullSeedStatus(FAMILY_BATCH)); return; }
+    if (action === 'remove-family') { const { FAMILY_BATCH } = await import('./fullSeed/familyPlan'); const out = await removeFullSeed(FAMILY_BATCH); logger.info('maintenance_family_seed_remove', { registryRowsDeleted: out.registryRowsDeleted }); res.json(out); return; }
+    if (action === 'run-family') {
+      try { const out = await runFamilySeed(String((req.body as { password?: unknown })?.password ?? '')); logger.info('maintenance_family_seed', { counts: out.counts }); res.json(out); }
+      catch (e) { if (e instanceof SeedRefused) { res.status(409).json({ error: e.message }); return; } throw e; }
+      return;
+    }
     if (action === 'run-school-app') {
       try { const out = await runSchoolAppSeed(); logger.info('maintenance_full_seed_school_app', { counts: out.counts }); res.json(out); }
       catch (e) { if (e instanceof SeedRefused) { res.status(409).json({ error: e.message }); return; } throw e; }
       return;
     }
-    if (action !== 'run') { res.status(400).json({ error: "action must be 'run', 'run-school-app', 'remove' or 'status'" }); return; }
+    if (action !== 'run') { res.status(400).json({ error: "action must be 'run', 'run-school-app', 'remove', 'status', 'run-family', 'remove-family' or 'family-status'" }); return; }
     try {
       const out = await runFullSeed();
       logger.info('maintenance_full_seed_run', { total: out.total });

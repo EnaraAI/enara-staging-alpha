@@ -16,7 +16,7 @@ export type ModelName =
   | 'ParentLearnerLink' | 'ParentLinkCode' | 'Invitation' | 'LmsOnboarding' | 'Assessment' | 'AssessmentVersion' | 'Assignment' | 'AssessmentAttempt'
   | 'GradeLedgerEntry' | 'LessonProgress' | 'ErrorToWorkOn' | 'SessionSummary' | 'LearnerProfile' | 'StudyHabitDaily' | 'ReviewItem'
   | 'StudentObjectiveMastery' | 'TutorSession' | 'TutorMessage' | 'AvatarSession' | 'LearningEvent' | 'UsageLedger' | 'ParentEmailSend' | 'ReminderLog'
-  | 'SchoolTimetableEntry' | 'SchoolDailyAttendance' | 'SchoolAnnouncement' | 'SchoolImport' | 'ParentNotification' | 'SchoolInstalment' | 'SchoolBusRoute' | 'SchoolBusAssignment' | 'SchoolBusNotice' | 'SchoolRequest' | 'SchoolConsentForm' | 'SchoolConsent';
+  | 'SchoolTimetableEntry' | 'SchoolDailyAttendance' | 'SchoolAnnouncement' | 'SchoolImport' | 'ParentNotification' | 'SchoolInstalment' | 'SchoolBusRoute' | 'SchoolBusAssignment' | 'SchoolBusNotice' | 'SchoolRequest' | 'SchoolConsentForm' | 'SchoolConsent' | 'BusHome' | 'BusLiveSettings';
 export interface PlannedDoc { model: ModelName; key: string; doc: Record<string, unknown> }
 export interface SeedUser { key: string; role: string; name: string; email: string; schoolId?: string; school?: string; state: string; userId: string }
 /** A parent link code a parent can type (owner, 22 Nov 2026: "write their codes and link those codes to the students accounts"). */
@@ -38,8 +38,21 @@ function rng(seed: number) {
   return () => { a = (a + 0x6d2b79f5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 }
 
-export function buildPlan(now: Date): FullSeedPlan {
-  const R = rng(20261122);
+/** One planned family (familyPlan.ts): its parent and children, put in the first school of the run. */
+export interface PlannedFamily {
+  family: string;
+  parent: { first: string; last: string; sex: 'm' | 'f'; email: string };
+  kids: { first: string; sex: 'm' | 'f'; group: string; ability: number }[];
+  /** The mark of a family child for one subject and assignment (1..5), and whether it waits for the teacher; null: not submitted. */
+  mark: (first: string, subject: SubjectKey, assignment: number) => { score: number; waiting: boolean } | null;
+}
+export interface PlanOptions { schools?: SchoolDef[]; seed?: number; emailDomain?: string; family?: PlannedFamily }
+
+export function buildPlan(now: Date, opts: PlanOptions = {}): FullSeedPlan {
+  const R = rng(opts.seed ?? 20261122);
+  const SCHOOL_LIST = opts.schools ?? SCHOOLS;
+  const FAM = opts.family;
+  const famKid = (s: { first: string; family: string }) => (FAM && s.family === FAM.family ? FAM.kids.find((k) => k.first === s.first) : undefined);
   const pick = <T>(xs: readonly T[]) => xs[Math.floor(R() * xs.length)];
   const int = (lo: number, hi: number) => lo + Math.floor(R() * (hi - lo + 1));
   const DAY = 86_400_000;
@@ -51,8 +64,9 @@ export function buildPlan(now: Date): FullSeedPlan {
   const usedEmails = new Set<string>(); const usedNames = new Set<string>();
   const slug = (s: string) => s.toLowerCase().normalize('NFKD').replace(/[^a-z]+/g, '');
   const emailFor = (first: string, last: string) => {
-    const base = `${slug(first)}.${slug(last)}`; let e = `${base}@${EMAIL_DOMAIN}`; let n = 2;
-    while (usedEmails.has(e)) e = `${base}${n++}@${EMAIL_DOMAIN}`;
+    const domain = opts.emailDomain ?? EMAIL_DOMAIN;
+    const base = `${slug(first)}.${slug(last)}`; let e = `${base}@${domain}`; let n = 2;
+    while (usedEmails.has(e)) e = `${base}${n++}@${domain}`;
     usedEmails.add(e); return e;
   };
   const person = (sex?: 'm' | 'f', family?: string, intlChance = 0.12): { first: string; last: string; sex: 'm' | 'f' } => {
@@ -74,13 +88,14 @@ export function buildPlan(now: Date): FullSeedPlan {
   };
 
   // ---------------------------------------------------------------- platform
-  user('platform.admin', { first: 'Mariam', last: 'Shawky' }, 'enara-admin', 'active platform admin', undefined, {}, ago(90));
+  if (!FAM) user('platform.admin', { first: 'Mariam', last: 'Shawky' }, 'enara-admin', 'active platform admin', undefined, {}, ago(90));
   usedNames.add('mariam shawky');
+  if (FAM) { usedNames.add(`${FAM.parent.first} ${FAM.parent.last}`.toLowerCase()); for (const k of FAM.kids) usedNames.add(`${k.first} ${FAM.family}`.toLowerCase()); }
 
   interface StudentRec { key: string; id: string; userId: string; name: string; first: string; family: string; school: SchoolDef; group: string; age: number; ability: number; classes: string[]; archived: boolean; state: string; kids: boolean }
   const allStudents: StudentRec[] = [];
 
-  for (const [si, school] of SCHOOLS.entries()) {
+  for (const [si, school] of SCHOOL_LIST.entries()) {
     const S = school.id.replace('SCH-', '');
     const created = ago(school.createdDaysAgo, 9);
     // ---------------------------------------------------------------- staff
@@ -150,6 +165,13 @@ export function buildPlan(now: Date): FullSeedPlan {
     // ---------------------------------------------------------------- students (families first, so siblings share a family name)
     const seats = new Map(school.groups.map((g) => [g.key, g.size]));
     const families: { family: string; kids: { group: string; age: number; p: { first: string; last: string; sex: 'm' | 'f' } }[]; intl: boolean }[] = [];
+    // The planned family comes first, in the first school of the run.
+    if (FAM && si === 0) {
+      families.push({ family: FAM.family, intl: false, kids: FAM.kids.map((k) => {
+        const g = school.groups.find((x) => x.key === k.group)!; seats.set(g.key, seats.get(g.key)! - 1);
+        return { group: g.key, age: g.age, p: { first: k.first, last: FAM.family, sex: k.sex } };
+      }) });
+    }
     while ([...seats.values()].some((n) => n > 0)) {
       const intl = R() < 0.12; const base = intl ? pick(INTL) : null; const family = base ? base[1] : pick(FAMILY);
       const want = school.adultLearners ? 1 : R() < 0.55 ? 1 : R() < 0.75 ? 2 : 3;
@@ -166,7 +188,8 @@ export function buildPlan(now: Date): FullSeedPlan {
     let n = 0; const schoolStudents: StudentRec[] = [];
     for (const f of families) for (const k of f.kids) {
       n += 1; const id = `STU-${S}-${String(n).padStart(3, '0')}`; const key = `${S}.s${n}`;
-      const ability = Math.min(0.97, Math.max(0.25, 0.45 + R() * 0.55 - (R() < 0.18 ? 0.25 : 0)));
+      const drawn = Math.min(0.97, Math.max(0.25, 0.45 + R() * 0.55 - (R() < 0.18 ? 0.25 : 0)));
+      const ability = (FAM && f.family === FAM.family ? FAM.kids.find((x) => x.first === k.p.first)?.ability : undefined) ?? drawn;
       const status = ability > 0.82 ? 'excelling' : ability < 0.5 ? 'at risk' : 'on track';
       const band = k.age < 13 ? 'child' : k.age < 18 ? 'teen' : 'adult'; const kidsMode = k.age < 9;
       const birth = new Date(Date.UTC(now.getUTCFullYear() - k.age, int(0, 11), int(1, 28)));
@@ -246,18 +269,22 @@ export function buildPlan(now: Date): FullSeedPlan {
       for (const f of families) {
         fi += 1;
         const kids = schoolStudents.filter((s) => s.family === f.family && f.kids.some((k) => `${k.p.first} ${k.p.last}` === s.name));
-        const roll = R(); const nParents = roll < 0.15 ? 0 : roll < 0.78 ? 1 : 2;
+        const planned = !!FAM && f.family === FAM.family;
+        const roll = R(); const nParents = planned ? 1 : roll < 0.15 ? 0 : roll < 0.78 ? 1 : 2;
         for (let pi = 0; pi < nParents; pi++) {
-          const key = `${S}.p${fi}${pi ? 'b' : ''}`; const p = person(pi === 0 ? (R() < 0.6 ? 'f' : 'm') : 'm', f.family, 0);
-          const verified = R() < 0.8; const signIn = verified && R() < 0.7 ? 'password' : 'code';
+          const key = `${S}.p${fi}${pi ? 'b' : ''}`; const p = planned ? { first: FAM!.parent.first, last: FAM!.parent.last, sex: FAM!.parent.sex } : person(pi === 0 ? (R() < 0.6 ? 'f' : 'm') : 'm', f.family, 0);
+          const verified = planned || R() < 0.8; const signIn = planned ? 'password' : verified && R() < 0.7 ? 'password' : 'code';
           const linkedAt = ago(int(14, 50), 18);
           const u = user(key, p, 'parent', '', undefined, {}, linkedAt);
+          if (planned) { // the family's parent signs in with this email
+            const ud = docs.find((d) => d.model === 'User' && d.key === key)!; ud.doc.email = FAM!.parent.email; u.email = FAM!.parent.email; users[users.length - 1].email = FAM!.parent.email;
+          }
           add('ParentProfile', key, { userId: u.id, language: school.emailLanguage, alertChannels: ['email'], failedRedeems: 0, signIn, ...(verified ? { emailVerifiedAt: linkedAt } : {}), emailPrefs: { weeklySummary: true, newResults: true }, createdAt: linkedAt, updatedAt: linkedAt });
           const linkStates: string[] = [];
           for (const [ci, s] of kids.entries()) {
-            const r2 = R(); const status = s.archived ? 'ended' : r2 < 0.06 ? 'pending' : r2 < 0.09 ? 'ended' : 'active';
+            const r2 = R(); const status = planned ? 'active' : s.archived ? 'ended' : r2 < 0.06 ? 'pending' : r2 < 0.09 ? 'ended' : 'active';
             const consent = status === 'pending' ? 'pending' : s.age < 13 ? 'captured' : 'not_required';
-            add('ParentLearnerLink', `${key}:${s.id}`, { id: `pl-${key.toLowerCase().replace(/\./g, '-')}-${s.id.toLowerCase()}`, parentUserId: u.id, studentId: s.id, institutionId: school.id, role: pi === 0 ? (ci === 0 && R() < 0.05 ? 'view' : 'owner') : 'full', status, consent,
+            add('ParentLearnerLink', `${key}:${s.id}`, { id: `pl-${key.toLowerCase().replace(/\./g, '-')}-${s.id.toLowerCase()}`, parentUserId: u.id, studentId: s.id, institutionId: school.id, role: pi === 0 ? (ci === 0 && R() < 0.05 && !planned ? 'view' : 'owner') : 'full', status, consent,
               ...(status === 'ended' ? { endedAt: ago(9), endReason: s.archived ? 'left_school' : 'unlinked_by_parent', endedBy: s.archived ? admin.id : u.id } : {}), learnerNotifiedAt: linkedAt, createdAt: linkedAt, updatedAt: status === 'ended' ? ago(9) : linkedAt });
             if (status === 'active') activeLinks.push({ parentUserId: u.id, studentId: s.id, institutionId: school.id });
             if (status !== 'ended') parentsOf.set(s.id, [...(parentsOf.get(s.id) ?? []), `${u.email}${status === 'pending' ? ' (pending)' : ''}`]);
@@ -311,25 +338,35 @@ export function buildPlan(now: Date): FullSeedPlan {
           }
         }
         // Assignments: two closed (weeks 6 and 3), one open now.
-        const plans: [number, number, number, 'closed' | 'published'][] = [[1, 44, 37, 'closed'], [2, 23, 16, 'closed'], [3, 4, -4, 'published']];
+        // The family's school: five assignments a subject (four marked, one open), so a parent sees a trend.
+        const plans: [number, number, number, 'closed' | 'published'][] = FAM && si === 0
+          ? [[1, 52, 46, 'closed'], [2, 40, 34, 'closed'], [3, 28, 22, 'closed'], [4, 16, 10, 'closed'], [5, 4, -4, 'published']]
+          : [[1, 44, 37, 'closed'], [2, 23, 16, 'closed'], [3, 4, -4, 'published']];
         for (const [qi, openAgo, dueAgo, state] of plans) {
-          const asg = `ASG-${cid}-${qi}`; const quiz = sub.quizzes[qi - 1];
+          const asg = `ASG-${cid}-${qi}`; const base0 = sub.quizzes[(qi - 1) % sub.quizzes.length];
+          const quiz = qi <= sub.quizzes.length ? base0 : { ...base0, title: `${base0.title}: unit ${qi}` };
+          const asId = `AS-${S}-${k}-${((qi - 1) % sub.quizzes.length) + 1}`;
           if (s === schoolStudents.find((x) => x.classes.includes(cid))) {
-            add('Assignment', asg, { id: asg, institutionId: school.id, assessmentId: `AS-${S}-${k}-${qi}`, assessmentVersion: 1, title: quiz.title, classId: cid, state, opensAt: ago(openAgo, 8), dueAt: ago(dueAgo, 21), timeZone: 'Africa/Cairo', latePolicy: 'not_accepted',
-              maxAttempts: qi === 3 ? 2 : 1, releasePolicy: school.releasePolicy, answerReveal: 'after-close', tutorPolicy: 'hints_only', assessmentKind: qi === 3 ? 'practice' : 'quiz', format: 'written', extensions: [], createdBy: uid(cls.teacher),
+            add('Assignment', asg, { id: asg, institutionId: school.id, assessmentId: asId, assessmentVersion: 1, title: quiz.title, classId: cid, state, opensAt: ago(openAgo, 8), dueAt: ago(dueAgo, 21), timeZone: 'Africa/Cairo', latePolicy: 'not_accepted',
+              maxAttempts: qi === plans.length ? 2 : 1, releasePolicy: school.releasePolicy, answerReveal: 'after-close', tutorPolicy: 'hints_only', assessmentKind: qi === plans.length ? 'practice' : 'quiz', format: 'written', extensions: [], createdBy: uid(cls.teacher),
               history: [{ at: ago(openAgo + 1, 9), by: uid(cls.teacher), action: 'published' }, ...(state === 'closed' ? [{ at: ago(dueAgo, 21), by: 'system', action: 'closed' }] : [])], origin: 'live', createdAt: ago(openAgo + 1, 9), updatedAt: ago(Math.max(dueAgo, 0), 21) });
           }
           if (s.archived && dueAgo < 10) continue;
+          const fk = famKid(s); const planned = fk ? FAM!.mark(s.first, k, qi) : undefined;
           const submits = state === 'closed' ? R() < (0.75 + s.ability * 0.22) : R() < 0.6;
-          if (!submits) continue;
+          if (fk ? !planned : !submits) continue;
           const sub0 = past(Math.max(dueAgo + int(0, 3), 0), int(16, 21), int(0, 59));
-          const answers = quiz.questions.map((q) => { const right = R() < s.ability; return { questionId: q.id, questionText: q.text, studentAnswer: right ? q.correctAnswer : q.wrong, correctAnswer: q.correctAnswer, isCorrect: right, points: right ? 1 : 0, maxPoints: 1, method: 'rule' }; });
-          const pts = answers.filter((a) => a.isCorrect).length; const score = Math.round((pts / answers.length) * 100);
+          let answers = quiz.questions.map((q) => { const right = R() < s.ability; return { questionId: q.id, questionText: q.text, studentAnswer: right ? q.correctAnswer : q.wrong, correctAnswer: q.correctAnswer, isCorrect: right, points: right ? 1 : 0, maxPoints: 1, method: 'rule' }; });
+          if (planned) { // the planned mark: whole questions right, the rest as part marks, so points and percent agree
+            let left = (planned.score / 100) * answers.length;
+            answers = answers.map((a, ai) => { const q = quiz.questions[ai]; const got = Math.round(Math.min(1, Math.max(0, left)) * 100) / 100; left -= got; const right = got >= 1; return { ...a, studentAnswer: right ? q.correctAnswer : q.wrong, isCorrect: right, points: got }; });
+          }
+          const pts = Math.round(answers.reduce((n, a) => n + a.points, 0) * 100) / 100; const score = planned ? planned.score : Math.round((pts / answers.length) * 100);
           // Waiting for review: the open assignment in schools that release by hand, and some of the second one there.
-          const waiting = school.releasePolicy === 'manual' && (qi === 3 || (qi === 2 && R() < 0.25));
-          const gradingStatus = waiting ? (qi === 3 && R() < 0.5 ? 'needs_review' : 'graded_draft') : 'released';
+          const waiting = planned ? planned.waiting : school.releasePolicy === 'manual' && (qi === plans.length || (qi === 2 && R() < 0.25));
+          const gradingStatus = waiting ? (planned ? 'needs_review' : qi === plans.length && R() < 0.5 ? 'needs_review' : 'graded_draft') : 'released';
           const attId = `ATT-${cid}-${qi}-${s.id}`;
-          add('AssessmentAttempt', attId, { id: attId, assessmentId: `AS-${S}-${k}-${qi}`, assessmentTitle: quiz.title, subject: sub.subject, studentId: s.id, institutionId: school.id, status: 'submitted', answers, score, startedAt: new Date(sub0.getTime() - int(6, 14) * 60_000), submittedAt: sub0,
+          add('AssessmentAttempt', attId, { id: attId, assessmentId: asId, assessmentTitle: quiz.title, subject: sub.subject, studentId: s.id, institutionId: school.id, status: 'submitted', answers, score, startedAt: new Date(sub0.getTime() - int(6, 14) * 60_000), submittedAt: sub0,
             timeSpentSec: int(360, 840), assignmentId: `ASG-${cid}-${qi}`, assessmentVersion: 1, gradingStatus, totalPoints: pts, maxPoints: answers.length, ...(gradingStatus === 'released' ? { finalizedAt: sub0, releasedAt: school.releasePolicy === 'manual' ? ago(Math.max(dueAgo - 2, 0), 12) : sub0 } : {}),
             history: [{ at: sub0, by: s.userId, action: 'submitted' }], origin: 'live', createdAt: sub0, updatedAt: sub0 });
           add('GradeLedgerEntry', `${attId}:submitted`, { id: `gl-${oid(`gl:${attId}:s`)}`, institutionId: school.id, assignmentId: `ASG-${cid}-${qi}`, attemptId: attId, attemptNumber: 1, studentId: s.id, reason: 'submitted', actor: 'student', from: null, to: { points: pts, maxPoints: answers.length, percent: score, status: 'submitted' }, at: sub0, createdAt: sub0 });
@@ -337,14 +374,14 @@ export function buildPlan(now: Date): FullSeedPlan {
             const rel = school.releasePolicy === 'manual' ? ago(Math.max(dueAgo - 2, 0), 12) : sub0;
             add('GradeLedgerEntry', `${attId}:released`, { id: `gl-${oid(`gl:${attId}:r`)}`, institutionId: school.id, assignmentId: `ASG-${cid}-${qi}`, attemptId: attId, attemptNumber: 1, studentId: s.id, reason: 'released', actor: school.releasePolicy === 'manual' ? uid(cls.teacher) : 'system', from: { points: pts, maxPoints: answers.length, percent: score, status: 'finalized' }, to: { points: pts, maxPoints: answers.length, percent: score, status: 'released' }, at: rel, createdAt: rel });
           }
-          add('LearningEvent', `${attId}:ev`, { id: `lev-${oid(`lev:${attId}`)}`, institutionId: school.id, studentId: s.id, actorId: s.userId, type: 'assessment_submitted', source: 'assessment', verified: true, gradedBy: 'rule', conceptIds: [], subject: sub.subject, topic: quiz.title, refs: { courseId: k, assessmentId: `AS-${S}-${k}-${qi}`, attemptId: attId, assignmentId: `ASG-${cid}-${qi}` }, outcome: { score }, at: sub0, recordedAt: sub0, objectiveIds: [], schemaVersion: 1 });
+          add('LearningEvent', `${attId}:ev`, { id: `lev-${oid(`lev:${attId}`)}`, institutionId: school.id, studentId: s.id, actorId: s.userId, type: 'assessment_submitted', source: 'assessment', verified: true, gradedBy: 'rule', conceptIds: [], subject: sub.subject, topic: quiz.title, refs: { courseId: k, assessmentId: asId, attemptId: attId, assignmentId: `ASG-${cid}-${qi}` }, outcome: { score }, at: sub0, recordedAt: sub0, objectiveIds: [], schemaVersion: 1 });
           // Errors to work on from wrong answers in released results.
           if (gradingStatus === 'released' && pts < answers.length && R() < 0.8) {
             const e = sub.errors[(qi - 1) % sub.errors.length]; const eid = `ERR-${s.id}-${k}-${e.code}`;
             if (!docs.some((d) => d.model === 'ErrorToWorkOn' && d.key === eid)) {
               const resolved = s.ability > 0.7 && dueAgo > 20;
               add('ErrorToWorkOn', eid, { id: eid, institutionId: school.id, studentId: s.id, courseId: k, curriculumId: curId(k), objectiveId: `${curId(k)}-O${((qi - 1) % 3) + 1}`, errorCode: e.code, errorLabel: e.label,
-                sources: [{ kind: 'assignment_attempt', assessmentId: `AS-${S}-${k}-${qi}`, attemptId: attId, questionId: answers.find((a) => !a.isCorrect)!.questionId, at: sub0 }], occurrences: int(1, 3), firstSeenAt: sub0, lastSeenAt: sub0, status: resolved ? 'resolved' : 'open', rightStreak: resolved ? 2 : 0, countedKeys: [],
+                sources: [{ kind: 'assignment_attempt', assessmentId: asId, attemptId: attId, questionId: answers.find((a) => !a.isCorrect)!.questionId, at: sub0 }], occurrences: int(1, 3), firstSeenAt: sub0, lastSeenAt: sub0, status: resolved ? 'resolved' : 'open', rightStreak: resolved ? 2 : 0, countedKeys: [],
                 ...(resolved ? { resolvedAt: ago(dueAgo - 8, 17) } : { nextReviewAt: ago(-int(0, 4), 9), reviewStep: 1, lastWrongAt: sub0 }), statusHistory: [{ at: sub0, to: 'open' }, ...(resolved ? [{ at: ago(dueAgo - 8, 17), from: 'open', to: 'resolved', reason: 'right_twice' }] : [])], createdAt: sub0, updatedAt: resolved ? ago(dueAgo - 8, 17) : sub0 });
             }
           }
@@ -407,8 +444,8 @@ export function buildPlan(now: Date): FullSeedPlan {
   }
   // Parents school app (a5): timetables, attendance, announcements, notifications (own random stream; appended last).
   addSchoolAppSeed({
-    now, add: (m, k, d) => add(m, k, d), schools: SCHOOLS, students: allStudents.map((s) => ({ id: s.id, name: s.name, first: s.first, school: s.school, group: s.group, archived: s.archived })), links: activeLinks,
-    groupName: (gid) => { for (const sc of SCHOOLS) { const g = sc.groups.find((x) => `GRP-${sc.id.replace('SCH-', '')}-${x.key}` === gid); if (g) return g.name; } return gid; },
+    now, add: (m, k, d) => add(m, k, d), schools: SCHOOL_LIST, students: allStudents.map((s) => ({ id: s.id, name: s.name, first: s.first, school: s.school, group: s.group, archived: s.archived })), links: activeLinks,
+    groupName: (gid) => { for (const sc of SCHOOL_LIST) { const g = sc.groups.find((x) => `GRP-${sc.id.replace('SCH-', '')}-${x.key}` === gid); if (g) return g.name; } return gid; },
     adminOf: (schoolId) => uid(`${schoolId.replace('SCH-', '')}.admin`),
   });
   return { docs, users, codes };
