@@ -26,4 +26,4 @@ jobs:
         env:
           SEED_USER_PASSWORD: ${{ secrets.SEED_USER_PASSWORD }}
           LMSTEST_MAINTENANCE_TOKEN: ${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}
-        run: node deploy/lms-test/schoolchat/run.mjs
+        run: ONLY="$(sed -n 2p deploy/lms-test/schoolchat/trigger.txt)" node deploy/lms-test/schoolchat/run.mjs

@@ -29,11 +29,13 @@ for (const email of PARENTS) {
   if (!kid) { console.log('NO LEARNER', email.split('@')[0]); continue; }
   const bus = await (await fetch(`${SITE}/api/parents/school/learners/${encodeURIComponent(kid.studentId)}/bus`, { headers: H })).json().catch(() => ({}));
   console.log('CHILD', email.split('@')[0], kid.firstName, 'bus trips', (bus.trips ?? []).length);
-  for (const q of DEMO[email.split('@')[0]]) {
+  const only = (process.env.ONLY ?? '').trim();
+  const qs = only ? DEMO[email.split('@')[0]].filter((q) => q === only) : DEMO[email.split('@')[0]];
+  for (const q of qs) {
     const t = Date.now();
     const a = await fetch(`${SITE}/api/parents/school/learners/${encodeURIComponent(kid.studentId)}/chat`, { method: 'POST', headers: H, body: JSON.stringify({ message: q }), signal: AbortSignal.timeout(70_000) }).catch((e) => ({ status: 0, json: async () => ({ error: String(e.name) }) }));
     const b = await a.json().catch(() => ({}));
-    const row = { parent: email.split('@')[0], q, status: a.status, engine: b.engine ?? null, sources: (b.sources ?? []).map((s) => s.source), offer: b.offerRequest?.type ?? null, ms: Date.now() - t, answer: (b.answer ?? b.error ?? '').slice(0, 300) };
+    const row = { parent: email.split('@')[0], q, status: a.status, engine: b.engine ?? null, sources: (b.sources ?? []).map((s) => s.source), offer: b.offerRequest?.type ?? null, ms: Date.now() - t, answer: String(b.answer ?? b.error?.code ?? b.error ?? '').slice(0, 300) };
     out.push(row);
     console.log('Q', JSON.stringify(row));
   }
