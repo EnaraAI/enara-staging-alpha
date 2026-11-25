@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { apiUrl } from '../services/apiService';
+import { GlowLogo } from '../components/brand/GlowLogo';
 import './bus.css';
 
 // Live bus map: the bus supervisor's phone, at /bus. Sign in once with the code from the school (the phone keeps a bus token,
@@ -57,6 +58,15 @@ const BusApp: React.FC = () => {
   const [me, setMe] = useState<Me | null>(null);
   const [note, setNote] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  useEffect(() => {
+    const added: HTMLElement[] = [];
+    const add = (tag: string, attrs: Record<string, string>) => { const el = document.createElement(tag); Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v)); document.head.appendChild(el); added.push(el); };
+    add('link', { rel: 'manifest', href: '/bus.webmanifest' });
+    add('link', { rel: 'apple-touch-icon', href: '/bus-icon.svg' });
+    add('link', { rel: 'icon', type: 'image/svg+xml', href: '/bus-icon.svg' });
+    add('meta', { name: 'theme-color', content: '#0B203C' });
+    return () => { added.forEach((el) => el.remove()); };
+  }, []);
   useEffect(() => { document.documentElement.lang = lang; document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr'; document.title = t.title; write(LANG_KEY, lang); }, [lang, t.title]);
 
   const signOut = useCallback((msg?: string) => { write(TOKEN_KEY, null); setToken(null); setMe(null); if (msg) setNote(msg); }, []);
@@ -115,7 +125,7 @@ const BusApp: React.FC = () => {
 
 const Header: React.FC<{ t: (typeof T)['en']; onLang: () => void }> = ({ t, onLang }) => (
   <header className="bus-head">
-    <span className="bus-brand"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><rect x="4" y="3" width="16" height="15" rx="3" fill="#F5A524" /><rect x="6.5" y="5.5" width="11" height="5" rx="1.2" fill="#fff" /><circle cx="8" cy="15" r="1.3" fill="#0E2747" /><circle cx="16" cy="15" r="1.3" fill="#0E2747" /></svg>{t.title}</span>
+    <span className="bus-brand"><GlowLogo product="Bus" size={34} /></span>
     <button type="button" className="bus-lang" onClick={onLang}>{t.lang}</button>
   </header>
 );
