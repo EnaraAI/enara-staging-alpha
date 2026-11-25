@@ -1,6 +1,8 @@
 import React from 'react';
-import { weekdayIndex, type LearnerChip, type SchoolOverview, type WeeklyStatus } from '../api';
+import { cairoDate, schoolApi, weekdayIndex, type SubjectCard, type LearnerChip, type SchoolOverview, type WeeklyStatus } from '../api';
 import { Icon, useP } from '../ui';
+import { bi } from '../i18n';
+import { useLive } from '../useLive';
 import type { SchoolView } from './School';
 import { BusLiveCard } from './BusLive';
 import type { BusLive as BusLiveData } from '../api';
@@ -246,3 +248,64 @@ export function useWide(query = '(min-width: 1180px)'): boolean {
   }, [query]);
   return wide;
 }
+
+/** Follow-up (item 4): "Latest" on Today. Built only from real data: the school's notifications for this child and each subject's
+ * latest released result (Parents P3: a held result is never here). Newest first, four at most; "See all" opens the notifications. */
+export const Latest: React.FC<{ learner: LearnerChip; overview: SchoolOverview | null; subjects: SubjectCard[]; refreshKey: number; open: (v: SchoolView) => void }> = ({ learner, overview: o, subjects, refreshKey, open }) => {
+  const { t, n, lang } = useP();
+  const notesOn = !!o?.sections.notifications;
+  const q = useLive(() => (notesOn ? schoolApi.notifications().catch(() => null) : Promise.resolve(null)), [notesOn], refreshKey);
+  type Item = { key: string; at: string; tone: string; icon: string; tile?: string; kicker: string; title: string; body?: string };
+  const KIND: Record<string, { tone: string; icon: string }> = { absence: { tone: 'bad', icon: 'alert' }, late: { tone: 'warn', icon: 'nudge' }, announcement: { tone: 'info', icon: 'megaphone' }, fee_due: { tone: 'warn', icon: 'coin' }, bus_notice: { tone: 'sun', icon: 'bus' }, request_update: { tone: 'info', icon: 'inbox' }, consent: { tone: 'warn', icon: 'pen' } };
+  const items: Item[] = [
+    ...(q.data?.notifications ?? []).filter((x) => x.studentId === learner.studentId).map((x) => ({ key: `n-${x.id}`, at: x.createdAt, ...(KIND[x.kind] ?? { tone: 'info', icon: 'bell' }), kicker: t.ui.latestKind[x.kind] ?? t.sch.notifications, title: x.title, body: x.body })),
+    ...subjects.filter((s) => s.latestResult?.submittedAt).map((s) => ({ key: `r-${s.key}`, at: s.latestResult!.submittedAt!, tone: s.latestResult!.score >= 50 ? 'ok' : 'warn', icon: 'check', tile: `${n(s.latestResult!.score)}%`, kicker: `${t.ui.resultReleased} · ${bi(s.name, lang)}`, title: s.latestResult!.title })),
+  ].sort((a, b) => b.at.localeCompare(a.at)).slice(0, 4);
+  if (!items.length) return null;
+  return (
+    <div className="pp-block" data-testid="pp-latest">
+      <div className="pp-sec-h"><h2>{t.ui.latest}</h2>{notesOn && <button type="button" className="pp-linkbtn" onClick={() => open('notifications')}>{t.ui.seeAll}</button>}</div>
+      <section className="pp-card pp-card--flush pp-threads">
+        {items.map((x) => (
+          <div key={x.key} className="pp-ev">
+            {x.tile ? <span className={`pp-score pp-score--${x.tone}`}>{x.tile}</span> : <span className={`pp-ico pp-ico--${x.tone}`}><Icon name={x.icon} /></span>}
+            <div className="pp-ev-tx">
+              <span className="pp-meta">{x.kicker} · {cairoDate(x.at.slice(0, 10), lang)}</span>
+              <b dir="auto">{x.title}</b>
+              {x.body && <p dir="auto">{x.body}</p>}
+            </div>
+          </div>
+        ))}
+      </section>
+    </div>
+  );
+};
+
+/** Follow-up (item 5): the weekly report card on Progress, written from this week's real numbers (no AI): results released and
+ * waiting since the week began, points to practise, minutes against the goal. "Share this week" opens the share sheet. */
+export const ReportCard: React.FC<{ learner: LearnerChip; status: WeeklyStatus; subjects: SubjectCard[]; results: { submittedAt: string | null; passed: boolean | null; waiting?: boolean; score: number | null }[]; onShare?: () => void }> = ({ learner, status: s, subjects, results, onShare }) => {
+  const { t, n, lang } = useP();
+  const week = results.filter((r) => r.submittedAt && r.submittedAt.slice(0, 10) >= s.weekStart);
+  const released = week.filter((r) => !r.waiting && r.score !== null);
+  const passed = released.filter((r) => r.passed).length;
+  const waiting = week.filter((r) => r.waiting).length;
+  const points = subjects.reduce((sum, x) => sum + (x.pointsCount || 0), 0);
+  const end = new Date(`${s.weekStart}T12:00:00Z`); end.setUTCDate(end.getUTCDate() + 6);
+  const range = `${cairoDate(s.weekStart, lang)} – ${cairoDate(end.toISOString().slice(0, 10), lang)}`;
+  const lines: { icon: string; tone: string; text: string }[] = [
+    { icon: 'target', tone: s.minutesDone >= s.goalMinutes ? 'ok' : 'sun', text: t.ofMin(n(s.minutesDone), n(s.goalMinutes)) },
+    ...(released.length ? [{ icon: 'check', tone: 'ok', text: t.ui.rPassed(n(passed), n(released.length)) }] : []),
+    ...(waiting ? [{ icon: 'nudge', tone: 'wait', text: t.ui.rWaiting(n(waiting)) }] : []),
+    ...(points ? [{ icon: 'alert', tone: 'warn', text: t.ui.rPoints(n(points)) }] : []),
+  ];
+  return (
+    <section className="pp-card pp-wreport" aria-labelledby="pp-report-h" data-testid="pp-report">
+      <span className="pp-meta">{t.ui.reportCard} · {range}</span>
+      <h2 className="pp-h2" id="pp-report-h" style={{ fontSize: 18 }}>{t.ui.reportTitle[s.status](learner.firstName)}</h2>
+      <ul className="pp-rlines">
+        {lines.map((l, i) => <li key={i}><span className={`pp-ico pp-ico--${l.tone} pp-ico--sm`}><Icon name={l.icon} /></span>{l.text}</li>)}
+      </ul>
+      {onShare && <button type="button" className="pp-btn pp-btn--block" onClick={onShare}><Icon name="share" />{t.share}</button>}
+    </section>
+  );
+};

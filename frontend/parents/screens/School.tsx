@@ -25,14 +25,18 @@ const StatusTag: React.FC<{ status: AttendanceStatus }> = ({ status }) => {
   return <span className="pp-tag" style={{ color: STATUS_COLOR[status], background: 'var(--page)', border: `1px solid color-mix(in srgb, ${STATUS_COLOR[status]} 20%, transparent)` }}>{t.sch.status[status]}</span>;
 };
 
-export const School: React.FC<{ learner: LearnerChip; refreshKey: number; overview: SchoolOverview; view: SchoolView; setView: (v: SchoolView) => void; onRead: () => void; nameOf: (studentId: string) => string }> = ({ learner, refreshKey, overview, view, setView, onRead, nameOf }) => {
+export const School: React.FC<{ learner: LearnerChip; refreshKey: number; overview: SchoolOverview; view: SchoolView; setView: (v: SchoolView) => void; onRead: () => void; nameOf: (studentId: string) => string; onBack?: () => void; backLabel?: string }> = ({ learner, refreshKey, overview, view, setView, onRead, nameOf, onBack, backLabel }) => {
   const { t } = useP();
   const on = overview.sections;
   const views: SchoolView[] = (['today', 'timetable', 'attendance', 'buses', 'fees', 'announcements', 'consents', 'requests', 'notifications'] as const).filter((v) => v === 'today' || on[v as SchoolSection]);
   const current = views.includes(view) ? view : 'today';
   return (
     <>
-      <h1 className="pp-h1">{t.sch.title}</h1>
+      {/* Follow-up (item 6): a detail page header (back to the tab it belongs to, and the section's name); the section chips scroll. */}
+      <div className="pp-dhead">
+        {onBack && <button type="button" className="pp-iconbtn pp-dhead-back" onClick={onBack} aria-label={backLabel ?? t.sch.title}><Icon name="chevron" className="pp-back" /></button>}
+        <div><span className="pp-meta">{t.sch.title}{learner.school ? ` · ${learner.school}` : ''}</span><h1 className="pp-h1" style={{ margin: 0 }}>{t.sch[current]}</h1></div>
+      </div>
       <div className="pp-seg pp-school-seg" role="tablist" aria-label={t.sch.title}>
         {views.map((v) => (
           <button key={v} type="button" role="tab" aria-selected={current === v} aria-pressed={current === v} data-testid={`pp-school-${v}`} onClick={() => setView(v)}>
@@ -125,7 +129,10 @@ const Attendance: React.FC<{ learner: LearnerChip; refreshKey: number }> = ({ le
       </div>
       {!q.data ? (q.error ? (q.error.status === 404 ? <p className="pp-notice">{t.sch.off}</p> : <ErrorBox onRetry={q.reload} />) : <Loading />) : (
         <>
-          <p className="pp-sub" data-testid="pp-att-counts">{t.sch.counts(n(q.data.counts.present), n(q.data.counts.absent), n(q.data.counts.late), n(q.data.counts.excused))}</p>
+          <div className="pp-att-tiles" aria-hidden="true">
+            {(['present', 'absent', 'late', 'excused'] as const).map((k) => <div key={k} className={`pp-att-tile pp-att-tile--${k}`}><b>{n(q.data!.counts[k])}</b><span>{t.sch.status[k]}</span></div>)}
+          </div>
+          <p className="pp-sub sr" data-testid="pp-att-counts">{t.sch.counts(n(q.data.counts.present), n(q.data.counts.absent), n(q.data.counts.late), n(q.data.counts.excused))}</p>
           {q.data.records.length ? (
             <section className="pp-card pp-card--flush">
               {q.data.records.map((r, i) => (
@@ -156,7 +163,7 @@ const Announcements: React.FC<{ learner: LearnerChip; refreshKey: number }> = ({
         const body = (lang === 'ar' && a.bodyAr) || a.body;
         return (
           <article key={a.id} className="pp-card" data-testid="pp-announcement">
-            <div className="pp-row pp-row--top"><h2 className="pp-h2" dir="auto">{title}</h2><span className="pp-tag pp-tag--sky">{aud[a.audience] ?? a.audience}</span></div>
+            <div className="pp-row pp-row--top"><span className="pp-ico pp-ico--info pp-ico--sm" aria-hidden="true"><Icon name="megaphone" /></span><h2 className="pp-h2" dir="auto" style={{ flex: 1 }}>{title}</h2><span className="pp-tag pp-tag--sky">{aud[a.audience] ?? a.audience}</span></div>
             <p className="pp-meta">{cairoDate(a.publishAt.slice(0, 10), lang)}{a.expiresAt ? ` · ${t.sch.until(cairoDate(a.expiresAt.slice(0, 10), lang))}` : ''}</p>
             <p dir="auto" style={{ fontSize: 14, lineHeight: '22px', whiteSpace: 'pre-wrap' }}>{body}</p>
           </article>
@@ -166,6 +173,9 @@ const Announcements: React.FC<{ learner: LearnerChip; refreshKey: number }> = ({
     </>
   );
 };
+
+const NOTE_ICON: Record<string, string> = { absence: 'alert', late: 'nudge', announcement: 'megaphone', fee_due: 'coin', bus_notice: 'bus', request_update: 'inbox', consent: 'pen' };
+const NOTE_TONE: Record<string, string> = { absence: 'bad', late: 'warn', announcement: 'info', fee_due: 'warn', bus_notice: 'sun', request_update: 'info', consent: 'warn' };
 
 const Notifications: React.FC<{ refreshKey: number; onRead: () => void; nameOf: (studentId: string) => string }> = ({ refreshKey, onRead, nameOf }) => {
   const { t, n, lang } = useP();
@@ -183,7 +193,7 @@ const Notifications: React.FC<{ refreshKey: number; onRead: () => void; nameOf: 
         <section className="pp-card pp-card--flush">
           {q.data.notifications.map((x) => (
             <div className="pp-list-row" key={x.id} data-testid="pp-notification" data-read={x.read ? '1' : '0'}>
-              <span className="pp-dot" style={{ background: x.read ? 'transparent' : x.kind === 'absence' ? 'var(--bad)' : x.kind === 'late' ? 'var(--warn-dot)' : 'var(--blue)' }} aria-hidden="true" />
+              <span className={`pp-ico pp-ico--sm pp-ico--${NOTE_TONE[x.kind] ?? 'info'}${x.read ? ' pp-ico--read' : ''}`} aria-hidden="true"><Icon name={NOTE_ICON[x.kind] ?? 'bell'} /></span>
               <p>
                 <b dir="auto" style={{ fontWeight: x.read ? 500 : 700 }}>{t.sch.kind[x.kind] ?? x.kind} · {nameOf(x.studentId)}</b>
                 {x.kind === 'fee_due' || x.kind === 'bus_notice' || x.kind === 'request_update' || x.kind === 'consent' ? (
@@ -234,6 +244,12 @@ const Fees: React.FC<{ learner: LearnerChip; refreshKey: number }> = ({ learner,
               {stat(t.sch.feeRemaining, f.totals.remaining, undefined, 'pp-fees-remaining')}
               {f.totals.overdue > 0 && stat(t.sch.feeOverdue, f.totals.overdue, 'var(--bad)', 'pp-fees-overdue')}
             </div>
+            {f.totals.total > 0 && (
+              <div className="pp-feebar" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round((f.totals.paid / f.totals.total) * 100)} aria-label={t.sch.feePaid}>
+                <i style={{ inlineSize: `${Math.min(100, (f.totals.paid / f.totals.total) * 100)}%` }} />
+                {f.totals.overdue > 0 && <i className="pp-feebar-over" style={{ inlineSize: `${Math.min(100, (f.totals.overdue / f.totals.total) * 100)}%` }} />}
+              </div>
+            )}
             {f.next && <p className="pp-sub">{t.sch.feeNext}: {t.sch.instalment(n(f.next.number))} · {t.sch.egp(money(f.next.amount, n))} · {t.sch.dueOn(cairoDate(f.next.dueDate, lang))}</p>}
           </section>
           {f.plans.map((p) => (
