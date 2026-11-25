@@ -559,3 +559,11 @@
   .pp { max-inline-size: 1280px; }
   .pp-main { max-inline-size: none; }
 }
+
+/* ---- Live bus map ---- */
+.pp-buslive { gap: 10px; }
+.pp-bus-eta { font-size: 15px; color: var(--blue); white-space: nowrap; }
+.pp-livedot { inline-size: 10px; block-size: 10px; border-radius: 50%; background: #E5484D; position: relative; flex: none; }
+.pp-livedot--stale { background: var(--muted); }
+.pp-livedot::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: inherit; opacity: 0; }
+@media (prefers-reduced-motion: no-preference) { .pp-livedot:not(.pp-livedot--stale)::after { animation: pp-ping 1.6s ease-out infinite; } }

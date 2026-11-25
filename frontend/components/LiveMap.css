@@ -1,0 +1,11 @@
+/* Live bus map markers and frame. */
+.enara-map { inline-size: 100%; border-radius: 16px; overflow: hidden; z-index: 0; position: relative; isolation: isolate; background: #e8e4da; }
+.enara-map-bus, .enara-map-stop { background: none; border: 0; }
+.enara-map-busdot { display: grid; place-items: center; inline-size: 40px; block-size: 40px; border-radius: 50%; background: #0E2747; box-shadow: 0 4px 12px rgba(14,39,71,.35); position: relative; }
+.enara-map-busdot::after { content: ''; position: absolute; inset: 0; border-radius: 50%; border: 3px solid #F5A524; opacity: .6; }
+.enara-map-busdot.stale { background: #8b93a1; filter: grayscale(1); }
+.enara-map-stopdot { display: block; inline-size: 14px; block-size: 14px; border-radius: 50%; background: #fff; border: 3px solid #2B5CE6; }
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes enara-map-ping { from { transform: scale(1); opacity: .6; } to { transform: scale(1.8); opacity: 0; } }
+  .enara-map-busdot:not(.stale)::after { animation: enara-map-ping 1.6s ease-out infinite; }
+}

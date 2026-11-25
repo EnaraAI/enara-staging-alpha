@@ -3,6 +3,7 @@ import type { RequestType } from '../api';
 import { cairoDate, cairoTime, schoolApi, type AttendanceStatus, type FeeStatus, type LearnerChip, type SchoolOverview, type SchoolSection, type SchoolSource } from '../api';
 import { ErrorBox, Icon, Loading, useP } from '../ui';
 import { useLive } from '../useLive';
+import { BusLiveCard, useBusLive } from './BusLive';
 
 // Parents school app (a): one child's school information, read from the school's own sheets (or, later, its system).
 // ENARA only shows it. Each part names its source and when it was last updated. A section the school has off is not shown.
@@ -261,10 +262,12 @@ const Fees: React.FC<{ learner: LearnerChip; refreshKey: number }> = ({ learner,
 const Bus: React.FC<{ learner: LearnerChip; refreshKey: number }> = ({ learner, refreshKey }) => {
   const { t, n } = useP();
   const q = useLive(() => schoolApi.bus(learner.studentId), [learner.studentId], refreshKey);
+  const live = useBusLive(learner, true);
   const [open, setOpen] = useState<string | null>(null);
   if (!q.data) return q.error ? (q.error.status === 404 ? <p className="pp-notice">{t.sch.off}</p> : <ErrorBox onRetry={q.reload} />) : <Loading />;
   return (
     <>
+      <BusLiveCard learner={learner} live={live} />
       {!q.data.trips.length ? <p className="pp-notice" style={{ display: 'block' }}>{t.sch.noBus}</p> : q.data.trips.map((tr) => (
         <section key={tr.direction} className="pp-card pp-bustrip" aria-labelledby={`pp-bus-${tr.direction}`} data-testid={`pp-bus-${tr.direction}`}>
           <div className="pp-row">

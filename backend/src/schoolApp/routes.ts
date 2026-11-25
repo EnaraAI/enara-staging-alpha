@@ -12,6 +12,7 @@ import { moodleConnections, runMoodleSyncNow, saveMoodleToken, setMoodleEnabled 
 import { ask, confirmRequest } from './chat';
 import { answerRequest, consentCsv, consentDashboard, consentForms, consentsForParent, createConsentForm, createRequest, requestsForAdmin, requestsForParent, signConsent, withdrawConsentForm } from './requests';
 import { busForParent, busesForAdmin, sendBusNotice, setBusPhonesShared, withdrawBusNotice } from './buses';
+import * as live from './busLive';
 import { attachReceipt, feesForAdmin, feesForParent, markInstalment, receiptForAdmin, receiptForParent } from './fees';
 import { SchoolAnnouncement } from './models';
 import { Batch } from '../models/Batch';
@@ -34,6 +35,8 @@ parentSchoolRoutes.get('/learners/:studentId/fees', h(async (req, res) => { res.
 const sendFile = (res: Response, f: { body: Buffer; contentType: string; fileName: string }) => { res.setHeader('Content-Type', f.contentType); res.setHeader('Content-Disposition', `attachment; filename="${f.fileName}"`); res.setHeader('Cache-Control', 'private, no-store'); res.setHeader('X-Content-Type-Options', 'nosniff'); res.send(f.body); };
 parentSchoolRoutes.get('/learners/:studentId/fees/:instalmentId/receipt', h(async (req, res) => { sendFile(res, await receiptForParent(await child(req), String(req.params.instalmentId))); }));
 parentSchoolRoutes.get('/learners/:studentId/bus', h(async (req, res) => { res.json(await busForParent(await child(req))); }));
+// Live bus map: the bus's latest position while a trip of the child's route runs (nothing otherwise). Polled every ~15 s.
+parentSchoolRoutes.get('/learners/:studentId/bus/live', h(async (req, res) => { res.setHeader('Cache-Control', 'no-store'); res.json(await live.liveForParent(await child(req))); }));
 parentSchoolRoutes.get('/learners/:studentId/requests', h(async (req, res) => { res.json(await requestsForParent(await child(req))); }));
 parentSchoolRoutes.post('/learners/:studentId/requests', h(async (req, res) => { const b = ensurePlainObject(req.body); rejectMongoOperators(b); res.status(201).json(await createRequest(await child(req), b)); }));
 parentSchoolRoutes.get('/learners/:studentId/consents', h(async (req, res) => { res.json(await consentsForParent(await child(req))); }));
@@ -46,6 +49,17 @@ parentSchoolRoutes.post('/notifications/read', h(async (req, res) => { const b =
 
 export const schoolAppAdminRoutes = Router();
 schoolAppAdminRoutes.use(anyOn, authMiddleware, requireRole('admin', 'enara-admin'));
+// Live bus map: the "Bus supervisors" tab (SCHOOL_APP_BUS_LIVE_ENABLED; 404 while off).
+const body = (req: AuthRequest) => { const b = ensurePlainObject(req.body); rejectMongoOperators(b); return b; };
+schoolAppAdminRoutes.get('/bus-live', h(async (req, res) => { res.setHeader('Cache-Control', 'no-store'); res.json(await live.adminView(actor(req), req.query.institutionId)); }));
+schoolAppAdminRoutes.put('/bus-live/settings', h(async (req, res) => { res.json(await live.saveSettings(actor(req), body(req))); }));
+schoolAppAdminRoutes.post('/bus-live/supervisors', h(async (req, res) => { res.status(201).json(await live.addSupervisor(actor(req), body(req))); }));
+schoolAppAdminRoutes.put('/bus-live/supervisors/:id', h(async (req, res) => { res.json(await live.updateSupervisor(actor(req), String(req.params.id), body(req))); }));
+schoolAppAdminRoutes.delete('/bus-live/supervisors/:id', h(async (req, res) => { res.json(await live.removeSupervisor(actor(req), String(req.params.id), req.query.institutionId)); }));
+schoolAppAdminRoutes.post('/bus-live/supervisors/:id/code', h(async (req, res) => { res.setHeader('Cache-Control', 'no-store'); res.json(await live.newSupervisorCode(actor(req), String(req.params.id), body(req).institutionId)); }));
+schoolAppAdminRoutes.post('/bus-live/supervisors/:id/sign-out', h(async (req, res) => { res.json(await live.signOutSupervisor(actor(req), String(req.params.id), body(req).institutionId)); }));
+schoolAppAdminRoutes.put('/bus-live/stops', h(async (req, res) => { res.json(await live.setStopPin(actor(req), body(req))); }));
+schoolAppAdminRoutes.post('/bus-live/trips/:id/stop', h(async (req, res) => { res.json(await live.adminEndTrip(actor(req), String(req.params.id), body(req).institutionId)); }));
 const schoolId = (req: AuthRequest, q?: unknown) => (req.user!.role === 'enara-admin' && typeof q === 'string' ? q : req.user!.institutionId);
 schoolAppAdminRoutes.get('/status', h(async (req, res) => {
   const id = schoolId(req, req.query.institutionId);
@@ -135,3 +149,16 @@ schoolAppAdminRoutes.post('/announcements/:id/withdraw', h(async (req, res) => {
   if (!r.matchedCount) throw new AppError('Announcement not found', 404, 'NOT_FOUND');
   res.json({ withdrawn: true });
 }));
+
+
+// Live bus map: the bus supervisor's phone (/bus). Public sign-in with the one-time code; after that a bus token (Authorization: Bus <token>),
+// which is never accepted as an ENARA session. 404 while SCHOOL_APP_BUS_LIVE_ENABLED is off.
+export const busSupervisorRoutes = Router();
+busSupervisorRoutes.use((_req, res, next) => { res.setHeader('Cache-Control', 'no-store'); return live.busLiveSiteOn() ? next() : next(new AppError('Route not found', 404, 'NOT_FOUND')); });
+const sup = async (req: AuthRequest) => { const m = /^Bus\s+(.+)$/i.exec(String(req.headers.authorization ?? '')); return live.supervisorFromToken(m?.[1]); };
+busSupervisorRoutes.post('/start', h(async (req, res) => { const b = ensurePlainObject(req.body); rejectMongoOperators(b); res.json(await live.redeemSupervisorCode(b.code)); }));
+busSupervisorRoutes.get('/me', h(async (req, res) => { res.json(await live.supervisorHome(await sup(req))); }));
+busSupervisorRoutes.post('/trips', h(async (req, res) => { const s = await sup(req); const b = ensurePlainObject(req.body); rejectMongoOperators(b); res.status(201).json(await live.startTrip(s, b)); }));
+busSupervisorRoutes.post('/trips/:id/position', h(async (req, res) => { const s = await sup(req); const b = ensurePlainObject(req.body); rejectMongoOperators(b); res.json(await live.sendPosition(s, String(req.params.id), b)); }));
+busSupervisorRoutes.post('/trips/:id/end', h(async (req, res) => { res.json(await live.supervisorEndTrip(await sup(req), String(req.params.id))); }));
+busSupervisorRoutes.post('/trips/:id/notice', h(async (req, res) => { const s = await sup(req); const b = ensurePlainObject(req.body); rejectMongoOperators(b); res.status(201).json(await live.supervisorNotice(s, String(req.params.id), b)); }));

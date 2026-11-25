@@ -7,6 +7,7 @@ import { ALL, SubjectView, SubjectsOverview } from './Subjects';
 import { useLive } from '../useLive';
 import type { SchoolOverview } from '../api';
 import type { SchoolView } from './School';
+import { useBusLive } from './BusLive';
 import { BusCard, Hero, NeedsYou, SchoolTiles, TodayClasses, useWide } from './Today';
 
 type HomeProps = { learner: LearnerChip; refreshKey: number; go: (tab: string) => void; onShare: () => void; onFetched: (d: Date | null, loading: boolean) => void; subjectKey?: string; overview?: SubjectCard[]; onPickSubject?: (key: string) => void ; school?: SchoolOverview | null; openSchool?: (v: SchoolView) => void };
@@ -21,6 +22,7 @@ const HomeAll: React.FC<HomeProps> = ({ learner, refreshKey, go, onShare, onFetc
   const ctx = useP();
   const { t, n, lang } = ctx;
   const wide = useWide();
+  const live = useBusLive(learner, !!school?.sections.buses);
   const q = useLive(() => parentsApi.home(learner.studentId), [learner.studentId], refreshKey);
   React.useEffect(() => onFetched(q.fetchedAt, q.loading), [q.fetchedAt, q.loading]); // eslint-disable-line react-hooks/exhaustive-deps
   if (!q.data) return q.error ? <ErrorBox onRetry={q.reload} /> : <Loading />;
@@ -36,7 +38,7 @@ const HomeAll: React.FC<HomeProps> = ({ learner, refreshKey, go, onShare, onFetc
   const side = (
     <>
       <NeedsYou overview={school} onOpen={() => go('actions')} />
-      <BusCard overview={school} open={openSchool} />
+      <BusCard overview={school} open={openSchool} learner={learner} live={live} />
       <TodayClasses overview={school} open={openSchool} />
     </>
   );

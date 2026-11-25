@@ -1,0 +1,38 @@
+/* The bus supervisor's phone page (/bus): big buttons, high contrast, logical properties for Arabic. */
+.bus { --navy: #0E2747; --sun: #F5A524; --blue: #2B5CE6; --ok: #157A4D; --bad: #B42318; --warn: #9A5B00; --muted: #5E6878; --line: #E4E0D7;
+  font-family: Inter, 'IBM Plex Sans Arabic', system-ui, sans-serif; background: #F6F4EF; color: #142033; min-block-size: 100dvh; max-inline-size: 480px; margin-inline: auto;
+  padding: 12px 16px 32px; display: flex; flex-direction: column; gap: 14px; box-sizing: border-box; }
+.bus *, .bus *::before, .bus *::after { box-sizing: border-box; }
+.bus-head { display: flex; align-items: center; justify-content: space-between; }
+.bus-brand { display: inline-flex; gap: 8px; align-items: center; font-weight: 700; font-size: 18px; color: var(--navy); }
+.bus-lang { min-block-size: 44px; padding-inline: 14px; border-radius: 999px; border: 1px solid var(--line); background: #fff; font: inherit; font-weight: 600; cursor: pointer; }
+.bus-h1 { font-size: 24px; font-weight: 700; margin: 0; }
+.bus-h2 { font-size: 15px; font-weight: 700; margin: 6px 0 0; color: var(--muted); }
+.bus-card { background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.bus-route { font-size: 18px; }
+.bus-muted { color: var(--muted); font-size: 14px; margin: 0; line-height: 1.45; }
+.bus-note { background: #E4F5EC; color: var(--ok); border-radius: 14px; padding: 10px 12px; margin: 0; font-weight: 600; }
+.bus-warn { background: #FFF2DB; color: var(--warn); border-radius: 14px; padding: 10px 12px; margin: 0; font-weight: 600; }
+.bus-err { background: #FDECEA; color: var(--bad); border-radius: 14px; padding: 10px 12px; margin: 0; }
+.bus-label { font-weight: 600; font-size: 14px; }
+.bus-code { min-block-size: 60px; border-radius: 16px; border: 2px solid #D6D1C6; font: 700 24px ui-monospace, Menlo, monospace; letter-spacing: .12em; text-align: center; }
+.bus-code:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 4px #E3EAFE; }
+.bus-btn { min-block-size: 56px; border-radius: 16px; border: 1px solid #D6D1C6; background: #fff; font: inherit; font-weight: 700; font-size: 16px; cursor: pointer; color: #142033; padding-inline: 12px; }
+.bus-btn:disabled { opacity: .45; cursor: not-allowed; }
+.bus-btn--go { background: var(--blue); border-color: var(--blue); color: #fff; }
+.bus-btn--warn { background: #FFF2DB; border-color: #F3D7A4; color: var(--warn); }
+.bus-btn--end { background: var(--navy); border-color: var(--navy); color: #fff; min-block-size: 64px; font-size: 18px; }
+.bus-two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.bus-four { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.bus-link { border: 0; background: none; color: var(--blue); font: inherit; font-weight: 600; text-decoration: underline; cursor: pointer; min-block-size: 44px; }
+.bus-live { display: flex; gap: 14px; align-items: center; padding: 14px; border-radius: 16px; background: #E4F5EC; color: var(--ok); }
+.bus-live div { display: flex; flex-direction: column; gap: 2px; }
+.bus-live b { font-size: 18px; }
+.bus-live span:not(.bus-pulse) { font-size: 14px; color: #142033; }
+.bus-live--wait { background: #FFF2DB; color: var(--warn); }
+.bus-pulse { inline-size: 16px; block-size: 16px; border-radius: 50%; background: currentColor; position: relative; flex: none; }
+.bus-pulse::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: currentColor; opacity: 0; }
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes bus-ping { from { transform: scale(1); opacity: .5; } to { transform: scale(2.6); opacity: 0; } }
+  .bus-pulse::after { animation: bus-ping 1.5s ease-out infinite; }
+}

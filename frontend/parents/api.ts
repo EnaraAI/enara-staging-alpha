@@ -84,6 +84,9 @@ export interface SchoolBus { today: string; trips: BusTrip[]; source: SchoolSour
 export type RequestType = 'certificate' | 'early_leave' | 'teacher_meeting' | 'other';
 export interface SchoolRequestItem { id: string; type: RequestType; details: string; preferredDate: string | null; status: 'new' | 'in_progress' | 'done' | 'refused'; reply: string | null; history: { at: string; by: 'parent' | 'school'; status: string; note: string | null }[]; createdAt: string; via: string }
 export interface ConsentFormItem { id: string; textHash: string; title: string; body: string; titleAr: string | null; bodyAr: string | null; options: { key: string; label: string; labelAr: string | null }[]; deadline: string; open: boolean; answer: { choice: string; at: string; byYou: boolean; sameText: boolean } | null; history: { choice: string; at: string; byYou: boolean }[] }
+/** Live bus map: running trips of the child's route right now (empty outside a trip). */
+export interface BusLiveTrip { direction: 'morning' | 'afternoon'; tripId: string; startedAt: string; bus: { lat: number; lng: number; at: string; heading: number | null } | null; stale: boolean; stop: { name: string; lat: number | null; lng: number | null }; etaMin: number | null }
+export interface BusLive { on: boolean; trips: BusLiveTrip[] }
 export interface ChatReply { answer: string; lang: 'en' | 'ar'; sources: { source: string; updatedAt: string | null }[]; offerRequest: { type: RequestType; details: string } | null; engine: 'code' | 'model' }
 export type FeeStatus = 'due' | 'overdue' | 'paid' | 'waived';
 export interface FeeTotals { total: number; paid: number; waived: number; remaining: number; overdue: number }
@@ -97,6 +100,7 @@ export const schoolApi = {
   announcements: (id: string) => apiRequest<SchoolAnnouncements>('GET', `${S(id)}/announcements`),
   fees: (id: string) => apiRequest<SchoolFees>('GET', `${S(id)}/fees`),
   bus: (id: string) => apiRequest<SchoolBus>('GET', `${S(id)}/bus`),
+  busLive: (id: string) => apiRequest<BusLive>('GET', `${S(id)}/bus/live`),
   chat: (id: string, message: string) => apiRequest<ChatReply>('POST', `${S(id)}/chat`, { message }),
   chatRequest: (id: string, offer: { type: RequestType; details: string }) => apiRequest<SchoolRequestItem>('POST', `${S(id)}/chat/request`, { ...offer, confirmed: true }),
   requests: (id: string) => apiRequest<{ requests: SchoolRequestItem[]; canCreate: boolean; types: RequestType[] }>('GET', `${S(id)}/requests`),

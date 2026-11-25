@@ -52,13 +52,15 @@ import { LmsActivityOverview, LmsActivityStudent } from './pages/LmsActivity';
 import { LmsOnboarding } from './pages/LmsOnboarding';
 import { LmsSchoolStatus } from './pages/LmsSchoolStatus';
 import { ParentsAdmin } from './pages/ParentsAdmin';
+import { BusAdmin } from './pages/BusAdmin';
 import { LmsEmailOptIn } from './components/LmsEmailOptIn';
-import { isLmsPreview, isLmsSession, lmsSessionClassId, takeLmsTarget, type LmsLandingTarget, fetchLmsStatus, fetchAssessments, fetchKnowledgeMap, fetchMyAssignments, fetchMyStudyPlan, fetchMyAssessments, fetchStudents, getSessionUser, logout, refreshSession, SESSION_EXPIRED_EVENT, SessionUser, getParentDeviceToken, resumeParentDevice, fetchParentsAdminStatus, type ParentsAdminStatus } from './services/apiService';
+import { isLmsPreview, isLmsSession, lmsSessionClassId, takeLmsTarget, type LmsLandingTarget, fetchLmsStatus, fetchAssessments, fetchKnowledgeMap, fetchMyAssignments, fetchMyStudyPlan, fetchMyAssessments, fetchStudents, getSessionUser, logout, refreshSession, SESSION_EXPIRED_EVENT, SessionUser, getParentDeviceToken, resumeParentDevice, fetchParentsAdminStatus, apiRequest, type ParentsAdminStatus } from './services/apiService';
 
 // Enara Kids: only for students their school moved to the kids interface. Loaded on demand.
 const KidsApp = React.lazy(() => import('./kids/KidsApp'));
 // Parents Portal: parent accounts only, under /parents. Loaded on demand.
 const ParentsApp = React.lazy(() => import('./parents/ParentsApp'));
+const BusApp = React.lazy(() => import('./bus/BusApp'));
 const onParentsPath = () => /^\/parents(\/|$)/.test(window.location.pathname);
 // P0 item 6: a student whose ENARA account came from an LMS (the server says
 // so at sign-in), or any LMS session (a staff "preview as student" included).
@@ -306,6 +308,13 @@ const App: React.FC = () => {
     fetchParentsAdminStatus().then(setParentsAdmin).catch(() => setParentsAdmin(null));
   }, [state.role]);
 
+  // Live bus map: the "Bus supervisors" tab, for a school admin when SCHOOL_APP_BUS_LIVE_ENABLED is on (the API answers 404 otherwise).
+  const [busAdmin, setBusAdmin] = useState(false);
+  useEffect(() => {
+    if (state.role !== 'admin' || getSessionUser()?.role !== 'admin') return setBusAdmin(false);
+    apiRequest('GET', '/api/school-app/bus-live').then(() => setBusAdmin(true)).catch(() => setBusAdmin(false));
+  }, [state.role]);
+
   const [isTutorOpen, setIsTutorOpen] = useState(false);
   const [tutorMessage, setTutorMessage] = useState<string | null>(null);
   const [tutorSessionId, setTutorSessionId] = useState<string | null>(null);
@@ -354,6 +363,8 @@ const App: React.FC = () => {
       .catch(() => undefined)
       .finally(() => setResumingDevice(false));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  // Live bus map: the bus supervisor's phone. Its own sign-in (a code from the school), never an ENARA session.
+  if (/^\/bus\/?$/.test(window.location.pathname)) return <React.Suspense fallback={null}><BusApp /></React.Suspense>;
   if (onLmsLaunchPath()) return <LmsLaunch onReady={handleLogin} />;
   // LMS Phase 2: the activity picker (a teacher's "Select content" in the LMS).
   if (onLmsPickerPath()) return <LmsPicker />;
@@ -638,6 +649,7 @@ const App: React.FC = () => {
           role="admin"
           showLms={lmsEnabled}
             showParents={parentsAdminEnabled}
+          showBus={busAdmin}
         />
         <main className="flex-1 overflow-y-auto">
           {/* LMS emails (D2): a teacher from the LMS is asked once whether Enara may email them. */}
@@ -678,6 +690,7 @@ const App: React.FC = () => {
           {state.page === 'lms-status' && lmsEnabled && sessionUser()?.role === 'admin' && sessionUser()?.institutionId && <LmsSchoolStatus institutionId={sessionUser()!.institutionId!} isEnara={false} />}
           {/* Parents P1: the school's Parents card (school admins; server-enforced, off unless PARENT_SETTINGS_ENABLED). */}
           {state.page === 'parents-admin' && parentsAdmin && (sessionUser()?.role === 'admin' || sessionUser()?.role === 'teacher') && <ParentsAdmin status={parentsAdmin} />}
+          {state.page === 'bus-admin' && busAdmin && sessionUser()?.role === 'admin' && <BusAdmin />}
           {state.page === 'assessment-builder' && <AssessmentBuilder />}
           {state.page === 'class-assignments' && <ClassAssignments initialClassId={state.lmsTarget?.classId ?? undefined} initialAssignmentId={state.lmsTarget?.assignmentId} />}
           {state.page === 'grading' && <GradingReview />}
