@@ -21,7 +21,7 @@ _25 Nov 2026, 7:55 AM Cairo. Checked on lms-test after #131._
 4. **Attendance** (الحضور): month view with totals. Jana has one absence on 9 November.
 5. **Bus** (الحافلة): Route 2 (Maadi), her stop is Corniche Maadi at 06:54. Point out the afternoon delay notice
    (15 minutes, traffic on the Corniche) and the button to call the supervisor.
-6. **Fees** (الرسوม): 31,500 EGP remaining; the next instalment is 13,500 EGP on 2 December. Note the line "payment is made at the school".
+6. **Fees** (الرسوم): 31,500 EGP remaining; the next instalment is 13,500 EGP on 2 December. Note the line "payment is made at the school".
 7. **Announcements** (الإعلانات): the parents' open day on Thursday, and the mid-term exams from 7 December.
 8. **Consent** (الموافقات): the museum trip form. Show the tap-to-sign step.
 9. **Requests** (الطلبات): earlier requests with the school's replies. Leave this open; the chat adds one below.
