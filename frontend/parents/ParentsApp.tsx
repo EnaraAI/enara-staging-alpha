@@ -14,7 +14,7 @@ import { LinkChild } from './screens/LinkChild';
 import { ShareSheet } from './screens/ShareSheet';
 import { AddEmail } from './screens/AddEmail';
 import { ALL, SubjectChips } from './screens/Subjects';
-import { School, SchoolHomeCard, type SchoolView } from './screens/School';
+import { School, type SchoolView } from './screens/School';
 import { SchoolChat } from './screens/SchoolChat';
 import { Messages } from './screens/Messages';
 import { Actions, actionsCount } from './screens/Actions';
@@ -220,12 +220,11 @@ const ParentsApp: React.FC<{ userName?: string; onSignOut: () => void }> = ({ on
               {tab === 'messages' && <Messages learner={learner} overview={school.data ?? null} openChat={() => setChatOpen(true)} openSchool={openSchool} />}
               {tab === 'actions' && <Actions overview={school.data ?? null} openSchool={openSchool} />}
               {(tab === 'home' || tab === 'progress' || tab === 'activity') && <SubjectChips subjects={subjectList} value={subjectKey} onChange={setSubject} />}
-              {status.data && (tab === 'home' || tab === 'progress' || tab === 'activity') && <StatusLine status={status.data} />}
+              {status.data && (tab === 'progress' || tab === 'activity' || (tab === 'home' && subjectKey !== ALL)) && <StatusLine status={status.data} />}
               <Updated at={fetched} loading={status.loading || screenFetched.loading} onRefresh={refresh} />
-              {tab === 'home' && schoolOn && school.data && <SchoolHomeCard overview={school.data} open={openSchool} />}
               {tab === 'school' && school.data && schoolOn && <School learner={learner} refreshKey={refreshKey} overview={school.data} view={schoolView} setView={setSchoolView} onRead={school.reload} nameOf={(id) => list.find((l) => l.studentId === id)?.firstName ?? ''} />}
               {tab === 'school' && !schoolOn && (school.data || school.error || !school.loading) && <p className="pp-notice">{t.sch.off}</p>}
-              {tab === 'home' && <Home learner={learner} refreshKey={refreshKey} go={(k) => go(k as Tab)} onShare={() => setSharing(true)} onFetched={onFetched} subjectKey={subjectKey} overview={subjectList} onPickSubject={(k) => { setSubject(k); window.scrollTo({ top: 0 }); }} />}
+              {tab === 'home' && <Home learner={learner} refreshKey={refreshKey} go={(k) => go(k as Tab)} onShare={() => setSharing(true)} onFetched={onFetched} subjectKey={subjectKey} overview={subjectList} onPickSubject={(k) => { setSubject(k); window.scrollTo({ top: 0 }); }} school={schoolOn ? school.data : null} openSchool={openSchool} />}
               {tab === 'progress' && <Progress learner={learner} refreshKey={refreshKey} onFetched={onFetched} subjectKey={subjectKey} english={!!chosen?.english} />}
               {tab === 'activity' && <Activity learner={learner} refreshKey={refreshKey} onFetched={onFetched} subjectKey={subjectKey} />}
               {tab === 'controls' && <Controls learner={learner} refreshKey={refreshKey} />}

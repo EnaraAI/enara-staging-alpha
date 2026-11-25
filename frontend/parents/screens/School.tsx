@@ -208,58 +208,6 @@ const Notifications: React.FC<{ refreshKey: number; onRead: () => void; nameOf: 
   );
 };
 
-/** The school card on Home: today's attendance, the next class, announcements and unread notifications. Hidden when every section is off. */
-export const SchoolHomeCard: React.FC<{ overview: SchoolOverview; open: (v: SchoolView) => void }> = ({ overview: o, open }) => {
-  const { t, n, lang } = useP();
-  const nowHm = new Intl.DateTimeFormat('en-GB', { timeZone: 'Africa/Cairo', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date());
-  const next = o.todayClasses?.find((c) => c.end > nowHm) ?? null;
-  return (
-    <section className="pp-card pp-card--flush" aria-labelledby="pp-school-home" data-testid="pp-school-home">
-      <h2 className="pp-h2" id="pp-school-home" style={{ padding: '14px 16px 4px' }}><Icon name="school" style={{ verticalAlign: 'middle', marginInlineEnd: 6, color: 'var(--navy)' }} />{t.sch.title}</h2>
-      {o.sections.attendance && (
-        <button type="button" className="pp-list-row pp-card--link" style={{ border: 0, background: 'none' }} onClick={() => open('attendance')}>
-          <p>{t.sch.attendanceToday}</p>{o.attendanceToday ? <StatusTag status={o.attendanceToday} /> : <span className="pp-meta">{t.sch.notRecorded}</span>}
-        </button>
-      )}
-      {o.sections.timetable && (
-        <button type="button" className="pp-list-row pp-card--link" style={{ border: 0, background: 'none' }} onClick={() => open('timetable')}>
-          <p>{t.sch.todayClasses}</p><span className="pp-meta" dir="auto">{next ? `${n(next.start)} · ${next.subject}` : t.sch.noClassesToday}</span>
-        </button>
-      )}
-      {o.sections.announcements && (
-        <button type="button" className="pp-list-row pp-card--link" style={{ border: 0, background: 'none' }} onClick={() => open('announcements')}>
-          <p>{t.sch.announcements}</p><span className="pp-meta">{o.announcementsCount ? n(o.announcementsCount) : t.sch.none}</span>
-        </button>
-      )}
-      {o.sections.consents && o.consentsPending ? (
-        <button type="button" className="pp-list-row pp-card--link" style={{ border: 0, background: 'none' }} onClick={() => open('consents')} data-testid="pp-school-home-consents">
-          <p>{t.sch.consents}</p><b style={{ color: 'var(--bad)', fontSize: 13 }}>{t.sch.consentPending(n(o.consentsPending))}</b>
-        </button>
-      ) : null}
-      {o.sections.requests && o.openRequests ? (
-        <button type="button" className="pp-list-row pp-card--link" style={{ border: 0, background: 'none' }} onClick={() => open('requests')} data-testid="pp-school-home-requests">
-          <p>{t.sch.requests}</p><span className="pp-meta">{t.sch.openRequests(n(o.openRequests))}</span>
-        </button>
-      ) : null}
-      {o.sections.buses && o.bus && (
-        <button type="button" className="pp-list-row pp-card--link" style={{ border: 0, background: 'none' }} onClick={() => open('buses')} data-testid="pp-school-home-bus">
-          <p>{t.sch.busToday}</p>
-          <span className="pp-meta">{o.bus.trips.map((tr) => `${t.sch[tr.direction]} ${tr.time ? n(tr.time) : ''}`).join(' · ')}{o.bus.trips.find((tr) => tr.notice) ? <> · <b style={{ color: 'var(--bad)' }}>{(() => { const nt = o.bus.trips.find((tr) => tr.notice)!.notice!; return nt.kind === 'cancel' ? t.sch.cancelled : t.sch.delay(n(nt.minutes ?? 0)); })()}</b></> : null}</span>
-        </button>
-      )}
-      {o.sections.fees && o.fees && (
-        <button type="button" className="pp-list-row pp-card--link" style={{ border: 0, background: 'none' }} onClick={() => open('fees')} data-testid="pp-school-home-fees">
-          <p>{t.sch.feeNext}</p>{o.fees.next ? <span className="pp-meta">{t.sch.feeDueLine(n(o.fees.next.amount.toLocaleString('en-US')), cairoDate(o.fees.next.dueDate, lang))}{o.fees.overdueCount ? <> · <b style={{ color: 'var(--bad)' }}>{t.sch.overdueCount(n(o.fees.overdueCount))}</b></> : null}</span> : <span className="pp-meta">{t.sch.feeNone}</span>}
-        </button>
-      )}
-      {o.sections.notifications && (
-        <button type="button" className="pp-list-row pp-card--link" style={{ border: 0, background: 'none' }} onClick={() => open('notifications')}>
-          <p>{t.sch.notifications}</p>{o.unreadNotifications ? <span className="pp-badge">{n(o.unreadNotifications)}</span> : <span className="pp-meta">{t.sch.none}</span>}
-        </button>
-      )}
-    </section>
-  );
-};
 
 const FEE_COLOR: Record<FeeStatus, string> = { paid: 'var(--emerald)', due: 'var(--sky)', overdue: 'var(--bad)', waived: 'var(--muted)' };
 const money = (a: number, n: (x: number | string) => string) => n(a.toLocaleString('en-US', { maximumFractionDigits: 2 }));

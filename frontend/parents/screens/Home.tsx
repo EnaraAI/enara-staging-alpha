@@ -1,12 +1,15 @@
 import React from 'react';
 import { bi } from '../i18n';
-import { cairoDate, parentsApi, weekdayIndex, type LearnerChip } from '../api';
-import { AiBadge, ErrorBox, Icon, Loading, Ring, levelNextLine, useP } from '../ui';
+import { cairoDate, parentsApi, type LearnerChip } from '../api';
+import { AiBadge, ErrorBox, Icon, Loading, levelNextLine, useP } from '../ui';
 import type { SubjectCard } from '../api';
 import { ALL, SubjectView, SubjectsOverview } from './Subjects';
 import { useLive } from '../useLive';
+import type { SchoolOverview } from '../api';
+import type { SchoolView } from './School';
+import { BusCard, Hero, NeedsYou, SchoolTiles, TodayClasses } from './Today';
 
-type HomeProps = { learner: LearnerChip; refreshKey: number; go: (tab: string) => void; onShare: () => void; onFetched: (d: Date | null, loading: boolean) => void; subjectKey?: string; overview?: SubjectCard[]; onPickSubject?: (key: string) => void };
+type HomeProps = { learner: LearnerChip; refreshKey: number; go: (tab: string) => void; onShare: () => void; onFetched: (d: Date | null, loading: boolean) => void; subjectKey?: string; overview?: SubjectCard[]; onPickSubject?: (key: string) => void ; school?: SchoolOverview | null; openSchool?: (v: SchoolView) => void };
 
 // All subjects: a chosen subject shows its own page; "All subjects" shows the week, the subject cards and the real cards below.
 // Cards built from placeholder data (mock) are not shown: parents see only real data.
@@ -14,7 +17,7 @@ export const Home: React.FC<HomeProps> = (props) => (props.subjectKey && props.s
   ? <SubjectView learner={props.learner} subjectKey={props.subjectKey} mode="home" refreshKey={props.refreshKey} onFetched={props.onFetched} />
   : <HomeAll {...props} />);
 
-const HomeAll: React.FC<HomeProps> = ({ learner, refreshKey, go, onShare, onFetched, overview = [], onPickSubject }) => {
+const HomeAll: React.FC<HomeProps> = ({ learner, refreshKey, go, onShare, onFetched, overview = [], onPickSubject, school = null, openSchool = () => undefined }) => {
   const ctx = useP();
   const { t, n, lang } = ctx;
   const q = useLive(() => parentsApi.home(learner.studentId), [learner.studentId], refreshKey);
@@ -37,31 +40,11 @@ const HomeAll: React.FC<HomeProps> = ({ learner, refreshKey, go, onShare, onFetc
         </section>
       )}
 
-      <section className="pp-card pp-effort" aria-labelledby="pp-week">
-        <Ring done={s.minutesDone} goal={s.goalMinutes} />
-        <div className="pp-effort-body">
-          <p className="pp-eyebrow" id="pp-week">{t.thisWeek}</p>
-          <ul className="pp-days">
-            {s.days.map((day) => {
-              const wd = weekdayIndex(day.day);
-              const state = day.practised ? 'practised' : day.isToday ? 'today' : day.isFuture ? 'upcoming' : 'missed';
-              return (
-                <li key={day.day}>
-                  <span className={`pp-daydot${day.practised ? ' pp-daydot--done' : day.isToday ? ' pp-daydot--today' : ''}`}>
-                    {day.practised && <svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true" fill="none" strokeWidth="3" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>}
-                  </span>
-                  <span aria-hidden="true">{t.weekdays[wd]}</span>
-                  <span className="sr">{`${t.weekdaysLong[wd]}: ${t.dayState[state]}`}</span>
-                </li>
-              );
-            })}
-          </ul>
-          <p style={{ fontSize: 14, lineHeight: '20px' }}>
-            {s.streak > 0 && <><strong style={{ fontWeight: 600 }}>{t.streak(n(s.streak))}</strong>{' · '}</>}
-            <span style={{ color: 'var(--muted)' }}>{t.sessions(n(s.sessions))}{s.lastPractised ? ` · ${t.lastPractised(cairoDate(s.lastPractised, lang, { weekday: 'long' }))}` : ` · ${t.notYet}`}</span>
-          </p>
-        </div>
-      </section>
+      {/* Redesign step 2: the hero (status, three rings, the week's days), then what needs the parent, the bus and today's classes. */}
+      <Hero learner={learner} status={s} lessons={overview.reduce((sum, x) => sum + (x.lessonsThisWeek || 0), 0)} />
+      <NeedsYou overview={school} onOpen={() => go('actions')} />
+      <BusCard overview={school} open={openSchool} />
+      <TodayClasses overview={school} open={openSchool} />
 
       {onPickSubject && <SubjectsOverview subjects={overview} onPick={onPickSubject} />}
 
@@ -125,6 +108,8 @@ const HomeAll: React.FC<HomeProps> = ({ learner, refreshKey, go, onShare, onFetc
           </div>
         ))}
       </section>}
+
+      <SchoolTiles overview={school} open={openSchool} school={learner.school} />
 
       <button type="button" className="pp-btn pp-btn--primary pp-btn--block" onClick={onShare}><Icon name="share" />{t.share}</button>
     </>
