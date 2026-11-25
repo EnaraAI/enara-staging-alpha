@@ -14,7 +14,7 @@ export const INTL: [string, string, 'm' | 'f'][] = [
 // Full names that belong to well-known people: never produced.
 export const PUBLIC_FIGURES = ['mohamed salah', 'amr diab', 'ahmed zewail', 'omar sharif', 'naguib mahfouz', 'mohamed elneny', 'ahmed hassan', 'hany ramzy', 'mona zaki', 'yousra', 'ahmed helmy', 'tamer hosny', 'sherine abdelwahab'];
 
-export type SubjectKey = 'ENG' | 'MATH' | 'SCI' | 'ARB';
+export type SubjectKey = 'ENG' | 'MATH' | 'SCI' | 'ARB' | 'SOC';
 export interface SubjectDef {
   key: SubjectKey; subject: string; courseName: string; type: string; languages: string[]; rtl: boolean;
   lessons: { title: string; spec?: { objectives: string[]; vocabulary: string[]; grammar: string[]; skills: string[] } }[];
@@ -26,7 +26,7 @@ export interface SubjectDef {
   avatarLessons: string[];
 }
 
-export const SUBJECTS: Record<SubjectKey, SubjectDef> = {
+export const SUBJECTS = {
   ENG: {
     key: 'ENG', subject: 'English', courseName: 'English', type: 'Language', languages: ['English'], rtl: false,
     lessons: [
@@ -137,6 +137,46 @@ export const SUBJECTS: Record<SubjectKey, SubjectDef> = {
     ],
     avatarLessons: ['محادثة: الجملة الاسمية'],
   },
+} as Record<SubjectKey, SubjectDef>;
+
+// Social Studies (the family school, owner "go" 25 Nov 2026): every child there takes 5 subjects.
+SUBJECTS.SOC = {
+  key: 'SOC', subject: 'Social Studies', courseName: 'Social Studies', type: 'National', languages: ['English'], rtl: false,
+  lessons: [{ title: 'Maps and directions' }, { title: 'The River Nile' }, { title: 'Ancient Egypt' }, { title: 'Our community' }, { title: 'Weather and climate' }],
+  objectives: [{ code: 'SOC.1', title: 'Read a map using a key and compass directions' }, { code: 'SOC.2', title: 'Explain why the Nile mattered to Ancient Egypt' }, { code: 'SOC.3', title: 'Describe roles in a local community' }],
+  quizzes: [
+    { title: 'Map skills quiz', questions: [
+      { id: 'q1', type: 'multiple-choice', text: 'Which direction is opposite to north?', options: ['south', 'east', 'west'], correctAnswer: 'south', wrong: 'east' },
+      { id: 'q2', type: 'short-answer', text: 'What part of a map explains its symbols?', correctAnswer: 'key', wrong: 'title' },
+      { id: 'q3', type: 'multiple-choice', text: 'A compass rose shows ...', options: ['directions', 'distances', 'heights'], correctAnswer: 'directions', wrong: 'distances' } ] },
+    { title: 'The Nile check', questions: [
+      { id: 'q1', type: 'short-answer', text: 'Into which sea does the Nile flow?', correctAnswer: 'Mediterranean', wrong: 'Red Sea' },
+      { id: 'q2', type: 'multiple-choice', text: 'The yearly flood left the land ...', options: ['fertile', 'dry', 'salty'], correctAnswer: 'fertile', wrong: 'dry' },
+      { id: 'q3', type: 'multiple-choice', text: 'The Nile flows from ...', options: ['south to north', 'north to south', 'east to west'], correctAnswer: 'south to north', wrong: 'north to south' } ] },
+    { title: 'Ancient Egypt practice', questions: [
+      { id: 'q1', type: 'short-answer', text: 'What was the ruler of Ancient Egypt called?', correctAnswer: 'pharaoh', wrong: 'king' },
+      { id: 'q2', type: 'multiple-choice', text: 'Hieroglyphs are a kind of ...', options: ['writing', 'building', 'boat'], correctAnswer: 'writing', wrong: 'building' },
+      { id: 'q3', type: 'short-answer', text: 'In which city are the Great Pyramids?', correctAnswer: 'Giza', wrong: 'Luxor' } ] },
+  ],
+  errors: [{ code: 'compass_directions', label: 'Compass directions mixed up' }, { code: 'nile_direction', label: 'Which way the Nile flows' }, { code: 'map_key', label: 'Using the map key' }],
+  reviews: [{ question: 'Opposite of east?', answer: 'west', options: ['west', 'north', 'south'] }, { question: 'The Nile flows into the ...', answer: 'Mediterranean Sea' }, { question: 'The ruler of Ancient Egypt?', answer: 'pharaoh' }],
+  chats: [
+    { title: 'Why the Nile floods', turns: [['why did the nile flood every year', 'Good question! Summer rains in the Ethiopian highlands filled the river, so each year it rose and spread over the land. When it went down it left rich black mud. Why do you think farmers liked that mud?'], ['because plants grow better', 'Exactly: the mud made the soil fertile, so crops like wheat grew well. That is why most Egyptians lived near the river.']] },
+    { title: 'Reading a map key', turns: [['what is a map key', 'A map key (or legend) is the box that explains the symbols on a map, like a blue line for a river or a cross for a hospital. Look at your map: what symbol is used for a school?'], ['a small flag', 'Right! Now find the nearest school to the park using the key and the compass rose.']] },
+  ],
+  avatarLessons: ['Speaking: life by the Nile', 'Speaking: my neighbourhood'],
+};
+
+/** The family school (owner "go" 25 Nov 2026): three grades, every child takes 5 subjects. Planned on its own (familyPlan.ts).
+ *  Owner, 25 Nov 2026: only Mona and her three children (one seat a grade, so no other students or parents); staff stay. */
+export const FAMILY_SCHOOL: SchoolDef = {
+  id: 'SCH-ANIS', name: 'Al Nour International School', status: 'active', portal: 'free', results: 'after_release', emailLanguage: 'en', pathwayMode: 'teacher_controlled',
+  createdDaysAgo: 75, onboarding: 'running: every class in use', releasePolicy: 'manual',
+  groups: [
+    { key: 'G3', name: 'Grade 3', age: 8, size: 1, subjects: ['ARB', 'ENG', 'MATH', 'SCI', 'SOC'] },
+    { key: 'G6', name: 'Grade 6', age: 11, size: 1, subjects: ['ARB', 'ENG', 'MATH', 'SCI', 'SOC'] },
+    { key: 'G9', name: 'Grade 9', age: 14, size: 1, subjects: ['ARB', 'ENG', 'MATH', 'SCI', 'SOC'] },
+  ],
 };
 
 export interface SchoolDef {

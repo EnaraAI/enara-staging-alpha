@@ -34,6 +34,8 @@ import { UsageLedger } from '../../models/UsageLedger';
 import { ParentEmailSend } from '../../models/ParentEmailSend';
 import { ParentNotification, SchoolAnnouncement, SchoolBusAssignment, SchoolBusNotice, SchoolBusRoute, SchoolConsent, SchoolConsentForm, SchoolRequest, SchoolDailyAttendance, SchoolImport, SchoolInstalment, SchoolTimetableEntry } from '../../schoolApp/models';
 import { ReminderLog } from '../../models/ReminderLog';
+import { BusHome } from '../../schoolApp/busHomes';
+import { BusLiveSettings } from '../../schoolApp/busLive';
 import { ALL_FLAGS, forgetFeatureFlags } from '../../services/featureFlags';
 import { CURRENT_PRICE_VERSION } from '../../services/priceCatalog';
 import { buildPlan, PRICE_VERSION_SLOT, SEED_BATCH, type ModelName, type SeedUser } from './plan';
@@ -46,6 +48,7 @@ const MODELS: Record<ModelName, Model<any>> = {
   Invitation, LmsOnboarding, Assessment, AssessmentVersion, Assignment, AssessmentAttempt, GradeLedgerEntry, LessonProgress, ErrorToWorkOn, SessionSummary,
   LearnerProfile, StudyHabitDaily, ReviewItem, StudentObjectiveMastery, TutorSession, TutorMessage, AvatarSession, LearningEvent, UsageLedger, ParentEmailSend, ReminderLog,
   SchoolTimetableEntry, SchoolDailyAttendance, SchoolAnnouncement, SchoolImport, ParentNotification, SchoolInstalment, SchoolBusRoute, SchoolBusAssignment, SchoolBusNotice, SchoolRequest, SchoolConsentForm, SchoolConsent,
+  BusHome, BusLiveSettings,
 };
 
 export class SeedRefused extends Error {}
@@ -62,8 +65,8 @@ export function seedPassword(env: NodeJS.ProcessEnv = process.env): string {
 export interface RunResult { batch: string; counts: Record<string, number>; total: number; users: Omit<SeedUser, 'key' | 'userId'>[] }
 
 /** Casts and validates every planned document (no writes). Returns rows grouped by collection, or the list of problems. */
-export function preparePlan(now: Date, hash: string, only?: readonly ModelName[]) {
-  const full = buildPlan(now);
+export function preparePlan(now: Date, hash: string, only?: readonly ModelName[], built?: ReturnType<typeof buildPlan>) {
+  const full = built ?? buildPlan(now);
   const plan = only ? { ...full, docs: full.docs.filter((d) => only.includes(d.model)) } : full;
   const features = Object.fromEntries(ALL_FLAGS.map((f) => [f, true]));
   const byCollection = new Map<string, { model: Model<any>; rows: Record<string, any>[] }>();
@@ -131,9 +134,9 @@ export async function runSchoolAppSeed(now = new Date()): Promise<{ batch: strin
   return { batch: SEED_BATCH, counts, schools: ids };
 }
 
-export async function removeFullSeed(): Promise<{ batch: string; deleted: Record<string, number>; registryRowsDeleted: number }> {
+export async function removeFullSeed(batch: string = SEED_BATCH): Promise<{ batch: string; deleted: Record<string, number>; registryRowsDeleted: number }> {
   const registry = mongoose.connection.collection(REGISTRY);
-  const rows = await registry.find({ batch: SEED_BATCH }, { projection: { collection: 1, ref: 1 } }).toArray();
+  const rows = await registry.find({ batch }, { projection: { collection: 1, ref: 1 } }).toArray();
   const grouped = new Map<string, unknown[]>();
   for (const r of rows) { const c = String(r.collection); if (!grouped.has(c)) grouped.set(c, []); grouped.get(c)!.push(r.ref); }
   const deleted: Record<string, number> = {};
@@ -143,15 +146,39 @@ export async function removeFullSeed(): Promise<{ batch: string; deleted: Record
     for (let i = 0; i < ids.length; i += 1000) n += (await mongoose.connection.collection(c).deleteMany({ _id: { $in: ids.slice(i, i + 1000) } } as any)).deletedCount;
     deleted[c] = n;
   }
-  const reg = await registry.deleteMany({ batch: SEED_BATCH });
+  const reg = await registry.deleteMany({ batch });
   if (grouped.has(Institution.collection.collectionName)) forgetFeatureFlags(); // clears the flag cache
-  return { batch: SEED_BATCH, deleted, registryRowsDeleted: reg.deletedCount };
+  return { batch, deleted, registryRowsDeleted: reg.deletedCount };
 }
 
-export async function fullSeedStatus(): Promise<{ batch: string; counts: Record<string, number>; total: number }> {
+export async function fullSeedStatus(batch: string = SEED_BATCH): Promise<{ batch: string; counts: Record<string, number>; total: number }> {
   const out = await mongoose.connection
     .collection(REGISTRY)
-    .aggregate<{ _id: string; n: number }>([{ $match: { batch: SEED_BATCH } }, { $group: { _id: '$collection', n: { $sum: 1 } } }, { $sort: { _id: 1 } }])
+    .aggregate<{ _id: string; n: number }>([{ $match: { batch } }, { $group: { _id: '$collection', n: { $sum: 1 } } }, { $sort: { _id: 1 } }])
     .toArray();
-  return { batch: SEED_BATCH, counts: Object.fromEntries(out.map((r) => [r._id, r.n])), total: out.reduce((a, r) => a + r.n, 0) };
+  return { batch, counts: Object.fromEntries(out.map((r) => [r._id, r.n])), total: out.reduce((a, r) => a + r.n, 0) };
+}
+
+/** The family account (familyPlan.ts): its own batch, so it is removed on its own. The password is the one the owner sets for the
+ *  family's parent (at least 8 characters); it is never returned, logged or stored (only its bcrypt hash). */
+export async function runFamilySeed(password: string, now = new Date()): Promise<{ batch: string; counts: Record<string, number>; total: number; parentEmail: string; children: string[] }> {
+  if (typeof password !== 'string' || password.length < 8) throw new SeedRefused('password (at least 8 characters) is required; nothing was created');
+  const { buildFamilyPlan, FAMILY_BATCH, FAMILY_PARENT_EMAIL } = await import('./familyPlan');
+  const hash = await bcrypt.hash(password, 10);
+  const built = buildFamilyPlan(now);
+  const { byCollection, problems } = preparePlan(now, hash, undefined, built);
+  if (problems.length) throw new SeedRefused(`The plan has ${problems.length} invalid documents; nothing was written. First: ${problems.slice(0, 5).join(' | ')}`);
+  const registry = mongoose.connection.collection(REGISTRY);
+  const counts: Record<string, number> = {};
+  for (const [coll, { model, rows }] of byCollection) {
+    for (let i = 0; i < rows.length; i += 500) {
+      const chunk = rows.slice(i, i + 500);
+      await registry.bulkWrite(chunk.map((r) => ({ updateOne: { filter: { _id: `${coll}:${String(r._id)}` as any }, update: { $setOnInsert: { collection: coll, ref: r._id, batch: FAMILY_BATCH, createdAt: new Date() } }, upsert: true } })), { ordered: false });
+      await model.collection.bulkWrite(chunk.map((r) => ({ replaceOne: { filter: { _id: r._id }, replacement: r, upsert: true } })), { ordered: false });
+    }
+    counts[coll] = rows.length;
+  }
+  for (const d of built.docs) if (d.model === 'Institution') forgetFeatureFlags(String(d.doc.id));
+  const kids = built.docs.filter((d) => d.model === 'Student' && String(d.doc.name).endsWith(' Hassan') && ['Youssef', 'Laila', 'Omar'].includes(String(d.doc.name).split(' ')[0])).map((d) => `${d.doc.name} (${d.doc.grade})`);
+  return { batch: FAMILY_BATCH, counts, total: built.docs.length, parentEmail: FAMILY_PARENT_EMAIL, children: kids };
 }
