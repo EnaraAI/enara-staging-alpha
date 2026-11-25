@@ -79,6 +79,17 @@ describe('the family plan', () => {
     const ids = plan.docs.map((d) => `${d.model}:${String(d.doc._id)}`);
     expect(new Set(ids).size).toBe(ids.length);
   });
+
+  it('respects the unique indexes (one parent with this email; no other family called Hassan)', () => {
+    const emails = docsOf('User').map((u) => u.email);
+    expect(new Set(emails).size).toBe(emails.length);
+    expect(docsOf('User').filter((u) => u.role === 'parent' && / Hassan$/.test(u.name))).toHaveLength(1);
+    expect(docsOf('Student').filter((s) => / Hassan$/.test(s.name))).toHaveLength(3);
+    for (const [m, f] of [['Student', 'id'], ['CourseInstance', 'id'], ['AssessmentAttempt', 'id'], ['TutorSession', 'id'], ['SchoolDailyAttendance', 'id'], ['ParentNotification', 'id']] as const) {
+      const vals = docsOf(m).map((d) => d[f]);
+      expect(new Set(vals).size, m).toBe(vals.length);
+    }
+  });
 });
 
 describe('family run and remove (in-memory MongoDB)', () => {
@@ -88,6 +99,7 @@ describe('family run and remove (in-memory MongoDB)', () => {
 
   it('refuses a short password; runs twice without duplicates; removes exactly its own rows', async () => {
     await expect(runFamilySeed('short', NOW)).rejects.toThrow(SeedRefused);
+    await mongoose.connection.collection('users').createIndex({ email: 1 }, { unique: true }); // as on lms-test (the E2E caught a duplicate)
     const keep = await mongoose.connection.collection('users').insertOne({ email: 'someone@lms-test.example', role: 'teacher' });
     const pw = 'a-throwaway-value-for-this-test';
     const first = await runFamilySeed(pw, NOW);

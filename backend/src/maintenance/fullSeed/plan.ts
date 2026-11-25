@@ -164,16 +164,17 @@ export function buildPlan(now: Date, opts: PlanOptions = {}): FullSeedPlan {
 
     // ---------------------------------------------------------------- students (families first, so siblings share a family name)
     const seats = new Map(school.groups.map((g) => [g.key, g.size]));
-    const families: { family: string; kids: { group: string; age: number; p: { first: string; last: string; sex: 'm' | 'f' } }[]; intl: boolean }[] = [];
+    const families: { family: string; kids: { group: string; age: number; p: { first: string; last: string; sex: 'm' | 'f' } }[]; intl: boolean; planned?: true }[] = [];
     // The planned family comes first, in the first school of the run.
     if (FAM && si === 0) {
-      families.push({ family: FAM.family, intl: false, kids: FAM.kids.map((k) => {
+      families.push({ family: FAM.family, intl: false, planned: true, kids: FAM.kids.map((k) => {
         const g = school.groups.find((x) => x.key === k.group)!; seats.set(g.key, seats.get(g.key)! - 1);
         return { group: g.key, age: g.age, p: { first: k.first, last: FAM.family, sex: k.sex } };
       }) });
     }
     while ([...seats.values()].some((n) => n > 0)) {
-      const intl = R() < 0.12; const base = intl ? pick(INTL) : null; const family = base ? base[1] : pick(FAMILY);
+      const intl = R() < 0.12; const base = intl ? pick(INTL) : null; let family = base ? base[1] : pick(FAMILY);
+      while (FAM && family === FAM.family) family = pick(FAMILY); // the planned family's name is theirs alone
       const want = school.adultLearners ? 1 : R() < 0.55 ? 1 : R() < 0.75 ? 2 : 3;
       const kids: typeof families[number]['kids'] = [];
       for (let i = 0; i < want; i++) {
@@ -189,7 +190,7 @@ export function buildPlan(now: Date, opts: PlanOptions = {}): FullSeedPlan {
     for (const f of families) for (const k of f.kids) {
       n += 1; const id = `STU-${S}-${String(n).padStart(3, '0')}`; const key = `${S}.s${n}`;
       const drawn = Math.min(0.97, Math.max(0.25, 0.45 + R() * 0.55 - (R() < 0.18 ? 0.25 : 0)));
-      const ability = (FAM && f.family === FAM.family ? FAM.kids.find((x) => x.first === k.p.first)?.ability : undefined) ?? drawn;
+      const ability = (f.planned ? FAM!.kids.find((x) => x.first === k.p.first)?.ability : undefined) ?? drawn;
       const status = ability > 0.82 ? 'excelling' : ability < 0.5 ? 'at risk' : 'on track';
       const band = k.age < 13 ? 'child' : k.age < 18 ? 'teen' : 'adult'; const kidsMode = k.age < 9;
       const birth = new Date(Date.UTC(now.getUTCFullYear() - k.age, int(0, 11), int(1, 28)));
@@ -269,7 +270,7 @@ export function buildPlan(now: Date, opts: PlanOptions = {}): FullSeedPlan {
       for (const f of families) {
         fi += 1;
         const kids = schoolStudents.filter((s) => s.family === f.family && f.kids.some((k) => `${k.p.first} ${k.p.last}` === s.name));
-        const planned = !!FAM && f.family === FAM.family;
+        const planned = !!f.planned;
         const roll = R(); const nParents = planned ? 1 : roll < 0.15 ? 0 : roll < 0.78 ? 1 : 2;
         for (let pi = 0; pi < nParents; pi++) {
           const key = `${S}.p${fi}${pi ? 'b' : ''}`; const p = planned ? { first: FAM!.parent.first, last: FAM!.parent.last, sex: FAM!.parent.sex } : person(pi === 0 ? (R() < 0.6 ? 'f' : 'm') : 'm', f.family, 0);
