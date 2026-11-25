@@ -80,7 +80,7 @@ test.describe.serial('12 · Parents P3: results reach parents only after release
     } else {
       expect(status.status.reason.code).not.toBe('score_drop');
     }
-    await page.getByRole('button', { name: 'Progress' }).click();
+    await page.getByTestId('pp-nav-progress').click();
     const row = page.getByTestId('pp-result').filter({ hasText: TITLE });
     await expect(row).toBeVisible();
     await expect(row.getByTestId('pp-result-waiting')).toHaveText('Waiting for the teacher');
@@ -104,7 +104,7 @@ test.describe.serial('12 · Parents P3: results reach parents only after release
       expect(item.class).toEqual({ id: readState().courseContext.enaraClassId, name: classes.find((c) => c.id === readState().courseContext.enaraClassId)?.name });
     }
     await page.reload();
-    await page.getByRole('button', { name: 'Progress' }).click();
+    await page.getByTestId('pp-nav-progress').click();
     const row = page.getByTestId('pp-result').filter({ hasText: TITLE });
     await expect(row).toContainText('75%');
     await expect(row.getByTestId('pp-result-waiting')).toHaveCount(0);

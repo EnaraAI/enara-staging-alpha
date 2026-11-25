@@ -47,15 +47,15 @@ const ProgressAll: React.FC<ProgressProps> = ({ learner, refreshKey, onFetched, 
               <span className={`pp-mark${lv.state === 'done' ? ' pp-mark--done' : lv.state === 'current' ? ' pp-mark--current' : ''}`} aria-hidden="true">{lv.state === 'done' ? '✓' : lv.state === 'current' ? '●' : ''}</span>
               <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
                 <div className="pp-row" style={{ alignItems: 'baseline' }}>
-                  <span style={{ fontSize: 14, fontWeight: lv.state === 'current' ? 600 : lv.state === 'done' ? 500 : 400, color: lv.state === 'ahead' ? '#566376' : '#111c2c' }}>{bi(lv.label, lang)}</span>
+                  <span style={{ fontSize: 14, fontWeight: lv.state === 'current' ? 600 : lv.state === 'done' ? 500 : 400, color: lv.state === 'ahead' ? 'var(--muted)' : 'var(--text)' }}>{bi(lv.label, lang)}</span>
                   <span className="pp-meta">{lv.cefr}</span>
                 </div>
                 {lv.state === 'current' && (d.level.subLevelPct !== null ? (
                   <>
                     <div className="pp-bar" style={{ blockSize: 6, background: '#fff' }} role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={d.level.subLevelPct} aria-label={lvlName}><i style={{ inlineSize: `${d.level.subLevelPct}%` }} /></div>
-                    <span style={{ fontSize: 12, color: '#16263b' }}>{d.level.subLevel ? `${d.level.subLevel} · ` : ''}{levelNextLine(ctx, d.level) ?? ''}</span>
+                    <span style={{ fontSize: 12, color: 'var(--text-2)' }}>{d.level.subLevel ? `${d.level.subLevel} · ` : ''}{levelNextLine(ctx, d.level) ?? ''}</span>
                   </>
-                ) : <span style={{ fontSize: 12, color: '#566376' }}>{t.noSubLevel}</span>)}
+                ) : <span style={{ fontSize: 12, color: 'var(--muted)' }}>{t.noSubLevel}</span>)}
                 {lv.state === 'done' && <span className="sr">{t.canDoState.achieved}</span>}
               </div>
             </li>
@@ -71,7 +71,7 @@ const ProgressAll: React.FC<ProgressProps> = ({ learner, refreshKey, onFetched, 
           <div className="pp-skill" key={s.skill}>
             <div className="pp-row" style={{ fontSize: 14 }}>
               <span style={{ fontWeight: 500 }}>{t.skill[s.skill] ?? s.skill}</span>
-              <span className="pp-num" style={{ color: '#16263b' }}>{n(s.pct)}% <span aria-hidden="true" style={{ color: s.trend === 'up' ? '#0b203c' : '#566376', fontWeight: s.trend === 'up' ? 600 : 400 }}>{s.trend === 'up' ? '↑' : s.trend === 'down' ? '↓' : rtl ? '←' : '→'}</span><span className="sr">, {t.trend[s.trend]}</span></span>
+              <span className="pp-num" style={{ color: 'var(--text-2)' }}>{n(s.pct)}% <span aria-hidden="true" style={{ color: s.trend === 'up' ? 'var(--navy)' : 'var(--muted)', fontWeight: s.trend === 'up' ? 600 : 400 }}>{s.trend === 'up' ? '↑' : s.trend === 'down' ? '↓' : rtl ? '←' : '→'}</span><span className="sr">, {t.trend[s.trend]}</span></span>
             </div>
             <div className="pp-bar pp-bar--navy" aria-hidden="true"><i style={{ inlineSize: `${s.pct}%` }} /></div>
           </div>

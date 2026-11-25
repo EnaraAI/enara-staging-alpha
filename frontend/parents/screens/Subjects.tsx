@@ -67,7 +67,7 @@ export const SubjectsOverview: React.FC<{ subjects: SubjectCard[]; onPick: (key:
           <article className="pp-card" key={s.key} data-testid="pp-subject-card" data-subject={s.key}>
             <button type="button" className="pp-card--link pp-subject-head" onClick={() => onPick(s.key)}>
               <h2 className="pp-h2">{bi(s.name, lang)}</h2>
-              <Icon name="chevron" flip style={{ color: '#566376' }} />
+              <Icon name="chevron" flip style={{ color: 'var(--muted)' }} />
             </button>
             <LevelLine s={s} />
             {s.lessons.total > 0 && (
@@ -166,8 +166,8 @@ export const SubjectView: React.FC<{ learner: LearnerChip; subjectKey: string; m
       </section>
       {(s.next.lesson || s.next.due) && (
         <section className="pp-card pp-card--flush" aria-label={t.comingNext}>
-          {s.next.due && <div className="pp-list-row"><span className="pp-dot" style={{ background: '#db7706' }} aria-hidden="true" /><p dir="auto">{s.next.due.title}</p><span className="pp-meta">{t.dueOn(cairoDate(s.next.due.dueAt.slice(0, 10), lang, { weekday: 'short', day: 'numeric', month: 'short' }))}</span></div>}
-          {s.next.lesson && <div className="pp-list-row"><span className="pp-dot" style={{ background: '#566376' }} aria-hidden="true" /><p dir="auto">{s.next.lesson}</p><span className="pp-meta">{t.nextLesson}</span></div>}
+          {s.next.due && <div className="pp-list-row"><span className="pp-dot" style={{ background: 'var(--warn-dot)' }} aria-hidden="true" /><p dir="auto">{s.next.due.title}</p><span className="pp-meta">{t.dueOn(cairoDate(s.next.due.dueAt.slice(0, 10), lang, { weekday: 'short', day: 'numeric', month: 'short' }))}</span></div>}
+          {s.next.lesson && <div className="pp-list-row"><span className="pp-dot" style={{ background: 'var(--muted)' }} aria-hidden="true" /><p dir="auto">{s.next.lesson}</p><span className="pp-meta">{t.nextLesson}</span></div>}
         </section>
       )}
       {results}

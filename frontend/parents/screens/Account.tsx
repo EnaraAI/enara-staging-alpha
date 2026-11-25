@@ -4,8 +4,9 @@ import { cairoDate, parentsApi } from '../api';
 import { Avatar, ErrorBox, Icon, Loading, useP } from '../ui';
 import { useLive } from '../useLive';
 import { AddEmail } from './AddEmail';
+import type { Theme } from '../ParentsApp';
 
-export const Account: React.FC<{ refreshKey: number; setLang: (l: Lang) => void; onLink: () => void; onPick: (studentId: string) => void; onChanged: () => void; onSignOut: () => void ; schoolOn?: boolean; feesOn?: boolean; busOn?: boolean; requestsOn?: boolean }> = ({ refreshKey, setLang, onLink, onPick, onChanged, onSignOut , schoolOn, feesOn, busOn, requestsOn }) => {
+export const Account: React.FC<{ refreshKey: number; setLang: (l: Lang) => void; onLink: () => void; onPick: (studentId: string) => void; onChanged: () => void; onSignOut: () => void ; schoolOn?: boolean; feesOn?: boolean; busOn?: boolean; requestsOn?: boolean; theme?: Theme; setTheme?: (v: Theme) => void; onControls?: () => void }> = ({ refreshKey, setLang, onLink, onPick, onChanged, onSignOut , schoolOn, feesOn, busOn, requestsOn, theme, setTheme, onControls }) => {
   const { t, n, lang } = useP();
   const q = useLive(() => parentsApi.account(), [], refreshKey);
   const [note, setNote] = useState<string | null>(null);
@@ -38,7 +39,7 @@ export const Account: React.FC<{ refreshKey: number; setLang: (l: Lang) => void;
             <button type="button" className="pp-person-text" style={{ border: 0, background: 'none', textAlign: 'start', cursor: 'pointer', padding: 0, minBlockSize: 44, justifyContent: 'center' }} onClick={() => onPick(l.studentId)}>
               <b>{l.firstName}{l.age !== null ? `${lang === 'ar' ? '، ' : ', '}${n(l.age)}` : ''}</b>
               <small>{t.tierLine[l.tier]}</small>
-              {l.consent === 'pending' && <small style={{ color: '#92400e' }}>{t.consentPending}</small>}
+              {l.consent === 'pending' && <small style={{ color: 'var(--warn)' }}>{t.consentPending}</small>}
             </button>
             <button type="button" className="pp-linkbtn" onClick={() => unlink(l.linkId, l.firstName)}>{t.unlink}</button>
           </div>
@@ -107,6 +108,17 @@ export const Account: React.FC<{ refreshKey: number; setLang: (l: Lang) => void;
             <button type="button" aria-pressed={lang === 'ar'} onClick={() => chooseLang('ar')} lang="ar">العربية</button>
           </div>
         </div>
+        {setTheme && (
+          // Redesign step 1: dark mode (saved on this device).
+          <div className="pp-row" style={{ fontSize: 14, flexWrap: 'wrap' }}>
+            <span id="pp-theme-label">{t.ui.theme}</span>
+            <div className="pp-theme" role="group" aria-labelledby="pp-theme-label" data-testid="pp-theme">
+              {(['light', 'dark', 'auto'] as const).map((v) => (
+                <button key={v} type="button" aria-pressed={theme === v} onClick={() => setTheme(v)}>{v === 'light' ? t.ui.themeLight : v === 'dark' ? t.ui.themeDark : t.ui.themeAuto}</button>
+              ))}
+            </div>
+          </div>
+        )}
         {d.preferences.emails ? (
           // Parents P4: the parent's own on/off for the two optional emails (the school's switches apply first).
           <>
@@ -133,6 +145,17 @@ export const Account: React.FC<{ refreshKey: number; setLang: (l: Lang) => void;
         )}
         <div className="pp-row" style={{ fontSize: 14, minBlockSize: 44 }}><span>{t.alertsVia}</span><span className="pp-meta">{d.preferences.alertChannels.map((c) => t.channels[c] ?? c).join(' + ')}</span></div>
       </section>
+
+      {onControls && d.learners.length > 0 && (
+        // Redesign step 1: learning controls moved here from their own tab.
+        <section className="pp-card pp-card--flush" style={{ gap: 0 }}>
+          <button type="button" className="pp-thread" onClick={onControls} data-testid="pp-open-controls">
+            <span className="pp-av2 pp-av2--info"><Icon name="controls" /></span>
+            <span className="pp-thread-body"><span className="pp-thread-name">{t.ui.controlsRow}</span><span className="pp-thread-sub">{t.ui.controlsSub}</span></span>
+            <Icon name="chevron" flip style={{ color: 'var(--muted)' }} />
+          </button>
+        </section>
+      )}
 
       <section className="pp-card" aria-labelledby="pp-privacy" style={{ gap: 4 }}>
         <h2 className="pp-h2" id="pp-privacy" style={{ marginBlockEnd: 8 }}>{t.privacy}</h2>

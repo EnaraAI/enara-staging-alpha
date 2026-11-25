@@ -6,9 +6,9 @@ import { Icon, Sheet, useP } from '../ui';
 // from the parent's own screens) and show their source and date. It never acts: a request is opened only after the parent taps confirm.
 type Msg = { from: 'you' | 'enara'; text: string; reply?: ChatReply; created?: boolean };
 
-export const SchoolChat: React.FC<{ learner: LearnerChip }> = ({ learner }) => {
+// Redesign step 1: opened from the assistant row in Messages (no floating button).
+export const SchoolChat: React.FC<{ learner: LearnerChip; onClose: () => void }> = ({ learner, onClose }) => {
   const { t, lang } = useP();
-  const [open, setOpen] = useState(false);
   const [msgs, setMsgs] = useState<Msg[]>([]);
   const [q, setQ] = useState('');
   const [busy, setBusy] = useState(false);
@@ -31,11 +31,7 @@ export const SchoolChat: React.FC<{ learner: LearnerChip }> = ({ learner }) => {
   };
   return (
     <>
-      <button type="button" className="pp-chat-fab" onClick={() => setOpen(true)} aria-label={t.sch.chatOpen} data-testid="pp-chat-open">
-        <svg viewBox="0 0 24 24" aria-hidden="true" width="26" height="26"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" /></svg>
-      </button>
-      {open && (
-        <Sheet title={t.sch.chatTitle} onClose={() => setOpen(false)}>
+        <Sheet title={t.sch.chatTitle} onClose={onClose}>
           <div className="pp-chat" data-testid="pp-chat">
             {!msgs.length && <p className="pp-sub">{t.sch.chatHint(learner.firstName)}</p>}
             {msgs.map((m, i) => (
@@ -60,7 +56,6 @@ export const SchoolChat: React.FC<{ learner: LearnerChip }> = ({ learner }) => {
           </form>
           <p className="pp-meta">{t.sch.chatDisclaimer}</p>
         </Sheet>
-      )}
     </>
   );
 };

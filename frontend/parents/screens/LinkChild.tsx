@@ -44,7 +44,7 @@ export const LinkChild: React.FC<{ onLinked: (studentId: string) => void; onCanc
             <p className="pp-sub" id="pp-code-help">{t.whatYouSee}</p>
           </div>
           {/* Owner decision d): the secret-code warning on the code entry page. */}
-          <p className="pp-notice" role="note" data-testid="secret-code-warning" style={{ display: 'block', fontSize: 13, background: '#fff7e6', color: '#5c3d00' }}>{t.secretCode}</p>
+          <p className="pp-notice" role="note" data-testid="secret-code-warning" style={{ display: 'block', fontSize: 13, background: 'var(--warn-50)', color: 'var(--sun-ink)' }}>{t.secretCode}</p>
           {error && <p className="pp-error" id="pp-code-err" role="alert"><Icon name="alert" />{error}</p>}
           <button type="submit" className="pp-btn pp-btn--primary pp-btn--block" disabled={busy}>{busy ? t.loading : t.check}</button>
           {onCancel && <button type="button" className="pp-btn pp-btn--block" onClick={onCancel}>{t.cancel}</button>}
@@ -54,7 +54,7 @@ export const LinkChild: React.FC<{ onLinked: (studentId: string) => void; onCanc
         <section className="pp-card" aria-labelledby="pp-preview">
           <h2 className="pp-h2" id="pp-preview">{t.previewTitle}</h2>
           <div className="pp-person">
-            <span className="pp-avatar" style={{ background: '#f59f0a', color: '#08172b' }} aria-hidden="true">{preview.learner.charAt(0)}</span>
+            <span className="pp-avatar" style={{ background: 'var(--amber)', color: '#08172b' }} aria-hidden="true">{preview.learner.charAt(0)}</span>
             <div className="pp-person-text"><b dir="auto">{preview.learner}</b>{preview.school && <small dir="auto">{t.previewSchool(preview.school)}</small>}</div>
           </div>
           <p className="pp-sub">{t.whatYouSee}</p>

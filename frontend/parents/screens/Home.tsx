@@ -32,7 +32,7 @@ const HomeAll: React.FC<HomeProps> = ({ learner, refreshKey, go, onShare, onFetc
     <>
       {!kid && (
         <section className="pp-notice">
-          <Icon name="eye" style={{ color: '#075985' }} />
+          <Icon name="eye" style={{ color: 'var(--sky)' }} />
           <div><b>{notice.title}</b><p>{notice.body}</p></div>
         </section>
       )}
@@ -58,7 +58,7 @@ const HomeAll: React.FC<HomeProps> = ({ learner, refreshKey, go, onShare, onFetc
           </ul>
           <p style={{ fontSize: 14, lineHeight: '20px' }}>
             {s.streak > 0 && <><strong style={{ fontWeight: 600 }}>{t.streak(n(s.streak))}</strong>{' · '}</>}
-            <span style={{ color: '#566376' }}>{t.sessions(n(s.sessions))}{s.lastPractised ? ` · ${t.lastPractised(cairoDate(s.lastPractised, lang, { weekday: 'long' }))}` : ` · ${t.notYet}`}</span>
+            <span style={{ color: 'var(--muted)' }}>{t.sessions(n(s.sessions))}{s.lastPractised ? ` · ${t.lastPractised(cairoDate(s.lastPractised, lang, { weekday: 'long' }))}` : ` · ${t.notYet}`}</span>
           </p>
         </div>
       </section>
@@ -68,7 +68,7 @@ const HomeAll: React.FC<HomeProps> = ({ learner, refreshKey, go, onShare, onFetc
       {!lvl.mock && <button type="button" className="pp-card pp-card--link" onClick={() => go('progress')}>
         <div className="pp-row">
           <p className="pp-eyebrow">{t.level}</p>
-          <Icon name="chevron" flip style={{ color: '#566376' }} />
+          <Icon name="chevron" flip style={{ color: 'var(--muted)' }} />
         </div>
         <p className="pp-level">{bi(lvl.label, lang)} <span>· {lvl.cefr}{lvl.subLevel && lvl.cefr !== 'Pre-A1' ? ` (${lvl.subLevel})` : ''}</span></p>
         {lvl.subLevelPct !== null ? (
@@ -94,9 +94,9 @@ const HomeAll: React.FC<HomeProps> = ({ learner, refreshKey, go, onShare, onFetc
 
       {!kid && (
         <section className="pp-card pp-card--flush">
-          <div className="pp-list-row"><Icon name="eye" style={{ color: '#566376' }} /><p>{t.conversations}</p><button type="button" className="pp-linkbtn" onClick={() => go('activity')}>{t.conversationsVisible}</button></div>
-          <div className="pp-list-row"><Icon name="shield" style={{ color: '#047857' }} /><p>{t.safetyAlerts}</p><span className="pp-meta">{d.alerts.count && !d.alerts.mock ? n(d.alerts.count) : t.noAlerts}</span></div>
-          <div className="pp-list-row"><Icon name="target" style={{ color: '#566376' }} /><p>{t.weeklyGoal(n(s.goalMinutes))}</p><span className={`pp-tag ${accepted ? 'pp-tag--sky' : 'pp-tag--warn'}`}>{accepted ? t.acceptedBy(name) : t.waitingFor(name)}</span></div>
+          <div className="pp-list-row"><Icon name="eye" style={{ color: 'var(--muted)' }} /><p>{t.conversations}</p><button type="button" className="pp-linkbtn" onClick={() => go('activity')}>{t.conversationsVisible}</button></div>
+          <div className="pp-list-row"><Icon name="shield" style={{ color: 'var(--emerald)' }} /><p>{t.safetyAlerts}</p><span className="pp-meta">{d.alerts.count && !d.alerts.mock ? n(d.alerts.count) : t.noAlerts}</span></div>
+          <div className="pp-list-row"><Icon name="target" style={{ color: 'var(--muted)' }} /><p>{t.weeklyGoal(n(s.goalMinutes))}</p><span className={`pp-tag ${accepted ? 'pp-tag--sky' : 'pp-tag--warn'}`}>{accepted ? t.acceptedBy(name) : t.waitingFor(name)}</span></div>
         </section>
       )}
 
@@ -109,7 +109,7 @@ const HomeAll: React.FC<HomeProps> = ({ learner, refreshKey, go, onShare, onFetc
 
       {d.alerts.latest && !d.alerts.mock && (
         <section className="pp-card" aria-labelledby="pp-alert">
-          <div className="pp-row"><h2 className="pp-h2" id="pp-alert"><Icon name="shield" style={{ color: '#b42318', verticalAlign: 'middle', marginInlineEnd: 6 }} />{t.alertCat[d.alerts.latest.category] ?? d.alerts.latest.category}</h2></div>
+          <div className="pp-row"><h2 className="pp-h2" id="pp-alert"><Icon name="shield" style={{ color: 'var(--bad)', verticalAlign: 'middle', marginInlineEnd: 6 }} />{t.alertCat[d.alerts.latest.category] ?? d.alerts.latest.category}</h2></div>
           <p className="pp-meta">{cairoDate(d.alerts.latest.createdAt.slice(0, 10), lang)}</p>
           <p style={{ fontSize: 14 }}><strong style={{ fontWeight: 600 }}>{t.whatEnaraDid}:</strong> {bi(d.alerts.latest.actionTaken, lang)}</p>
           {d.alerts.latest.excerpt && <p style={{ fontSize: 14 }}><strong style={{ fontWeight: 600 }}>{t.excerpt}:</strong> <q dir="auto">{d.alerts.latest.excerpt}</q></p>}
@@ -119,7 +119,7 @@ const HomeAll: React.FC<HomeProps> = ({ learner, refreshKey, go, onShare, onFetc
       {!d.upcoming.mock && <section className="pp-card pp-card--flush" aria-label={t.alerts}>
         {d.upcoming.items.map((u, i) => (
           <div className="pp-list-row" key={i}>
-            <span className="pp-dot" style={{ background: u.kind === 'assessment' ? '#db7706' : '#566376' }} aria-hidden="true" />
+            <span className="pp-dot" style={{ background: u.kind === 'assessment' ? 'var(--warn-dot)' : 'var(--muted)' }} aria-hidden="true" />
             <p>{bi(u.text, lang)}</p>
             {u.kind === 'plan_renewal' ? <button type="button" className="pp-linkbtn" onClick={() => go('account')}>{t.manage}</button> : <span className="pp-meta">{u.meta}</span>}
           </div>

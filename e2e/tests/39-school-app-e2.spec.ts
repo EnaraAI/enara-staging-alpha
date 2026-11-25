@@ -27,6 +27,7 @@ test.describe.serial('39 · Parents school app (e2): the assistant on a phone', 
     await page.getByRole('button', { name: 'Yes, open ENARA Parents' }).click();
     await expect(page.locator('.pp-switcher .pp-chip:not(.pp-chip--add)')).toHaveCount(1, { timeout: 30_000 });
 
+    await page.getByTestId('pp-nav-messages').click(); // redesign: the assistant is the first chat in Messages
     await page.getByTestId('pp-chat-open').click();
     await page.getByTestId('pp-chat-input').fill('How much is left to pay?');
     await page.getByTestId('pp-chat-send').click();

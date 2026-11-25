@@ -62,7 +62,7 @@ test.describe.serial('37 · Parents school app (d2): request and consent screens
     await staff.context.close();
 
     await page.reload();
-    await page.locator('.pp-nav').getByRole('button', { name: 'School' }).click();
+    await page.getByTestId('pp-nav-home').click(); await page.getByTestId('pp-school-home').getByRole('button').first().click(); // redesign: School opens from Today
     await page.getByTestId('pp-school-requests').click();
     await expect(page.getByTestId('pp-request').filter({ hasText: `Meeting about homework ${RUN}` }).getByTestId('pp-request-reply')).toHaveText('Thursday 10:00 with Ms Salma.');
     await shot(page, 'school-d2-03-request-answered');
