@@ -146,6 +146,7 @@ export function addSchoolAppSeed(input: { now: Date; add: Add; schools: SchoolDe
     const tuitionName = lang === 'ar' ? 'المصروفات الدراسية 2026-2027' : 'Tuition 2026-2027';
     const busName = lang === 'ar' ? 'اشتراك الحافلة 2026-2027' : 'School bus 2026-2027';
     const dayAt = (n: number) => cairoDate(new Date(now.getTime() + n * DAY));
+    const busRiders = new Set<string>(); // a child with a bus fee plan always has a bus route (step c), and only those children
     for (const s of students.filter((x) => x.school.id === school.id && !x.archived)) {
       const base = (en ? 18_000 : 12_000) + Math.floor(R() * 4) * 1_500;
       const r = R();
@@ -163,7 +164,8 @@ export function addSchoolAppSeed(input: { now: Date; add: Add; schools: SchoolDe
           ...(row.status === 'waived' ? { note: lang === 'ar' ? 'إعفاء الأخوة' : 'Sibling discount' } : {}),
           ...(row.n === 2 && second === 'soon' ? {} : row.n === 1 ? { reminders: ['d7', 'd1'] } : {}), source: feeSource, createdAt: feeSource.at, updatedAt: feeSource.at });
       }
-      if (R() < 0.33) for (const n of [1, 2]) {
+      if (R() < 0.33) busRiders.add(s.id);
+      if (busRiders.has(s.id)) for (const n of [1, 2]) {
         const key = `${s.id}:bus:${n}`;
         const paid = n === 1;
         add('SchoolInstalment', key, { id: sid('sin', key), institutionId: school.id, studentId: s.id, planName: busName, planKey: norm(busName), academicYear: '2026-2027', number: n,
@@ -171,7 +173,7 @@ export function addSchoolAppSeed(input: { now: Date; add: Add; schools: SchoolDe
           source: feeSource, createdAt: feeSource.at, updatedAt: feeSource.at });
       }
     }
-    // ---- buses (step c): 3 routes with 4-5 stops each; about half of the current students ride; one delay notice today.
+    // ---- buses (step c): 3 routes with 4-5 stops each; the children with a bus fee plan ride (about a third); one delay notice today.
     const busSource = imp('bus_routes', lang === 'ar' ? 'خطوط-الحافلات.xlsx' : 'bus-routes.xlsx', 20, 0);
     const AREAS = lang === 'ar'
       ? [['ميدان الحجاز', 'شارع النزهة', 'ميدان تريومف', 'شارع الثورة', 'بوابة المدرسة'], ['المعادي الجديدة', 'دجلة', 'كورنيش المعادي', 'شارع 9'], ['التجمع الخامس', 'شارع التسعين', 'الرحاب', 'مدينتي', 'بوابة المدرسة']]
@@ -191,7 +193,7 @@ export function addSchoolAppSeed(input: { now: Date; add: Add; schools: SchoolDe
     });
     const assignSource = imp('bus_assignments', lang === 'ar' ? 'ركاب-الحافلات.xlsx' : 'bus-riders.xlsx', 20, 0);
     for (const s of students.filter((x) => x.school.id === school.id && !x.archived)) {
-      if (R() >= 0.5) continue;
+      if (!busRiders.has(s.id)) continue;
       const ri = Math.floor(R() * routes.length); const r = routes[ri];
       const stop = r.stops[Math.floor(R() * (r.stops.length - 1))];
       const dir = R() < 0.85 ? 'both' : R() < 0.5 ? 'morning' : 'afternoon';

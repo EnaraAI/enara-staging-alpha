@@ -3,7 +3,7 @@ import { Batch } from '../models/Batch';
 import { Student } from '../models/Student';
 import { recordAudit } from '../services/auditTrail';
 import { parseCsv } from '../parents/csvInvites';
-import { SchoolAnnouncement, SchoolBusAssignment, SchoolBusRoute, SchoolDailyAttendance, SchoolImport, SchoolInstalment, SchoolTimetableEntry, type Source } from './models';
+import { SchoolAnnouncement, SchoolBusAssignment, SchoolBusRoute, SchoolColumnMapping, SchoolDailyAttendance, SchoolImport, SchoolInstalment, SchoolTimetableEntry, type Source } from './models';
 import { COLUMNS, MAX_ROWS, SECTION_OF, checkRow, mapHeaders, norm, type ImportSection } from './importSpec';
 import { sectionOn, newId } from './sections';
 import { notifyAbsences, notifyAnnouncements } from './notifications';
@@ -24,12 +24,31 @@ function scopeOf(actor: Actor, institutionId?: string): string {
 }
 
 /** Rows from CSV text (first row = headers), with header problems. */
-export function rowsFromCsv(section: ImportSection, text: string): { rows: Record<string, string>[]; missing: string[] } {
+export function rowsFromCsv(section: ImportSection, text: string, saved: Record<string, string> = {}): { rows: Record<string, string>[]; missing: string[]; headers: string[]; map: (string | null)[] } {
   const grid = parseCsv(text.replace(/^﻿/, ''));
-  if (!grid.length) return { rows: [], missing: COLUMNS[section].filter((c) => c.required).map((c) => c.key) };
-  const { map, missing } = mapHeaders(section, grid[0]);
+  if (!grid.length) return { rows: [], missing: COLUMNS[section].filter((c) => c.required).map((c) => c.key), headers: [], map: [] };
+  const { map, missing } = mapHeaders(section, grid[0], saved);
   const rows = grid.slice(1).map((cells) => { const r: Record<string, string> = {}; map.forEach((k, i) => { if (k) r[k] = (cells[i] ?? '').trim(); }); return r; });
-  return { rows, missing };
+  return { rows, missing, headers: grid[0].map((h) => h.trim()), map };
+}
+
+/** The admin's column choices from the request: { "<file header>": "<column key>" | "" }. Unknown keys are refused. */
+function mappingFrom(section: ImportSection, raw: unknown): Record<string, string> {
+  if (raw === undefined || raw === null) return {};
+  if (typeof raw !== 'object' || Array.isArray(raw)) throw new AppError('mapping must be an object of file header -> column', 400, 'VALIDATION_ERROR');
+  const keys = new Set(COLUMNS[section].map((c) => c.key));
+  const out: Record<string, string> = {};
+  const entries = Object.entries(raw as Record<string, unknown>);
+  if (entries.length > 60) throw new AppError('Too many columns in mapping (max 60)', 400, 'VALIDATION_ERROR');
+  for (const [h, k] of entries) {
+    if (typeof k !== 'string' || (k !== '' && !keys.has(k))) throw new AppError(`Unknown column "${String(k)}" for this import`, 400, 'VALIDATION_ERROR');
+    const nh = norm(h).slice(0, 100);
+    if (nh) out[nh] = k;
+  }
+  return out;
+}
+async function savedMapping(institutionId: string, section: ImportSection): Promise<Record<string, string>> {
+  return ((await SchoolColumnMapping.findOne({ institutionId, section }).lean())?.map ?? {}) as Record<string, string>;
 }
 
 /** Field checks + database matching (students, classes). Never writes. */
@@ -117,19 +136,25 @@ async function diff(section: ImportSection, institutionId: string, rows: Record<
 }
 
 /** Step 1: check and preview. Nothing is written except the preview itself. */
-export async function previewImport(actor: Actor, body: { section?: unknown; csv?: unknown; fileName?: unknown; institutionId?: unknown }) {
+export async function previewImport(actor: Actor, body: { section?: unknown; csv?: unknown; fileName?: unknown; institutionId?: unknown; mapping?: unknown; askMapping?: unknown }, opts: { savedMapping?: boolean } = {}) {
   const institutionId = scopeOf(actor, typeof body.institutionId === 'string' ? body.institutionId : undefined);
   if (!isImportSection(body.section)) throw new AppError('section must be timetable, attendance, announcements, fees, bus_routes or bus_assignments', 400, 'VALIDATION_ERROR');
   if (!(await sectionOn(institutionId, SECTION_OF[body.section]))) throw new AppError(`The ${SECTION_OF[body.section]} section is off for this school`, 409, 'SECTION_OFF');
   if (typeof body.csv !== 'string' || !body.csv.trim()) throw new AppError('Upload a CSV file (Excel: Save as CSV UTF-8)', 400, 'VALIDATION_ERROR');
   if (body.csv.length > 3_000_000) throw new AppError('File too large (max 3 MB)', 413, 'TOO_LARGE');
-  const { rows, missing } = rowsFromCsv(body.section, body.csv);
-  if (missing.length) throw new AppError(`Missing columns: ${missing.join(', ')}`, 400, 'MISSING_COLUMNS');
+  const chosen = mappingFrom(body.section, body.mapping);
+  const saved = opts.savedMapping === false ? {} : await savedMapping(institutionId, body.section);
+  const { rows, missing, headers, map } = rowsFromCsv(body.section, body.csv, { ...saved, ...chosen });
+  if (missing.length) {
+    // The admin page asks to match the file's own column names instead of an error; the choice is saved for the school on confirm.
+    if (body.askMapping === true) return { needsMapping: true as const, section: body.section, headers: headers.slice(0, 60), map: map.slice(0, 60), missing, columns: COLUMNS[body.section].filter((c) => c.key !== 'external_id').map((c) => ({ key: c.key, required: c.required })) };
+    throw new AppError(`Missing columns: ${missing.join(', ')}`, 400, 'MISSING_COLUMNS');
+  }
   if (rows.length > MAX_ROWS) throw new AppError(`Too many rows (max ${MAX_ROWS})`, 413, 'TOO_MANY_ROWS');
   const { good, problems } = await resolve(body.section, institutionId, rows);
   const counts = { ...(await diff(body.section, institutionId, good)), rejected: problems.length, total: rows.length };
   const imp = await SchoolImport.create({ id: newId('simp'), institutionId, section: body.section, fileName: typeof body.fileName === 'string' ? body.fileName.slice(0, 200) : undefined,
-    status: 'preview', rows: good, counts, problems: problems.slice(0, 500), createdBy: actor.id });
+    status: 'preview', rows: good, counts, problems: problems.slice(0, 500), createdBy: actor.id, ...(Object.keys(chosen).length ? { mapping: chosen } : {}) });
   return { importId: imp.id, section: body.section, counts, problems: problems.slice(0, 200), sample: good.slice(0, 20) };
 }
 
@@ -143,6 +168,10 @@ export async function confirmImport(actor: Actor, importId: string) {
   const written = await write(section, imp.institutionId, imp.rows, { kind: 'import', ref: imp.id, at: new Date() });
   imp.status = 'confirmed'; imp.confirmedBy = actor.id; imp.confirmedAt = new Date(); imp.written = written; imp.markModified('written');
   await imp.save();
+  if (imp.mapping && Object.keys(imp.mapping).length) {
+    const merged = { ...(await savedMapping(imp.institutionId, section)), ...imp.mapping };
+    await SchoolColumnMapping.updateOne({ institutionId: imp.institutionId, section }, { $set: { map: merged, updatedBy: actor.id } }, { upsert: true });
+  }
   await recordAudit('school_app_import_confirmed', actor, { institutionId: imp.institutionId, type: 'school_import', id: imp.id }, { section, rows: imp.rows.length, counts: imp.counts });
   return { importId: imp.id, section, written: { inserted: written.inserted.length, replaced: written.replaced.length } };
 }
@@ -159,6 +188,20 @@ export async function undoImport(actor: Actor, importId: string) {
   imp.status = 'undone'; imp.undoneAt = new Date(); await imp.save();
   await recordAudit('school_app_import_undone', actor, { institutionId: imp.institutionId, type: 'school_import', id: imp.id }, { section: imp.section });
   return { importId: imp.id, status: 'undone' };
+}
+
+/** The school's saved column names per import section, and clearing one section's. */
+export async function listMappings(actor: Actor, institutionId?: string) {
+  const id = scopeOf(actor, institutionId);
+  const rows = await SchoolColumnMapping.find({ institutionId: id }).lean();
+  return { mappings: rows.map((r) => ({ section: r.section, map: r.map, updatedAt: (r as { updatedAt?: Date }).updatedAt ?? null })) };
+}
+export async function clearMapping(actor: Actor, section: string, institutionId?: string) {
+  const id = scopeOf(actor, institutionId);
+  if (!isImportSection(section)) throw new AppError('Unknown import section', 400, 'VALIDATION_ERROR');
+  const r = await SchoolColumnMapping.deleteOne({ institutionId: id, section });
+  await recordAudit('school_app_column_mapping_cleared', actor, { institutionId: id, type: 'school_column_mapping', id: section }, {});
+  return { cleared: r.deletedCount === 1 };
 }
 
 export async function listImports(actor: Actor, institutionId?: string) {

@@ -256,6 +256,8 @@ export interface ISchoolImport extends Document {
   createdBy: string; confirmedBy?: string; confirmedAt?: Date; undoneAt?: Date;
   // what the confirm wrote, so undo can restore it: ids inserted, and previous versions of rows it replaced
   written?: { inserted: string[]; replaced: Record<string, unknown>[] };
+  // column choices the admin made for this file (file header, normalised -> column key, '' = ignore); saved for the school on confirm
+  mapping?: Record<string, string>;
 }
 const importSchema = new Schema<ISchoolImport>({
   id: { type: String, required: true, unique: true },
@@ -268,8 +270,20 @@ const importSchema = new Schema<ISchoolImport>({
   problems: { type: [{ row: Number, message: String, _id: false }], default: [] },
   createdBy: { type: String, required: true }, confirmedBy: String, confirmedAt: Date, undoneAt: Date,
   written: { type: Schema.Types.Mixed },
+  mapping: { type: Schema.Types.Mixed },
 }, { timestamps: true });
 export const SchoolImport = model<ISchoolImport>('SchoolImport', importSchema, 'school_imports');
+
+// ---- saved column mappings: per school and import section, the school's own header names (normalised) -> column key ('' = ignore)
+export interface ISchoolColumnMapping extends Document { institutionId: string; section: string; map: Record<string, string>; updatedBy: string }
+const columnMappingSchema = new Schema<ISchoolColumnMapping>({
+  institutionId: { type: String, required: true },
+  section: { type: String, required: true },
+  map: { type: Schema.Types.Mixed, default: {} },
+  updatedBy: { type: String, required: true },
+}, { timestamps: true });
+columnMappingSchema.index({ institutionId: 1, section: 1 }, { unique: true });
+export const SchoolColumnMapping = model<ISchoolColumnMapping>('SchoolColumnMapping', columnMappingSchema, 'school_column_mappings');
 
 // ---- in-app notifications for parents
 export interface IParentNotification extends Document {
