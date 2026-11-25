@@ -92,7 +92,12 @@ type HomePoint = { lat: number; lng: number; note: string; at: string };
 export interface BusHomeView { enabled: boolean; canEdit?: boolean; home: { confirmed: HomePoint | null; pending: HomePoint | null } }
 export type ChatChart =
   | { kind: 'subjects'; rows: { subject: string; subjectAr: string; mark: number | null; markTitle: string | null; lessonsDone: number; lessonsTotal: number; waiting: number }[]; highlight: string | null; highlightKind: 'weakest' | 'strongest' | null }
-  | { kind: 'subject'; subject: string; subjectAr: string; points: { title: string; date: string | null; mark: number }[]; waiting: string[]; lessonsDone: number; lessonsTotal: number; outcomesMastered: number; outcomesTotal: number };
+  | { kind: 'subject'; subject: string; subjectAr: string; points: { title: string; date: string | null; mark: number }[]; waiting: string[]; lessonsDone: number; lessonsTotal: number; outcomesMastered: number; outcomesTotal: number }
+  | { kind: 'trend'; subjects: { subject: string; subjectAr: string; trend: 'up' | 'steady' | 'down' | 'too_few'; change: number | null; points: { title: string; date: string | null; mark: number }[] }[] }
+  | { kind: 'weekdays'; weekdays: { day: number; absent: number; late: number }[]; thisMonth: { month: string; attendedPercent: number | null; absentDays: number; lateDays: number; days: number }; lastMonth: { month: string; attendedPercent: number | null; absentDays: number; lateDays: number; days: number } }
+  | { kind: 'weeks'; weeks: { start: string; minutes: number }[]; goal: number; streakDays: number }
+  | { kind: 'practice_marks'; rows: { subject: string; subjectAr: string; minutes: number; mark: number | null }[] }
+  | { kind: 'week'; rows: { key: 'practiceMinutes' | 'absentDays' | 'lateDays' | 'newMarks'; thisWeek: number; lastWeek: number }[] };
 export interface ChatReply { answer: string; lang: 'en' | 'ar'; sources: { source: string; updatedAt: string | null }[]; offerRequest: { type: RequestType; details: string } | null; engine: 'code' | 'model'; chart?: ChatChart | null }
 export type FeeStatus = 'due' | 'overdue' | 'paid' | 'waived';
 export interface FeeTotals { total: number; paid: number; waived: number; remaining: number; overdue: number }

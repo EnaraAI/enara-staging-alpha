@@ -12,6 +12,7 @@ import { busForParent } from './buses';
 import { consentsForParent, createRequest, requestsForParent } from './requests';
 import { digits } from './importSpec';
 import { parentAllSubjectsEnabled } from '../parents/flags';
+import { analyticsForChat, analyticsKind, type AnalyticsData, type Trend } from './chatAnalytics';
 
 // Parents school app, step (e): the parents' assistant. It answers ONE parent about ONE of their own children, only from what that
 // parent's own screens show (the same reads, through requireLearner), and names the source and date of what it used.
@@ -23,16 +24,21 @@ import { parentAllSubjectsEnabled } from '../parents/flags';
 //   3. It never acts. It may OFFER "Open a request to the office?"; the request is created only by a separate call after the parent taps
 //      confirm (createRequest, via 'chat').
 //   Logs: question, sources and answer, kept for the 'chat' retention setting (retention.ts); never used for training.
-export type Topic = 'fees' | 'buses' | 'timetable' | 'attendance' | 'announcements' | 'consents' | 'requests' | 'results' | 'help';
+export type Topic = 'fees' | 'buses' | 'timetable' | 'attendance' | 'announcements' | 'consents' | 'requests' | 'results' | 'analytics' | 'help';
 type Lang = 'en' | 'ar';
-type Source = 'fees' | 'buses' | 'timetable' | 'attendance' | 'announcements' | 'consents' | 'requests' | 'results';
+type Source = 'fees' | 'buses' | 'timetable' | 'attendance' | 'announcements' | 'consents' | 'requests' | 'results' | 'analytics';
 export interface Fact { source: Source; updatedAt: string | null; data: unknown }
 export interface ChatContext { child: string; today: string; facts: Fact[]; notShared: { source: Source; reason: 'off' | 'main_guardian_only' }[] }
 export interface ChatAnswer { answer: string; lang: Lang; sources: { source: Source; updatedAt: string | null }[]; offerRequest: { type: 'certificate' | 'early_leave' | 'teacher_meeting' | 'other'; details: string } | null; engine: 'code' | 'model'; chart?: ChatChart | null }
 /** A chart under a results answer, built by code from the same released data (never by the model). Marks are percents. */
 export type ChatChart =
   | { kind: 'subjects'; rows: { subject: string; subjectAr: string; mark: number | null; markTitle: string | null; lessonsDone: number; lessonsTotal: number; waiting: number }[]; highlight: string | null; highlightKind: 'weakest' | 'strongest' | null }
-  | { kind: 'subject'; subject: string; subjectAr: string; points: { title: string; date: string | null; mark: number }[]; waiting: string[]; lessonsDone: number; lessonsTotal: number; outcomesMastered: number; outcomesTotal: number };
+  | { kind: 'subject'; subject: string; subjectAr: string; points: { title: string; date: string | null; mark: number }[]; waiting: string[]; lessonsDone: number; lessonsTotal: number; outcomesMastered: number; outcomesTotal: number }
+  | { kind: 'trend'; subjects: { subject: string; subjectAr: string; trend: Trend; change: number | null; points: { title: string; date: string | null; mark: number }[] }[] }
+  | { kind: 'weekdays'; weekdays: { day: number; absent: number; late: number }[]; thisMonth: { month: string; attendedPercent: number | null; absentDays: number; lateDays: number; days: number }; lastMonth: { month: string; attendedPercent: number | null; absentDays: number; lateDays: number; days: number } }
+  | { kind: 'weeks'; weeks: { start: string; minutes: number }[]; goal: number; streakDays: number }
+  | { kind: 'practice_marks'; rows: { subject: string; subjectAr: string; minutes: number; mark: number | null }[] }
+  | { kind: 'week'; rows: { key: 'practiceMinutes' | 'absentDays' | 'lateDays' | 'newMarks'; thisWeek: number; lastWeek: number }[] };
 
 const cairoDate = (d = new Date()) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Cairo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(d);
 const isArabic = (s: string) => /[؀-ۿ]/.test(s);
@@ -53,6 +59,8 @@ const TOPICS: [Topic, RegExp][] = [
   ['announcements', /\b(announcement|news|event|trip|notice)\b|إعلان|إعلانات|اعلان|خبر|رحلة/i],
 ];
 export function topicOf(q: string): Topic {
+  // Analytics about the child (trend, attendance pattern, practice, practice vs marks, this week vs last) come first.
+  if (analyticsKind(q)) return 'analytics';
   for (const [t, re] of TOPICS) if (re.test(q)) return t;
   return 'help';
 }
@@ -81,6 +89,7 @@ export async function buildContext(ctx: LearnerContext, now = new Date()): Promi
   await add('announcements', sections.announcements, async () => { const a = await views.announcements(ctx, now); return { ...a, announcements: a.announcements.slice(0, 10) } as never; });
   await add('requests', sections.requests, async () => { const r = await requestsForParent(ctx); return { requests: r.requests.slice(0, 10).map((x) => ({ type: x.type, status: x.status, reply: x.reply, createdAt: x.createdAt })), source: { updatedAt: null } } as never; });
   if (parentAllSubjectsEnabled()) await add('results', true, () => resultsForChat(ctx, now) as never);
+  await add('analytics', true, () => analyticsForChat(ctx, now, { attendanceOn: !!sections.attendance, subjectsOn: parentAllSubjectsEnabled() }) as never);
   await add('consents', sections.consents, async () => { const c = await consentsForParent(ctx, now); return { forms: c.forms.map((f) => ({ title: f.title, deadline: f.deadline, open: f.open, answered: !!f.answer, choice: f.answer?.choice ?? null })), source: { updatedAt: null } } as never; });
   return { child: ctx.firstName, today: cairoDate(now), facts, notShared };
 }
@@ -109,9 +118,9 @@ const dayName = (d: number, lang: Lang) => (lang === 'ar' ? ['الأحد', 'ال
 const SECTION_NAME: Record<Source, { en: string; ar: string }> = {
   fees: { en: 'fees', ar: 'الرسوم' }, buses: { en: 'the bus', ar: 'الحافلة' }, timetable: { en: 'the timetable', ar: 'الجدول' }, attendance: { en: 'attendance', ar: 'الحضور' },
   announcements: { en: 'announcements', ar: 'الإعلانات' }, consents: { en: 'consent forms', ar: 'نماذج الموافقة' }, requests: { en: 'requests', ar: 'الطلبات' },
-  results: { en: 'results', ar: 'النتائج' },
+  results: { en: 'results', ar: 'النتائج' }, analytics: { en: 'analysis', ar: 'التحليل' },
 };
-const TOPIC_SOURCE: Record<Exclude<Topic, 'help'>, Source> = { fees: 'fees', buses: 'buses', timetable: 'timetable', attendance: 'attendance', announcements: 'announcements', consents: 'consents', requests: 'requests', results: 'results' };
+const TOPIC_SOURCE: Record<Exclude<Topic, 'help'>, Source> = { fees: 'fees', buses: 'buses', timetable: 'timetable', attendance: 'attendance', announcements: 'announcements', consents: 'consents', requests: 'requests', results: 'results', analytics: 'analytics' };
 
 type ResultRow = { title: string; date: string | null; scorePercent?: number | null; passed?: boolean | null; waitingForTeacher?: true };
 type ResultSubject = { subject: string; subjectAr: string; lessonsDone: number; lessonsTotal: number; outcomesMastered?: number; outcomesTotal?: number; results: ResultRow[] };
@@ -144,6 +153,59 @@ export function chartFor(c: ChatContext, q: string): ChatChart | null {
   if (highlightKind) rows.sort((a, b) => (a.mark === null ? 1 : b.mark === null ? -1 : highlightKind === 'weakest' ? a.mark - b.mark : b.mark - a.mark));
   const pick = highlightKind && marked.length ? rows[0].subject : null;
   return { kind: 'subjects', rows, highlight: pick, highlightKind: pick ? highlightKind : null };
+}
+
+const TREND_WORD: Record<Trend, { en: string; ar: string }> = { up: { en: 'improving', ar: 'في تحسن' }, steady: { en: 'steady', ar: 'ثابت' }, down: { en: 'going down', ar: 'في تراجع' }, too_few: { en: 'not enough marks yet for a trend', ar: 'لا توجد درجات كافية بعد لمعرفة الاتجاه' } };
+const WEEKDAY = (d: number, lang: Lang) => dayName(d, lang);
+function pickSubjects<T extends { subject: string; subjectAr: string }>(rows: T[], q: string): T[] {
+  const ql = q.toLowerCase();
+  const named = rows.filter((s) => ql.includes(s.subject.toLowerCase()) || (s.subjectAr && q.includes(s.subjectAr.replace(/^ال/, ''))));
+  return named.length ? named : rows;
+}
+/** The code's own answer for an analytics question (the model may word it differently, from the same numbers). */
+export function analyticsAnswer(a: AnalyticsData, child: string, lang: Lang, q: string): string {
+  const ar = lang === 'ar';
+  const kind = analyticsKind(q) ?? 'trend';
+  const sep = ar ? '، ' : ', ';
+  if (kind === 'trend') {
+    if (!a.trends?.length) return ar ? `لا توجد درجات منشورة لـ${child} بعد.` : `There are no released marks for ${child} yet.`;
+    return pickSubjects(a.trends, q).slice(0, 4).map((t) => `${ar ? t.subjectAr || t.subject : t.subject}: ${TREND_WORD[t.trend][lang]}${t.change !== null && t.trend !== 'steady' ? ` (${t.change > 0 ? '+' : ''}${t.change} ${ar ? 'نقطة' : 'points'})` : ''}`).join(ar ? '. ' : '. ') + '.';
+  }
+  if (kind === 'attendance') {
+    if (!a.attendance) return ar ? 'لم تشارك المدرسة الحضور في التطبيق.' : "The school hasn't shared attendance in the app.";
+    const { thisMonth: t, lastMonth: l, weekdays } = a.attendance;
+    const top = [...weekdays].filter((w) => w.absent + w.late > 0).sort((x, y) => y.absent + y.late - (x.absent + x.late))[0];
+    const pct = (s: typeof t) => (s.attendedPercent === null ? (ar ? 'لا سجلات' : 'no records') : `${s.attendedPercent}%`);
+    return ar
+      ? `الحضور هذا الشهر ${pct(t)} (غياب ${t.absentDays}، تأخر ${t.lateDays})، والشهر الماضي ${pct(l)} (غياب ${l.absentDays}، تأخر ${l.lateDays}).${top ? ` أكثر يوم غيابًا أو تأخرًا: ${WEEKDAY(top.day, lang)}.` : ''}`
+      : `Attendance this month ${pct(t)} (absent ${t.absentDays}, late ${t.lateDays}); last month ${pct(l)} (absent ${l.absentDays}, late ${l.lateDays}).${top ? ` Most absences or late days: ${WEEKDAY(top.day, lang)}.` : ''}`;
+  }
+  if (kind === 'practice') {
+    const p = a.practice; const w = p.weeks; const now = w[w.length - 1]?.minutes ?? 0, prev = w[w.length - 2]?.minutes ?? 0;
+    return ar
+      ? `تدرب ${child} ${now} دقيقة هذا الأسبوع من هدف ${p.goalMinutesPerWeek} دقيقة، و${prev} دقيقة الأسبوع الماضي. أيام التدريب المتتالية: ${p.streakDays}.`
+      : `${child} practised ${now} minutes this week of a ${p.goalMinutesPerWeek}-minute goal, and ${prev} minutes last week. Practice days in a row: ${p.streakDays}.`;
+  }
+  if (kind === 'practice_marks') {
+    if (!a.practiceVsMarks?.length) return ar ? 'لا توجد بيانات مواد بعد.' : 'There is no subject data yet.';
+    return pickSubjects(a.practiceVsMarks, q).slice(0, 4).map((r) => `${ar ? r.subjectAr || r.subject : r.subject}: ${r.minutesLast4Weeks} ${ar ? 'دقيقة تدريب في 4 أسابيع' : 'practice minutes in 4 weeks'}${sep}${r.latestMark === null ? (ar ? 'لا درجة بعد' : 'no mark yet') : `${ar ? 'آخر درجة' : 'latest mark'} ${r.latestMark}%`}`).join(ar ? '. ' : '. ') + (ar ? '. (عرض جنبًا إلى جنب، وليس سببًا ونتيجة.)' : '. (Shown side by side, not as cause and effect.)');
+  }
+  const t = a.week.thisWeek, l = a.week.lastWeek;
+  return ar
+    ? `هذا الأسبوع مقابل الماضي: تدريب ${t.practiceMinutes} مقابل ${l.practiceMinutes} دقيقة، غياب ${t.absentDays} مقابل ${l.absentDays}، تأخر ${t.lateDays} مقابل ${l.lateDays}، درجات جديدة ${t.newMarks} مقابل ${l.newMarks}.`
+    : `This week vs last: practice ${t.practiceMinutes} vs ${l.practiceMinutes} minutes, absent days ${t.absentDays} vs ${l.absentDays}, late days ${t.lateDays} vs ${l.lateDays}, new marks ${t.newMarks} vs ${l.newMarks}.`;
+}
+/** The chart for an analytics answer, from the same numbers. */
+export function analyticsChart(c: ChatContext, q: string): ChatChart | null {
+  const a = c.facts.find((f) => f.source === 'analytics')?.data as AnalyticsData | undefined;
+  if (!a) return null;
+  const kind = analyticsKind(q) ?? 'trend';
+  if (kind === 'trend') return a.trends?.length ? { kind: 'trend', subjects: pickSubjects(a.trends, q).slice(0, 4) } : null;
+  if (kind === 'attendance') return a.attendance ? { kind: 'weekdays', weekdays: a.attendance.weekdays, thisMonth: a.attendance.thisMonth, lastMonth: a.attendance.lastMonth } : null;
+  if (kind === 'practice') return { kind: 'weeks', weeks: a.practice.weeks, goal: a.practice.goalMinutesPerWeek, streakDays: a.practice.streakDays };
+  if (kind === 'practice_marks') return a.practiceVsMarks?.length ? { kind: 'practice_marks', rows: pickSubjects(a.practiceVsMarks, q).map((r) => ({ subject: r.subject, subjectAr: r.subjectAr, minutes: r.minutesLast4Weeks, mark: r.latestMark })) } : null;
+  const t = a.week.thisWeek, l = a.week.lastWeek;
+  return { kind: 'week', rows: (['practiceMinutes', 'absentDays', 'lateDays', 'newMarks'] as const).map((key) => ({ key, thisWeek: t[key], lastWeek: l[key] })) };
 }
 
 export function codeAnswer(topic: Topic, c: ChatContext, lang: Lang, q: string): ChatAnswer {
@@ -205,6 +267,7 @@ export function codeAnswer(topic: Topic, c: ChatContext, lang: Lang, q: string):
     });
     return done(lines.join(ar ? '. ' : '. ') + '.', ['results'], null);
   }
+  if (topic === 'analytics') return done(analyticsAnswer(fact.data as AnalyticsData, c.child, lang, q), ['analytics'], null);
   if (topic === 'announcements') {
     const list = (d.announcements ?? []).slice(0, 3).map((a: any) => `«${(ar && a.titleAr) || a.title}»`).join(ar ? '، ' : ', ');
     return done(list ? (ar ? `أحدث الإعلانات: ${list}. التفاصيل في تبويب الإعلانات.` : `Latest announcements: ${list}. The details are on the Announcements tab.`) : (ar ? 'لا توجد إعلانات الآن.' : 'No announcements right now.'), ['announcements']);
@@ -229,7 +292,8 @@ export const SYSTEM = [
   'Name days by their weekday (todayWeekday, tomorrowWeekday, timetable weekday), never as a number such as "day 2".',
   'For attendance, use counts for totals and records for dates; never contradict them. Payment is made at the school: never suggest paying in the app.',
   'For results: scorePercent is a percent; a result with waitingForTeacher has NO mark yet (say it is waiting for the teacher, never guess one). Use subjectAr for subject names in Arabic.',
-  'Reply with JSON only: {"answer":"...","sources":["fees"|"buses"|"timetable"|"attendance"|"announcements"|"consents"|"requests"|"results"]} listing the DATA parts you used.',
+  'For analytics: use its numbers as given (trend, change, attendedPercent, minutes per week); a trend of too_few means there are not enough marks yet. Never compare the child with other children or a class average.',
+  'Reply with JSON only: {"answer":"...","sources":["fees"|"buses"|"timetable"|"attendance"|"announcements"|"consents"|"requests"|"results"|"analytics"]} listing the DATA parts you used.',
 ].join('\n');
 
 // Common Egyptian colloquial words: an Arabic reply must be fusha (owner rule). High precision only.
@@ -312,7 +376,8 @@ export async function ask(ctx: LearnerContext, body: Record<string, unknown>, no
     }
   } catch (error) { refused = 'model_error'; logger.warn('school_chat_model_failed', { error: serializeError(error) }); }
   // A chart under any answer about results (the code's topic, or the model citing results).
-  if (topic === 'results' || out.sources.some((s) => s.source === 'results')) out = { ...out, chart: chartFor(c, q) };
+  if (topic === 'analytics') out = { ...out, chart: analyticsChart(c, q) };
+  else if (topic === 'results' || out.sources.some((s) => s.source === 'results')) out = { ...out, chart: chartFor(c, q) };
   await SchoolChatLog.create({ id: newId('scl'), institutionId: school, studentId: ctx.student.id, parentUserId: ctx.link.parentUserId, question: q, answer: out.answer, sources: out.sources.map((s) => s.source), engine: out.engine, refused });
   return out;
 }
