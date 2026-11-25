@@ -25,4 +25,5 @@ jobs:
         if: hashFiles('deploy/lms-test/schoolchat/probe-health') == ''
         env:
           SEED_USER_PASSWORD: ${{ secrets.SEED_USER_PASSWORD }}
+          LMSTEST_MAINTENANCE_TOKEN: ${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}
         run: node deploy/lms-test/schoolchat/run.mjs
