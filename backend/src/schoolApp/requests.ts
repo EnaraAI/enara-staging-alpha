@@ -45,7 +45,8 @@ const requestView = (r: { id: string; type: string; details: string; preferredDa
 
 export async function requestsForParent(ctx: LearnerContext) {
   await gate(ctx, 'requests');
-  const rows = await SchoolRequest.find({ institutionId: schoolOf(ctx), studentId: ctx.student.id }).sort({ createdAt: -1 }).limit(100).lean();
+  // A request the parent cancelled leaves their list (the school still sees it, marked "Cancelled by the parent").
+  const rows = await SchoolRequest.find({ institutionId: schoolOf(ctx), studentId: ctx.student.id, status: { $ne: 'cancelled' } }).sort({ createdAt: -1 }).limit(100).lean();
   return { requests: rows.map(requestView), canCreate: canDo(ctx.link, 'change_controls'), types: REQUEST_TYPES };
 }
 
@@ -67,6 +68,20 @@ export async function createRequest(ctx: LearnerContext, body: Record<string, un
   return requestView(r.toObject());
 }
 
+/** The parent cancels a request the school has not finished (new or in progress). Only a main or full guardian; any of the child's
+ *  guardians may cancel a request about that child (they all see it). Kept for the school with the history line "cancelled by parent". */
+export async function cancelRequest(ctx: LearnerContext, requestId: string) {
+  await gate(ctx, 'requests'); mayAct(ctx);
+  const r = await SchoolRequest.findOne({ id: requestId, institutionId: schoolOf(ctx), studentId: ctx.student.id });
+  if (!r) throw new AppError('Request not found', 404, 'NOT_FOUND');
+  if (r.status === 'cancelled') return { id: r.id, status: r.status };
+  if (r.status !== 'new' && r.status !== 'in_progress') throw new AppError('The school has already answered this request', 409, 'REQUEST_CLOSED');
+  r.status = 'cancelled';
+  r.history.push({ at: new Date(), by: 'parent', status: 'cancelled' });
+  await r.save();
+  return { id: r.id, status: r.status };
+}
+
 export async function requestsForAdmin(actor: Actor, q: { institutionId?: string; status?: string }) {
   const school = scope(actor, q.institutionId);
   const filter: Record<string, unknown> = { institutionId: school };
@@ -80,7 +95,8 @@ export async function requestsForAdmin(actor: Actor, q: { institutionId?: string
 export async function answerRequest(actor: Actor, id: string, body: Record<string, unknown>) {
   const r = await SchoolRequest.findOne({ id });
   if (!r || r.institutionId !== scope(actor, r?.institutionId)) throw new AppError('Request not found', 404, 'NOT_FOUND');
-  const status = REQUEST_STATUSES.find((x) => x === body.status) ?? r.status;
+  if (r.status === 'cancelled') throw new AppError('The parent cancelled this request', 409, 'REQUEST_CANCELLED');
+  const status = REQUEST_STATUSES.find((x) => x === body.status && x !== 'cancelled') ?? r.status;
   const reply = typeof body.reply === 'string' ? body.reply.trim().slice(0, 2000) : undefined;
   if (status === r.status && reply === undefined) throw new AppError('Nothing to change', 400, 'VALIDATION_ERROR');
   if (status === 'refused' && !(reply || r.reply)) throw new AppError('Say why the request is refused', 400, 'VALIDATION_ERROR');

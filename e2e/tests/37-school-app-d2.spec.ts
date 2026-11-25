@@ -45,6 +45,14 @@ test.describe.serial('37 · Parents school app (d2): request and consent screens
     await page.getByTestId('pp-request-send').click();
     await expect(page.getByTestId('pp-request-sent')).toBeVisible();
     await expect(page.getByTestId('pp-request').filter({ hasText: `Meeting about homework ${RUN}` })).toHaveAttribute('data-status', 'new');
+    // The parent cancels a request they no longer need (owner, 25 Nov 2026): it leaves their list; the school sees it as cancelled.
+    await page.getByTestId('pp-request-details').fill(`Not needed ${RUN}`);
+    await page.getByTestId('pp-request-send').click();
+    const extra = page.getByTestId('pp-request').filter({ hasText: `Not needed ${RUN}` });
+    await expect(extra).toHaveAttribute('data-status', 'new');
+    await extra.getByTestId('pp-request-cancel').click();
+    await extra.getByTestId('pp-request-cancel-yes').click();
+    await expect(page.getByTestId('pp-request').filter({ hasText: `Not needed ${RUN}` })).toHaveCount(0);
 
     // The school answers on its screen and sees the signed form.
     const staff = await enaraUiSession(browser, 'admin.a', 'School staff');
@@ -56,6 +64,9 @@ test.describe.serial('37 · Parents school app (d2): request and consent screens
     await row.getByTestId('sa-req-reply').fill('Thursday 10:00 with Ms Salma.');
     await row.getByTestId('sa-req-save').click();
     await expect(inbox.getByTestId('sa-request').filter({ hasText: `Meeting about homework ${RUN}` })).toHaveCount(0);
+    await expect(inbox.getByTestId('sa-request').filter({ hasText: `Not needed ${RUN}` })).toHaveCount(0); // not among the new ones
+    await inbox.getByTestId('sa-req-filter-cancelled').click();
+    await expect(inbox.getByTestId('sa-request').filter({ hasText: `Not needed ${RUN}` }).getByTestId('sa-req-cancelled')).toHaveText('Cancelled by the parent');
     const cons = staff.page.getByTestId('sa-consents');
     await cons.getByTestId('sa-cons-row').filter({ hasText: `Zoo trip ${RUN}` }).getByTestId('sa-cons-open').click();
     await expect(cons.getByTestId('sa-cons-counts')).toContainText('I agree: 1');

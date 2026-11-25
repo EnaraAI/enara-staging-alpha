@@ -43,6 +43,10 @@ test.describe.serial('39 · Parents school app (e2): the assistant on a phone', 
     await expect(page.getByTestId('pp-chat-created')).toBeVisible();
     const reqs = await enaraApi.get(`/api/parents/school/learners/${student}/requests`, await page.evaluate(() => localStorage.getItem('enara_token') || ''));
     expect(reqs.requests[0]).toMatchObject({ type: 'certificate', via: 'chat', status: 'new' });
+    // Results (owner's walk, 25 Nov 2026): the assistant answers about marks from the Learning screen's data, naming the source.
+    await page.getByTestId('pp-chat-input').fill('How is he doing in his tests?');
+    await page.getByTestId('pp-chat-send').click();
+    await expect(page.getByTestId('pp-chat-answer').last().getByTestId('pp-chat-source')).toContainText('Source: results', { timeout: 30_000 });
     await page.keyboard.press('Escape');
 
     await page.locator('.pp-langbtn').click();

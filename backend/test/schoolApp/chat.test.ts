@@ -101,3 +101,38 @@ describe('the model reply checks', () => {
     expect(checkModelReply('{"answer":"","sources":[]}', ctx, 'x').refused).toBe('empty_or_long');
   });
 });
+
+// Owner's walk, 25 Nov 2026: «أمير درجاته عاملة إزاي؟» got "no information about grades". Results come from the Learning screen's data.
+describe('results (the Learning screen\'s subjects and released marks)', () => {
+  const withResults: ChatContext = { ...ctx, facts: [...ctx.facts, { source: 'results', updatedAt: '2026-11-20', data: { subjects: [
+    { subject: 'Mathematics', subjectAr: 'الرياضيات', lessonsDone: 3, lessonsTotal: 8, outcomesMastered: 2, outcomesTotal: 6, results: [{ title: 'Fractions check', date: '2026-11-20', scorePercent: 75, passed: true }] },
+    { subject: 'English', subjectAr: 'اللغة الإنجليزية', lessonsDone: 0, lessonsTotal: 3, outcomesMastered: 0, outcomesTotal: 4, results: [{ title: 'Greetings quiz', date: '2026-11-10', waitingForTeacher: true }] },
+  ] } }] };
+  it('recognises questions about marks, tests and subjects (Arabic, Egyptian and English)', () => {
+    for (const q of ['أمير درجاته عاملة إزاي؟', 'نتيجة امتحان الرياضيات كام؟', 'إيه أضعف مادة عنده؟', 'مستواه إيه في الإنجليزي؟', 'How is he doing in Maths?', 'What was his last test score?', 'Show me his grades']) expect(topicOf(q), q).toBe('results');
+    // Classes stay timetable questions.
+    expect(topicOf('ابني عند مواد اي النهاردة')).toBe('timetable');
+  });
+  it('answers from released marks only; a mark not released yet says "waiting for the teacher"', () => {
+    const a = codeAnswer('results', withResults, 'ar', 'درجاته عاملة إزاي؟');
+    expect(a.answer).toContain('الرياضيات: آخر درجة «Fractions check» 75% (ناجح)');
+    expect(a.answer).toContain('بانتظار تصحيح المعلم: «Greetings quiz»');
+    expect(a.answer).toContain('لا درجات منشورة بعد');
+    expect(a.sources).toEqual([{ source: 'results', updatedAt: '2026-11-20' }]);
+    expect(a.offerRequest).toBeNull();
+  });
+  it('a question that names a subject answers about that subject only', () => {
+    const a = codeAnswer('results', withResults, 'en', 'How is he doing in Mathematics?');
+    expect(a.answer).toMatch(/^Mathematics: latest mark "Fractions check" 75% \(passed\)/);
+    expect(a.answer).not.toContain('English');
+  });
+  it('no results yet: says so plainly', () => {
+    const empty: ChatContext = { ...ctx, facts: [{ source: 'results', updatedAt: null, data: { subjects: [] } }] };
+    expect(codeAnswer('results', empty, 'en', 'grades?').answer).toBe('There are no results for Omar yet.');
+  });
+  it('the model may use the results source, and only numbers that are in the data', () => {
+    expect(checkModelReply('{"answer":"Omar scored 75% in Fractions check.","sources":["results"]}', withResults, 'grades?')).toMatchObject({ sources: ['results'] });
+    expect(checkModelReply('{"answer":"Omar scored 90% in Greetings quiz.","sources":["results"]}', withResults, 'grades?').refused).toMatch(/number_not_in_data/);
+  });
+});
+

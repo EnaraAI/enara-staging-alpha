@@ -157,7 +157,7 @@ export const SchoolReceiptFile = model<ISchoolReceiptFile>('SchoolReceiptFile', 
 
 // ---- requests (step d): a parent asks the school office (certificate, early leave, teacher meeting, other); the school answers.
 export const REQUEST_TYPES = ['certificate', 'early_leave', 'teacher_meeting', 'other'] as const;
-export const REQUEST_STATUSES = ['new', 'in_progress', 'done', 'refused'] as const;
+export const REQUEST_STATUSES = ['new', 'in_progress', 'done', 'refused', 'cancelled'] as const;
 export interface ISchoolRequest extends Document {
   id: string; institutionId: string; studentId: string; parentUserId: string; type: (typeof REQUEST_TYPES)[number]; details: string; preferredDate?: string;
   status: (typeof REQUEST_STATUSES)[number]; reply?: string; history: { at: Date; by: 'parent' | 'school'; status: string; note?: string }[]; via?: 'screen' | 'chat'; createdAt: Date; updatedAt: Date;

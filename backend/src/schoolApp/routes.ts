@@ -10,7 +10,7 @@ import { COLUMNS } from './importSpec';
 import * as views from './parentViews';
 import { moodleConnections, runMoodleSyncNow, saveMoodleToken, setMoodleEnabled } from './moodleSync';
 import { ask, confirmRequest } from './chat';
-import { answerRequest, consentCsv, consentDashboard, consentForms, consentsForParent, createConsentForm, createRequest, requestsForAdmin, requestsForParent, signConsent, withdrawConsentForm } from './requests';
+import { answerRequest, cancelRequest, consentCsv, consentDashboard, consentForms, consentsForParent, createConsentForm, createRequest, requestsForAdmin, requestsForParent, signConsent, withdrawConsentForm } from './requests';
 import { busForParent, busesForAdmin, sendBusNotice, setBusPhonesShared, withdrawBusNotice } from './buses';
 import * as live from './busLive';
 import * as homes from './busHomes';
@@ -44,6 +44,7 @@ parentSchoolRoutes.put('/learners/:studentId/bus/home', h(async (req, res) => { 
 parentSchoolRoutes.delete('/learners/:studentId/bus/home/pending', h(async (req, res) => { res.json(await homes.cancelPendingByParent(await child(req))); }));
 parentSchoolRoutes.get('/learners/:studentId/requests', h(async (req, res) => { res.json(await requestsForParent(await child(req))); }));
 parentSchoolRoutes.post('/learners/:studentId/requests', h(async (req, res) => { const b = ensurePlainObject(req.body); rejectMongoOperators(b); res.status(201).json(await createRequest(await child(req), b)); }));
+parentSchoolRoutes.post('/learners/:studentId/requests/:requestId/cancel', h(async (req, res) => { res.json(await cancelRequest(await child(req), String(req.params.requestId).slice(0, 80))); }));
 parentSchoolRoutes.get('/learners/:studentId/consents', h(async (req, res) => { res.json(await consentsForParent(await child(req))); }));
 parentSchoolRoutes.post('/learners/:studentId/consents/:formId', h(async (req, res) => { const b = ensurePlainObject(req.body); rejectMongoOperators(b); res.status(201).json(await signConsent(await child(req), String(req.params.formId), b, { ip: req.ip, userAgent: String(req.headers['user-agent'] ?? '') })); }));
 parentSchoolRoutes.post('/learners/:studentId/chat', h(async (req, res) => { const b = ensurePlainObject(req.body); rejectMongoOperators(b); res.json(await ask(await child(req), b)); }));

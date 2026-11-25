@@ -11,6 +11,7 @@ import { feesForParent } from './fees';
 import { busForParent } from './buses';
 import { consentsForParent, createRequest, requestsForParent } from './requests';
 import { digits } from './importSpec';
+import { parentAllSubjectsEnabled } from '../parents/flags';
 
 // Parents school app, step (e): the parents' assistant. It answers ONE parent about ONE of their own children, only from what that
 // parent's own screens show (the same reads, through requireLearner), and names the source and date of what it used.
@@ -22,9 +23,9 @@ import { digits } from './importSpec';
 //   3. It never acts. It may OFFER "Open a request to the office?"; the request is created only by a separate call after the parent taps
 //      confirm (createRequest, via 'chat').
 //   Logs: question, sources and answer, kept for the 'chat' retention setting (retention.ts); never used for training.
-export type Topic = 'fees' | 'buses' | 'timetable' | 'attendance' | 'announcements' | 'consents' | 'requests' | 'help';
+export type Topic = 'fees' | 'buses' | 'timetable' | 'attendance' | 'announcements' | 'consents' | 'requests' | 'results' | 'help';
 type Lang = 'en' | 'ar';
-type Source = 'fees' | 'buses' | 'timetable' | 'attendance' | 'announcements' | 'consents' | 'requests';
+type Source = 'fees' | 'buses' | 'timetable' | 'attendance' | 'announcements' | 'consents' | 'requests' | 'results';
 export interface Fact { source: Source; updatedAt: string | null; data: unknown }
 export interface ChatContext { child: string; today: string; facts: Fact[]; notShared: { source: Source; reason: 'off' | 'main_guardian_only' }[] }
 export interface ChatAnswer { answer: string; lang: Lang; sources: { source: Source; updatedAt: string | null }[]; offerRequest: { type: 'certificate' | 'early_leave' | 'teacher_meeting' | 'other'; details: string } | null; engine: 'code' | 'model' }
@@ -38,6 +39,9 @@ const TOPICS: [Topic, RegExp][] = [
   ['fees', /\b(fee|fees|instal+ments?|tuition|pay|paid|payment|due|owe|receipt)\b|مصروف|مصاريف|رسوم|قسط|أقساط|اقساط|دفع|سداد|مستحق|إيصال|ايصال|فلوس|ندفع|هندفع|هدفع|باقي علي|فاضل علي/i],
   ['buses', /\b(bus|buses|pick ?up|drop ?off|stop|route|driver|supervisor)\b|حافلة|الحافلة|باص|أتوبيس|اتوبيس|أوتوبيس|اوتوبيس|محطة|سائق|السواق|سواق|مشرف/i],
   ['attendance', /\b(absent|absence|attendance|late|present|missed school)\b|غياب|غائب|حضور|تأخر|تأخير|متأخر|غاب|غابت|مجاش|ماجاش|ما جاش|مجتش|ماجتش|مراحش|ما راحش|مراحتش|اتأخر|اتأخرت|إتأخر/i],
+  // Results and subjects (owner's walk, 25 Nov 2026: «أمير درجاته عاملة إزاي؟» got "no information about grades"). Before the timetable:
+  // «أضعف مادة», «نتيجة امتحان الرياضيات» are about results, not classes.
+  ['results', /\b(grades?|marks?|scores?|results?|tests?|exams?|quiz(zes)?|assessments?|report card|progress|doing|weak(est)?|strong(est)?|level)\b|درج|نتيجة|نتيجه|نتائج|نتايج|امتحان|إمتحان|امتحانات|اختبار|إختبار|اختبارات|كويز|تقييم|مستوى|مستواه|مستواها|أضعف|اضعف|ضعيف|ضعيفة|أقوى|اقوى|شاطر|شاطرة|تقدير|علامات|عامل إيه في|عامل ايه في|عاملة إيه في|عاملة ايه في|أداء|اداء|تقدم|تقدّم/i],
   // Egyptian forms too: «عنده مواد إيه النهارده», «بياخد إيه بكرة», «الدروس»: a parent's question about classes is a timetable question.
   ['timetable', /\b(timetable|schedule|class(es)?|lesson|period|subject)\b|جدول|حصة|حصص|مادة|ماده|مواد|المواد|الحصه|حصه|دروس|الدروس|درس|بياخد|هياخد|بيدرس|هيدرس|بتاخد|هتاخد/i],
   ['consents', /\b(consent|sign|permission|form)\b|موافقة|توقيع|نموذج|إذن/i],
@@ -72,8 +76,27 @@ export async function buildContext(ctx: LearnerContext, now = new Date()): Promi
   await add('buses', sections.buses, () => busForParent(ctx, now) as never);
   await add('announcements', sections.announcements, async () => { const a = await views.announcements(ctx, now); return { ...a, announcements: a.announcements.slice(0, 10) } as never; });
   await add('requests', sections.requests, async () => { const r = await requestsForParent(ctx); return { requests: r.requests.slice(0, 10).map((x) => ({ type: x.type, status: x.status, reply: x.reply, createdAt: x.createdAt })), source: { updatedAt: null } } as never; });
+  if (parentAllSubjectsEnabled()) await add('results', true, () => resultsForChat(ctx, now) as never);
   await add('consents', sections.consents, async () => { const c = await consentsForParent(ctx, now); return { forms: c.forms.map((f) => ({ title: f.title, deadline: f.deadline, open: f.open, answered: !!f.answer, choice: f.answer?.choice ?? null })), source: { updatedAt: null } } as never; });
   return { child: ctx.firstName, today: cairoDate(now), facts, notShared };
+}
+
+/** Results: the same subjects and released results as the Learning screen (marks not released yet say "waiting for the teacher"). */
+async function resultsForChat(ctx: LearnerContext, now: Date) {
+  const { childData } = await import('../parents/subjectViews');
+  const { subjectDetail, subjectsWithActivity } = await import('../parents/subjects');
+  const d = await childData(ctx, now);
+  const subjects = subjectsWithActivity(d).slice(0, 12).map((s) => {
+    const x = subjectDetail(d, s.key);
+    return {
+      subject: x.name.en, subjectAr: x.name.ar,
+      lessonsDone: x.lessons.done, lessonsTotal: x.lessons.total,
+      outcomesMastered: x.outcomes.mastered, outcomesTotal: x.outcomes.total,
+      results: x.results.map((r) => ({ title: r.title, date: r.submittedAt ? r.submittedAt.slice(0, 10) : null, ...(r.waiting ? { waitingForTeacher: true } : { scorePercent: r.score, passed: r.passed }) })),
+    };
+  });
+  const dates = subjects.flatMap((s) => s.results.map((r) => r.date).filter((x): x is string => !!x)).sort();
+  return { subjects, scoresAre: 'percent; passed means 60% or more; waitingForTeacher means the mark is not released yet', source: { updatedAt: dates.at(-1) ?? null } };
 }
 
 // ------------------------------------------------------------------ code answers
@@ -82,8 +105,9 @@ const dayName = (d: number, lang: Lang) => (lang === 'ar' ? ['الأحد', 'ال
 const SECTION_NAME: Record<Source, { en: string; ar: string }> = {
   fees: { en: 'fees', ar: 'الرسوم' }, buses: { en: 'the bus', ar: 'الحافلة' }, timetable: { en: 'the timetable', ar: 'الجدول' }, attendance: { en: 'attendance', ar: 'الحضور' },
   announcements: { en: 'announcements', ar: 'الإعلانات' }, consents: { en: 'consent forms', ar: 'نماذج الموافقة' }, requests: { en: 'requests', ar: 'الطلبات' },
+  results: { en: 'results', ar: 'النتائج' },
 };
-const TOPIC_SOURCE: Record<Exclude<Topic, 'help'>, Source> = { fees: 'fees', buses: 'buses', timetable: 'timetable', attendance: 'attendance', announcements: 'announcements', consents: 'consents', requests: 'requests' };
+const TOPIC_SOURCE: Record<Exclude<Topic, 'help'>, Source> = { fees: 'fees', buses: 'buses', timetable: 'timetable', attendance: 'attendance', announcements: 'announcements', consents: 'consents', requests: 'requests', results: 'results' };
 
 export function codeAnswer(topic: Topic, c: ChatContext, lang: Lang, q: string): ChatAnswer {
   const ar = lang === 'ar';
@@ -126,6 +150,27 @@ export function codeAnswer(topic: Topic, c: ChatContext, lang: Lang, q: string):
     const last = (d.records ?? []).filter((r: any) => r.status === 'absent' || r.status === 'late').slice(-3).map((r: any) => `${r.date} (${ar ? (r.status === 'absent' ? 'غياب' : 'تأخر') : r.status})`).join(ar ? '، ' : ', ');
     return done((ar ? `هذا الشهر: حاضر ${n.present ?? 0}، غائب ${n.absent ?? 0}، متأخر ${n.late ?? 0}، بعذر ${n.excused ?? 0}.` : `This month: present ${n.present ?? 0}, absent ${n.absent ?? 0}, late ${n.late ?? 0}, excused ${n.excused ?? 0}.`) + (last ? (ar ? ` آخرها: ${last}.` : ` Most recent: ${last}.`) : ''), ['attendance']);
   }
+  if (topic === 'results') {
+    type R = { title: string; date: string | null; scorePercent?: number | null; passed?: boolean | null; waitingForTeacher?: true };
+    type S = { subject: string; subjectAr: string; lessonsDone: number; lessonsTotal: number; results: R[] };
+    const all = (d.subjects ?? []) as S[];
+    const ql = q.toLowerCase();
+    const named = all.filter((s) => ql.includes(s.subject.toLowerCase()) || (s.subjectAr && q.includes(s.subjectAr.replace(/^ال/, ''))));
+    const list = (named.length ? named : all).slice(0, 4);
+    if (!list.length) return done(ar ? `لا توجد نتائج لـ${c.child} بعد.` : `There are no results for ${c.child} yet.`, ['results']);
+    const lines = list.map((s) => {
+      const name = ar ? s.subjectAr || s.subject : s.subject;
+      const shown = s.results.find((r) => typeof r.scorePercent === 'number');
+      const waiting = s.results.filter((r) => r.waitingForTeacher).map((r) => `«${r.title}»`);
+      const parts: string[] = [];
+      if (shown) parts.push(ar ? `آخر درجة «${shown.title}» ${shown.scorePercent}%${shown.passed ? ' (ناجح)' : ' (لم ينجح)'}` : `latest mark "${shown.title}" ${shown.scorePercent}%${shown.passed ? ' (passed)' : ' (not passed)'}`);
+      else parts.push(ar ? 'لا درجات منشورة بعد' : 'no marks released yet');
+      if (waiting.length) parts.push(ar ? `بانتظار تصحيح المعلم: ${waiting.join('، ')}` : `waiting for the teacher: ${waiting.join(', ')}`);
+      parts.push(ar ? `الدروس ${s.lessonsDone} من ${s.lessonsTotal}` : `lessons ${s.lessonsDone} of ${s.lessonsTotal}`);
+      return `${name}: ${parts.join(ar ? '، ' : ', ')}`;
+    });
+    return done(lines.join(ar ? '. ' : '. ') + '.', ['results'], null);
+  }
   if (topic === 'announcements') {
     const list = (d.announcements ?? []).slice(0, 3).map((a: any) => `«${(ar && a.titleAr) || a.title}»`).join(ar ? '، ' : ', ');
     return done(list ? (ar ? `أحدث الإعلانات: ${list}. التفاصيل في تبويب الإعلانات.` : `Latest announcements: ${list}. The details are on the Announcements tab.`) : (ar ? 'لا توجد إعلانات الآن.' : 'No announcements right now.'), ['announcements']);
@@ -149,7 +194,8 @@ export const SYSTEM = [
   'Reply in REPLY_LANGUAGE given below, even when DATA is in another language (names and titles may stay as given). Arabic means Modern Standard Arabic (fusha) only, never colloquial: say الحافلة for the bus.',
   'Name days by their weekday (todayWeekday, tomorrowWeekday, timetable weekday), never as a number such as "day 2".',
   'For attendance, use counts for totals and records for dates; never contradict them. Payment is made at the school: never suggest paying in the app.',
-  'Reply with JSON only: {"answer":"...","sources":["fees"|"buses"|"timetable"|"attendance"|"announcements"|"consents"|"requests"]} listing the DATA parts you used.',
+  'For results: scorePercent is a percent; a result with waitingForTeacher has NO mark yet (say it is waiting for the teacher, never guess one). Use subjectAr for subject names in Arabic.',
+  'Reply with JSON only: {"answer":"...","sources":["fees"|"buses"|"timetable"|"attendance"|"announcements"|"consents"|"requests"|"results"]} listing the DATA parts you used.',
 ].join('\n');
 
 // Common Egyptian colloquial words: an Arabic reply must be fusha (owner rule). High precision only.
