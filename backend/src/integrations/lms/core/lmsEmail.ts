@@ -3,7 +3,7 @@ import { getConfig } from '../../../config/env';
 import { LMS_TEMPLATES_BUNDLE } from '../../../email/lms/lmsTemplatesBundle';
 import { isReservedRecipient } from '../../../email/reservedRecipients';
 import { deliverRendered, renderCodeTemplate, variablesMismatch, type CodeTemplate } from '../../../email/sendBundledTemplate';
-import { cairoDay, CAIRO_TIME_ZONE, ceilingAllows, testCopy } from '../../../email/testInbox';
+import { cairoDay, CAIRO_TIME_ZONE, ceilingAllows, openDeliverable, openDelivery, testCopy } from '../../../email/testInbox';
 import { Institution } from '../../../models/Institution';
 import { User } from '../../../models/User';
 import { logger, serializeError } from '../../../utils/logging';
@@ -259,7 +259,9 @@ export async function sendLmsEmail(input: LmsEmailInput): Promise<LmsEmailResult
     return out;
   }
   const cfg = getConfig();
-  const redirect = cfg.email.testRecipient;
+  // Open delivery (owner, 25 Nov 2026): no test-inbox redirect and no subject prefix; reserved addresses are still skipped below.
+  const open = openDelivery();
+  const redirect = open ? undefined : cfg.email.testRecipient;
   const seen = new Set<string>();
   const list: LmsRecipient[] = [];
   for (const r of input.recipients) {
@@ -269,6 +271,8 @@ export async function sendLmsEmail(input: LmsEmailInput): Promise<LmsEmailResult
     if (/\.test$/i.test(email)) continue;
     // Other reserved domains only as a redirected test copy (the email goes to the test inbox).
     if (!redirect && isReservedRecipient(email)) continue;
+    // Open delivery: no mail to addresses that cannot be real mailboxes (subdomains of enara.app).
+    if (open && !openDeliverable(email)) continue;
     seen.add(email);
     list.push({ ...r, email });
   }
@@ -307,7 +311,7 @@ export async function sendLmsEmail(input: LmsEmailInput): Promise<LmsEmailResult
       const htmlValues = Object.fromEntries(Object.entries(values).map(([k, v]) => [k, asHtml(v)]));
       const textValues = Object.fromEntries(Object.entries(values).map(([k, v]) => [k, asText(v)]));
       let { html } = renderCodeTemplate(found.t, htmlValues);
-      const subject = `${cfg.email.subjectPrefix ?? ''}${renderCodeTemplate(found.t, textValues).subject}`.slice(0, 300);
+      const subject = `${open ? '' : cfg.email.subjectPrefix ?? ''}${renderCodeTemplate(found.t, textValues).subject}`.slice(0, 300);
       if (redirect) html = testCopy(html, d.forWhom.map((r) => r.email));
       const capture = cfg.lms.emailCapture === true;
       const result = await deliverRendered({ kind: 'lms', alias: found.alias, to: d.to, subject, html, capture, testInboxApplied: true });

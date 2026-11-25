@@ -32,7 +32,7 @@ const BASE_ENV = {
 };
 const ENV_KEYS = [
   'LMS_LTI_ENABLED', 'LMS_TOOL_BASE_URL', 'LMS_KEK', 'LMS_EMAILS_ENABLED', 'REMINDERS_ENABLED', 'RESEND_API_KEY', 'APP_URL', 'REMINDER_FROM',
-  'REMINDER_TEST_RECIPIENT', 'EMAIL_SUBJECT_PREFIX', 'EMAIL_DAILY_CEILING', 'LMS_EMAIL_CAPTURE', 'PARENT_EMAILS_ENABLED', 'ENARA_STAGING', 'LMS_OPS_EMAILS',
+  'REMINDER_TEST_RECIPIENT', 'EMAIL_SUBJECT_PREFIX', 'EMAIL_DAILY_CEILING', 'LMS_EMAIL_CAPTURE', 'PARENT_EMAILS_ENABLED', 'ENARA_STAGING', 'LMS_OPS_EMAILS', 'LMS_EMAIL_OPEN_DELIVERY',
 ];
 const OPS = 'ops@ops.enara.app';
 const ON = {
@@ -234,6 +234,45 @@ describe('staging (lms-test) with a test inbox: every path redirected, prefixed,
     expect(sendMock).not.toHaveBeenCalled();
     expect(fetchMock).not.toHaveBeenCalled();
     expect(await I.ceilingCount(day())).toBe(0);
+  });
+});
+
+// Owner, 25 Nov 2026: "make Resend send emails to any email (open)". LMS_EMAIL_OPEN_DELIVERY=true on staging: the real
+// recipients, no prefix, no Test copy line; reserved addresses are still never sent to; the ceiling still counts.
+describe('staging with LMS_EMAIL_OPEN_DELIVERY: real recipients', () => {
+  beforeEach(() => setEnv({ ...LMS_TEST, LMS_EMAIL_OPEN_DELIVERY: 'true' }, { staging: true }));
+
+  it('every path goes to the real address, no "[lms-test]" prefix, no Test copy line; counted against the ceiling', async () => {
+    const MUM = 'mona@familymail.com';
+    expect(await consent(MUM)).toMatchObject({ ok: true });
+    expect(await parentInvite(MUM)).toMatchObject({ ok: true });
+    expect(sent().map((x) => x.to)).toEqual([MUM, MUM]);
+    expect(sent().every((x) => !x.subject.startsWith('[lms-test]') && !x.html.includes('Test copy'))).toBe(true);
+    expect(sent()[0].subject).toBe("Please approve Omar's Enara account");
+    expect(await legacy('teacher@schoolmail.com')).toBe(true);
+    expect(posted()[0].to).toEqual(['teacher@schoolmail.com']);
+    expect(posted()[0].html).not.toContain('Test copy');
+    // The LMS path: real recipients too; the ops address here (a subdomain of enara.app) is not a mailbox, so it is skipped.
+    const r = await lmsEmail();
+    expect(r.sent).toBe(0);
+    expect(r.skipped).toBe(1);
+    expect((await rows()).every((x) => x.redirected === false)).toBe(true);
+    expect(await I.ceilingCount(day())).toBe(3);
+  });
+
+  it('several recipients: each real address; reserved addresses dropped, never sent to', async () => {
+    await T.sendTemplate('enara-welcome', ['a@schoolmail.com', 'b@schoolmail.com'], { NAME: 'A' });
+    expect(sent()[0].to).toEqual(['a@schoolmail.com', 'b@schoolmail.com']);
+    expect(await consent('someone@school.example')).toMatchObject({ ok: false, code: 'reserved_recipient' });
+    expect(await legacy('demo@lms.enara.test')).toBe(false);
+    expect(sent()).toHaveLength(1);
+  });
+
+  it('accounts lms-test builds (subdomains of enara.app) are never mailed; addresses at enara.app itself are', async () => {
+    expect(await consent('mona.hassan@family.enara.app')).toMatchObject({ ok: false, code: 'no_deliverable_recipient' });
+    expect(await legacy('ahmed.fahmy@school.enara.app')).toBe(false);
+    await T.sendTemplate('enara-welcome', ['owner@enara.app', 'kid@school.enara.app'], { NAME: 'A' });
+    expect(sent().map((x) => x.to)).toEqual(['owner@enara.app']);
   });
 });
 
