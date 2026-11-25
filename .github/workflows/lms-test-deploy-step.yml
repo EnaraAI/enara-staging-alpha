@@ -40,8 +40,7 @@ jobs:
           set -euo pipefail
           git fetch -q origin lms-test-live
           git merge-base --is-ancestor "${{ steps.t.outputs.sha }}" FETCH_HEAD || { echo "not on lms-test-live"; exit 1; }
-          git fetch -q origin claude/tutor-lms-vercel-newteam
-          for f in cli.mjs lib.mjs; do git show FETCH_HEAD:deploy/lms-test/$f > deploy/lms-test/$f; done
+          # lms-test-live now carries the new-team pipeline scripts itself (same as lms-deploy.yml uses).
           grep -q team_fHEDYVPWJ218PaXEBwnBMFvk deploy/lms-test/lib.mjs
       - uses: actions/setup-node@v4
         with: { node-version: '22' }
