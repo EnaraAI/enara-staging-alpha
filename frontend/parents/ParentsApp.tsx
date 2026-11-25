@@ -219,7 +219,7 @@ const ParentsApp: React.FC<{ userName?: string; onSignOut: () => void }> = ({ on
           {!showLink && learner && (
             <>
               {tab === 'messages' && <Messages learner={learner} overview={school.data ?? null} openChat={() => setChatOpen(true)} openSchool={openSchool} />}
-              {tab === 'actions' && <Actions overview={school.data ?? null} openSchool={openSchool} />}
+              {tab === 'actions' && <Actions learner={learner} overview={school.data ?? null} refreshKey={refreshKey} openSchool={openSchool} />}
               {(tab === 'home' || tab === 'progress' || tab === 'activity') && <SubjectChips subjects={subjectList} value={subjectKey} onChange={setSubject} />}
               {status.data && (tab === 'activity' || ((tab === 'home' || tab === 'progress') && subjectKey !== ALL)) && <StatusLine status={status.data} />}
               <Updated at={fetched} loading={status.loading || screenFetched.loading} onRefresh={refresh} />

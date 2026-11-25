@@ -531,3 +531,16 @@
   .pp-chatscreen { animation: pp-in .2s ease-out both; }
 }
 @media (min-width: 900px) { .pp-chatscreen { inset-block: 24px; border-radius: 20px; border: 1px solid var(--line); box-shadow: 0 20px 60px -20px rgba(0,0,0,.35); overflow: hidden; } }
+
+/* ---- Redesign step 5: Actions inbox and bus ---- */
+.pp-pagehead.pp-row { justify-content: space-between; }
+.pp-act { gap: 12px; }
+.pp-act--bad { border-color: var(--bad-200); }
+.pp-act-top { display: flex; gap: 12px; align-items: flex-start; }
+.pp-act-tx { display: flex; flex-direction: column; gap: 2px; min-inline-size: 0; flex: 1; }
+.pp-act-tx b { font-size: 16px; line-height: 1.3; }
+.pp-notice--ok { background: var(--emerald-50); border-color: color-mix(in srgb, var(--emerald) 25%, transparent); color: var(--emerald); align-items: center; font-weight: 600; font-size: 14px; }
+.pp-bustrip { gap: 12px; }
+.pp-bus-expected { font-size: 14px; font-weight: 700; color: var(--warn); text-align: end; margin-block-start: -6px; }
+.pp-bustrip .pp-school-list li:has(b), .pp-bustrip .pp-school-list li[style*="700"] { color: var(--blue); }
+.pp-pagehead .pp-btn { white-space: nowrap; flex: none; }

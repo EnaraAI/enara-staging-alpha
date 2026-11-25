@@ -266,20 +266,22 @@ const Bus: React.FC<{ learner: LearnerChip; refreshKey: number }> = ({ learner, 
   return (
     <>
       {!q.data.trips.length ? <p className="pp-notice" style={{ display: 'block' }}>{t.sch.noBus}</p> : q.data.trips.map((tr) => (
-        <section key={tr.direction} className="pp-card" aria-labelledby={`pp-bus-${tr.direction}`} data-testid={`pp-bus-${tr.direction}`}>
+        <section key={tr.direction} className="pp-card pp-bustrip" aria-labelledby={`pp-bus-${tr.direction}`} data-testid={`pp-bus-${tr.direction}`}>
           <div className="pp-row">
-            <h2 className="pp-h2" id={`pp-bus-${tr.direction}`}>{t.sch[tr.direction]}</h2>
+            <h2 className="pp-h2 pp-row" id={`pp-bus-${tr.direction}`} style={{ gap: 10, justifyContent: 'flex-start' }}><span className="pp-ico pp-ico--sun"><Icon name="bus" /></span>{t.sch[tr.direction]}</h2>
             <span className="pp-meta" dir="auto">{tr.route}{tr.busNumber ? ` · ${t.sch.busNumber(tr.busNumber)}` : ''}</span>
           </div>
           {tr.notices.map((nt, i) => (
-            <p key={i} className="pp-error" role="alert" data-testid="pp-bus-notice" style={{ margin: 0 }}>
-              <b>{nt.kind === 'cancel' ? t.sch.cancelled : t.sch.delay(n(nt.minutes ?? 0))}</b>{nt.message ? <span dir="auto"> · {nt.message}</span> : null}
+            <p key={i} className={`pp-bus-status ${nt.kind === 'cancel' ? 'pp-bus-status--bad' : 'pp-bus-status--late'}`} role="alert" data-testid="pp-bus-notice" style={{ margin: 0 }}>
+              <span className="pp-pulse" aria-hidden="true" />
+              <span><b>{nt.kind === 'cancel' ? t.sch.cancelled : t.sch.delay(n(nt.minutes ?? 0))}</b>{nt.message ? <span dir="auto"> · {nt.message}</span> : null}</span>
             </p>
           ))}
           <div className="pp-row" style={{ fontSize: 15 }}>
             <span>{t.sch.yourStop}: <b dir="auto">{tr.stop}</b></span>
             <b className="pp-num" style={{ fontSize: 20 }} data-testid="pp-bus-time">{tr.time ? n(tr.time) : '—'}</b>
           </div>
+          {(() => { const d = tr.notices.find((x) => x.kind === 'delay' && x.minutes); if (!d || !tr.time) return null; const [h, m] = tr.time.split(':').map(Number); const tot = h * 60 + m + (d.minutes ?? 0); const exp = `${String(Math.floor(tot / 60) % 24).padStart(2, '0')}:${String(tot % 60).padStart(2, '0')}`; return <p className="pp-bus-expected" data-testid="pp-bus-expected">{t.ui.expected(n(exp))}</p>; })()}
           {tr.mapLink && <a href={tr.mapLink} target="_blank" rel="noopener noreferrer" className="pp-linkbtn">{t.sch.mapLink}</a>}
           {(tr.supervisor || tr.driver) && (
             <p className="pp-sub" dir="auto">
