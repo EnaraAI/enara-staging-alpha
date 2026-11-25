@@ -720,3 +720,6 @@
 .pp-schoolindex .pp-stile { flex-direction: row; align-items: center; min-block-size: 64px; padding-block: 12px; padding-inline: 16px; gap: 14px; }
 .pp-schoolindex .pp-stile:hover { background: var(--blue-50); }
 .pp-schoolindex .pp-stile-tx { flex: 1; }
+/* Design A: the selected section chip inside a school page is teal, like the rest of the app. */
+.pp-seg:not(.pp-seg--two) button[aria-pressed="true"] { background: var(--teal); border-color: var(--teal); color: #fff; }
+.pp[data-theme="dark"] .pp-seg:not(.pp-seg--two) button[aria-pressed="true"] { color: #04201D; }
