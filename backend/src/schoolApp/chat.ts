@@ -38,7 +38,8 @@ const TOPICS: [Topic, RegExp][] = [
   ['fees', /\b(fee|fees|instal+ments?|tuition|pay|paid|payment|due|owe|receipt)\b|مصروف|مصاريف|رسوم|قسط|أقساط|اقساط|دفع|سداد|مستحق|إيصال|ايصال|فلوس|ندفع|هندفع|هدفع|باقي علي|فاضل علي/i],
   ['buses', /\b(bus|buses|pick ?up|drop ?off|stop|route|driver|supervisor)\b|حافلة|الحافلة|باص|أتوبيس|اتوبيس|أوتوبيس|اوتوبيس|محطة|سائق|السواق|سواق|مشرف/i],
   ['attendance', /\b(absent|absence|attendance|late|present|missed school)\b|غياب|غائب|حضور|تأخر|تأخير|متأخر|غاب|غابت|مجاش|ماجاش|ما جاش|مجتش|ماجتش|مراحش|ما راحش|مراحتش|اتأخر|اتأخرت|إتأخر/i],
-  ['timetable', /\b(timetable|schedule|class(es)?|lesson|period|subject)\b|جدول|حصة|حصص|مادة|المواد|الحصه|حصه/i],
+  // Egyptian forms too: «عنده مواد إيه النهارده», «بياخد إيه بكرة», «الدروس»: a parent's question about classes is a timetable question.
+  ['timetable', /\b(timetable|schedule|class(es)?|lesson|period|subject)\b|جدول|حصة|حصص|مادة|ماده|مواد|المواد|الحصه|حصه|دروس|الدروس|درس|بياخد|هياخد|بيدرس|هيدرس|بتاخد|هتاخد/i],
   ['consents', /\b(consent|sign|permission|form)\b|موافقة|توقيع|نموذج|إذن/i],
   ['requests', /\b(request|certificate|meeting|leave early|early leave)\b|طلب|طلبات|شهادة|شهاده|مقابلة|مقابله|انصراف|أقابل|اقابل|بدري/i],
   ['announcements', /\b(announcement|news|event|trip|notice)\b|إعلان|إعلانات|اعلان|خبر|رحلة/i],
@@ -180,7 +181,11 @@ export function checkModelReply(raw: string, c: ChatContext, q: string): { answe
   const sources = Array.isArray(j.sources) ? j.sources.filter((s): s is Source => typeof s === 'string' && have.has(s as Source)) : [];
   if (Array.isArray(j.sources) && sources.length !== j.sources.length) return { refused: 'unknown_source' };
   if (INJECTION.test(answer)) return { refused: 'injection_marker' };
-  const arabicShare = (answer.match(/[\u0600-\u06FF]/g) ?? []).length / Math.max(1, (answer.match(/[A-Za-z\u0600-\u06FF]/g) ?? []).length);
+  // Names and words the school typed in English (subjects, teachers, rooms, routes, the child's name) stay as they are in an Arabic
+  // reply; they do not count against the reply's language (owner's walk, 25 Nov 2026: a timetable answer in Arabic was refused).
+  const dataWords = new Set(((JSON.stringify(c) + ' ' + q).match(/[A-Za-z][A-Za-z'.-]*/g) ?? []).map((w) => w.toLowerCase()));
+  const langText = lang === 'ar' ? answer.replace(/[A-Za-z][A-Za-z'.-]*/g, (w) => (dataWords.has(w.toLowerCase()) ? ' ' : w)) : answer;
+  const arabicShare = (langText.match(/[\u0600-\u06FF]/g) ?? []).length / Math.max(1, (langText.match(/[A-Za-z\u0600-\u06FF]/g) ?? []).length);
   if (lang === 'en' ? arabicShare > 0.3 : arabicShare < 0.5) return { refused: 'wrong_language' };
   if (lang === 'ar' && COLLOQUIAL.test(answer)) return { refused: 'colloquial' };
   if (DAY_NUMBER.test(answer)) return { refused: 'day_number' };
