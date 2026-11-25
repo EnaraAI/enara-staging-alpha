@@ -14,6 +14,15 @@ describe('headers: English or Arabic, any case and spacing', () => {
     expect(r.missing).toEqual(['student']);
     expect(r.map).toEqual(['date', 'status', null]);
   });
+  it('a saved mapping (the school\'s own column names) wins; "" ignores a column', () => {
+    const saved = { 'tarikh el youm': 'date', 'code': 'student', 'colour': '' };
+    const r = mapHeaders('attendance', ['Tarikh el youm', 'Code', 'Status', 'Colour'], saved);
+    expect(r).toEqual({ map: ['date', 'student', 'status', null], missing: [] });
+    expect(mapHeaders('attendance', ['Date', 'X'], { x: 'not_a_column' }).map).toEqual(['date', null]);
+    const { rows, missing } = rowsFromCsv('attendance', 'Tarikh el youm,Code,Status\n24/11/2026,S1,absent\n', saved);
+    expect(missing).toEqual([]);
+    expect(rows[0]).toMatchObject({ date: '24/11/2026', student: 'S1', status: 'absent' });
+  });
 });
 
 describe('values', () => {

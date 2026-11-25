@@ -17,6 +17,8 @@ const IMPORTS: ImportSection[] = ['timetable', 'attendance', 'announcements', 'f
 interface Status { feesVisibleTo?: 'all' | 'owner'; institutionId: string | null; available: Record<Section, boolean>; sections: Record<Section, boolean>; templates: Partial<Record<ImportSection, { key: string; required: boolean; header: string; headerAr: string | null }[]>> }
 interface Roster { groups: { name: string; students: { id: string; name: string; grade: string | null }[] }[]; withoutGroup: { id: string; name: string; grade: string | null }[] }
 interface Preview { importId: string; section: ImportSection; counts: Record<string, number>; problems: { row: number; message: string }[] }
+// The file's column names did not match: the admin says which column each one is (saved for the school when the import is confirmed).
+interface NeedsMapping { needsMapping: true; headers: string[]; map: (string | null)[]; missing: string[]; columns: { key: string; required: boolean }[] }
 interface ImportRow { id: string; section: ImportSection; fileName?: string; status: string; counts?: Record<string, number>; createdAt: string; confirmedAt?: string; canUndo: boolean }
 interface Ann { id: string; audience: string; audienceValue: string | null; title: string; body: string; publishAt: string; expiresAt: string | null; withdrawn: boolean }
 
@@ -32,7 +34,8 @@ const TEXT = {
     notOnSite: 'not available yet', save: 'Save', saved: 'Saved.', failed: 'Could not save. Try again.',
     upload: 'Upload a file', template: 'Excel template', templateCsv: 'CSV template', fileHelp: 'Excel (.xlsx) or CSV. The first sheet is read; the first row is the column names (English or Arabic).',
     preview: 'Preview', counts: { new: 'New', changed: 'Changed', unchanged: 'Unchanged', removed: 'Removed', rejected: 'Rejected', total: 'Rows' } as Record<string, string>,
-    problems: 'Rows not imported', row: 'Row', reason: 'Reason', confirm: 'Import', cancel: 'Cancel', imported: 'Imported.', removedNote: 'A timetable file replaces the whole week of each class in it.',
+    problems: 'Rows not imported', row: 'Row', reason: 'Reason', confirm: 'Import', cancel: 'Cancel', imported: 'Imported.',
+    match: { title: 'Match your columns', help: 'Some column names in your file are not ours. Choose what each column is; we remember your choice for the next file.', fileCol: 'Your column', ours: 'Is', ignore: 'Ignore this column', again: 'Preview with these columns', stillMissing: 'Still missing:', saved: (n: number) => `Your own column names are remembered (${n}).`, clear: 'Forget them', cleared: 'Forgotten.' }, removedNote: 'A timetable file replaces the whole week of each class in it.',
     log: 'Import log', undo: 'Undo', undone: 'Undone.', undoHelp: 'Undo is possible for 24 hours.', status: { preview: 'Preview only', confirmed: 'Imported', undone: 'Undone', expired: 'Expired' } as Record<string, string>,
     noImports: 'No imports yet.', off: 'Turn this section on above to import.',
     compose: 'New announcement', audience: 'To', aud: { school: 'Whole school', grade: 'A grade', group: 'A class', student: 'One student (ID)' } as Record<string, string>,
@@ -51,7 +54,8 @@ const TEXT = {
     notOnSite: 'غير متاح بعد', save: 'حفظ', saved: 'تم الحفظ.', failed: 'تعذّر الحفظ. حاول مرة أخرى.',
     upload: 'رفع ملف', template: 'قالب Excel', templateCsv: 'قالب CSV', fileHelp: 'ملف Excel (‎.xlsx) أو CSV. تُقرأ الورقة الأولى؛ والصف الأول أسماء الأعمدة (بالعربية أو الإنجليزية).',
     preview: 'معاينة', counts: { new: 'جديد', changed: 'معدَّل', unchanged: 'دون تغيير', removed: 'محذوف', rejected: 'مرفوض', total: 'الصفوف' } as Record<string, string>,
-    problems: 'صفوف لم تُستورد', row: 'الصف', reason: 'السبب', confirm: 'استيراد', cancel: 'إلغاء', imported: 'تم الاستيراد.', removedNote: 'ملف الجدول يستبدل أسبوع كل فصل وارد فيه بالكامل.',
+    problems: 'صفوف لم تُستورد', row: 'الصف', reason: 'السبب', confirm: 'استيراد', cancel: 'إلغاء', imported: 'تم الاستيراد.',
+    match: { title: 'طابق أعمدتك', help: 'بعض أسماء الأعمدة في ملفك تختلف عن أسمائنا. اختر ما يمثله كل عمود، وسنتذكر اختيارك للملف التالي.', fileCol: 'عمودك', ours: 'يمثل', ignore: 'تجاهل هذا العمود', again: 'معاينة بهذه الأعمدة', stillMissing: 'ما زال ناقصًا:', saved: (n: number) => `أسماء أعمدتك محفوظة (${n}).`, clear: 'احذفها', cleared: 'حُذفت.' }, removedNote: 'ملف الجدول يستبدل أسبوع كل فصل وارد فيه بالكامل.',
     log: 'سجل الاستيراد', undo: 'تراجع', undone: 'تم التراجع.', undoHelp: 'يمكن التراجع خلال 24 ساعة.', status: { preview: 'معاينة فقط', confirmed: 'مستورد', undone: 'تم التراجع عنه', expired: 'منتهي' } as Record<string, string>,
     noImports: 'لا عمليات استيراد بعد.', off: 'فعّل هذا القسم أعلاه للاستيراد.',
     compose: 'إعلان جديد', audience: 'إلى', aud: { school: 'كل المدرسة', grade: 'صف دراسي', group: 'فصل', student: 'طالب واحد (الرقم)' } as Record<string, string>,
@@ -101,6 +105,9 @@ export const SchoolAppAdmin: React.FC<{ lang: Lang }> = ({ lang }) => {
     } catch { setHidden(true); }
   }, []);
   useEffect(() => { void load(); }, [load]);
+  const [mappings, setMappings] = useState<Partial<Record<ImportSection, Record<string, string>>>>({});
+  const reloadMappings = () => apiRequest<{ mappings: { section: ImportSection; map: Record<string, string> }[] }>('GET', '/api/school-app/imports/mappings').then((r) => setMappings(Object.fromEntries(r.mappings.map((m) => [m.section, m.map])))).catch(() => undefined);
+  useEffect(() => { if (!hidden) void reloadMappings(); }, [hidden]); // eslint-disable-line react-hooks/exhaustive-deps
   if (hidden || !status || !draft) return null;
 
   const saveSections = async () => {
@@ -108,7 +115,7 @@ export const SchoolAppAdmin: React.FC<{ lang: Lang }> = ({ lang }) => {
     try { const r = await apiRequest<{ sections: Record<Section, boolean> }>('PUT', '/api/school-app/sections', draft); setStatus({ ...status, sections: r.sections }); setDraft(r.sections); setNote(t.saved); }
     catch (e) { setNote(errText(e, t.failed)); }
   };
-  const reloadImports = () => apiRequest<{ imports: ImportRow[] }>('GET', '/api/school-app/imports').then((r) => setImports(r.imports)).catch(() => undefined);
+  const reloadImports = () => { void reloadMappings(); return apiRequest<{ imports: ImportRow[] }>('GET', '/api/school-app/imports').then((r) => setImports(r.imports)).catch(() => undefined); };
 
   return (
     <section className="rounded-xl border border-slate-200 bg-white p-5 space-y-5" aria-labelledby="sa-title" data-testid="school-app-admin">
@@ -129,7 +136,7 @@ export const SchoolAppAdmin: React.FC<{ lang: Lang }> = ({ lang }) => {
         {note && <p className="text-sm text-slate-600" role="status">{note}</p>}
       </fieldset>
 
-      {IMPORTS.filter((s) => status.templates[s] && status.available[SECTION_OF[s]]).map((s) => <ImportCard key={s} lang={lang} section={s} on={!!status.sections[SECTION_OF[s]]} template={status.templates[s]!} roster={roster} onDone={reloadImports} />)}
+      {IMPORTS.filter((s) => status.templates[s] && status.available[SECTION_OF[s]]).map((s) => <ImportCard key={s} lang={lang} section={s} on={!!status.sections[SECTION_OF[s]]} template={status.templates[s]!} roster={roster} saved={mappings[s]} onDone={reloadImports} />)}
       <MoodleAdmin lang={lang} />
       {status.sections.requests && <RequestsAdmin lang={lang} />}
       {status.sections.consents && <ConsentsAdmin lang={lang} roster={roster} />}
@@ -163,9 +170,11 @@ export const SchoolAppAdmin: React.FC<{ lang: Lang }> = ({ lang }) => {
   );
 };
 
-const ImportCard: React.FC<{ lang: Lang; section: ImportSection; on: boolean; template: NonNullable<Status['templates'][ImportSection]>; roster: Roster | null; onDone: () => void }> = ({ lang, section, on, template, roster, onDone }) => {
+const ImportCard: React.FC<{ lang: Lang; section: ImportSection; on: boolean; template: NonNullable<Status['templates'][ImportSection]>; roster: Roster | null; saved?: Record<string, string>; onDone: () => void }> = ({ lang, section, on, template, roster, saved, onDone }) => {
   const t = TEXT[lang];
   const [preview, setPreview] = useState<Preview | null>(null);
+  const [match, setMatch] = useState<(NeedsMapping & { csv: string; fileName: string; choice: string[] }) | null>(null);
+  const colName = (key: string) => { const c = template.find((x) => x.key === key); return c ? ((lang === 'ar' && c.headerAr) || c.header) : key; };
   const [msg, setMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const input = useRef<HTMLInputElement>(null);
@@ -173,14 +182,30 @@ const ImportCard: React.FC<{ lang: Lang; section: ImportSection; on: boolean; te
   const rows = () => [headers, ...exampleRows(section, roster).map((r) => template.map((c) => r[c.key] ?? ''))];
   const rosterSheet = () => [t.rosterCols, ...(roster?.groups ?? []).flatMap((g) => g.students.map((s) => [g.name, s.id, s.name, s.grade ?? ''])), ...(roster?.withoutGroup ?? []).map((s) => ['', s.id, s.name, s.grade ?? ''])];
   const onFile = async (f: File) => {
-    setMsg(null); setPreview(null); setBusy(true);
+    setMsg(null); setPreview(null); setMatch(null); setBusy(true);
     try {
       let csv: string;
       if (/\.xlsx$/i.test(f.name)) { try { csv = toCsv(await readXlsx(await f.arrayBuffer())); } catch { throw new Error(t.readError); } }
       else csv = await f.text();
-      setPreview(await apiRequest<Preview>('POST', '/api/school-app/imports/preview', { section, csv: csv.replace(/^﻿/, ''), fileName: f.name }));
+      await runPreview(csv.replace(/^﻿/, ''), f.name);
     } catch (e) { setMsg(errText(e, t.readError)); }
     finally { setBusy(false); if (input.current) input.current.value = ''; }
+  };
+  const runPreview = async (csv: string, fileName: string, mapping?: Record<string, string>) => {
+    const r = await apiRequest<Preview | NeedsMapping>('POST', '/api/school-app/imports/preview', { section, csv, fileName, askMapping: true, ...(mapping ? { mapping } : {}) });
+    if ('needsMapping' in r) { setPreview(null); setMatch({ ...r, csv, fileName, choice: r.map.map((k) => k ?? '') }); }
+    else { setMatch(null); setPreview(r); }
+  };
+  const previewMatched = async () => {
+    if (!match) return;
+    setBusy(true); setMsg(null);
+    try { await runPreview(match.csv, match.fileName, Object.fromEntries(match.headers.map((h, i) => [h, match.choice[i] ?? '']))); }
+    catch (e) { setMsg(errText(e, t.failed)); }
+    finally { setBusy(false); }
+  };
+  const forget = async () => {
+    try { await apiRequest('DELETE', `/api/school-app/imports/mappings/${encodeURIComponent(section)}`); setMsg(t.match.cleared); onDone(); }
+    catch (e) { setMsg(errText(e, t.failed)); }
   };
   const confirm = async () => {
     if (!preview) return;
@@ -205,6 +230,28 @@ const ImportCard: React.FC<{ lang: Lang; section: ImportSection; on: boolean; te
             <input ref={input} type="file" accept=".xlsx,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" className="mt-1 block w-full text-sm" disabled={busy} data-testid={`sa-file-${section}`} onChange={(e) => { const f = e.target.files?.[0]; if (f) void onFile(f); }} />
             <span className="text-xs text-slate-500">{t.fileHelp}</span>
           </label>
+          {saved && Object.keys(saved).length > 0 && (
+            <p className="text-xs text-slate-600" data-testid={`sa-saved-map-${section}`}>{t.match.saved(Object.keys(saved).length)} <button type="button" className="underline" onClick={forget} data-testid={`sa-forget-map-${section}`}>{t.match.clear}</button></p>
+          )}
+          {match && (
+            <div className="space-y-2 rounded-lg bg-amber-50 p-3" data-testid={`sa-match-${section}`}>
+              <p className="text-sm font-semibold">{t.match.title}</p>
+              <p className="text-xs text-slate-600">{t.match.help}</p>
+              <table className="w-full text-sm"><thead><tr><th className="text-start pe-3">{t.match.fileCol}</th><th className="text-start">{t.match.ours}</th></tr></thead>
+                <tbody>{match.headers.map((h, i) => (
+                  <tr key={i}><td className="pe-3 py-1" dir="auto">{h || '—'}</td><td className="py-1">
+                    <select className="rounded border border-slate-300 px-2 py-1 text-sm" value={match.choice[i] ?? ''} aria-label={`${t.match.fileCol}: ${h}`} data-testid={`sa-match-col-${i}`}
+                      onChange={(e) => setMatch({ ...match, choice: match.choice.map((c, j) => (j === i ? e.target.value : c)) })}>
+                      <option value="">{t.match.ignore}</option>
+                      {match.columns.map((c) => <option key={c.key} value={c.key}>{colName(c.key)}{c.required ? ' *' : ''}</option>)}
+                    </select></td></tr>))}</tbody></table>
+              {(() => { const left = match.columns.filter((c) => c.required && !match.choice.includes(c.key)).map((c) => colName(c.key)); return left.length ? <p className="text-xs text-red-700">{t.match.stillMissing} {left.join(lang === 'ar' ? '، ' : ', ')}</p> : null; })()}
+              <div className="flex gap-2">
+                <button type="button" className={primary} onClick={previewMatched} disabled={busy || match.columns.some((c) => c.required && !match.choice.includes(c.key))} data-testid={`sa-match-preview-${section}`}>{t.match.again}</button>
+                <button type="button" className={btn} onClick={() => setMatch(null)}>{t.cancel}</button>
+              </div>
+            </div>
+          )}
           {preview && (
             <div className="space-y-2 rounded-lg bg-slate-50 p-3" data-testid={`sa-preview-${section}`}>
               <p className="text-sm font-semibold">{t.preview}</p>

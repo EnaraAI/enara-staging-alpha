@@ -5,7 +5,7 @@ import { ensurePlainObject, rejectMongoOperators } from '../utils/validation';
 import { requireLearner } from '../parents/service';
 import { anySiteSectionOn, SECTIONS, siteSectionOn } from './flags';
 import { feesVisibleTo, schoolSections, setFeesVisibleTo, setSchoolSections } from './sections';
-import { confirmImport, listImports, previewImport, undoImport } from './importer';
+import { clearMapping, confirmImport, listImports, listMappings, previewImport, undoImport } from './importer';
 import { COLUMNS } from './importSpec';
 import * as views from './parentViews';
 import { moodleConnections, runMoodleSyncNow, saveMoodleToken, setMoodleEnabled } from './moodleSync';
@@ -69,6 +69,8 @@ schoolAppAdminRoutes.put('/sections', h(async (req, res) => {
 schoolAppAdminRoutes.post('/imports/preview', h(async (req, res) => { const b = ensurePlainObject(req.body); rejectMongoOperators(b); res.json(await previewImport(actor(req), b)); }));
 schoolAppAdminRoutes.post('/imports/:id/confirm', h(async (req, res) => { res.json(await confirmImport(actor(req), String(req.params.id))); }));
 schoolAppAdminRoutes.post('/imports/:id/undo', h(async (req, res) => { res.json(await undoImport(actor(req), String(req.params.id))); }));
+schoolAppAdminRoutes.get('/imports/mappings', h(async (req, res) => { res.json(await listMappings(actor(req), typeof req.query.institutionId === 'string' ? req.query.institutionId : undefined)); }));
+schoolAppAdminRoutes.delete('/imports/mappings/:section', h(async (req, res) => { res.json(await clearMapping(actor(req), String(req.params.section), typeof req.query.institutionId === 'string' ? req.query.institutionId : undefined)); }));
 schoolAppAdminRoutes.get('/imports', h(async (req, res) => { res.json(await listImports(actor(req), typeof req.query.institutionId === 'string' ? req.query.institutionId : undefined)); }));
 
 // Step (b): fees. The school sees its instalments (filter by student or status), marks one paid / waived / due, and chooses who in a
@@ -121,7 +123,8 @@ schoolAppAdminRoutes.post('/announcements', h(async (req, res) => {
   const id = schoolId(req, b.institutionId); if (!id) throw new AppError('A school is required', 400, 'VALIDATION_ERROR');
   const csv = `audience,audience value,title,body,publish,expires\n${[b.audience, b.audienceValue, b.title, b.body, b.publish, b.expires].map((v) => `"${String(v ?? '').replace(/"/g, '""')}"`).join(',')}`;
   // Same checks as an import row (one path for every source); then published at once.
-  const p = await previewImport(actor(req), { section: 'announcements', csv, institutionId: id });
+  const p = await previewImport(actor(req), { section: 'announcements', csv, institutionId: id }, { savedMapping: false });
+  if ('needsMapping' in p) throw new AppError('Unexpected columns', 500, 'INTERNAL');
   if (p.problems.length) throw new AppError(p.problems[0].message, 400, 'VALIDATION_ERROR');
   const c = await confirmImport(actor(req), p.importId);
   res.status(201).json({ created: c.written.inserted });

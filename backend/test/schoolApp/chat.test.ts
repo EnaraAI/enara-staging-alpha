@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { checkModelReply, codeAnswer, requestOffer, topicOf, type ChatContext } from '../../src/schoolApp/chat';
+import { checkModelReply, codeAnswer, forModel, requestOffer, topicOf, type ChatContext } from '../../src/schoolApp/chat';
 
 // Parents school app, step (e): the assistant's rules, without a model. The model's reply is only ever used if checkModelReply passes.
 const ctx: ChatContext = {
@@ -75,6 +75,15 @@ describe('the model reply checks', () => {
     expect(checkModelReply('{"answer":"Omar has 30,000 EGP remaining.","sources":["fees"]}', ctx, 'كم المتبقي؟').refused).toBe('wrong_language');
     expect(checkModelReply('{"answer":"يصل الباص الساعة 7.","sources":[]}', ctx, 'متى يصل 7؟').refused).toBe('colloquial');
     expect(checkModelReply('{"answer":"المتبقي من الرسوم 30,000 جنيه.","sources":["fees"]}', ctx, 'كم المتبقي من الرسوم؟')).toMatchObject({ sources: ['fees'] });
+  });
+  it('refuses day numbers; the model sees weekday names', () => {
+    expect(checkModelReply('{"answer":"The next maths lesson is on day 2 at 10:50.","sources":[]}', ctx, 'When is maths?').refused).toBe('day_number');
+    const tt: ChatContext = { ...ctx, today: '2026-11-25', facts: [{ source: 'timetable', updatedAt: null, data: { days: [{ day: 3, periods: [{ period: 1, start: '08:00', subject: 'Maths' }] }] } }] };
+    const m = forModel(tt);
+    expect(m.todayWeekday).toEqual({ en: 'Wednesday', ar: 'الأربعاء' });
+    expect(m.tomorrowWeekday.en).toBe('Thursday');
+    expect(JSON.stringify(m.facts)).toContain('"weekday":{"en":"Wednesday"');
+    expect(JSON.stringify(m.facts)).not.toContain('"day":3');
   });
   it('refuses unknown sources, non-JSON and empty replies', () => {
     expect(checkModelReply('{"answer":"The bus is at 7.","sources":["buses"]}', ctx, 'bus').refused).toBe('unknown_source');

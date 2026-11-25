@@ -80,9 +80,16 @@ export const norm = (s: unknown) => String(s ?? '').normalize('NFKC').replace(/[
 export const digits = (s: string) => s.replace(/[٠-٩]/g, (d) => String(d.charCodeAt(0) - 0x660)).replace(/[۰-۹]/g, (d) => String(d.charCodeAt(0) - 0x6f0));
 
 /** Header row -> column key per index (null = ignored), or the missing required columns. */
-export function mapHeaders(section: ImportSection, headers: string[]): { map: (string | null)[]; missing: string[] } {
+/** `saved`: the school's own header names (normalised) -> column key, '' = ignore; it wins over the built-in names. */
+export function mapHeaders(section: ImportSection, headers: string[], saved: Record<string, string> = {}): { map: (string | null)[]; missing: string[] } {
   const cols = COLUMNS[section];
-  const map = headers.map((h) => cols.find((c) => c.aliases.some((a) => norm(a) === norm(h)))?.key ?? null);
+  const keys = new Set(cols.map((c) => c.key));
+  const map = headers.map((h) => {
+    const s = saved[norm(h)];
+    if (s === '') return null;
+    if (s && keys.has(s)) return s;
+    return cols.find((c) => c.aliases.some((a) => norm(a) === norm(h)))?.key ?? null;
+  });
   const missing = cols.filter((c) => c.required && !map.includes(c.key)).map((c) => c.key);
   return { map, missing };
 }

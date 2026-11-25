@@ -616,6 +616,14 @@ export const MIGRATIONS: Migration[] = [
       await m.SchoolAnnouncement.createIndexes();
     },
   },
+  {
+    id: '2026-12-09-school-app-column-mappings',
+    description: 'Parents school app, imports: unique index of school_column_mappings (new collection: saved column names per school and section). Nothing existing changed.',
+    up: async () => {
+      const m = await import('../schoolApp/models');
+      await m.SchoolColumnMapping.createIndexes();
+    },
+  },
 ];
 
 type TtlCollection = { collectionName: string; indexes(): Promise<{ key: Record<string, unknown>; expireAfterSeconds?: number }[]>; createIndex(key: Record<string, 1>, opts: { expireAfterSeconds: number }): Promise<unknown> };
