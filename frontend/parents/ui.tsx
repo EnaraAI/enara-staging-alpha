@@ -32,10 +32,35 @@ const PATHS: Record<string, React.ReactNode> = {
   out: <><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><path d="M21 12H9" /></>,
   close: <path d="M18 6 6 18M6 6l12 12" />,
   school: <><path d="M2 9 12 4l10 5-10 5z" /><path d="M6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5" /></>,
+  today: <><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></>,
+  rings: <><path d="M12 3a9 9 0 1 1-9 9" /><path d="M12 6.8a5.2 5.2 0 1 1-5.2 5.2" /><circle cx="12" cy="12" r="1.5" /></>,
+  messages: <><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H9l-5 4V6a1 1 0 0 1 1-1z" /><path d="M8 10h8M8 13h5" /></>,
+  actions: <path d="m4 7 1.8 1.8L9 5.5M4 15.5l1.8 1.8L9 14M12.5 7.5H20M12.5 16H20" />,
+  megaphone: <><path d="M3 11v2a1 1 0 0 0 1 1h3l6 4V6L7 10H4a1 1 0 0 0-1 1z" /><path d="M17 9a4 4 0 0 1 0 6" /></>,
+  pen: <><path d="M4 20h4L19 9l-4-4L4 16z" /><path d="m13.5 6.5 4 4" /></>,
+  coin: <><circle cx="12" cy="12" r="9" /><path d="M14.5 9.5c-.5-1-1.5-1.5-2.5-1.5-1.4 0-2.5.8-2.5 2s1.1 1.7 2.5 2 2.5.8 2.5 2-1.1 2-2.5 2c-1 0-2-.5-2.5-1.5M12 6.5v1.5M12 16v1.5" /></>,
+  inbox: <><path d="M3 13h5l1.5 3h5L16 13h5" /><path d="M5 5h14l2 8v6H3v-6z" /></>,
+  bus: <><rect x="4" y="3" width="16" height="15" rx="3" /><path d="M4 11h16M8 21v-3M16 21v-3" /><circle cx="8" cy="14.5" r=".8" /><circle cx="16" cy="14.5" r=".8" /></>,
+  send: <><path d="M4 12 20 4l-6 16-3-7z" /><path d="m11 13 9-9" /></>,
+  moon: <path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z" />,
 };
 export const Icon: React.FC<{ name: keyof typeof PATHS | string; className?: string; flip?: boolean; style?: React.CSSProperties }> = ({ name, className, flip, style }) => (
   <svg className={`pp-icon${flip ? ' pp-flip' : ''}${className ? ` ${className}` : ''}`} viewBox="0 0 24 24" aria-hidden="true" focusable="false" style={style}>{PATHS[name]}</svg>
 );
+
+/** The ENARA assistant's avatar: a star with a turning ring and a twinkling spark (CSS motion, still with "reduce motion"). */
+export const AssistantStar: React.FC<{ small?: boolean }> = ({ small }) => {
+  const id = React.useId().replace(/:/g, '');
+  return (
+    <svg className={`pp-star${small ? ' pp-star--sm' : ''}`} viewBox="0 0 40 40" aria-hidden="true" focusable="false">
+      <defs><linearGradient id={`g${id}`} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#6D4AFF" /><stop offset="1" stopColor="#2B5CE6" /></linearGradient></defs>
+      <circle cx="20" cy="20" r="20" fill={`url(#g${id})`} />
+      <circle className="pp-orb" cx="20" cy="20" r="13" fill="none" stroke="#fff" strokeOpacity=".4" strokeWidth="1.5" strokeDasharray="3 5" />
+      <path d="M20 11.5c.7 5 2.8 7.2 8 8-5.2.8-7.3 3-8 8-.7-5-2.8-7.2-8-8 5.2-.8 7.3-3 8-8z" fill="#fff" />
+      <circle className="pp-spark" cx="29.5" cy="11" r="2.2" fill="#FFD58A" />
+    </svg>
+  );
+};
 
 /** Marks AI-written text. */
 export const AiBadge: React.FC = () => {

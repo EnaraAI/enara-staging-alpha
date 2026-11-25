@@ -50,9 +50,9 @@ export const Activity: React.FC<{ learner: LearnerChip; refreshKey: number; onFe
           ))}
         </div>
         <div className="pp-legend" aria-hidden="true">
-          <span><i style={{ background: '#f59f0a' }} />{t.practised}</span>
-          <span><i style={{ background: '#f2f4f8' }} />{t.missed}</span>
-          <span><i style={{ border: '1.5px dashed #566376' }} />{t.upcoming}</span>
+          <span><i style={{ background: 'var(--amber)' }} />{t.practised}</span>
+          <span><i style={{ background: 'var(--track)' }} />{t.missed}</span>
+          <span><i style={{ border: '1.5px dashed var(--muted)' }} />{t.upcoming}</span>
         </div>
       </section>
 

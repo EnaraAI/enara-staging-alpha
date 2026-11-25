@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { bi } from '../i18n';
 import { cairoDate, parentsApi, type LearnerChip } from '../api';
 import { ErrorBox, Icon, Loading, levelNextLine, useP } from '../ui';
-import { ALL, SubjectView } from './Subjects';
+import { ALL, ResultRow, SubjectRows, SubjectView, waitingFirst } from './Subjects';
+import { RingsCard } from './Today';
+import type { SubjectCard, WeeklyStatus } from '../api';
 import { useLive } from '../useLive';
 import { ClassFilter } from '../shared';
 import { MemoryCard } from './MemoryCard';
 
-type ProgressProps = { learner: LearnerChip; refreshKey: number; onFetched: (d: Date | null, loading: boolean) => void; subjectKey?: string; english?: boolean };
+type ProgressProps = { learner: LearnerChip; refreshKey: number; onFetched: (d: Date | null, loading: boolean) => void; subjectKey?: string; english?: boolean; status?: WeeklyStatus | null; subjects?: SubjectCard[]; onPickSubject?: (key: string) => void };
 
 // All subjects: English (and "All subjects") keep the CEFR view; another subject shows its own outcomes and results.
 // Placeholder sections (mock) are not shown.
@@ -15,7 +17,7 @@ export const Progress: React.FC<ProgressProps> = (props) => (props.subjectKey &&
   ? <SubjectView learner={props.learner} subjectKey={props.subjectKey} mode="progress" refreshKey={props.refreshKey} onFetched={props.onFetched} />
   : <ProgressAll {...props} />);
 
-const ProgressAll: React.FC<ProgressProps> = ({ learner, refreshKey, onFetched, subjectKey }) => {
+const ProgressAll: React.FC<ProgressProps> = ({ learner, refreshKey, onFetched, subjectKey, status, subjects = [], onPickSubject }) => {
   const ctx = useP();
   const { t, n, lang } = ctx;
   const [classId, setClassId] = useState<string | null>(null);
@@ -38,6 +40,9 @@ const ProgressAll: React.FC<ProgressProps> = ({ learner, refreshKey, onFetched, 
   return (
     <>
       <h1 className="pp-h1">{t.progressTitle}</h1>
+      {/* Redesign step 3: the week's rings and the subject rows come first on "All subjects". */}
+      {(!subjectKey || subjectKey === ALL) && status && <RingsCard status={status} lessons={subjects.reduce((sum, x) => sum + (x.lessonsThisWeek || 0), 0)} />}
+      {(!subjectKey || subjectKey === ALL) && onPickSubject && <SubjectRows subjects={subjects} onPick={onPickSubject} />}
 
       {!d.level.mock && <section className="pp-card" aria-labelledby="pp-cefr" style={{ gap: 4 }}>
         <div className="pp-row" style={{ marginBlockEnd: 8 }}><p className="pp-eyebrow" id="pp-cefr">{t.cefrTitle}</p></div>
@@ -47,15 +52,15 @@ const ProgressAll: React.FC<ProgressProps> = ({ learner, refreshKey, onFetched, 
               <span className={`pp-mark${lv.state === 'done' ? ' pp-mark--done' : lv.state === 'current' ? ' pp-mark--current' : ''}`} aria-hidden="true">{lv.state === 'done' ? '✓' : lv.state === 'current' ? '●' : ''}</span>
               <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
                 <div className="pp-row" style={{ alignItems: 'baseline' }}>
-                  <span style={{ fontSize: 14, fontWeight: lv.state === 'current' ? 600 : lv.state === 'done' ? 500 : 400, color: lv.state === 'ahead' ? '#566376' : '#111c2c' }}>{bi(lv.label, lang)}</span>
+                  <span style={{ fontSize: 14, fontWeight: lv.state === 'current' ? 600 : lv.state === 'done' ? 500 : 400, color: lv.state === 'ahead' ? 'var(--muted)' : 'var(--text)' }}>{bi(lv.label, lang)}</span>
                   <span className="pp-meta">{lv.cefr}</span>
                 </div>
                 {lv.state === 'current' && (d.level.subLevelPct !== null ? (
                   <>
                     <div className="pp-bar" style={{ blockSize: 6, background: '#fff' }} role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={d.level.subLevelPct} aria-label={lvlName}><i style={{ inlineSize: `${d.level.subLevelPct}%` }} /></div>
-                    <span style={{ fontSize: 12, color: '#16263b' }}>{d.level.subLevel ? `${d.level.subLevel} · ` : ''}{levelNextLine(ctx, d.level) ?? ''}</span>
+                    <span style={{ fontSize: 12, color: 'var(--text-2)' }}>{d.level.subLevel ? `${d.level.subLevel} · ` : ''}{levelNextLine(ctx, d.level) ?? ''}</span>
                   </>
-                ) : <span style={{ fontSize: 12, color: '#566376' }}>{t.noSubLevel}</span>)}
+                ) : <span style={{ fontSize: 12, color: 'var(--muted)' }}>{t.noSubLevel}</span>)}
                 {lv.state === 'done' && <span className="sr">{t.canDoState.achieved}</span>}
               </div>
             </li>
@@ -71,7 +76,7 @@ const ProgressAll: React.FC<ProgressProps> = ({ learner, refreshKey, onFetched, 
           <div className="pp-skill" key={s.skill}>
             <div className="pp-row" style={{ fontSize: 14 }}>
               <span style={{ fontWeight: 500 }}>{t.skill[s.skill] ?? s.skill}</span>
-              <span className="pp-num" style={{ color: '#16263b' }}>{n(s.pct)}% <span aria-hidden="true" style={{ color: s.trend === 'up' ? '#0b203c' : '#566376', fontWeight: s.trend === 'up' ? 600 : 400 }}>{s.trend === 'up' ? '↑' : s.trend === 'down' ? '↓' : rtl ? '←' : '→'}</span><span className="sr">, {t.trend[s.trend]}</span></span>
+              <span className="pp-num" style={{ color: 'var(--text-2)' }}>{n(s.pct)}% <span aria-hidden="true" style={{ color: s.trend === 'up' ? 'var(--navy)' : 'var(--muted)', fontWeight: s.trend === 'up' ? 600 : 400 }}>{s.trend === 'up' ? '↑' : s.trend === 'down' ? '↓' : rtl ? '←' : '→'}</span><span className="sr">, {t.trend[s.trend]}</span></span>
             </div>
             <div className="pp-bar pp-bar--navy" aria-hidden="true"><i style={{ inlineSize: `${s.pct}%` }} /></div>
           </div>
@@ -130,19 +135,7 @@ const ProgressAll: React.FC<ProgressProps> = ({ learner, refreshKey, onFetched, 
         <div className="pp-row"><h2 className="pp-h2" id="pp-results">{t.assessments}</h2><span className="pp-meta">{t.lessonsDone(n(d.lessonsCompleted.count))}</span></div>
         <ClassFilter classes={d.classes} value={classId} onChange={setClassId} />
         {shown.length === 0 && <p className="pp-sub">{t.noAssessments}</p>}
-        {shown.map((a) => (
-          <div className="pp-row" key={a.id} data-testid="pp-result">
-            <div style={{ flexGrow: 1, minInlineSize: 0 }}>
-              <p style={{ fontSize: 14, fontWeight: 600, lineHeight: '20px' }} dir="auto">{a.title}</p>
-              <p className="pp-sub">{a.submittedAt ? cairoDate(a.submittedAt.slice(0, 10), lang) : ''}{a.score !== null ? ` · ${n(a.score)}%` : ''}{a.class !== undefined ? ` · ${a.class ? t.inClass(a.class.name) : t.noClass}` : ''}</p>
-            </div>
-            {/* Parents P3: not released yet: no score, "Waiting for the teacher". */}
-            {a.waiting && <span className="pp-tag pp-tag--sky" data-testid="pp-result-waiting">{t.waitingForTeacher}</span>}
-            {a.passed !== null && a.verified && (a.passed
-              ? <span className="pp-tag pp-tag--ok"><Icon name="check" style={{ inlineSize: 14, blockSize: 14 }} />{t.passed}</span>
-              : <span className="pp-tag pp-tag--warn">{t.notPassed}</span>)}
-          </div>
-        ))}
+        {waitingFirst(shown).map((a) => <ResultRow key={a.id} a={a} extra={a.class !== undefined ? (a.class ? t.inClass(a.class.name) : t.noClass) : undefined} />)}
       </section>
     </>
   );

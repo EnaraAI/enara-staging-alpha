@@ -89,12 +89,12 @@ test.describe.serial('20 · Parents: every subject the child studies', () => {
     await shot(page, '20-parents-maths');
 
     // Progress tab for Maths: outcomes and results, still no held score.
-    await page.getByRole('button', { name: 'Progress' }).click();
+    await page.getByTestId('pp-nav-progress').click();
     await expect(page.getByTestId('pp-result').filter({ hasText: st.titles.held })).not.toContainText('100%');
     await expect(page.locator('body')).not.toContainText('Sample data');
 
     // Arabic: right-to-left, the same chips.
-    await page.getByRole('button', { name: 'Home' }).click();
+    await page.getByTestId('pp-nav-home').click();
     await page.locator('.pp-langbtn').click();
     await expect(page.locator('.pp')).toHaveAttribute('dir', 'rtl');
     await expect(page.getByTestId('pp-subjects').getByRole('button', { name: 'كل المواد' })).toBeVisible();

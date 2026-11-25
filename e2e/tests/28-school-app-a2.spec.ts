@@ -50,10 +50,10 @@ test.describe.serial('28 · Parents school app (a2): parent screens', () => {
     await expect(home).toBeVisible({ timeout: 30_000 });
     await expect(home).toContainText('Absent');
     await expect(home).toContainText(`Science ${RUN}`);
-    await expect(page.getByTestId('pp-bell').locator('.pp-badge')).toBeVisible();
+    await expect(page.getByTestId('pp-nav-messages').locator('.pp-badge')).toBeVisible();
     await shot(page, 'school-a2-01-home-card');
 
-    await page.locator('.pp-nav').getByRole('button', { name: 'School' }).click();
+    await page.getByTestId('pp-nav-home').click(); await page.getByTestId('pp-school-home').getByRole('button').first().click(); // redesign: School opens from Today
     await expect(page).toHaveURL(/\/parents\/school$/);
     await page.getByTestId('pp-school-timetable').click();
     await expect(page.locator('.pp-school-today')).toContainText(`Science ${RUN}`);
@@ -70,18 +70,18 @@ test.describe.serial('28 · Parents school app (a2): parent screens', () => {
     await expect(page.getByTestId('pp-announcement').filter({ hasText: `Sports day ${RUN}` })).toContainText('Whole school');
     await shot(page, 'school-a2-04-announcements');
 
-    await page.getByTestId('pp-bell').click();
+    await page.getByTestId('pp-nav-messages').click(); await page.getByTestId('pp-msg-notifications').click();
     await expect(page.getByTestId('pp-notification').filter({ hasText: 'was absent on' }).first()).toBeVisible();
     await expect(page.getByTestId('pp-notification').filter({ hasText: `Sports day ${RUN}` })).toBeVisible();
     await shot(page, 'school-a2-05-notifications');
     await page.getByTestId('pp-notif-markall').click();
     await expect(page.getByTestId('pp-notif-unread')).toContainText('0 unread');
-    await expect(page.getByTestId('pp-bell').locator('.pp-badge')).toHaveCount(0);
+    await expect(page.getByTestId('pp-nav-messages').locator('.pp-badge')).toHaveCount(0);
 
     // Arabic: right to left, Arabic labels, nothing wider than the phone.
     await page.locator('.pp-langbtn').click();
     await expect(page.locator('.pp')).toHaveAttribute('dir', 'rtl');
-    await expect(page.locator('.pp-nav').getByRole('button', { name: 'المدرسة' })).toBeVisible();
+    await expect(page.getByTestId('pp-nav-messages')).toContainText('الرسائل');
     await page.getByTestId('pp-school-timetable').click();
     await expect(page.getByTestId('pp-school-timetable')).toHaveText('الجدول');
     await expect(page.getByTestId('pp-school-source')).toContainText('من جدول المدرسة');
@@ -91,7 +91,8 @@ test.describe.serial('28 · Parents school app (a2): parent screens', () => {
       expect(overflow, `no sideways scroll on ${v} (Arabic)`).toBeLessThanOrEqual(0);
       await shot(page, `school-a2-ar-${v}`);
     }
-    await page.locator('.pp-nav').getByRole('button', { name: 'الرئيسية' }).click();
+    await page.getByTestId('pp-nav-home').click();
+    await expect(page.getByTestId('pp-nav-home')).toContainText('اليوم');
     await expect(page.getByTestId('pp-school-home')).toBeVisible();
     await shot(page, 'school-a2-ar-home-card');
     await page.locator('.pp-langbtn').click(); // back to English for later runs on this browser
@@ -100,9 +101,8 @@ test.describe.serial('28 · Parents school app (a2): parent screens', () => {
     await enaraApi.put('/api/school-app/sections', admin, { timetable: false, announcements: false, attendance: false, notifications: false });
     await page.goto(`${ENARA}/parents`);
     await expect(page.locator('.pp-switcher .pp-chip:not(.pp-chip--add)')).toHaveCount(1, { timeout: 30_000 });
-    await expect(page.locator('.pp-nav').getByRole('button', { name: 'Home' })).toBeVisible();
-    await expect(page.locator('.pp-nav').getByRole('button', { name: 'School' })).toHaveCount(0);
-    await expect(page.getByTestId('pp-bell')).toHaveCount(0);
+    await expect(page.getByTestId('pp-nav-home')).toContainText('Today');
+    await expect(page.getByTestId('pp-nav-messages')).toHaveCount(0); // no school messages: the Messages tab is hidden
     await expect(page.getByTestId('pp-school-home')).toHaveCount(0);
     await expect(enaraApi.get(`/api/parents/school/learners/${student}/timetable`, await page.evaluate(() => localStorage.getItem('enara_token') || ''))).rejects.toThrow(/-> 404/);
 

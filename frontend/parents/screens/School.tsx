@@ -8,7 +8,7 @@ import { useLive } from '../useLive';
 // ENARA only shows it. Each part names its source and when it was last updated. A section the school has off is not shown.
 export type SchoolView = 'today' | 'timetable' | 'attendance' | 'announcements' | 'fees' | 'buses' | 'requests' | 'consents' | 'notifications';
 
-const STATUS_COLOR: Record<AttendanceStatus, string> = { present: '#047857', absent: '#b42318', late: '#db7706', excused: '#075985' };
+const STATUS_COLOR: Record<AttendanceStatus, string> = { present: 'var(--emerald)', absent: 'var(--bad)', late: 'var(--warn-dot)', excused: 'var(--sky)' };
 const cairoMonth = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Cairo', year: 'numeric', month: '2-digit' }).format(new Date()).slice(0, 7);
 const shiftMonth = (m: string, by: number) => { const [y, mo] = m.split('-').map(Number); const d = new Date(Date.UTC(y, mo - 1 + by, 15)); return d.toISOString().slice(0, 7); };
 
@@ -21,7 +21,7 @@ const Source: React.FC<{ source: SchoolSource }> = ({ source }) => {
 
 const StatusTag: React.FC<{ status: AttendanceStatus }> = ({ status }) => {
   const { t } = useP();
-  return <span className="pp-tag" style={{ color: STATUS_COLOR[status], background: '#f6f7fa', border: `1px solid ${STATUS_COLOR[status]}33` }}>{t.sch.status[status]}</span>;
+  return <span className="pp-tag" style={{ color: STATUS_COLOR[status], background: 'var(--page)', border: `1px solid color-mix(in srgb, ${STATUS_COLOR[status]} 20%, transparent)` }}>{t.sch.status[status]}</span>;
 };
 
 export const School: React.FC<{ learner: LearnerChip; refreshKey: number; overview: SchoolOverview; view: SchoolView; setView: (v: SchoolView) => void; onRead: () => void; nameOf: (studentId: string) => string }> = ({ learner, refreshKey, overview, view, setView, onRead, nameOf }) => {
@@ -61,13 +61,13 @@ const Today: React.FC<{ overview: SchoolOverview; setView: (v: SchoolView) => vo
     <>
       {o.sections.attendance && (
         <button type="button" className="pp-card pp-card--link" onClick={() => setView('attendance')} data-testid="pp-school-today-attendance">
-          <div className="pp-row"><p className="pp-eyebrow">{t.sch.attendanceToday}</p><Icon name="chevron" flip style={{ color: '#566376' }} /></div>
+          <div className="pp-row"><p className="pp-eyebrow">{t.sch.attendanceToday}</p><Icon name="chevron" flip style={{ color: 'var(--muted)' }} /></div>
           {o.attendanceToday ? <StatusTag status={o.attendanceToday} /> : <p className="pp-sub">{t.sch.notRecorded}</p>}
         </button>
       )}
       {o.sections.timetable && (
         <button type="button" className="pp-card pp-card--link" onClick={() => setView('timetable')} data-testid="pp-school-today-classes">
-          <div className="pp-row"><p className="pp-eyebrow">{t.sch.todayClasses}</p><Icon name="chevron" flip style={{ color: '#566376' }} /></div>
+          <div className="pp-row"><p className="pp-eyebrow">{t.sch.todayClasses}</p><Icon name="chevron" flip style={{ color: 'var(--muted)' }} /></div>
           {o.todayClasses?.length ? (
             <ul className="pp-school-list">{o.todayClasses.map((c) => <li key={c.period}><span className="pp-num">{n(c.start)}–{n(c.end)}</span><b dir="auto">{c.subject}</b></li>)}</ul>
           ) : <p className="pp-sub">{t.sch.noClassesToday}</p>}
@@ -75,7 +75,7 @@ const Today: React.FC<{ overview: SchoolOverview; setView: (v: SchoolView) => vo
       )}
       {o.sections.announcements && (
         <button type="button" className="pp-card pp-card--link" onClick={() => setView('announcements')}>
-          <div className="pp-row"><p className="pp-eyebrow">{t.sch.announcements}</p><Icon name="chevron" flip style={{ color: '#566376' }} /></div>
+          <div className="pp-row"><p className="pp-eyebrow">{t.sch.announcements}</p><Icon name="chevron" flip style={{ color: 'var(--muted)' }} /></div>
           <p className="pp-sub">{o.announcementsCount ? t.sch.newAnnouncements(n(o.announcementsCount)) : t.sch.noAnnouncements}</p>
         </button>
       )}
@@ -182,7 +182,7 @@ const Notifications: React.FC<{ refreshKey: number; onRead: () => void; nameOf: 
         <section className="pp-card pp-card--flush">
           {q.data.notifications.map((x) => (
             <div className="pp-list-row" key={x.id} data-testid="pp-notification" data-read={x.read ? '1' : '0'}>
-              <span className="pp-dot" style={{ background: x.read ? 'transparent' : x.kind === 'absence' ? '#b42318' : x.kind === 'late' ? '#db7706' : '#2f6bff' }} aria-hidden="true" />
+              <span className="pp-dot" style={{ background: x.read ? 'transparent' : x.kind === 'absence' ? 'var(--bad)' : x.kind === 'late' ? 'var(--warn-dot)' : 'var(--blue)' }} aria-hidden="true" />
               <p>
                 <b dir="auto" style={{ fontWeight: x.read ? 500 : 700 }}>{t.sch.kind[x.kind] ?? x.kind} · {nameOf(x.studentId)}</b>
                 {x.kind === 'fee_due' || x.kind === 'bus_notice' || x.kind === 'request_update' || x.kind === 'consent' ? (
@@ -208,60 +208,8 @@ const Notifications: React.FC<{ refreshKey: number; onRead: () => void; nameOf: 
   );
 };
 
-/** The school card on Home: today's attendance, the next class, announcements and unread notifications. Hidden when every section is off. */
-export const SchoolHomeCard: React.FC<{ overview: SchoolOverview; open: (v: SchoolView) => void }> = ({ overview: o, open }) => {
-  const { t, n, lang } = useP();
-  const nowHm = new Intl.DateTimeFormat('en-GB', { timeZone: 'Africa/Cairo', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date());
-  const next = o.todayClasses?.find((c) => c.end > nowHm) ?? null;
-  return (
-    <section className="pp-card pp-card--flush" aria-labelledby="pp-school-home" data-testid="pp-school-home">
-      <h2 className="pp-h2" id="pp-school-home" style={{ padding: '14px 16px 4px' }}><Icon name="school" style={{ verticalAlign: 'middle', marginInlineEnd: 6, color: '#0b203c' }} />{t.sch.title}</h2>
-      {o.sections.attendance && (
-        <button type="button" className="pp-list-row pp-card--link" style={{ border: 0, background: 'none' }} onClick={() => open('attendance')}>
-          <p>{t.sch.attendanceToday}</p>{o.attendanceToday ? <StatusTag status={o.attendanceToday} /> : <span className="pp-meta">{t.sch.notRecorded}</span>}
-        </button>
-      )}
-      {o.sections.timetable && (
-        <button type="button" className="pp-list-row pp-card--link" style={{ border: 0, background: 'none' }} onClick={() => open('timetable')}>
-          <p>{t.sch.todayClasses}</p><span className="pp-meta" dir="auto">{next ? `${n(next.start)} · ${next.subject}` : t.sch.noClassesToday}</span>
-        </button>
-      )}
-      {o.sections.announcements && (
-        <button type="button" className="pp-list-row pp-card--link" style={{ border: 0, background: 'none' }} onClick={() => open('announcements')}>
-          <p>{t.sch.announcements}</p><span className="pp-meta">{o.announcementsCount ? n(o.announcementsCount) : t.sch.none}</span>
-        </button>
-      )}
-      {o.sections.consents && o.consentsPending ? (
-        <button type="button" className="pp-list-row pp-card--link" style={{ border: 0, background: 'none' }} onClick={() => open('consents')} data-testid="pp-school-home-consents">
-          <p>{t.sch.consents}</p><b style={{ color: '#b42318', fontSize: 13 }}>{t.sch.consentPending(n(o.consentsPending))}</b>
-        </button>
-      ) : null}
-      {o.sections.requests && o.openRequests ? (
-        <button type="button" className="pp-list-row pp-card--link" style={{ border: 0, background: 'none' }} onClick={() => open('requests')} data-testid="pp-school-home-requests">
-          <p>{t.sch.requests}</p><span className="pp-meta">{t.sch.openRequests(n(o.openRequests))}</span>
-        </button>
-      ) : null}
-      {o.sections.buses && o.bus && (
-        <button type="button" className="pp-list-row pp-card--link" style={{ border: 0, background: 'none' }} onClick={() => open('buses')} data-testid="pp-school-home-bus">
-          <p>{t.sch.busToday}</p>
-          <span className="pp-meta">{o.bus.trips.map((tr) => `${t.sch[tr.direction]} ${tr.time ? n(tr.time) : ''}`).join(' · ')}{o.bus.trips.find((tr) => tr.notice) ? <> · <b style={{ color: '#b42318' }}>{(() => { const nt = o.bus.trips.find((tr) => tr.notice)!.notice!; return nt.kind === 'cancel' ? t.sch.cancelled : t.sch.delay(n(nt.minutes ?? 0)); })()}</b></> : null}</span>
-        </button>
-      )}
-      {o.sections.fees && o.fees && (
-        <button type="button" className="pp-list-row pp-card--link" style={{ border: 0, background: 'none' }} onClick={() => open('fees')} data-testid="pp-school-home-fees">
-          <p>{t.sch.feeNext}</p>{o.fees.next ? <span className="pp-meta">{t.sch.feeDueLine(n(o.fees.next.amount.toLocaleString('en-US')), cairoDate(o.fees.next.dueDate, lang))}{o.fees.overdueCount ? <> · <b style={{ color: '#b42318' }}>{t.sch.overdueCount(n(o.fees.overdueCount))}</b></> : null}</span> : <span className="pp-meta">{t.sch.feeNone}</span>}
-        </button>
-      )}
-      {o.sections.notifications && (
-        <button type="button" className="pp-list-row pp-card--link" style={{ border: 0, background: 'none' }} onClick={() => open('notifications')}>
-          <p>{t.sch.notifications}</p>{o.unreadNotifications ? <span className="pp-badge">{n(o.unreadNotifications)}</span> : <span className="pp-meta">{t.sch.none}</span>}
-        </button>
-      )}
-    </section>
-  );
-};
 
-const FEE_COLOR: Record<FeeStatus, string> = { paid: '#047857', due: '#075985', overdue: '#b42318', waived: '#566376' };
+const FEE_COLOR: Record<FeeStatus, string> = { paid: 'var(--emerald)', due: 'var(--sky)', overdue: 'var(--bad)', waived: 'var(--muted)' };
 const money = (a: number, n: (x: number | string) => string) => n(a.toLocaleString('en-US', { maximumFractionDigits: 2 }));
 
 /** Step (b): fees, display only. The school records payments; ENARA never takes money. */
@@ -281,9 +229,9 @@ const Fees: React.FC<{ learner: LearnerChip; refreshKey: number }> = ({ learner,
           <section className="pp-card" aria-label={t.sch.fees} data-testid="pp-fees-totals">
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
               {stat(t.sch.feeTotal, f.totals.total)}
-              {stat(t.sch.feePaid, f.totals.paid, '#047857', 'pp-fees-paid')}
+              {stat(t.sch.feePaid, f.totals.paid, 'var(--emerald)', 'pp-fees-paid')}
               {stat(t.sch.feeRemaining, f.totals.remaining, undefined, 'pp-fees-remaining')}
-              {f.totals.overdue > 0 && stat(t.sch.feeOverdue, f.totals.overdue, '#b42318', 'pp-fees-overdue')}
+              {f.totals.overdue > 0 && stat(t.sch.feeOverdue, f.totals.overdue, 'var(--bad)', 'pp-fees-overdue')}
             </div>
             {f.next && <p className="pp-sub">{t.sch.feeNext}: {t.sch.instalment(n(f.next.number))} · {t.sch.egp(money(f.next.amount, n))} · {t.sch.dueOn(cairoDate(f.next.dueDate, lang))}</p>}
           </section>
@@ -297,7 +245,7 @@ const Fees: React.FC<{ learner: LearnerChip; refreshKey: number }> = ({ learner,
                     <span className="pp-meta" style={{ display: 'block' }}>{i.status === 'paid' && i.paidDate ? t.sch.paidOn(cairoDate(i.paidDate, lang)) : t.sch.dueOn(cairoDate(i.dueDate, lang))}{i.receiptRef ? ` · ${t.sch.receipt(i.receiptRef)}` : ''}</span>
                     {i.hasReceipt && <button type="button" className="pp-linkbtn" data-testid="pp-receipt" onClick={() => { schoolApi.receipt(learner.studentId, i.id).catch(() => window.alert(t.sch.receiptFailed)); }}>{t.sch.downloadReceipt}</button>}
                   </p>
-                  <span className="pp-tag" style={{ color: FEE_COLOR[i.status], background: '#f6f7fa', border: `1px solid ${FEE_COLOR[i.status]}33` }}>{t.sch.feeStatus[i.status]}</span>
+                  <span className="pp-tag" style={{ color: FEE_COLOR[i.status], background: 'var(--page)', border: `1px solid color-mix(in srgb, ${FEE_COLOR[i.status]} 20%, transparent)` }}>{t.sch.feeStatus[i.status]}</span>
                 </div>
               ))}
             </section>
@@ -318,20 +266,22 @@ const Bus: React.FC<{ learner: LearnerChip; refreshKey: number }> = ({ learner, 
   return (
     <>
       {!q.data.trips.length ? <p className="pp-notice" style={{ display: 'block' }}>{t.sch.noBus}</p> : q.data.trips.map((tr) => (
-        <section key={tr.direction} className="pp-card" aria-labelledby={`pp-bus-${tr.direction}`} data-testid={`pp-bus-${tr.direction}`}>
+        <section key={tr.direction} className="pp-card pp-bustrip" aria-labelledby={`pp-bus-${tr.direction}`} data-testid={`pp-bus-${tr.direction}`}>
           <div className="pp-row">
-            <h2 className="pp-h2" id={`pp-bus-${tr.direction}`}>{t.sch[tr.direction]}</h2>
+            <h2 className="pp-h2 pp-row" id={`pp-bus-${tr.direction}`} style={{ gap: 10, justifyContent: 'flex-start' }}><span className="pp-ico pp-ico--sun"><Icon name="bus" /></span>{t.sch[tr.direction]}</h2>
             <span className="pp-meta" dir="auto">{tr.route}{tr.busNumber ? ` · ${t.sch.busNumber(tr.busNumber)}` : ''}</span>
           </div>
           {tr.notices.map((nt, i) => (
-            <p key={i} className="pp-error" role="alert" data-testid="pp-bus-notice" style={{ margin: 0 }}>
-              <b>{nt.kind === 'cancel' ? t.sch.cancelled : t.sch.delay(n(nt.minutes ?? 0))}</b>{nt.message ? <span dir="auto"> · {nt.message}</span> : null}
+            <p key={i} className={`pp-bus-status ${nt.kind === 'cancel' ? 'pp-bus-status--bad' : 'pp-bus-status--late'}`} role="alert" data-testid="pp-bus-notice" style={{ margin: 0 }}>
+              <span className="pp-pulse" aria-hidden="true" />
+              <span><b>{nt.kind === 'cancel' ? t.sch.cancelled : t.sch.delay(n(nt.minutes ?? 0))}</b>{nt.message ? <span dir="auto"> · {nt.message}</span> : null}</span>
             </p>
           ))}
           <div className="pp-row" style={{ fontSize: 15 }}>
             <span>{t.sch.yourStop}: <b dir="auto">{tr.stop}</b></span>
             <b className="pp-num" style={{ fontSize: 20 }} data-testid="pp-bus-time">{tr.time ? n(tr.time) : '—'}</b>
           </div>
+          {(() => { const d = tr.notices.find((x) => x.kind === 'delay' && x.minutes); if (!d || !tr.time) return null; const [h, m] = tr.time.split(':').map(Number); const tot = h * 60 + m + (d.minutes ?? 0); const exp = `${String(Math.floor(tot / 60) % 24).padStart(2, '0')}:${String(tot % 60).padStart(2, '0')}`; return <p className="pp-bus-expected" data-testid="pp-bus-expected">{t.ui.expected(n(exp))}</p>; })()}
           {tr.mapLink && <a href={tr.mapLink} target="_blank" rel="noopener noreferrer" className="pp-linkbtn">{t.sch.mapLink}</a>}
           {(tr.supervisor || tr.driver) && (
             <p className="pp-sub" dir="auto">
@@ -353,7 +303,7 @@ const Bus: React.FC<{ learner: LearnerChip; refreshKey: number }> = ({ learner, 
   );
 };
 
-const REQ_COLOR: Record<string, string> = { new: '#075985', in_progress: '#db7706', done: '#047857', refused: '#b42318' };
+const REQ_COLOR: Record<string, string> = { new: 'var(--sky)', in_progress: 'var(--warn-dot)', done: 'var(--emerald)', refused: 'var(--bad)' };
 
 /** Step (d): requests to the school office. Sent only by a main or full guardian; the school answers here. */
 const Requests: React.FC<{ learner: LearnerChip; refreshKey: number }> = ({ learner, refreshKey }) => {
@@ -392,7 +342,7 @@ const Requests: React.FC<{ learner: LearnerChip; refreshKey: number }> = ({ lear
         <article key={r.id} className="pp-card" data-testid="pp-request" data-status={r.status}>
           <div className="pp-row pp-row--top">
             <h2 className="pp-h2">{t.sch.reqType[r.type] ?? r.type}</h2>
-            <span className="pp-tag" style={{ color: REQ_COLOR[r.status], background: '#f6f7fa', border: `1px solid ${REQ_COLOR[r.status]}33` }}>{t.sch.reqStatus[r.status] ?? r.status}</span>
+            <span className="pp-tag" style={{ color: REQ_COLOR[r.status], background: 'var(--page)', border: `1px solid color-mix(in srgb, ${REQ_COLOR[r.status]} 20%, transparent)` }}>{t.sch.reqStatus[r.status] ?? r.status}</span>
           </div>
           <p className="pp-meta">{cairoDate(r.createdAt.slice(0, 10), lang)}{r.preferredDate ? ` · ${cairoDate(r.preferredDate, lang)}` : ''}</p>
           <p dir="auto" style={{ fontSize: 14, whiteSpace: 'pre-wrap' }}>{r.details}</p>

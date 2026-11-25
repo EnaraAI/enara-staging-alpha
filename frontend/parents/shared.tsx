@@ -6,7 +6,7 @@ import { cairoTime, type ClassChoice, type WeeklyStatus } from './api';
 export const StatusLine: React.FC<{ status: WeeklyStatus }> = ({ status }) => {
   const { t, n } = useP();
   const icon = status.status === 'on_track' ? 'ontrack' : status.status === 'needs_nudge' ? 'nudge' : 'alert';
-  const color = status.status === 'on_track' ? '#2f6bff' : status.status === 'needs_nudge' ? '#db7706' : '#b42318';
+  const color = status.status === 'on_track' ? 'var(--blue)' : status.status === 'needs_nudge' ? 'var(--warn-dot)' : 'var(--bad)';
   return (
     <section className={`pp-status pp-status--${status.status}`} aria-live="polite" aria-labelledby="pp-status-title">
       <Icon name={icon} className="pp-status-icon" style={{ color }} />

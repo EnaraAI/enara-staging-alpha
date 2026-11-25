@@ -63,14 +63,14 @@ export const Controls: React.FC<{ learner: LearnerChip; refreshKey: number }> = 
           <div className="pp-toggle-row" key={k}>
             <label htmlFor={`pp-sw-${k}`}>{t.toggles[k][0]}<small>{t.toggles[k][1]}</small></label>
             <button type="button" id={`pp-sw-${k}`} role="switch" className="pp-switch" aria-checked={!!draft[k]} disabled={!canEdit} onClick={() => set({ [k]: !draft[k] })}>
-              <span className="pp-switch-track" aria-hidden="true"><span>{draft[k] ? <Icon name="check" style={{ inlineSize: 14, blockSize: 14, color: '#2f6bff' }} /> : null}</span></span>
+              <span className="pp-switch-track" aria-hidden="true"><span>{draft[k] ? <Icon name="check" style={{ inlineSize: 14, blockSize: 14, color: 'var(--blue)' }} /> : null}</span></span>
             </button>
           </div>
         ))}
       </section>
 
       <section className="pp-notice" aria-live="polite">
-        <Icon name="eye" style={{ color: '#075985' }} />
+        <Icon name="eye" style={{ color: 'var(--sky)' }} />
         <p>{t.preview(name, n(draft.dailyLimitMin), n(draft.weeklyGoalMin), t.focusOpt[draft.focus])}</p>
       </section>
       {canEdit && (

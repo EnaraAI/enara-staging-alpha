@@ -69,7 +69,7 @@ test.describe.serial('32 · Parents school app (b2): fee screens', () => {
     await staff.context.close();
 
     await page.reload();
-    await page.locator('.pp-nav').getByRole('button', { name: 'School' }).click();
+    await page.getByTestId('pp-nav-home').click(); await page.getByTestId('pp-school-home').getByRole('button').first().click(); // redesign: School opens from Today
     await page.getByTestId('pp-school-fees').click();
     await expect(page.getByTestId('pp-fee-plan').filter({ hasText: PLAN }).locator('[data-testid="pp-instalment"][data-status="paid"]')).toHaveCount(2);
     await expect(page.getByTestId('pp-fee-plan').filter({ hasText: PLAN })).toContainText(`R2-${RUN}`);

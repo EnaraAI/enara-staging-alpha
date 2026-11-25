@@ -1,12 +1,15 @@
 import React from 'react';
 import { bi } from '../i18n';
-import { cairoDate, parentsApi, weekdayIndex, type LearnerChip } from '../api';
-import { AiBadge, ErrorBox, Icon, Loading, Ring, levelNextLine, useP } from '../ui';
+import { cairoDate, parentsApi, type LearnerChip } from '../api';
+import { AiBadge, ErrorBox, Icon, Loading, levelNextLine, useP } from '../ui';
 import type { SubjectCard } from '../api';
 import { ALL, SubjectView, SubjectsOverview } from './Subjects';
 import { useLive } from '../useLive';
+import type { SchoolOverview } from '../api';
+import type { SchoolView } from './School';
+import { BusCard, Hero, NeedsYou, SchoolTiles, TodayClasses, useWide } from './Today';
 
-type HomeProps = { learner: LearnerChip; refreshKey: number; go: (tab: string) => void; onShare: () => void; onFetched: (d: Date | null, loading: boolean) => void; subjectKey?: string; overview?: SubjectCard[]; onPickSubject?: (key: string) => void };
+type HomeProps = { learner: LearnerChip; refreshKey: number; go: (tab: string) => void; onShare: () => void; onFetched: (d: Date | null, loading: boolean) => void; subjectKey?: string; overview?: SubjectCard[]; onPickSubject?: (key: string) => void ; school?: SchoolOverview | null; openSchool?: (v: SchoolView) => void };
 
 // All subjects: a chosen subject shows its own page; "All subjects" shows the week, the subject cards and the real cards below.
 // Cards built from placeholder data (mock) are not shown: parents see only real data.
@@ -14,9 +17,10 @@ export const Home: React.FC<HomeProps> = (props) => (props.subjectKey && props.s
   ? <SubjectView learner={props.learner} subjectKey={props.subjectKey} mode="home" refreshKey={props.refreshKey} onFetched={props.onFetched} />
   : <HomeAll {...props} />);
 
-const HomeAll: React.FC<HomeProps> = ({ learner, refreshKey, go, onShare, onFetched, overview = [], onPickSubject }) => {
+const HomeAll: React.FC<HomeProps> = ({ learner, refreshKey, go, onShare, onFetched, overview = [], onPickSubject, school = null, openSchool = () => undefined }) => {
   const ctx = useP();
   const { t, n, lang } = ctx;
+  const wide = useWide();
   const q = useLive(() => parentsApi.home(learner.studentId), [learner.studentId], refreshKey);
   React.useEffect(() => onFetched(q.fetchedAt, q.loading), [q.fetchedAt, q.loading]); // eslint-disable-line react-hooks/exhaustive-deps
   if (!q.data) return q.error ? <ErrorBox onRetry={q.reload} /> : <Loading />;
@@ -28,47 +32,32 @@ const HomeAll: React.FC<HomeProps> = ({ learner, refreshKey, go, onShare, onFetc
   const lvl = d.level;
   const accepted = s.goalAcceptedByLearner;
 
-  return (
+  const hero = <Hero learner={learner} status={s} lessons={overview.reduce((sum, x) => sum + (x.lessonsThisWeek || 0), 0)} />;
+  const side = (
+    <>
+      <NeedsYou overview={school} onOpen={() => go('actions')} />
+      <BusCard overview={school} open={openSchool} />
+      <TodayClasses overview={school} open={openSchool} />
+    </>
+  );
+  const tiles = <SchoolTiles overview={school} open={openSchool} school={learner.school} />;
+  const share = <button type="button" className="pp-btn pp-btn--primary pp-btn--block" onClick={onShare}><Icon name="share" />{t.share}</button>;
+  const rest = (
     <>
       {!kid && (
         <section className="pp-notice">
-          <Icon name="eye" style={{ color: '#075985' }} />
+          <Icon name="eye" style={{ color: 'var(--sky)' }} />
           <div><b>{notice.title}</b><p>{notice.body}</p></div>
         </section>
       )}
 
-      <section className="pp-card pp-effort" aria-labelledby="pp-week">
-        <Ring done={s.minutesDone} goal={s.goalMinutes} />
-        <div className="pp-effort-body">
-          <p className="pp-eyebrow" id="pp-week">{t.thisWeek}</p>
-          <ul className="pp-days">
-            {s.days.map((day) => {
-              const wd = weekdayIndex(day.day);
-              const state = day.practised ? 'practised' : day.isToday ? 'today' : day.isFuture ? 'upcoming' : 'missed';
-              return (
-                <li key={day.day}>
-                  <span className={`pp-daydot${day.practised ? ' pp-daydot--done' : day.isToday ? ' pp-daydot--today' : ''}`}>
-                    {day.practised && <svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true" fill="none" strokeWidth="3" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>}
-                  </span>
-                  <span aria-hidden="true">{t.weekdays[wd]}</span>
-                  <span className="sr">{`${t.weekdaysLong[wd]}: ${t.dayState[state]}`}</span>
-                </li>
-              );
-            })}
-          </ul>
-          <p style={{ fontSize: 14, lineHeight: '20px' }}>
-            {s.streak > 0 && <><strong style={{ fontWeight: 600 }}>{t.streak(n(s.streak))}</strong>{' · '}</>}
-            <span style={{ color: '#566376' }}>{t.sessions(n(s.sessions))}{s.lastPractised ? ` · ${t.lastPractised(cairoDate(s.lastPractised, lang, { weekday: 'long' }))}` : ` · ${t.notYet}`}</span>
-          </p>
-        </div>
-      </section>
 
       {onPickSubject && <SubjectsOverview subjects={overview} onPick={onPickSubject} />}
 
       {!lvl.mock && <button type="button" className="pp-card pp-card--link" onClick={() => go('progress')}>
         <div className="pp-row">
           <p className="pp-eyebrow">{t.level}</p>
-          <Icon name="chevron" flip style={{ color: '#566376' }} />
+          <Icon name="chevron" flip style={{ color: 'var(--muted)' }} />
         </div>
         <p className="pp-level">{bi(lvl.label, lang)} <span>· {lvl.cefr}{lvl.subLevel && lvl.cefr !== 'Pre-A1' ? ` (${lvl.subLevel})` : ''}</span></p>
         {lvl.subLevelPct !== null ? (
@@ -94,9 +83,9 @@ const HomeAll: React.FC<HomeProps> = ({ learner, refreshKey, go, onShare, onFetc
 
       {!kid && (
         <section className="pp-card pp-card--flush">
-          <div className="pp-list-row"><Icon name="eye" style={{ color: '#566376' }} /><p>{t.conversations}</p><button type="button" className="pp-linkbtn" onClick={() => go('activity')}>{t.conversationsVisible}</button></div>
-          <div className="pp-list-row"><Icon name="shield" style={{ color: '#047857' }} /><p>{t.safetyAlerts}</p><span className="pp-meta">{d.alerts.count && !d.alerts.mock ? n(d.alerts.count) : t.noAlerts}</span></div>
-          <div className="pp-list-row"><Icon name="target" style={{ color: '#566376' }} /><p>{t.weeklyGoal(n(s.goalMinutes))}</p><span className={`pp-tag ${accepted ? 'pp-tag--sky' : 'pp-tag--warn'}`}>{accepted ? t.acceptedBy(name) : t.waitingFor(name)}</span></div>
+          <div className="pp-list-row"><Icon name="eye" style={{ color: 'var(--muted)' }} /><p>{t.conversations}</p><button type="button" className="pp-linkbtn" onClick={() => go('activity')}>{t.conversationsVisible}</button></div>
+          <div className="pp-list-row"><Icon name="shield" style={{ color: 'var(--emerald)' }} /><p>{t.safetyAlerts}</p><span className="pp-meta">{d.alerts.count && !d.alerts.mock ? n(d.alerts.count) : t.noAlerts}</span></div>
+          <div className="pp-list-row"><Icon name="target" style={{ color: 'var(--muted)' }} /><p>{t.weeklyGoal(n(s.goalMinutes))}</p><span className={`pp-tag ${accepted ? 'pp-tag--sky' : 'pp-tag--warn'}`}>{accepted ? t.acceptedBy(name) : t.waitingFor(name)}</span></div>
         </section>
       )}
 
@@ -109,7 +98,7 @@ const HomeAll: React.FC<HomeProps> = ({ learner, refreshKey, go, onShare, onFetc
 
       {d.alerts.latest && !d.alerts.mock && (
         <section className="pp-card" aria-labelledby="pp-alert">
-          <div className="pp-row"><h2 className="pp-h2" id="pp-alert"><Icon name="shield" style={{ color: '#b42318', verticalAlign: 'middle', marginInlineEnd: 6 }} />{t.alertCat[d.alerts.latest.category] ?? d.alerts.latest.category}</h2></div>
+          <div className="pp-row"><h2 className="pp-h2" id="pp-alert"><Icon name="shield" style={{ color: 'var(--bad)', verticalAlign: 'middle', marginInlineEnd: 6 }} />{t.alertCat[d.alerts.latest.category] ?? d.alerts.latest.category}</h2></div>
           <p className="pp-meta">{cairoDate(d.alerts.latest.createdAt.slice(0, 10), lang)}</p>
           <p style={{ fontSize: 14 }}><strong style={{ fontWeight: 600 }}>{t.whatEnaraDid}:</strong> {bi(d.alerts.latest.actionTaken, lang)}</p>
           {d.alerts.latest.excerpt && <p style={{ fontSize: 14 }}><strong style={{ fontWeight: 600 }}>{t.excerpt}:</strong> <q dir="auto">{d.alerts.latest.excerpt}</q></p>}
@@ -119,14 +108,26 @@ const HomeAll: React.FC<HomeProps> = ({ learner, refreshKey, go, onShare, onFetc
       {!d.upcoming.mock && <section className="pp-card pp-card--flush" aria-label={t.alerts}>
         {d.upcoming.items.map((u, i) => (
           <div className="pp-list-row" key={i}>
-            <span className="pp-dot" style={{ background: u.kind === 'assessment' ? '#db7706' : '#566376' }} aria-hidden="true" />
+            <span className="pp-dot" style={{ background: u.kind === 'assessment' ? 'var(--warn-dot)' : 'var(--muted)' }} aria-hidden="true" />
             <p>{bi(u.text, lang)}</p>
             {u.kind === 'plan_renewal' ? <button type="button" className="pp-linkbtn" onClick={() => go('account')}>{t.manage}</button> : <span className="pp-meta">{u.meta}</span>}
           </div>
         ))}
       </section>}
 
-      <button type="button" className="pp-btn pp-btn--primary pp-btn--block" onClick={onShare}><Icon name="share" />{t.share}</button>
+    </>
+  );
+  // Redesign step 6: on a wide screen Today has two columns (the week and learning on the left; what needs the parent,
+  // the bus, today's classes and the school tiles on the right). On a phone it is one column in the order below.
+  if (wide) return <div className="pp-today2"><div className="pp-today2-main">{hero}{rest}{share}</div><aside className="pp-today2-side">{side}{tiles}</aside></div>;
+  return (
+    <>
+      {/* Redesign step 2: the hero (status, three rings, the week's days), then what needs the parent, the bus and today's classes. */}
+      {hero}
+      {side}
+      {rest}
+      {tiles}
+      {share}
     </>
   );
 };

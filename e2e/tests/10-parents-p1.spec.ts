@@ -132,7 +132,7 @@ test.describe.serial('10 · Parents P1: code-first entry, two children in two sc
   test('desktop: the portal uses the wide layout (side navigation), the phone layout stays for phones', async () => {
     const page = state.page!;
     await page.setViewportSize({ width: 1366, height: 900 });
-    await page.getByRole('button', { name: 'Home' }).click();
+    await page.getByTestId('pp-nav-home').click();
     const width = await page.locator('.pp').evaluate((el) => el.getBoundingClientRect().width);
     expect(width).toBeGreaterThan(900);
     const nav = await page.locator('.pp-nav').evaluate((el) => ({ dir: getComputedStyle(el).flexDirection, top: el.getBoundingClientRect().top }));
@@ -180,8 +180,8 @@ test.describe.serial('10 · Parents P1: code-first entry, two children in two sc
     // The parent opened a few screens of the School A child.
     const parent = state.page!;
     await chips(parent).first().click();
-    await parent.getByRole('button', { name: 'Progress' }).click();
-    await parent.getByRole('button', { name: 'Home' }).click();
+    await parent.getByTestId('pp-nav-progress').click();
+    await parent.getByTestId('pp-nav-home').click();
     const { context, page } = await enaraUiSession(browser, 'admin.a', 'School staff');
     await page.getByRole('button', { name: 'Parents', exact: true }).first().click();
     const card = page.getByTestId('parents-card');

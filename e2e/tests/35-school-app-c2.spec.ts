@@ -57,7 +57,7 @@ test.describe.serial('35 · Parents school app (c2): bus screens', () => {
     await staff.context.close();
 
     await page.reload();
-    await page.locator('.pp-nav').getByRole('button', { name: 'School' }).click();
+    await page.getByTestId('pp-nav-home').click(); await page.getByTestId('pp-school-home').getByRole('button').first().click(); // redesign: School opens from Today
     await page.getByTestId('pp-school-buses').click();
     await expect(page.getByTestId('pp-bus-morning').getByTestId('pp-bus-notice')).toContainText('About 25 minutes late');
     await expect(page.getByTestId('pp-bus-afternoon').getByTestId('pp-bus-notice')).toHaveCount(0);
@@ -69,7 +69,7 @@ test.describe.serial('35 · Parents school app (c2): bus screens', () => {
     expect(overflow, 'no sideways scroll on the bus view (Arabic)').toBeLessThanOrEqual(0);
     await shot(page, 'school-c2-04-bus-ar');
     await page.locator('.pp-langbtn').click();
-    await page.getByTestId('pp-bell').click();
+    await page.getByTestId('pp-nav-messages').click(); await page.getByTestId('pp-msg-notifications').click();
     await expect(page.getByTestId('pp-notification').filter({ hasText: ROUTE })).toBeVisible();
     await context.close();
   });
