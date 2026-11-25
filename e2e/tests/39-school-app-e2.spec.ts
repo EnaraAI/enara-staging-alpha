@@ -55,6 +55,19 @@ test.describe.serial('39 · Parents school app (e2): the assistant on a phone', 
       await expect(chart.getByTestId('pp-chat-chart-row')).toHaveCount(subj.subjects.length);
       await shot(page, 'school-e2-03-chat-chart');
     } else await expect(chart).toHaveCount(0);
+    // Analytics (owner "go" 25 Nov 2026, class averages off): practice per week and this week vs last, each with its chart.
+    await page.getByTestId('pp-chat-input').fill('How much does he practise?');
+    await page.getByTestId('pp-chat-send').click();
+    const practice = page.getByTestId('pp-chat-answer').last();
+    await expect(practice.getByTestId('pp-chat-source')).toContainText('Source: analysis of the school data', { timeout: 30_000 });
+    await expect(practice.getByTestId('pp-chat-chart')).toHaveAttribute('data-kind', 'weeks');
+    await expect(practice.getByTestId('pp-chat-chart-point')).toHaveCount(6);
+    await page.getByTestId('pp-chat-input').fill('What changed compared to last week?');
+    await page.getByTestId('pp-chat-send').click();
+    const week = page.getByTestId('pp-chat-answer').last().getByTestId('pp-chat-chart');
+    await expect(week).toHaveAttribute('data-kind', 'week', { timeout: 30_000 });
+    await expect(week.getByTestId('pp-chat-chart-row')).toHaveCount(4);
+    await shot(page, 'school-e2-04-chat-analytics');
     await page.keyboard.press('Escape');
 
     await page.locator('.pp-langbtn').click();
