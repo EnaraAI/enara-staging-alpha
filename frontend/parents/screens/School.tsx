@@ -3,7 +3,7 @@ import type { RequestType } from '../api';
 import { cairoDate, cairoTime, schoolApi, type AttendanceStatus, type FeeStatus, type LearnerChip, type SchoolOverview, type SchoolSection, type SchoolSource } from '../api';
 import { ErrorBox, Icon, Loading, useP } from '../ui';
 import { useLive } from '../useLive';
-import { BusLiveCard, useBusLive } from './BusLive';
+import { BusLiveCard, PickupPoint, useBusLive } from './BusLive';
 
 // Parents school app (a): one child's school information, read from the school's own sheets (or, later, its system).
 // ENARA only shows it. Each part names its source and when it was last updated. A section the school has off is not shown.
@@ -284,6 +284,7 @@ const Bus: React.FC<{ learner: LearnerChip; refreshKey: number }> = ({ learner, 
   return (
     <>
       <BusLiveCard learner={learner} live={live} />
+      <PickupPoint learner={learner} refreshKey={refreshKey} />
       {!q.data.trips.length ? <p className="pp-notice" style={{ display: 'block' }}>{t.sch.noBus}</p> : q.data.trips.map((tr) => (
         <section key={tr.direction} className="pp-card pp-bustrip" aria-labelledby={`pp-bus-${tr.direction}`} data-testid={`pp-bus-${tr.direction}`}>
           <div className="pp-row">

@@ -9,6 +9,7 @@ import { SchoolBusAssignment, SchoolBusRoute } from './models';
 import { newId, schoolSections } from './sections';
 import { norm } from './importSpec';
 import { sendBusNoticeFor } from './buses';
+import { liveHomeFor, markStop, nearNotice, tripHomes } from './busHomes';
 
 // Live bus map (docs: scratchpad BUS_LIVE_MAP_PLAN.md, owner "go" 25 Nov 2026: option 1, the supervisor's phone).
 // - The school adds bus supervisors, assigns routes and prints a one-time sign-in code (like parent codes; no password).
@@ -29,12 +30,13 @@ const cairoHm = (d = new Date()) => new Intl.DateTimeFormat('en-GB', { timeZone:
 const cairoDate = (d = new Date()) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Cairo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(d);
 
 // ---- models -------------------------------------------------------------------------------------------------------------------
-export interface IBusLiveSettings extends Document { institutionId: string; enabled: boolean; windows: { from: string; to: string }[]; routesOff: string[]; updatedBy?: string }
+export interface IBusLiveSettings extends Document { institutionId: string; enabled: boolean; windows: { from: string; to: string }[]; routesOff: string[]; homesRoutes?: string[]; updatedBy?: string }
 const settingsSchema = new Schema<IBusLiveSettings>({
   institutionId: { type: String, required: true, unique: true },
   enabled: { type: Boolean, default: false },
   windows: { type: [{ from: String, to: String, _id: false }], default: undefined },
   routesOff: { type: [String], default: [] },
+  homesRoutes: { type: [String], default: [] }, // door to door (busHomes.ts)
   updatedBy: String,
 }, { timestamps: true });
 export const BusLiveSettings = model<IBusLiveSettings>('BusLiveSettings', settingsSchema, 'school_bus_live_settings');
@@ -313,7 +315,7 @@ export async function supervisorHome(s: Sup, now = new Date()) {
     supervisor: { name: s.name },
     liveOn: sectionOn && settings.enabled, windows: settings.windows, inWindowNow: inWindow(settings.windows, now),
     routes: routes.map((r) => ({ routeKey: r.routeKey, routeName: r.routeName, busNumber: r.busNumber ?? null, liveOn: !settings.routesOff.includes(r.routeKey), stops: r.stops.length })),
-    trip: running[0] ? { id: running[0].id, routeKey: running[0].routeKey, direction: running[0].direction, startedAt: running[0].startedAt, endsBy: new Date(new Date(running[0].startedAt).getTime() + TRIP_MAX_MS) } : null,
+    trip: running[0] ? { id: running[0].id, routeKey: running[0].routeKey, direction: running[0].direction, startedAt: running[0].startedAt, endsBy: new Date(new Date(running[0].startedAt).getTime() + TRIP_MAX_MS), homes: await tripHomes(running[0], now) } : null,
   };
 }
 
@@ -351,6 +353,7 @@ export async function sendPosition(s: Sup, tripId: string, body: Record<string, 
   const accuracy = num(body.accuracy, 0, 100000) ?? undefined; const speed = num(body.speed, 0, 100) ?? undefined; const heading = num(body.heading, 0, 360) ?? undefined;
   await BusLivePosition.updateOne({ tripId: t.id }, { $set: { institutionId: t.institutionId, lat, lng, accuracy, speed, heading, at: now } }, { upsert: true });
   await BusTrip.updateOne({ id: t.id }, { $set: { lastAt: now } });
+  try { await nearNotice(t, { lat, lng, speed }, now); } catch { /* the position is saved; the notice is best effort */ }
   return { ok: true, at: now };
 }
 
@@ -360,6 +363,12 @@ export async function supervisorEndTrip(s: Sup, tripId: string) {
   await endTrip(t, 'ended', s.id);
   await recordAudit('bus_trip_ended', { id: s.id, role: 'bus_supervisor' }, { institutionId: s.institutionId, type: 'bus_trip', id: t.id }, {});
   return { id: t.id, ended: true };
+}
+
+/** Door to door: Picked up / Dropped off / Not riding today for a child of the running trip. */
+export async function supervisorStop(s: Sup, tripId: string, body: Record<string, unknown>) {
+  const t = await myRunningTrip(s, tripId);
+  return markStop(t, s.id, body);
 }
 
 /** "Running late" / "Trip cancelled" from the phone: the same notices (and parent notifications) as the school's. */
@@ -401,6 +410,15 @@ export async function liveForParent(ctx: LearnerContext, now = new Date()) {
     const p = await BusLivePosition.findOne({ tripId: trip.id }).lean();
     const pin = await BusStopPin.findOne({ institutionId: school, routeKey: a.routeKey, stopKey: norm(a.stopName) }).lean();
     const stale = !p || now.getTime() - new Date(p.at).getTime() > STALE_MS;
+    const d2d = await liveHomeFor(school, ctx.student.id, trip, p && !stale ? { lat: p.lat, lng: p.lng, speed: p.speed } : null, now);
+    if (d2d) {
+      out.push({
+        direction: dir, tripId: trip.id, startedAt: trip.startedAt, doorToDoor: true,
+        bus: p ? { lat: p.lat, lng: p.lng, at: p.at, heading: p.heading ?? null } : null, stale,
+        stop: { name: 'home', lat: d2d.home?.lat ?? null, lng: d2d.home?.lng ?? null }, etaMin: d2d.etaMin, childStatus: d2d.status, childStatusAt: d2d.at,
+      });
+      continue;
+    }
     out.push({
       direction: dir, tripId: trip.id, startedAt: trip.startedAt,
       bus: p ? { lat: p.lat, lng: p.lng, at: p.at, heading: p.heading ?? null } : null, stale,

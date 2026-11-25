@@ -222,6 +222,17 @@ describe('run: the whole round trip over HTTP', () => {
     expect((await Assignment.findOne({ id: r2.body.ids.assignmentId }).lean())!.dueAt.getTime()).toBeGreaterThan(Date.now() + 300 * 86_400_000);
   }, 90_000);
 
+  it('a back-off left on its own job by an earlier cold-start timeout does not block the next run', async () => {
+    const M = await import('../src/integrations/lms/models');
+    const job = await M.LmsGradeSyncJob.findOne({ institutionId: 'LT-SCHOOL-A', reason: 'health_check' }).sort({ updatedAt: -1 }).lean();
+    expect(job).toBeTruthy();
+    // As after the 25 Nov 2026 rollbacks: the re-sent job timed out once and waits a minute before its next try.
+    await M.LmsGradeSyncJob.updateOne({ id: job!.id }, { $set: { status: 'pending', attempts: 1, lastError: 'timeout', nextAttemptAt: new Date(Date.now() + 10 * 60_000) } });
+    const r = await request(app!).post('/api/maintenance/health-check/run').set('Authorization', CI);
+    expect(r.body.ok, JSON.stringify(r.body.steps)).toBe(true);
+    expect(await M.LmsGradeSyncJob.findOne({ id: job!.id }).lean()).toMatchObject({ status: 'sent' });
+  }, 60_000);
+
   it('reports the failing step with a short code, and skips the rest (grade passback off)', async () => {
     setEnv({ ...ON, LMS_GRADE_PASSBACK_ENABLED: 'false' });
     await freshApp();

@@ -27,6 +27,7 @@ const TEXT = {
     pins: 'Stops on the map', pinHelp: 'Pick a stop, then tap its place on the map. Parents see their stop and an arrival estimate.', route: 'Route', clearPin: 'Clear pin', pinned: 'on the map', notPinned: 'not on the map',
     running: 'Running now', none: 'No trip is running.', stopTrip: 'Stop trip', confirmStop: 'Stop this trip? Location sharing ends now.', lastUpdate: (s: string) => `last update ${s}`, noPos: 'no position yet',
     history: 'Trip history', started: 'Started', ended: 'Ended', who: 'Supervisor', how: { ended: 'ended by supervisor', auto: 'stopped after 2 hours', admin: 'stopped by the school', off: 'live map switched off' } as Record<string, string>,
+    d2d: 'Door to door (homes)', d2dHelp: 'On a door-to-door route each child’s home is their stop. Parents set the home in their app; you confirm it here before the bus uses it. You can also set it yourself.', d2dOn: 'Door to door on this route', order: 'Order', up: 'Up', down: 'Down', confirmed: 'Confirmed', pendingHome: 'Waiting for you', noHome: 'No home yet', confirm: 'Confirm', reject: 'Turn down', setOnMap: 'Set on map', pickOnMap: (n: string) => `Tap ${n}’s home on the map.`, noKids: 'No children on this route yet (bus assignments sheet).',
     noRoute: 'No route yet: this supervisor sees nothing until you tick a route (Edit routes).', pickRoute: 'Tick at least one route.',
     morning: 'Morning', afternoon: 'Afternoon', failed: 'Something went wrong. Try again.', loading: 'Loading…', mapAria: 'Map',
   },
@@ -42,6 +43,7 @@ const TEXT = {
     pins: 'المحطات على الخريطة', pinHelp: 'اختر محطة ثم اضغط مكانها على الخريطة. يرى أولياء الأمور محطتهم والوقت المتوقع للوصول.', route: 'الخط', clearPin: 'إزالة الدبوس', pinned: 'على الخريطة', notPinned: 'ليست على الخريطة',
     running: 'الرحلات الجارية', none: 'لا توجد رحلة جارية.', stopTrip: 'إيقاف الرحلة', confirmStop: 'إيقاف هذه الرحلة؟ تتوقف مشاركة الموقع الآن.', lastUpdate: (s: string) => `آخر تحديث ${s}`, noPos: 'لا موقع بعد',
     history: 'سجل الرحلات', started: 'البداية', ended: 'النهاية', who: 'المشرف', how: { ended: 'أنهاها المشرف', auto: 'توقفت بعد ساعتين', admin: 'أوقفتها المدرسة', off: 'أُوقفت الخريطة المباشرة' } as Record<string, string>,
+    d2d: 'من البيت للبيت', d2dHelp: 'في خط «من البيت للبيت» يكون بيت كل طفل هو محطته. يحدد ولي الأمر البيت من التطبيق، وتوافق عليه هنا قبل أن تعتمده الحافلة. يمكنك أيضًا تحديده بنفسك.', d2dOn: 'من البيت للبيت في هذا الخط', order: 'الترتيب', up: 'أعلى', down: 'أسفل', confirmed: 'معتمد', pendingHome: 'بانتظار موافقتك', noHome: 'لا بيت بعد', confirm: 'موافقة', reject: 'رفض', setOnMap: 'تحديد على الخريطة', pickOnMap: (n: string) => `اضغط على بيت ${n} في الخريطة.`, noKids: 'لا أطفال على هذا الخط بعد (كشف توزيع الحافلات).',
     noRoute: 'لا خط بعد: لن يرى هذا المشرف شيئًا حتى تختار خطًا (تعديل الخطوط).', pickRoute: 'اختر خطًا واحدًا على الأقل.',
     morning: 'الذهاب', afternoon: 'العودة', failed: 'حدث خطأ. حاول مرة أخرى.', loading: 'جارٍ التحميل…', mapAria: 'خريطة',
   },
@@ -76,6 +78,7 @@ export const BusAdmin: React.FC = () => {
       <Settings t={t} v={v} act={act} />
       <Supervisors t={t} lang={lang} v={v} act={act} />
       <Pins t={t} v={v} act={act} />
+      <Homes t={t} v={v} act={act} />
       <RunningNow t={t} lang={lang} v={v} act={act} />
       <History t={t} lang={lang} v={v} />
     </div>
@@ -186,6 +189,62 @@ const Pins: React.FC<P> = ({ t, v, act = async () => undefined }) => {
           onPick={stop ? (p) => void act(() => apiRequest('PUT', '/api/school-app/bus-live/stops', { routeKey: route.routeKey, stopName: stop, lat: p.lat, lng: p.lng })) : undefined} />
       </React.Suspense>
       {stop && route.stops.find((s) => s.name === stop)?.lat !== null && <button type="button" className={btn} onClick={() => void act(() => apiRequest('PUT', '/api/school-app/bus-live/stops', { routeKey: route.routeKey, stopName: stop, lat: null, lng: null }))}>{t.clearPin}</button>}
+    </section>
+  );
+};
+
+type HomeRow = { studentId: string; name: string; order: number; confirmed: { lat: number; lng: number; note: string } | null; pending: { lat: number; lng: number; note: string } | null };
+type HomesView = { routes: { routeKey: string; routeName: string; doorToDoor: boolean; children: HomeRow[] }[] };
+
+const Homes: React.FC<P> = ({ t, act = async () => undefined }) => {
+  const [hv, setHv] = useState<HomesView | null>(null);
+  const [routeKey, setRouteKey] = useState('');
+  const [picking, setPicking] = useState<string | null>(null);
+  const load = useCallback(() => apiRequest<HomesView>('GET', '/api/school-app/bus-live/homes').then(setHv).catch(() => setHv(null)), []);
+  useEffect(() => { void load(); }, [load]);
+  const run = async (fn: () => Promise<unknown>) => { await act(fn); await load(); };
+  if (!hv?.routes.length) return null;
+  const route = hv.routes.find((r) => r.routeKey === routeKey) ?? hv.routes[0];
+  const kids = route.children;
+  const move = (i: number, d: -1 | 1) => { const ids = kids.map((k) => k.studentId); const j = i + d; if (j < 0 || j >= ids.length) return; [ids[i], ids[j]] = [ids[j], ids[i]]; void run(() => apiRequest('PUT', '/api/school-app/bus-live/homes/order', { studentIds: ids })); };
+  const pins = kids.filter((k) => k.confirmed).map((k) => ({ lat: k.confirmed!.lat, lng: k.confirmed!.lng, label: k.name }));
+  const sel = kids.find((k) => k.studentId === picking);
+  return (
+    <section className={card} data-testid="bus-admin-homes">
+      <h3 className="text-base font-semibold">{t.d2d}</h3>
+      <p className="text-sm text-slate-600">{t.d2dHelp}</p>
+      <div className="flex flex-wrap items-end gap-4">
+        <label className="text-sm block max-w-xs">{t.route}<select className={field} value={route.routeKey} onChange={(e) => { setRouteKey(e.target.value); setPicking(null); }} data-testid="bus-homes-route">{hv.routes.map((r) => <option key={r.routeKey} value={r.routeKey}>{r.routeName}</option>)}</select></label>
+        <label className="flex items-center gap-2 text-sm font-semibold"><input type="checkbox" className="h-5 w-5" checked={route.doorToDoor} onChange={(e) => void run(() => apiRequest('PUT', '/api/school-app/bus-live/homes/door-to-door', { routeKey: route.routeKey, on: e.target.checked }))} data-testid="bus-homes-d2d" />{t.d2dOn}</label>
+      </div>
+      {route.doorToDoor && (kids.length === 0 ? <p className="text-sm text-slate-600">{t.noKids}</p> : (
+        <>
+          <ol className="space-y-2">
+            {kids.map((k, i) => (
+              <li key={k.studentId} className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-slate-200 p-3" data-testid="bus-home-row" data-student={k.studentId}>
+                <span className="text-sm"><b className="me-2">{i + 1}.</b><span dir="auto">{k.name}</span>
+                  {k.pending ? <span className="ms-2 rounded-full bg-violet-50 px-2 py-0.5 text-xs text-violet-800" data-testid="bus-home-state">{t.pendingHome}</span>
+                    : k.confirmed ? <span className="ms-2 rounded-full bg-emerald-50 px-2 py-0.5 text-xs text-emerald-800" data-testid="bus-home-state">{t.confirmed}</span>
+                      : <span className="ms-2 rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600" data-testid="bus-home-state">{t.noHome}</span>}
+                  {(k.pending ?? k.confirmed)?.note && <span className="block text-xs text-slate-500" dir="auto">{(k.pending ?? k.confirmed)!.note}</span>}
+                </span>
+                <span className="flex flex-wrap gap-2">
+                  {k.pending && <button type="button" className={primary} onClick={() => void run(() => apiRequest('POST', `/api/school-app/bus-live/homes/${encodeURIComponent(k.studentId)}`, { action: 'confirm' }))} data-testid="bus-home-confirm">{t.confirm}</button>}
+                  {k.pending && <button type="button" className={btn} onClick={() => void run(() => apiRequest('POST', `/api/school-app/bus-live/homes/${encodeURIComponent(k.studentId)}`, { action: 'reject' }))}>{t.reject}</button>}
+                  <button type="button" className={`${btn} ${picking === k.studentId ? '!border-blue-600 !bg-blue-50' : ''}`} aria-pressed={picking === k.studentId} onClick={() => setPicking(picking === k.studentId ? null : k.studentId)}>{t.setOnMap}</button>
+                  <button type="button" className={btn} disabled={i === 0} onClick={() => move(i, -1)} aria-label={`${t.up}: ${k.name}`}>↑</button>
+                  <button type="button" className={btn} disabled={i === kids.length - 1} onClick={() => move(i, 1)} aria-label={`${t.down}: ${k.name}`}>↓</button>
+                </span>
+              </li>
+            ))}
+          </ol>
+          {sel && <p className="text-sm text-blue-800">{t.pickOnMap(sel.name)}</p>}
+          <React.Suspense fallback={<div className="h-64 rounded-xl bg-slate-100" />}>
+            <LiveMap ariaLabel={t.mapAria} height={300} stops={pins} stop={sel?.pending ? { ...sel.pending, label: sel.name } : null}
+              onPick={sel ? (p) => { setPicking(null); void run(() => apiRequest('POST', `/api/school-app/bus-live/homes/${encodeURIComponent(sel.studentId)}`, { action: 'set', lat: p.lat, lng: p.lng })); } : undefined} />
+          </React.Suspense>
+        </>
+      ))}
     </section>
   );
 };

@@ -374,12 +374,20 @@ export async function runHealthCheck(opts: HealthRunOptions): Promise<HealthRunR
           ids.jobId = job.id;
           if (job.status === 'sent') return;
           if (job.status === 'dead') throw new StepFailure(`job_dead_${(job.lastError ?? 'unknown').slice(0, 40)}`);
+          // This is the fake student's own job: a back-off left by an earlier try (a cold new deployment timing out on its
+          // first send, 25 Nov 2026) must not keep the check from sending it now.
+          if (job.status === 'pending' && job.nextAttemptAt && new Date(job.nextAttemptAt).getTime() > Date.now()) {
+            await LmsGradeSyncJob.updateOne({ id: job.id, status: 'pending', institutionId: HEALTH.institutionId }, { $set: { nextAttemptAt: new Date() } });
+          }
           await drainGradeJobs({ filter: { lmsUserId: lmsStudent.lmsUserId, platformId: platform.id }, limit: 5, budgetMs: 10_000, trigger: 'health_check' });
           const after = await LmsGradeSyncJob.findOne({ id: job.id }).lean();
           if (after?.status === 'sent') return;
           if (after?.status === 'dead') throw new StepFailure(`job_dead_${(after.lastError ?? 'unknown').slice(0, 40)}`);
         }
-        if (Date.now() > deadline) throw new StepFailure(job ? `job_${job.status}` : 'no_job');
+        if (Date.now() > deadline) {
+          const last = job ? await LmsGradeSyncJob.findOne({ id: job.id }).select('status lastError').lean() : null;
+          throw new StepFailure(last ? `job_${last.status}${last.lastError ? `_${last.lastError.slice(0, 40)}` : ''}` : 'no_job');
+        }
         await new Promise((res) => setTimeout(res, 500));
       }
     });

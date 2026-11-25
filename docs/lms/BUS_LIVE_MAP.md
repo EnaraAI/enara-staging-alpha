@@ -55,3 +55,15 @@ The owner said "go" on 25 Nov 2026 with these decisions: supervisors sign in wit
 - Backend: `backend/src/schoolApp/busLive.ts` holds the models, the service, the supervisor token and the arrival estimate. The routes are in `schoolApp/routes.ts`: `/api/school-app/bus-live/*` for the school, `/api/bus/*` for the supervisor's phone, and `/api/parents/school/learners/:id/bus/live` for parents.
 - Frontend: `frontend/bus/BusApp.tsx` is the supervisor page (`/bus`), `frontend/pages/BusAdmin.tsx` is the school admin tab, `frontend/parents/screens/BusLive.tsx` is the parent map, and `frontend/components/LiveMap.tsx` is the shared map (Leaflet with OpenStreetMap, loaded only on map screens).
 - Tests: `backend/test/schoolApp/busLive.test.ts` and `e2e/tests/42-bus-live-map.spec.ts`.
+
+## Door to door (owner "go" 25 Nov 2026)
+Decisions: the parent sets the home and the school confirms it; all three parent notices are on ("about 5 minutes away", "Picked up", "Dropped off"); the supervisor sees the child's first name and the parents' note.
+- **School:** the "Door to door" card in the Bus supervisors tab. Turn a route to door to door, order its children (↑ ↓), confirm or turn down a parent's point, or set a home on the map.
+- **Parent:** the "Pickup point (home)" card on the Bus page. Tap the map or use the current location, add a note, then send it to the school. It shows "Waiting for the school" until the school confirms.
+- **Supervisor (`/bus`):** "Next home" shows the child's first name, the note and a Directions link, with **Picked up / Dropped off** and **Not riding today**. A list of the trip's homes sits below.
+- **Parent live map:** the bus and their home, with "about N min away" counted through the homes before theirs, plus "Picked up at …" or "Dropped off at home at …". In-app notices go to every parent of the child, in each parent's language.
+- **Privacy:**
+  - A home is seen by its own parents, the school, and the route's supervisor during a running trip.
+  - Other parents never see it.
+  - A home is deleted when the child is on no route.
+- **Code and tests:** the code is `backend/src/schoolApp/busHomes.ts`, and the E2E scenario is `e2e/tests/43-bus-door-to-door.spec.ts`.
