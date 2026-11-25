@@ -59,6 +59,10 @@ test.describe.serial('42 · Live bus map: supervisor phone, school tab, parent m
     const phone = await phoneCtx.newPage();
     phone.on('pageerror', (e) => console.log('[pageerror bus phone]', String(e).slice(0, 400)));
     await phone.goto(`${ENARA}/bus`);
+    // Glow logo: "Enara Bus" in the header, and the bus page has its own home-screen icon and manifest.
+    await expect(phone.locator('.bus-head').getByRole('img', { name: 'Enara Bus' })).toBeVisible();
+    await expect(phone.locator('link[rel="manifest"][href="/bus.webmanifest"]')).toHaveCount(1);
+    for (const f of ['/bus-icon.svg', '/bus.webmanifest']) expect((await phone.request.get(`${ENARA}${f}`)).status()).toBe(200);
     await phone.getByTestId('bus-code').fill(code);
     await phone.getByTestId('bus-signin').click();
     const route = phone.getByTestId('bus-route').filter({ hasText: ROUTE });

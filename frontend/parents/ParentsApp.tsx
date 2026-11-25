@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { GlowLogo } from '../components/brand/GlowLogo';
 import './parents.css';
 import type { Lang } from './i18n';
 import { parentsApi, schoolApi, type LearnerChip } from './api';
@@ -52,6 +53,7 @@ function usePwaHead(lang: Lang) {
     add('link', { rel: 'manifest', href: '/parents.webmanifest' });
     add('meta', { name: 'theme-color', content: '#0E2747' });
     add('link', { rel: 'apple-touch-icon', href: '/parents-icon.svg' });
+    add('link', { rel: 'icon', type: 'image/svg+xml', href: '/parents-icon.svg' });
     add('link', { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap' });
     const prevTitle = document.title;
     return () => { added.forEach((el) => el.remove()); document.title = prevTitle; };
@@ -181,7 +183,7 @@ const ParentsApp: React.FC<{ userName?: string; onSignOut: () => void }> = ({ on
     <ParentsCtx.Provider value={ctx}>
       <div className="pp" dir={dir} lang={lang} data-theme={dark ? 'dark' : 'light'} onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
         <header className="pp-header">
-          <div className="pp-hello"><small>{t.brand} {t.parents}</small><b>{t.ui.hello(hour)}</b></div>
+          <div className="pp-hello"><GlowLogo product="Parents" size={30} className="pp-logo" /><b>{t.ui.hello(hour)}</b></div>
           <div className="pp-head-actions">
             <button type="button" className="pp-langbtn" onClick={() => setLang(lang === 'en' ? 'ar' : 'en')} lang={lang === 'en' ? 'ar' : 'en'} aria-label={`${t.language}: ${lang === 'en' ? 'العربية' : 'English'}`}>{lang === 'en' ? 'ع' : 'EN'}</button>
             {!showLink && learner && (

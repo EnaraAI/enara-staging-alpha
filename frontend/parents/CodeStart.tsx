@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ArrowRight, CircleAlert, KeyRound, Link2, ShieldAlert, Smartphone, UserRound } from 'lucide-react';
 import { previewStartCode, startWithCode, type SessionUser } from '../services/apiService';
 import { formatCodeInput } from './codeFormat';
+import { GlowLogo } from '../components/brand/GlowLogo';
 
 // Parents P1 (PARENT_CODE_SIGNUP_ENABLED), owner decision a): the code-first
 // entry on the Parents tab of the sign-in page. The parent types the school's
@@ -101,6 +102,7 @@ export const CodeStart: React.FC<{ lang: Lang; onLogin: (user: SessionUser) => v
       {/* Parents redesign: a navy welcome card and the code shown as three groups of cells (the input stays the real field). */}
       <div className="si-pwelcome" aria-hidden="true">
         <svg className="si-pwelcome-art" viewBox="0 0 200 120" focusable="false"><circle className="si-pdrift" cx="170" cy="20" r="44" fill="rgba(245,165,36,.18)" /><path className="si-ptwinkle" d="M150 18l1.6 4.4 4.4 1.6-4.4 1.6-1.6 4.4-1.6-4.4-4.4-1.6 4.4-1.6z" fill="#FFD58A" /></svg>
+        <GlowLogo product="Parents" size={34} className="si-plogo" />
         <b>{t.welcome}</b><span>{t.welcomeBody}</span>
       </div>
       <h3 className="si-code-title">{t.title}</h3>

@@ -203,7 +203,18 @@ async function applyFlags(dryRun) {
 async function maintenance(what) {
   const paths = { migrate: '/api/maintenance/migrate', setup: '/api/maintenance/health-check/setup', run: '/api/maintenance/health-check/run' };
   if (!paths[what]) throw new Error('maintenance migrate|setup|run');
-  const r = await site(paths[what], { method: 'POST', auth: true, body: {} });
+  let r = await site(paths[what], { method: 'POST', auth: true, body: {} });
+  // A brand-new deployment is cold: its first grade send to the mock LMS (on the same site) can time out (deploy rollbacks
+  // on 25 Nov 2026: grade_send job_pending, lastError timeout). Run the whole check once more after a pause; a real fault
+  // fails twice and still rolls back.
+  const coldGrade = (j) => { const f = (j?.steps ?? []).find((s) => !s.ok); return !!f && ['grade_send', 'grade_received'].includes(f.name) && /timeout|job_pending|no_score_at_mock/.test(f.code ?? ''); };
+  if (what === 'run' && r.status === 200 && r.json?.ok !== true && coldGrade(r.json)) {
+    for (const s of r.json.steps ?? []) console.log(`${s.ok ? 'ok  ' : 'FAIL'} ${s.name} ${s.ms}ms ${s.code ?? ''} (first run)`);
+    console.log('::warning::health check: grade step failed on the cold deployment; running the check once more in 15 s');
+    summary('\n> Health check: the grade step failed on the first run (cold deployment); the check ran once more.\n');
+    await new Promise((res) => setTimeout(res, 15_000));
+    r = await site(paths[what], { method: 'POST', auth: true, body: {} });
+  }
   if (what === 'migrate') {
     if (r.status !== 200 || !Array.isArray(r.json?.applied)) throw new Error(`migrate: HTTP ${r.status}`);
     if (r.json.pending?.length) throw new Error(`migrate: still pending ${r.json.pending.join(',')}`);
