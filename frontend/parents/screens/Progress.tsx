@@ -3,13 +3,13 @@ import { bi } from '../i18n';
 import { cairoDate, parentsApi, type LearnerChip } from '../api';
 import { ErrorBox, Icon, Loading, levelNextLine, useP } from '../ui';
 import { ALL, ResultRow, SubjectRows, SubjectView, waitingFirst } from './Subjects';
-import { RingsCard } from './Today';
+import { ReportCard, RingsCard } from './Today';
 import type { SubjectCard, WeeklyStatus } from '../api';
 import { useLive } from '../useLive';
 import { ClassFilter } from '../shared';
 import { MemoryCard } from './MemoryCard';
 
-type ProgressProps = { learner: LearnerChip; refreshKey: number; onFetched: (d: Date | null, loading: boolean) => void; subjectKey?: string; english?: boolean; status?: WeeklyStatus | null; subjects?: SubjectCard[]; onPickSubject?: (key: string) => void };
+type ProgressProps = { learner: LearnerChip; refreshKey: number; onFetched: (d: Date | null, loading: boolean) => void; subjectKey?: string; english?: boolean; status?: WeeklyStatus | null; subjects?: SubjectCard[]; onPickSubject?: (key: string) => void; onShare?: () => void };
 
 // All subjects: English (and "All subjects") keep the CEFR view; another subject shows its own outcomes and results.
 // Placeholder sections (mock) are not shown.
@@ -17,9 +17,10 @@ export const Progress: React.FC<ProgressProps> = (props) => (props.subjectKey &&
   ? <SubjectView learner={props.learner} subjectKey={props.subjectKey} mode="progress" refreshKey={props.refreshKey} onFetched={props.onFetched} />
   : <ProgressAll {...props} />);
 
-const ProgressAll: React.FC<ProgressProps> = ({ learner, refreshKey, onFetched, subjectKey, status, subjects = [], onPickSubject }) => {
+const ProgressAll: React.FC<ProgressProps> = ({ learner, refreshKey, onFetched, subjectKey, status, subjects = [], onPickSubject, onShare }) => {
   const ctx = useP();
   const { t, n, lang } = ctx;
+  const [view, setView] = useState<'week' | 'term'>('week');
   const [classId, setClassId] = useState<string | null>(null);
   const q = useLive(() => parentsApi.progress(learner.studentId, classId), [learner.studentId, classId], refreshKey);
   React.useEffect(() => onFetched(q.fetchedAt, q.loading), [q.fetchedAt, q.loading]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -41,9 +42,20 @@ const ProgressAll: React.FC<ProgressProps> = ({ learner, refreshKey, onFetched, 
     <>
       <h1 className="pp-h1">{t.progressTitle}</h1>
       {/* Redesign step 3: the week's rings and the subject rows come first on "All subjects". */}
+      {/* Follow-up (item 5): This week / This term. The week view has the rings, the report card and the subjects; the term view
+      // the level, trend, can-dos and strengths. Results stay below both. */}
+      {(!subjectKey || subjectKey === ALL) && (
+        <div className="pp-seg pp-seg--two" role="tablist" aria-label={t.ui.period}>
+          <button type="button" role="tab" aria-selected={view === 'week'} aria-pressed={view === 'week'} onClick={() => setView('week')} data-testid="pp-view-week">{t.ui.thisWeekCard}</button>
+          <button type="button" role="tab" aria-selected={view === 'term'} aria-pressed={view === 'term'} onClick={() => setView('term')} data-testid="pp-view-term">{t.ui.thisTerm}</button>
+        </div>
+      )}
+      {(view === 'week' || !(!subjectKey || subjectKey === ALL)) && <>
       {(!subjectKey || subjectKey === ALL) && status && <RingsCard status={status} lessons={subjects.reduce((sum, x) => sum + (x.lessonsThisWeek || 0), 0)} />}
       {(!subjectKey || subjectKey === ALL) && onPickSubject && <SubjectRows subjects={subjects} onPick={onPickSubject} />}
-
+      {(!subjectKey || subjectKey === ALL) && status && <ReportCard learner={learner} status={status} subjects={subjects} results={d.assessments.items} onShare={onShare} />}
+      </>}
+      {(view === 'term' || !(!subjectKey || subjectKey === ALL)) && <>
       {!d.level.mock && <section className="pp-card" aria-labelledby="pp-cefr" style={{ gap: 4 }}>
         <div className="pp-row" style={{ marginBlockEnd: 8 }}><p className="pp-eyebrow" id="pp-cefr">{t.cefrTitle}</p></div>
         <ol className="pp-ladder">
@@ -130,6 +142,7 @@ const ProgressAll: React.FC<ProgressProps> = ({ learner, refreshKey, onFetched, 
       </section>}
 
       <MemoryCard studentId={learner.studentId} canEdit={learner.role !== 'view'} />
+      </>}
 
       <section className="pp-card" aria-labelledby="pp-results">
         <div className="pp-row"><h2 className="pp-h2" id="pp-results">{t.assessments}</h2><span className="pp-meta">{t.lessonsDone(n(d.lessonsCompleted.count))}</span></div>
