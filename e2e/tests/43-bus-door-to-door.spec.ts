@@ -86,6 +86,7 @@ test.describe.serial('43 · Door to door: home pickup point, school confirms, su
     await expect(phone.getByTestId('bus-homes-done')).toBeVisible({ timeout: 30_000 });
 
     await page.reload();
+    await page.getByTestId('pp-school-buses').or(page.getByTestId('pp-school-home-bus')).first().click({ timeout: 30_000 }); // back to the bus section after the reload
     await expect(page.getByTestId('pp-bus-live').getByTestId('pp-bus-child-status')).toContainText('Picked up at', { timeout: 45_000 });
     await shot(page, 'bus-43-04-parent-picked-up');
     const token = await page.evaluate(() => localStorage.getItem('enara_token') || sessionStorage.getItem('enara_token') || '');
