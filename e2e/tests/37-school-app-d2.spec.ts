@@ -27,6 +27,7 @@ test.describe.serial('37 · Parents school app (d2): request and consent screens
     await page.getByRole('button', { name: 'Continue' }).click();
     await page.getByRole('button', { name: 'Yes, open ENARA Parents' }).click();
     await expect(page.locator('.pp-switcher .pp-chip:not(.pp-chip--add)')).toHaveCount(1, { timeout: 30_000 });
+    await page.getByTestId('pp-nav-school').click({ timeout: 30_000 }); // design A: the school sections live in the School tab
     await expect(page.getByTestId('pp-school-home-consents')).toContainText('to answer', { timeout: 30_000 });
 
     await page.getByTestId('pp-school-home-consents').click();
@@ -62,7 +63,7 @@ test.describe.serial('37 · Parents school app (d2): request and consent screens
     await staff.context.close();
 
     await page.reload();
-    await page.getByTestId('pp-nav-home').click(); await page.getByTestId('pp-school-home').getByRole('button').first().click(); // redesign: School opens from Today
+    await page.getByTestId('pp-nav-school').click(); await page.getByTestId('pp-school-home').getByRole('button').first().click(); // design A: the School tab lists the sections
     await page.getByTestId('pp-school-requests').click();
     await expect(page.getByTestId('pp-request').filter({ hasText: `Meeting about homework ${RUN}` }).getByTestId('pp-request-reply')).toHaveText('Thursday 10:00 with Ms Salma.');
     await shot(page, 'school-d2-03-request-answered');

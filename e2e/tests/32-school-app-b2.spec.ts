@@ -33,6 +33,7 @@ test.describe.serial('32 · Parents school app (b2): fee screens', () => {
     await page.getByRole('button', { name: 'Continue' }).click();
     await page.getByRole('button', { name: 'Yes, open ENARA Parents' }).click();
     await expect(page.locator('.pp-switcher .pp-chip:not(.pp-chip--add)')).toHaveCount(1, { timeout: 30_000 });
+    await page.getByTestId('pp-nav-school').click({ timeout: 30_000 }); // design A: the school sections live in the School tab
     await expect(page.getByTestId('pp-school-home-fees')).toContainText('overdue', { timeout: 30_000 });
     await shot(page, 'school-b2-01-home-fees');
 
@@ -69,7 +70,7 @@ test.describe.serial('32 · Parents school app (b2): fee screens', () => {
     await staff.context.close();
 
     await page.reload();
-    await page.getByTestId('pp-nav-home').click(); await page.getByTestId('pp-school-home').getByRole('button').first().click(); // redesign: School opens from Today
+    await page.getByTestId('pp-nav-school').click(); await page.getByTestId('pp-school-home').getByRole('button').first().click(); // design A: the School tab lists the sections
     await page.getByTestId('pp-school-fees').click();
     await expect(page.getByTestId('pp-fee-plan').filter({ hasText: PLAN }).locator('[data-testid="pp-instalment"][data-status="paid"]')).toHaveCount(2);
     await expect(page.getByTestId('pp-fee-plan').filter({ hasText: PLAN })).toContainText(`R2-${RUN}`);

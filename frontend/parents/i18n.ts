@@ -15,13 +15,14 @@ export const T = {
   en: {
     brand: 'ENARA', parents: 'Parents', sample: 'Sample data', sampleHint: 'Parts marked Sample data are examples until ENARA has real data for them.',
     chooseLearner: 'Choose learner', age: (n: string) => `Age ${n}`, main: 'Main',
-    tabs: { home: 'Today', progress: 'Progress', activity: 'Activity', controls: 'Controls', account: 'Account', school: 'School', messages: 'Messages', actions: 'Actions' },
+    tabs: { home: 'Home', progress: 'Learning', activity: 'Activity', controls: 'Controls', account: 'Account', school: 'School', messages: 'Messages', actions: 'To do', more: 'More' },
     ui: {
       hello: (h: number) => (h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening'), account: 'Account',
+      todayH: 'Today', askAssistant: 'Ask the ENARA assistant', childLine: (name: string, grade: string, school: string) => [name, grade, school].filter(Boolean).join(' · '), children: 'Children', moreTitle: 'More', schoolSub: 'Everything from the school, in one place',
       msgTitle: 'Messages', msgSub: 'The ENARA assistant and news from school', assistant: 'ENARA assistant', assistantSub: (name: string) => `Answers from ${name}'s school info`,
       assistantPv: 'Ask about the timetable, attendance, fees or the bus.', ai: 'AI', schoolNews: 'School notifications', schoolNewsPv: (n: string) => `${n} unread`, allRead: 'All read',
       announcementsPv: (n: string) => `${n} announcements`, noMessages: 'No messages yet. When the school sends news, it will appear here.',
-      actTitle: 'Actions', actSub: 'Everything the school needs from you', consentsPv: (n: string) => `${n} waiting for your answer`, noConsents: 'Nothing to sign',
+      actTitle: 'To do', actSub: 'Everything the school needs from you', consentsPv: (n: string) => `${n} waiting for your answer`, noConsents: 'Nothing to sign',
       requestsPv: (n: string) => `${n} open`, noRequests: 'No open requests', newRequest: 'Send the school a request', feesNone: 'Nothing due', nothingToDo: 'Nothing needs you right now.',
       weekOf: (name: string) => `${name} this week`, practisedDays: (name: string, a: string, b: string) => `${name} practised ${a} of ${b} days`,
       ringPractice: 'Practice', ringLessons: 'Lessons', ringDays: 'Days', ofMin: (b: string) => `of ${b} min`, ofLessons: (b: string) => `of ${b} lessons`, ofDays: (b: string) => `of ${b} days`,
@@ -87,7 +88,7 @@ export const T = {
     share: 'Share this week', shareTitle: (name: string) => `${name}'s week in English`, shareEmail: 'Send by email', shareWhatsapp: 'Share on WhatsApp', shareSent: 'Sent to your email.', shareWhatsappReady: 'WhatsApp message ready (sending is not connected yet):', shareFailed: 'Could not send. Try again later.', shareEmailBlocked: 'Parent emails are switched on in a later step.', close: 'Close',
     heLearned: 'Learned', streakShort: 'day streak', openPortal: 'Open ENARA Parents', weekOf: (d: string) => `ENARA · week of ${d}`,
     // Progress
-    progressTitle: 'Progress', cefrTitle: 'English level (CEFR)', skills: 'Skills', skillsSub: (lvl: string) => `Share of ${lvl} goals mastered · trend over 4 weeks`,
+    progressTitle: 'Learning', cefrTitle: 'English level (CEFR)', skills: 'Skills', skillsSub: (lvl: string) => `Share of ${lvl} goals mastered · trend over 4 weeks`,
     skill: { listening: 'Listening', speaking: 'Speaking', reading: 'Reading', writing: 'Writing', vocabulary: 'Vocabulary', grammar: 'Grammar' } as Record<string, string>,
     trend: { up: 'going up', flat: 'steady', down: 'going down' } as Record<string, string>,
     trendTitle: 'Overall score, last 8 weeks', trendLabel: (a: string, b: string) => `Overall score went from ${a} to ${b} over 8 weeks`, assessmentMark: 'Checkpoint', thisWeekShort: 'This week',
@@ -178,9 +179,10 @@ export const T = {
   ar: {
     brand: 'إنارة', parents: 'أولياء الأمور', sample: 'بيانات تجريبية', sampleHint: 'الأجزاء المعلَّمة «بيانات تجريبية» أمثلة إلى أن تتوفر لدى إنارة بيانات حقيقية لها.',
     chooseLearner: 'اختر الابن', age: (n: string) => `${n} سنة`, main: 'القائمة الرئيسية',
-    tabs: { home: 'اليوم', progress: 'التقدّم', activity: 'النشاط', controls: 'الإعدادات', account: 'الحساب', school: 'المدرسة', messages: 'الرسائل', actions: 'المطلوب' },
+    tabs: { home: 'الرئيسية', progress: 'التعلّم', activity: 'النشاط', controls: 'الإعدادات', account: 'الحساب', school: 'المدرسة', messages: 'الرسائل', actions: 'المطلوب', more: 'المزيد' },
     ui: {
       hello: (h: number) => (h < 12 ? 'صباح الخير' : 'مساء الخير'), account: 'الحساب',
+      todayH: 'اليوم', askAssistant: 'اسأل مساعد إنارة', childLine: (name: string, grade: string, school: string) => [name, grade, school].filter(Boolean).join(' · '), children: 'الأبناء', moreTitle: 'المزيد', schoolSub: 'كل ما يخص المدرسة في مكان واحد',
       msgTitle: 'الرسائل', msgSub: 'مساعد إنارة وأخبار المدرسة', assistant: 'مساعد إنارة', assistantSub: (name: string) => `إجابات من معلومات مدرسة ${name}`,
       assistantPv: 'اسأل عن الجدول أو الحضور أو الرسوم أو الحافلة.', ai: 'AI', schoolNews: 'إشعارات المدرسة', schoolNewsPv: (n: string) => `${n} غير مقروءة`, allRead: 'كلها مقروءة',
       announcementsPv: (n: string) => `${n} إعلانات`, noMessages: 'لا توجد رسائل بعد. عندما ترسل المدرسة أخبارًا ستظهر هنا.',
@@ -247,7 +249,7 @@ export const T = {
     whatEnaraDid: 'ما فعلته إنارة', excerpt: 'ما قيل', manage: 'إدارة',
     share: 'شارك هذا الأسبوع', shareTitle: (name: string) => `أسبوع ${name} في اللغة الإنجليزية`, shareEmail: 'إرسال بالبريد الإلكتروني', shareWhatsapp: 'مشاركة عبر واتساب', shareSent: 'أُرسل إلى بريدك الإلكتروني.', shareWhatsappReady: 'رسالة واتساب جاهزة (الإرسال غير مفعّل بعد):', shareFailed: 'تعذّر الإرسال. حاول لاحقًا.', shareEmailBlocked: 'ستُفعَّل رسائل البريد لأولياء الأمور في خطوة لاحقة.', close: 'إغلاق',
     heLearned: 'تعلّم', streakShort: 'أيام متتالية', openPortal: 'افتح بوابة أولياء الأمور في إنارة', weekOf: (d: string) => `إنارة · أسبوع ${d}`,
-    progressTitle: 'التقدّم', cefrTitle: 'مستوى اللغة الإنجليزية (CEFR)', skills: 'المهارات', skillsSub: (lvl: string) => `نسبة أهداف ${lvl} المتقنة · الاتجاه خلال ٤ أسابيع`,
+    progressTitle: 'التعلّم', cefrTitle: 'مستوى اللغة الإنجليزية (CEFR)', skills: 'المهارات', skillsSub: (lvl: string) => `نسبة أهداف ${lvl} المتقنة · الاتجاه خلال ٤ أسابيع`,
     skill: { listening: 'الاستماع', speaking: 'التحدث', reading: 'القراءة', writing: 'الكتابة', vocabulary: 'المفردات', grammar: 'القواعد' } as Record<string, string>,
     trend: { up: 'في ارتفاع', flat: 'ثابت', down: 'في انخفاض' } as Record<string, string>,
     trendTitle: 'الدرجة العامة، آخر ٨ أسابيع', trendLabel: (a: string, b: string) => `ارتفعت الدرجة العامة من ${a} إلى ${b} خلال ٨ أسابيع`, assessmentMark: 'اختبار', thisWeekShort: 'هذا الأسبوع',

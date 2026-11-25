@@ -46,6 +46,7 @@ test.describe.serial('28 · Parents school app (a2): parent screens', () => {
     await enaraApi.post('/api/school-app/announcements', admin, { audience: 'school', title: `Sports day ${RUN}`, body: 'Wear the sports uniform.' });
 
     await page.reload();
+    await page.getByTestId('pp-nav-school').click({ timeout: 30_000 });
     const home = page.getByTestId('pp-school-home');
     await expect(home).toBeVisible({ timeout: 30_000 });
     await expect(home).toContainText('Absent');
@@ -53,7 +54,7 @@ test.describe.serial('28 · Parents school app (a2): parent screens', () => {
     await expect(page.getByTestId('pp-nav-messages').locator('.pp-badge')).toBeVisible();
     await shot(page, 'school-a2-01-home-card');
 
-    await page.getByTestId('pp-nav-home').click(); await page.getByTestId('pp-school-home').getByRole('button').first().click(); // redesign: School opens from Today
+    await page.getByTestId('pp-nav-school').click(); await page.getByTestId('pp-school-home').getByRole('button').first().click(); // design A: the School tab lists the sections
     await expect(page).toHaveURL(/\/parents\/school$/);
     await page.getByTestId('pp-school-timetable').click();
     await expect(page.locator('.pp-school-today')).toContainText(`Science ${RUN}`);
@@ -92,7 +93,8 @@ test.describe.serial('28 · Parents school app (a2): parent screens', () => {
       await shot(page, `school-a2-ar-${v}`);
     }
     await page.getByTestId('pp-nav-home').click();
-    await expect(page.getByTestId('pp-nav-home')).toContainText('اليوم');
+    await expect(page.getByTestId('pp-nav-home')).toContainText('الرئيسية');
+    await page.getByTestId('pp-nav-school').click();
     await expect(page.getByTestId('pp-school-home')).toBeVisible();
     await shot(page, 'school-a2-ar-home-card');
     await page.locator('.pp-langbtn').click(); // back to English for later runs on this browser
@@ -101,7 +103,7 @@ test.describe.serial('28 · Parents school app (a2): parent screens', () => {
     await enaraApi.put('/api/school-app/sections', admin, { timetable: false, announcements: false, attendance: false, notifications: false });
     await page.goto(`${ENARA}/parents`);
     await expect(page.locator('.pp-switcher .pp-chip:not(.pp-chip--add)')).toHaveCount(1, { timeout: 30_000 });
-    await expect(page.getByTestId('pp-nav-home')).toContainText('Today');
+    await expect(page.getByTestId('pp-nav-home')).toContainText('Home');
     await expect(page.getByTestId('pp-nav-messages')).toHaveCount(0); // no school messages: the Messages tab is hidden
     await expect(page.getByTestId('pp-school-home')).toHaveCount(0);
     await expect(enaraApi.get(`/api/parents/school/learners/${student}/timetable`, await page.evaluate(() => localStorage.getItem('enara_token') || ''))).rejects.toThrow(/-> 404/);

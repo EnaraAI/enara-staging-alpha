@@ -8,7 +8,7 @@ import { useLive } from '../useLive';
 import type { SchoolOverview } from '../api';
 import type { SchoolView } from './School';
 import { useBusLive } from './BusLive';
-import { BusCard, Hero, Latest, NeedsYou, SchoolTiles, TodayClasses, useWide } from './Today';
+import { BusCard, Hero, Latest, NeedsYou, TodayClasses, useWide } from './Today';
 
 type HomeProps = { learner: LearnerChip; refreshKey: number; go: (tab: string) => void; onShare: () => void; onFetched: (d: Date | null, loading: boolean) => void; subjectKey?: string; overview?: SubjectCard[]; onPickSubject?: (key: string) => void ; school?: SchoolOverview | null; openSchool?: (v: SchoolView) => void };
 
@@ -35,15 +35,15 @@ const HomeAll: React.FC<HomeProps> = ({ learner, refreshKey, go, onShare, onFetc
   const accepted = s.goalAcceptedByLearner;
 
   const hero = <Hero learner={learner} status={s} lessons={overview.reduce((sum, x) => sum + (x.lessonsThisWeek || 0), 0)} />;
-  const side = (
+  // Design A: what needs the parent, then Today (classes, the bus home, the latest result), then the week's practice.
+  const needs = <NeedsYou overview={school} onOpen={() => go('actions')} />;
+  const today = (
     <>
-      <NeedsYou overview={school} onOpen={() => go('actions')} />
-      <BusCard overview={school} open={openSchool} learner={learner} live={live} />
       <TodayClasses overview={school} open={openSchool} />
+      <BusCard overview={school} open={openSchool} learner={learner} live={live} />
     </>
   );
   const latest = <Latest learner={learner} overview={school} subjects={overview} refreshKey={refreshKey} open={openSchool} />;
-  const tiles = <SchoolTiles overview={school} open={openSchool} school={learner.school} />;
   const share = <button type="button" className="pp-btn pp-btn--primary pp-btn--block" onClick={onShare}><Icon name="share" />{t.share}</button>;
   const rest = (
     <>
@@ -120,17 +120,15 @@ const HomeAll: React.FC<HomeProps> = ({ learner, refreshKey, go, onShare, onFetc
 
     </>
   );
-  // Redesign step 6: on a wide screen Today has two columns (the week and learning on the left; what needs the parent,
-  // the bus, today's classes and the school tiles on the right). On a phone it is one column in the order below.
-  if (wide) return <div className="pp-today2"><div className="pp-today2-main">{hero}{latest}{rest}{share}</div><aside className="pp-today2-side">{side}{tiles}</aside></div>;
+  // Design A on a wide screen: what needs the parent, Today and the latest results on the left; the week's practice on the right.
+  if (wide) return <div className="pp-today2"><div className="pp-today2-main">{needs}{today}{latest}{rest}</div><aside className="pp-today2-side">{hero}{share}</aside></div>;
   return (
     <>
-      {/* Redesign step 2: the hero (status, three rings, the week's days), then what needs the parent, the bus and today's classes. */}
-      {hero}
-      {side}
+      {needs}
+      {today}
       {latest}
+      {hero}
       {rest}
-      {tiles}
       {share}
     </>
   );
