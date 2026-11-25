@@ -14,6 +14,7 @@ type Lang = 'en' | 'ar';
 
 export const CODE_START_TEXT = {
   en: {
+    welcome: 'Welcome to ENARA Parents', welcomeBody: 'Follow your child’s learning and school day, in English or Arabic.',
     title: 'Enter the code from the school',
     body: "Type the parent code your child's school gave you. It looks like ENR-ABCD-EFGH. You don't need a password.",
     haveAccount: 'Already have an account? Sign in with your email first',
@@ -27,6 +28,7 @@ export const CODE_START_TEXT = {
     tooMany: 'Too many tries. Wait 15 minutes and try again.', unreachable: 'Could not reach the server. Please try again.',
   },
   ar: {
+    welcome: 'مرحبًا بك في إنارة لأولياء الأمور', welcomeBody: 'تابع تعلّم طفلك ويومه الدراسي، بالعربية أو الإنجليزية.',
     title: 'أدخل الرمز الذي أعطته لك المدرسة',
     body: 'اكتب رمز ولي الأمر الذي أعطته لك مدرسة طفلك. يبدو هكذا: ENR-ABCD-EFGH. لا تحتاج إلى كلمة مرور.',
     haveAccount: 'لديك حساب بالفعل؟ سجّل الدخول ببريدك الإلكتروني أولًا',
@@ -45,6 +47,21 @@ export const CODE_START_TEXT = {
 export const SecretCodeWarning: React.FC<{ text: string; className?: string }> = ({ text, className }) => (
   <div className={className ?? 'si-alert warn'} role="note" data-testid="secret-code-warning"><ShieldAlert size={18} /><span>{text}</span></div>
 );
+
+/** The typed code as cells: ENR, then two groups of four (always left to right). Decorative: the input above is the field. */
+const CodeCells: React.FC<{ code: string }> = ({ code }) => {
+  const raw = code.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  const body = raw.startsWith('ENR') ? raw.slice(3) : raw;
+  const cells = Array.from({ length: 8 }, (_, i) => body[i] ?? '');
+  return (
+    <div className="si-cells" dir="ltr" aria-hidden="true">
+      <span className="si-cells-pre">ENR</span>
+      {[0, 4].map((g) => (
+        <span key={g} className="si-cells-g">{cells.slice(g, g + 4).map((c, i) => <i key={i} className={c ? 'on' : ''}>{c}</i>)}</span>
+      ))}
+    </div>
+  );
+};
 
 export const CodeStart: React.FC<{ lang: Lang; onLogin: (user: SessionUser) => void; onSignIn: () => void }> = ({ lang, onLogin, onSignIn }) => {
   const t = CODE_START_TEXT[lang];
@@ -81,6 +98,11 @@ export const CodeStart: React.FC<{ lang: Lang; onLogin: (user: SessionUser) => v
       <button type="button" className="si-ghost si-ghost--wide" onClick={onSignIn} data-testid="parent-have-account">
         <UserRound size={16} />{t.haveAccount}
       </button>
+      {/* Parents redesign: a navy welcome card and the code shown as three groups of cells (the input stays the real field). */}
+      <div className="si-pwelcome" aria-hidden="true">
+        <svg className="si-pwelcome-art" viewBox="0 0 200 120" focusable="false"><circle className="si-pdrift" cx="170" cy="20" r="44" fill="rgba(245,165,36,.18)" /><path className="si-ptwinkle" d="M150 18l1.6 4.4 4.4 1.6-4.4 1.6-1.6 4.4-1.6-4.4-4.4-1.6 4.4-1.6z" fill="#FFD58A" /></svg>
+        <b>{t.welcome}</b><span>{t.welcomeBody}</span>
+      </div>
       <h3 className="si-code-title">{t.title}</h3>
       {error && <div className="si-alert err" role="alert"><CircleAlert size={18} /><span>{error}</span></div>}
       {!preview && (
@@ -95,6 +117,7 @@ export const CodeStart: React.FC<{ lang: Lang; onLogin: (user: SessionUser) => v
                 onChange={(e) => { setCode(formatCodeInput(e.target.value)); setError(null); }}
                 onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); void check(); } }} />
             </div>
+            <CodeCells code={code} />
           </div>
           <SecretCodeWarning text={t.secret} />
           <button type="button" className="si-submit" disabled={busy} onClick={() => void check()}>
