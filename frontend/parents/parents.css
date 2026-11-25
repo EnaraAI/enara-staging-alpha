@@ -498,3 +498,36 @@
   .pp-step--cur i { animation: pp-breathe 1.8s ease-in-out infinite; }
 }
 .pp-legend li > span:last-child { display: flex; flex-direction: column; }
+
+/* ---- Redesign step 4: the assistant, full screen ---- */
+.pp-back { transform: scaleX(-1); }
+.pp[dir="rtl"] .pp-back { transform: none; }
+.pp-chatscreen { position: fixed; inset: 0; z-index: 60; background: var(--page); display: flex; flex-direction: column; max-inline-size: 480px; margin-inline: auto; }
+.pp-chat-head { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-block-end: 1px solid var(--line); background: var(--card); }
+.pp-chatscreen .pp-chat { flex: 1; max-block-size: none; overflow-y: auto; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+.pp-chatscreen .pp-chat-msg { max-inline-size: 84%; padding: 11px 14px; border-radius: 18px; font-size: 15px; line-height: 1.45; }
+.pp-chatscreen .pp-chat-msg--you { align-self: flex-end; background: var(--blue); color: var(--on-strong); border-end-end-radius: 6px; }
+.pp-chatscreen .pp-chat-msg--enara { align-self: flex-start; background: var(--card); border: 1px solid var(--line); border-end-start-radius: 6px; }
+.pp-chat-src { display: flex; align-items: center; gap: 6px; margin-block-start: 8px; padding-block-start: 8px; border-block-start: 1px solid var(--line); font-size: 12px; color: var(--muted); }
+.pp-chat-src .pp-icon { inline-size: 14px; block-size: 14px; }
+.pp-propose { align-self: stretch; display: flex; flex-direction: column; gap: 8px; padding: 14px; border-radius: 18px; border: 2px solid var(--violet-50); background: color-mix(in srgb, var(--violet-50) 50%, var(--card)); }
+.pp-propose b { display: flex; gap: 8px; align-items: center; font-size: 15px; }
+.pp-propose small { font-size: 12px; color: var(--muted); }
+.pp-typing { display: inline-flex; gap: 5px; padding: 14px 16px !important; inline-size: max-content; }
+.pp-typing i { inline-size: 7px; block-size: 7px; border-radius: 50%; background: var(--muted); display: block; }
+.pp-chat-foot { padding: 8px 16px 14px; display: flex; flex-direction: column; gap: 8px; border-block-start: 1px solid var(--line); background: var(--page); }
+.pp-sugs { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
+.pp-sugs button { flex: none; min-block-size: 40px; padding-inline: 14px; border-radius: 999px; border: 1px solid var(--violet-50); background: var(--card); color: var(--violet); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+.pp-chatscreen .pp-chat-form { margin: 0; display: flex; gap: 8px; align-items: center; padding: 4px; padding-inline-start: 16px; border-radius: 999px; border: 1px solid var(--line-2); background: var(--card); }
+.pp-chatscreen .pp-chat-form input { border: 0; background: none; color: var(--text); outline: none; min-block-size: 44px; padding: 0; }
+.pp-chat-sendbtn { inline-size: 44px; block-size: 44px; border-radius: 50%; border: 0; background: var(--blue); color: var(--on-strong); display: grid; place-items: center; cursor: pointer; flex: none; }
+.pp-chat-sendbtn:disabled { opacity: .5; cursor: not-allowed; }
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes pp-dots { 0%, 60%, 100% { transform: translateY(0); opacity: .45; } 30% { transform: translateY(-4px); opacity: 1; } }
+  @keyframes pp-in { from { opacity: 0; transform: translateY(6px); } }
+  .pp-typing i { animation: pp-dots 1.2s ease-in-out infinite; }
+  .pp-typing i:nth-child(2) { animation-delay: .15s; } .pp-typing i:nth-child(3) { animation-delay: .3s; }
+  .pp-chatscreen .pp-chat-msg, .pp-propose { animation: pp-in .25s ease-out both; }
+  .pp-chatscreen { animation: pp-in .2s ease-out both; }
+}
+@media (min-width: 900px) { .pp-chatscreen { inset-block: 24px; border-radius: 20px; border: 1px solid var(--line); box-shadow: 0 20px 60px -20px rgba(0,0,0,.35); overflow: hidden; } }

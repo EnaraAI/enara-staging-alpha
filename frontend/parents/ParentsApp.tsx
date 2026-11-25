@@ -80,6 +80,7 @@ const ParentsApp: React.FC<{ userName?: string; onSignOut: () => void }> = ({ on
   }, []);
   const dark = theme === 'dark' || (theme === 'auto' && systemDark);
   const [chatOpen, setChatOpen] = useState(false);
+  const closeChat = useCallback(() => setChatOpen(false), []);
   const setLang = (l: Lang) => { setLangState(l); write(LANG_KEY, l); };
   const ctx = useMemo(() => makeCtx(lang), [lang]);
   const { t, n } = ctx;
@@ -233,7 +234,7 @@ const ParentsApp: React.FC<{ userName?: string; onSignOut: () => void }> = ({ on
           )}
         </main>
         {!showLink && learner && nav}
-        {!showLink && learner && chatOpen && school.data?.sections.chat && <SchoolChat learner={learner} onClose={() => setChatOpen(false)} />}
+        {!showLink && learner && school.data?.sections.chat && <SchoolChat learner={learner} open={chatOpen} onClose={closeChat} sections={school.data.sections} />}
         {sharing && learner && <ShareSheet learner={learner} onClose={() => setSharing(false)} />}
       </div>
     </ParentsCtx.Provider>
