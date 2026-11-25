@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { cairoDate, schoolApi, type ChatReply, type LearnerChip, type SchoolSection } from '../api';
 import { AssistantStar, Icon, useP } from '../ui';
+import { ChatChart } from './ChatChart';
 
 // Parents school app, step (e): the assistant. Answers come only from what the school shares for THIS child (the server builds them
 // from the parent's own screens) and show their source and date. It never acts: a request is opened only after the parent taps confirm.
@@ -65,6 +66,7 @@ export const SchoolChat: React.FC<{ learner: LearnerChip; open: boolean; onClose
           <React.Fragment key={i}>
             <div className={`pp-chat-msg pp-chat-msg--${m.from}`} data-testid={m.from === 'enara' ? 'pp-chat-answer' : 'pp-chat-question'}>
               <p dir="auto">{m.text}</p>
+              {m.reply?.chart && <ChatChart chart={m.reply.chart} />}
               {m.reply?.sources.map((s) => <small key={s.source} className="pp-chat-src" data-testid="pp-chat-source"><Icon name="school" />{t.sch.chatFrom(label(s.source), s.updatedAt ? cairoDate(s.updatedAt.slice(0, 10), lang) : '')}</small>)}
               {m.created && <small className="pp-chat-src" role="status" data-testid="pp-chat-created"><Icon name="check" />{t.sch.chatCreated}</small>}
             </div>

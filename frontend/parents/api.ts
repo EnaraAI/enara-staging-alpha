@@ -90,7 +90,10 @@ export interface BusLive { on: boolean; trips: BusLiveTrip[] }
 type HomePoint = { lat: number; lng: number; note: string; at: string };
 /** Door to door: the child's pickup point (confirmed by the school) and a change waiting for the school. */
 export interface BusHomeView { enabled: boolean; canEdit?: boolean; home: { confirmed: HomePoint | null; pending: HomePoint | null } }
-export interface ChatReply { answer: string; lang: 'en' | 'ar'; sources: { source: string; updatedAt: string | null }[]; offerRequest: { type: RequestType; details: string } | null; engine: 'code' | 'model' }
+export type ChatChart =
+  | { kind: 'subjects'; rows: { subject: string; subjectAr: string; mark: number | null; markTitle: string | null; lessonsDone: number; lessonsTotal: number; waiting: number }[]; highlight: string | null; highlightKind: 'weakest' | 'strongest' | null }
+  | { kind: 'subject'; subject: string; subjectAr: string; points: { title: string; date: string | null; mark: number }[]; waiting: string[]; lessonsDone: number; lessonsTotal: number; outcomesMastered: number; outcomesTotal: number };
+export interface ChatReply { answer: string; lang: 'en' | 'ar'; sources: { source: string; updatedAt: string | null }[]; offerRequest: { type: RequestType; details: string } | null; engine: 'code' | 'model'; chart?: ChatChart | null }
 export type FeeStatus = 'due' | 'overdue' | 'paid' | 'waived';
 export interface FeeTotals { total: number; paid: number; waived: number; remaining: number; overdue: number }
 export interface SchoolFees { currency: string; totals: FeeTotals; next: { id: string; planName: string; number: number; amount: number; dueDate: string; status: FeeStatus } | null; plans: { name: string; academicYear: string | null; totals: FeeTotals; instalments: { id: string; number: number; amount: number; dueDate: string; status: FeeStatus; paidDate: string | null; receiptRef: string | null; hasReceipt: boolean; note: string | null }[] }[]; source: SchoolSource }

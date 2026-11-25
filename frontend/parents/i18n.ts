@@ -137,6 +137,11 @@ export const T = {
       status: { present: 'Present', absent: 'Absent', late: 'Late', excused: 'Excused' } as Record<string, string>,
       period: (p: string) => `Period ${p}`, teacher: 'Teacher', room: 'Room', group: (g: string) => `Class ${g}`, noTimetable: 'The school has not shared a timetable yet.',
       source: (label: string, when: string) => `From the school's ${label} · updated ${when}`, sourceNone: (label: string) => `From the school's ${label}`,
+      chart: {
+        subjectsTitle: 'Latest mark in each subject', subjectTitle: (s: string) => `${s}: marks over time`, passLine: (p: string) => `Pass line ${p}%`,
+        noMark: 'No mark yet', noMarksYet: 'No marks released yet.', lessons: (d: string, t: string) => `Lessons ${d} of ${t}`, outcomes: (d: string, t: string) => `Outcomes ${d} of ${t}`,
+        waiting: (k: string) => `${k} waiting for the teacher`, weakest: 'Weakest', strongest: 'Strongest',
+      },
       srcLabel: { timetable: 'timetable', attendance: 'attendance sheet', announcements: 'announcements', fees: 'fee record', buses: 'bus sheet', results: 'results' } as Record<string, string>,
       month: 'Month', prevMonth: 'Previous month', nextMonth: 'Next month', noAttendance: 'No attendance recorded this month.', counts: (p: string, a: string, l: string, e: string) => `Present ${p} · Absent ${a} · Late ${l} · Excused ${e}`,
       noAnnouncements: 'No announcements right now.', newAnnouncements: (n: string) => `${n} announcements`, until: (d: string) => `Until ${d}`, forAll: 'Whole school', forGrade: 'This grade', forGroup: 'This class', forStudent: 'Only for your child',
@@ -295,6 +300,11 @@ export const T = {
       status: { present: 'حاضر', absent: 'غائب', late: 'متأخر', excused: 'غياب بعذر' } as Record<string, string>,
       period: (p: string) => `الحصة ${p}`, teacher: 'المعلم', room: 'القاعة', group: (g: string) => `الفصل ${g}`, noTimetable: 'لم تشارك المدرسة الجدول بعد.',
       source: (label: string, when: string) => `من ${label} المدرسة · آخر تحديث ${when}`, sourceNone: (label: string) => `من ${label} المدرسة`,
+      chart: {
+        subjectsTitle: 'آخر درجة في كل مادة', subjectTitle: (s: string) => `${s}: الدرجات مع الوقت`, passLine: (p: string) => `خط النجاح ${p}%`,
+        noMark: 'لا درجة بعد', noMarksYet: 'لا درجات منشورة بعد.', lessons: (d: string, t: string) => `الدروس ${d} من ${t}`, outcomes: (d: string, t: string) => `النواتج ${d} من ${t}`,
+        waiting: (k: string) => `${k} بانتظار المعلم`, weakest: 'الأضعف', strongest: 'الأقوى',
+      },
       srcLabel: { timetable: 'جدول', attendance: 'كشف حضور', announcements: 'إعلانات', fees: 'سجل رسوم', buses: 'كشف حافلات', results: 'النتائج' } as Record<string, string>,
       month: 'الشهر', prevMonth: 'الشهر السابق', nextMonth: 'الشهر التالي', noAttendance: 'لا يوجد حضور مسجَّل هذا الشهر.', counts: (p: string, a: string, l: string, e: string) => `حاضر ${p} · غائب ${a} · متأخر ${l} · بعذر ${e}`,
       noAnnouncements: 'لا توجد إعلانات الآن.', newAnnouncements: (n: string) => `${n} إعلانات`, until: (d: string) => `حتى ${d}`, forAll: 'كل المدرسة', forGrade: 'هذا الصف', forGroup: 'هذا الفصل', forStudent: 'لطفلك فقط',
