@@ -19,16 +19,18 @@ import { School, type SchoolView } from './screens/School';
 import { SchoolChat } from './screens/SchoolChat';
 import { Messages } from './screens/Messages';
 import { Actions, actionsCount } from './screens/Actions';
+import { SchoolIndex } from './screens/SchoolIndex';
 
 // ENARA Parents Portal: a parent mode inside the ENARA app, under /parents.
 // Mobile-first; English and Arabic with full RTL; week starts Saturday;
 // times in Africa/Cairo; live data on every visit, focus and pull-to-refresh.
 
-// Redesign step 1: four tabs (Today, Progress, Messages, Actions). Account sits behind the avatar. The other screens keep their
-// addresses (old links still open them) but are reached from inside the four tabs.
-const NAV = ['home', 'progress', 'messages', 'actions'] as const;
-const TABS = ['home', 'progress', 'messages', 'actions', 'activity', 'controls', 'account', 'school'] as const;
-const NAV_ICON: Record<(typeof NAV)[number], string> = { home: 'today', progress: 'rings', messages: 'messages', actions: 'actions' };
+// Design A ("Calm", owner "go" 25 Nov 2026): five tabs on a phone (Home, Learning, School, Messages, More), a left sidebar on a
+// computer (logo, the children, the same sections). Every older address still opens its screen (/parents/progress is Learning,
+// /parents/actions is the to-do list, now under More).
+const NAV = ['home', 'progress', 'school', 'messages', 'more'] as const;
+const TABS = ['home', 'progress', 'messages', 'actions', 'activity', 'controls', 'account', 'school', 'more'] as const;
+const NAV_ICON: Record<(typeof NAV)[number], string> = { home: 'home', progress: 'learning', school: 'school', messages: 'messages', more: 'more' };
 const THEME_KEY = 'enara_parents_theme';
 export type Theme = 'light' | 'dark' | 'auto';
 type Tab = (typeof TABS)[number] | 'link';
@@ -128,15 +130,23 @@ const ParentsApp: React.FC<{ userName?: string; onSignOut: () => void }> = ({ on
   const school = useLive(() => (learner ? schoolApi.overview(learner.studentId).catch(() => null) : Promise.resolve(null)), [learner?.studentId], refreshKey);
   const schoolOn = !!school.data && Object.values(school.data.sections).some(Boolean);
   const unread = school.data?.unreadNotifications ?? 0;
-  const [schoolView, setSchoolView] = useState<SchoolView>('today');
+  // The School tab opens on its own index (one row per section); a row opens that section. Sections opened from elsewhere (Home,
+  // Messages, the to-do list) go back where they came from.
+  const [schoolView, setSchoolView] = useState<SchoolView | 'index'>('index');
+  const [schoolFrom, setSchoolFrom] = useState<Tab>('school');
   const on = school.data?.sections;
   const messagesOn = !!(on?.chat || on?.notifications || on?.announcements);
   const actionsOn = !!(on?.consents || on?.fees || on?.requests);
-  const tabs = NAV.filter((k) => (k === 'messages' ? messagesOn : k === 'actions' ? actionsOn : true));
+  const tabs = NAV.filter((k) => (k === 'messages' ? messagesOn : k === 'school' ? schoolOn : true));
   const toDo = actionsCount(school.data);
   // Where a School detail screen belongs now: its tab is highlighted while it is open.
-  const navTab = tab === 'school' ? (['notifications', 'announcements'].includes(schoolView) ? 'messages' : ['fees', 'consents', 'requests'].includes(schoolView) ? 'actions' : 'home') : tab === 'activity' ? 'home' : tab === 'controls' ? 'account' : tab;
-  const openSchool = (v: SchoolView) => { setSchoolView(v); go('school'); };
+  const navOf = (x: Tab): Tab => (x === 'activity' ? 'progress' : x === 'controls' || x === 'account' || x === 'actions' || x === 'link' ? 'more' : x);
+  const navTab = tab === 'school' ? navOf(schoolFrom) : navOf(tab);
+  const openSchool = (v: SchoolView) => { setSchoolFrom(tab === 'school' ? 'school' : navOf(tab)); setSchoolView(v); go('school'); };
+  const openSchoolTab = () => { setSchoolFrom('school'); setSchoolView('index'); go('school'); };
+  const schoolBack = () => { if (schoolFrom === 'school') setSchoolView('index'); else go(schoolFrom); };
+  const dateLine = new Intl.DateTimeFormat(lang === 'ar' ? 'ar-EG' : 'en-GB', { timeZone: 'Africa/Cairo', weekday: 'long', day: 'numeric', month: 'long' }).format(new Date());
+  const parentName = (account.data?.guardians.byLearner.flatMap((g) => g.items).find((x) => x.isYou)?.name ?? '').split(' ')[0];
   const hour = Number(new Intl.DateTimeFormat('en-GB', { timeZone: 'Africa/Cairo', hour: '2-digit', hour12: false }).format(new Date())) % 24;
   const [screenFetched, setScreenFetched] = useState<{ at: Date | null; loading: boolean }>({ at: null, loading: false });
   const onFetched = useCallback((at: Date | null, loading: boolean) => setScreenFetched({ at, loading }), []);
@@ -169,9 +179,9 @@ const ParentsApp: React.FC<{ userName?: string; onSignOut: () => void }> = ({ on
   const nav = (
     <nav className="pp-nav" aria-label={t.main}>
       {tabs.map((k) => {
-        const badge = k === 'messages' ? unread : k === 'actions' ? toDo : 0;
+        const badge = k === 'messages' ? unread : k === 'more' ? toDo : 0;
         return (
-          <button type="button" key={k} className="pp-navlink" aria-current={navTab === k ? 'page' : undefined} onClick={() => go(k)} data-testid={`pp-nav-${k}`} aria-label={badge ? `${t.tabs[k]} (${n(badge)})` : undefined}>
+          <button type="button" key={k} className="pp-navlink" aria-current={navTab === k ? 'page' : undefined} onClick={() => (k === 'school' ? openSchoolTab() : go(k))} data-testid={`pp-nav-${k}`} aria-label={badge ? `${t.tabs[k]} (${n(badge)})` : undefined}>
             <span className="pp-navpill"><Icon name={NAV_ICON[k]} />{badge > 0 && <span className="pp-badge" aria-hidden="true">{n(badge > 99 ? '99+' : badge)}</span>}</span>{t.tabs[k]}
           </button>
         );
@@ -183,11 +193,11 @@ const ParentsApp: React.FC<{ userName?: string; onSignOut: () => void }> = ({ on
     <ParentsCtx.Provider value={ctx}>
       <div className="pp" dir={dir} lang={lang} data-theme={dark ? 'dark' : 'light'} onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={onTouchEnd}>
         <header className="pp-header">
-          <div className="pp-hello"><GlowLogo product="Parents" size={30} className="pp-logo" /><b>{t.ui.hello(hour)}</b></div>
+          <GlowLogo product="Parents" size={30} className="pp-logo" />
           <div className="pp-head-actions">
             <button type="button" className="pp-langbtn" onClick={() => setLang(lang === 'en' ? 'ar' : 'en')} lang={lang === 'en' ? 'ar' : 'en'} aria-label={`${t.language}: ${lang === 'en' ? 'العربية' : 'English'}`}>{lang === 'en' ? 'ع' : 'EN'}</button>
             {!showLink && learner && (
-              <button type="button" className="pp-acct" aria-label={t.ui.account} aria-current={navTab === 'account' ? 'page' : undefined} onClick={() => go('account')} data-testid="pp-account"><Icon name="account" /></button>
+              <button type="button" className="pp-acct" aria-label={t.ui.account} aria-current={tab === 'account' ? 'page' : undefined} onClick={() => go('account')} data-testid="pp-account"><Icon name="account" /></button>
             )}
             {(showLink || !learner) && <button type="button" className="pp-iconbtn" aria-label={t.signOut} onClick={onSignOut}><Icon name="out" flip /></button>}
           </div>
@@ -195,6 +205,7 @@ const ParentsApp: React.FC<{ userName?: string; onSignOut: () => void }> = ({ on
 
         {list.length > 0 && !showLink && (
           <nav className="pp-switcher" aria-label={t.chooseLearner}>
+            <span className="pp-switcher-h" aria-hidden="true">{t.ui.children}</span>
             {list.map((l, i) => (
               <button type="button" key={l.studentId} className="pp-chip" aria-current={learner?.studentId === l.studentId ? 'true' : undefined} onClick={() => setSelectedId(l.studentId)}>
                 <Avatar initial={l.initial} index={i} />
@@ -218,20 +229,30 @@ const ParentsApp: React.FC<{ userName?: string; onSignOut: () => void }> = ({ on
           {showEmailPrompt && tab === 'home' && !showLink && learners.data && (
             <AddEmail mode="prompt" suggested={signIn?.suggestedEmail} onDone={refresh} onDismiss={() => { setEmailPromptDismissed(true); write(EMAIL_PROMPT_KEY, '1', 'session'); }} />
           )}
+          {!showLink && learner && tab === 'home' && (
+            <div className="pp-greet" data-testid="pp-greet">
+              <div className="pp-greet-tx">
+                <span className="pp-meta">{dateLine}{learner.school ? ` · ${learner.school}` : ''}</span>
+                <h1 className="pp-greet-h">{t.ui.hello(hour)}{parentName ? `, ${parentName}` : ''}</h1>
+              </div>
+              {school.data?.sections.chat && <button type="button" className="pp-btn pp-btn--ghost pp-greet-ask" onClick={() => setChatOpen(true)}><Icon name="messages" />{t.ui.askAssistant}</button>}
+            </div>
+          )}
           {!showLink && learner && (
             <>
               {tab === 'messages' && <Messages learner={learner} overview={school.data ?? null} openChat={() => setChatOpen(true)} openSchool={openSchool} />}
-              {tab === 'actions' && <Actions learner={learner} overview={school.data ?? null} refreshKey={refreshKey} openSchool={openSchool} />}
+              {(tab === 'actions' || (tab === 'more' && actionsOn)) && <Actions learner={learner} overview={school.data ?? null} refreshKey={refreshKey} openSchool={openSchool} />}
               {(tab === 'home' || tab === 'progress' || tab === 'activity') && <SubjectChips subjects={subjectList} value={subjectKey} onChange={setSubject} />}
               {status.data && (tab === 'activity' || ((tab === 'home' || tab === 'progress') && subjectKey !== ALL)) && <StatusLine status={status.data} />}
               <Updated at={fetched} loading={status.loading || screenFetched.loading} onRefresh={refresh} />
-              {tab === 'school' && school.data && schoolOn && <School learner={learner} refreshKey={refreshKey} overview={school.data} view={schoolView} setView={setSchoolView} onRead={school.reload} nameOf={(id) => list.find((l) => l.studentId === id)?.firstName ?? ''} onBack={() => go(navTab as Tab)} backLabel={t.tabs[navTab as 'home']} />}
+              {tab === 'school' && school.data && schoolOn && schoolView === 'index' && <SchoolIndex learner={learner} overview={school.data} open={openSchool} />}
+              {tab === 'school' && school.data && schoolOn && schoolView !== 'index' && <School learner={learner} refreshKey={refreshKey} overview={school.data} view={schoolView} setView={setSchoolView} onRead={school.reload} nameOf={(id) => list.find((l) => l.studentId === id)?.firstName ?? ''} onBack={schoolBack} backLabel={t.tabs[schoolFrom as 'home'] ?? t.tabs.school} />}
               {tab === 'school' && !schoolOn && (school.data || school.error || !school.loading) && <p className="pp-notice">{t.sch.off}</p>}
               {tab === 'home' && <Home learner={learner} refreshKey={refreshKey} go={(k) => go(k as Tab)} onShare={() => setSharing(true)} onFetched={onFetched} subjectKey={subjectKey} overview={subjectList} onPickSubject={(k) => { setSubject(k); window.scrollTo({ top: 0 }); }} school={schoolOn ? school.data : null} openSchool={openSchool} />}
               {tab === 'progress' && <Progress learner={learner} refreshKey={refreshKey} onFetched={onFetched} subjectKey={subjectKey} english={!!chosen?.english} status={status.data} subjects={subjectList} onPickSubject={(k) => { setSubject(k); window.scrollTo({ top: 0 }); }} onShare={() => setSharing(true)} />}
               {tab === 'activity' && <Activity learner={learner} refreshKey={refreshKey} onFetched={onFetched} subjectKey={subjectKey} />}
               {tab === 'controls' && <Controls learner={learner} refreshKey={refreshKey} />}
-              {tab === 'account' && <Account schoolOn={schoolOn && !!school.data?.sections.notifications} feesOn={!!school.data?.sections.fees} busOn={!!school.data?.sections.buses} requestsOn={!!(school.data?.sections.requests || school.data?.sections.consents)} refreshKey={refreshKey} setLang={setLang} theme={theme} setTheme={setTheme} onControls={() => go('controls')} onLink={() => go('link')} onPick={(id) => { setSelectedId(id); go('home'); }} onChanged={refresh} onSignOut={onSignOut} />}
+              {(tab === 'account' || tab === 'more') && <Account schoolOn={schoolOn && !!school.data?.sections.notifications} feesOn={!!school.data?.sections.fees} busOn={!!school.data?.sections.buses} requestsOn={!!(school.data?.sections.requests || school.data?.sections.consents)} refreshKey={refreshKey} setLang={setLang} theme={theme} setTheme={setTheme} onControls={() => go('controls')} onLink={() => go('link')} onPick={(id) => { setSelectedId(id); go('home'); }} onChanged={refresh} onSignOut={onSignOut} />}
             </>
           )}
         </main>

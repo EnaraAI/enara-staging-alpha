@@ -33,6 +33,7 @@ test.describe.serial('35 · Parents school app (c2): bus screens', () => {
     await page.getByRole('button', { name: 'Continue' }).click();
     await page.getByRole('button', { name: 'Yes, open ENARA Parents' }).click();
     await expect(page.locator('.pp-switcher .pp-chip:not(.pp-chip--add)')).toHaveCount(1, { timeout: 30_000 });
+    await page.getByTestId('pp-nav-school').click({ timeout: 30_000 }); // design A: the school sections live in the School tab
     await expect(page.getByTestId('pp-school-home-bus')).toContainText('06:55', { timeout: 30_000 });
 
     await page.getByTestId('pp-school-home-bus').click();
@@ -57,7 +58,7 @@ test.describe.serial('35 · Parents school app (c2): bus screens', () => {
     await staff.context.close();
 
     await page.reload();
-    await page.getByTestId('pp-nav-home').click(); await page.getByTestId('pp-school-home').getByRole('button').first().click(); // redesign: School opens from Today
+    await page.getByTestId('pp-nav-school').click(); await page.getByTestId('pp-school-home').getByRole('button').first().click(); // design A: the School tab lists the sections
     await page.getByTestId('pp-school-buses').click();
     await expect(page.getByTestId('pp-bus-morning').getByTestId('pp-bus-notice')).toContainText('About 25 minutes late');
     await expect(page.getByTestId('pp-bus-afternoon').getByTestId('pp-bus-notice')).toHaveCount(0);

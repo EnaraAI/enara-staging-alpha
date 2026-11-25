@@ -43,6 +43,7 @@ test.describe.serial('43 · Door to door: home pickup point, school confirms, su
     await page.locator('#si-code').fill((await enaraApi.post(`/api/students/${student.id}/parent-codes`, admin, {})).code);
     await page.getByRole('button', { name: 'Continue' }).click();
     await page.getByRole('button', { name: 'Yes, open ENARA Parents' }).click();
+    await page.getByTestId('pp-nav-school').click({ timeout: 45_000 }); // design A: the school sections live in the School tab
     await page.getByTestId('pp-school-home-bus').click({ timeout: 45_000 });
     const pickup = page.getByTestId('pp-pickup');
     await expect(pickup).toBeVisible({ timeout: 30_000 });

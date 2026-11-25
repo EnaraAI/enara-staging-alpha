@@ -608,3 +608,118 @@
 
 /* Glow logo (ENARA Parents) above the greeting. */
 .pp-hello .pp-logo { color: var(--text); margin-block-end: 6px; }
+
+/* ==== Design A ("Calm", owner "go" 25 Nov 2026) ====
+   White, one teal accent, amber only for what needs the parent, lists before charts, thin borders.
+   Phone: five bottom tabs. Computer (from 1024px): a left sidebar with the logo, the children and the sections. */
+.pp {
+  --navy: #111827; --blue: #0F766E; --blue-50: #F0FDFA; --blue-200: #99F6E4;
+  --sky: #0F766E; --sky-50: #F0FDFA; --sky-200: #CCFBF1;
+  --emerald: #047857; --emerald-50: #ECFDF5;
+  --warn: #92400E; --warn-dot: #F59E0B; --warn-50: #FFFBEB; --warn-200: #FDE68A;
+  --bad: #B91C1C; --bad-50: #FEF2F2; --bad-200: #FECACA;
+  --text: #111827; --text-2: #374151; --muted: #6B7280; --line: #E5E7EB; --line-2: #D1D5DB; --track: #F3F4F6; --page: #FFFFFF; --card: #FFFFFF;
+  --brand-100: #CCFBF1; --brand-700: #0F766E; --sun-100: #FEF3C7; --sun-ink: #78350F; --row-line: #F3F4F6;
+  --shadow-1: none; --shadow-nav: none; --r-card: 16px;
+  --teal: #0F766E; --teal-ink: #115E59;
+}
+.pp[data-theme="dark"] {
+  --navy: #F3F4F6; --blue: #2DD4BF; --blue-50: #0F2A28; --blue-200: #134E4A;
+  --sky: #5EEAD4; --sky-50: #0F2A28; --sky-200: #134E4A;
+  --emerald: #34D399; --emerald-50: #052E22;
+  --warn: #FCD34D; --warn-dot: #F59E0B; --warn-50: #2A2110; --warn-200: #4A3A16;
+  --bad: #FCA5A5; --bad-50: #2A1414; --bad-200: #4A2020;
+  --text: #F3F4F6; --text-2: #D1D5DB; --muted: #9CA3AF; --line: #1F2937; --line-2: #374151; --track: #111827; --page: #0B0F14; --card: #111827;
+  --brand-100: #134E4A; --brand-700: #5EEAD4; --sun-100: #2A2110; --sun-ink: #FCD34D; --row-line: #1F2937;
+  --teal: #2DD4BF; --teal-ink: #5EEAD4;
+}
+.pp-card { box-shadow: none; }
+.pp a:hover { color: var(--teal-ink); }
+.pp-btn--primary { background: var(--teal); border-color: var(--teal); color: #fff; }
+.pp[data-theme="dark"] .pp-btn--primary { color: #04201D; }
+.pp-chip[aria-current="true"] { border: 1px solid var(--teal); background: var(--teal); color: #fff; }
+.pp[data-theme="dark"] .pp-chip[aria-current="true"] { color: #04201D; }
+.pp-chip--add { color: var(--teal); }
+.pp-subject-chip[aria-current="true"] { border: 1px solid var(--teal); background: var(--blue-50); color: var(--teal-ink); }
+.pp-header { padding-block: 14px 6px; }
+.pp-logo { color: var(--text); }
+.pp-switcher-h { display: none; }
+
+/* Greeting on Home */
+.pp-greet { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding-block: 4px 2px; }
+.pp-greet-tx { display: flex; flex-direction: column; gap: 2px; min-inline-size: 0; }
+.pp-greet-h { font-size: 26px; font-weight: 700; letter-spacing: -.02em; line-height: 1.2; color: var(--text); }
+.pp[lang="ar"] .pp-greet-h { letter-spacing: 0; }
+.pp-greet-ask { display: inline-flex; align-items: center; gap: 8px; min-block-size: 44px; padding-inline: 14px; border: 1px solid var(--line); border-radius: 9999px; background: var(--card); color: var(--teal-ink); font-weight: 600; font-size: 14px; cursor: pointer; }
+.pp-greet-ask:hover { border-color: var(--teal); }
+
+/* Bottom tabs (phone): five, teal when current */
+.pp-nav { border-block-start: 1px solid var(--line); padding-block: 4px 12px; padding-inline: 2px; }
+.pp-navlink { font-size: 11.5px; color: var(--muted); }
+.pp-navpill { inline-size: 48px; block-size: 30px; }
+.pp-navlink[aria-current="page"] { color: var(--teal); }
+.pp-navlink[aria-current="page"] .pp-navpill { background: var(--brand-100); color: var(--teal-ink); }
+.pp[data-theme="dark"] .pp-navlink[aria-current="page"] .pp-navpill { color: var(--teal-ink); }
+
+/* School tab index */
+.pp-schoolindex { display: flex; flex-direction: column; gap: 12px; }
+.pp-schoolindex .pp-sgrid { grid-template-columns: minmax(0, 1fr); gap: 0; border: 1px solid var(--line); border-radius: var(--r-card); overflow: hidden; }
+.pp-schoolindex .pp-stile { border: 0; border-radius: 0; border-block-end: 1px solid var(--row-line); background: var(--card); }
+.pp-schoolindex .pp-stile:last-child { border-block-end: 0; }
+
+/* Computer: the left sidebar (logo, children, sections), content on the right */
+@media (min-width: 1024px) {
+  .pp {
+    max-inline-size: none; margin: 0; padding: 0; column-gap: 0;
+    grid-template-columns: 264px minmax(0, 1fr);
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas: "head main" "switch main" "nav main";
+    background: var(--page);
+  }
+  .pp-header, .pp-switcher, .pp-nav { background: var(--track); border-inline-end: 1px solid var(--line); }
+  .pp[data-theme="dark"] .pp-header, .pp[data-theme="dark"] .pp-switcher, .pp[data-theme="dark"] .pp-nav { background: #0D1117; }
+  .pp-header { margin: 0; padding-block: 22px 14px; padding-inline: 20px 12px; border-block-end: 0; }
+  .pp-switcher { flex-direction: column; gap: 4px; padding-block: 8px; padding-inline: 12px; overflow: visible; }
+  .pp-switcher-h { display: block; font-size: 12px; font-weight: 600; color: var(--muted); padding-inline: 8px; padding-block-end: 4px; text-transform: uppercase; letter-spacing: .05em; }
+  .pp[lang="ar"] .pp-switcher-h { text-transform: none; letter-spacing: 0; }
+  .pp-chip { border: 0; background: transparent; border-radius: 12px; padding-inline: 8px; inline-size: 100%; }
+  .pp-chip:hover { background: var(--card); }
+  .pp-chip[aria-current="true"] { background: var(--card); color: var(--text); border: 1px solid var(--line); }
+  .pp-chip[aria-current="true"] .pp-chip-name small { opacity: 1; color: var(--muted); }
+  .pp-chip--add { justify-content: flex-start; border: 1px dashed var(--line-2); }
+  .pp-nav {
+    position: sticky; inset-block-start: 0; align-self: stretch; block-size: auto; min-block-size: calc(100dvh - 180px);
+    flex-direction: column; gap: 2px; padding-block: 12px 24px; padding-inline: 12px; border: 0; border-inline-end: 1px solid var(--line); border-radius: 0; border-block-start: 1px solid var(--line);
+  }
+  .pp-navlink { flex: none; flex-direction: row; justify-content: flex-start; gap: 12px; min-block-size: 44px; padding-inline: 10px; font-size: 15px; border-radius: 10px; color: var(--text-2); }
+  .pp-navlink:hover { background: var(--card); }
+  .pp-navlink[aria-current="page"] { background: var(--card); color: var(--teal); box-shadow: inset 3px 0 0 var(--teal); }
+  .pp[dir="rtl"] .pp-navlink[aria-current="page"] { box-shadow: inset -3px 0 0 var(--teal); }
+  .pp-navpill { inline-size: 24px; block-size: 24px; }
+  .pp-navlink[aria-current="page"] .pp-navpill, .pp[data-theme="dark"] .pp-navlink[aria-current="page"] .pp-navpill { background: none; color: inherit; }
+  .pp-navpill .pp-badge { inset-block-start: -6px; inset-inline-end: -10px; }
+  .pp-main { grid-area: main; max-inline-size: 1120px; inline-size: 100%; margin-inline: auto; padding-block: 28px 48px; padding-inline: 40px; }
+  .pp-greet-h { font-size: 30px; }
+}
+/* Design A: the week's practice is a calm white card (no navy gradient); the avatar button is light. */
+.pp-hero, .pp[data-theme="dark"] .pp-hero { background: var(--card); color: var(--text); border: 1px solid var(--line); box-shadow: none; border-radius: var(--r-card); }
+.pp-hero-art { display: none; }
+.pp-hero-eyebrow { color: var(--muted); opacity: 1; }
+.pp-hero p, .pp-hr-tx small, .pp-hday { opacity: 1; color: var(--muted); }
+.pp-hero-status { background: var(--blue-50); color: var(--teal-ink); }
+.pp-hr-ring svg circle:first-child { stroke: var(--track); }
+.pp-hday-dot { background: var(--track); }
+.pp-hday--today .pp-hday-dot { border-color: var(--teal); }
+.pp-hday--today { color: var(--teal-ink); }
+.pp-acct, .pp[data-theme="dark"] .pp-acct { background: var(--blue-50); color: var(--teal-ink); }
+.pp-acct::after { border-color: transparent; }
+.pp-acct[aria-current="page"]::after { border-color: var(--teal); }
+.pp-today2 { grid-template-columns: minmax(0, 1fr) 340px; }
+/* School tab index: each section is one list row (icon, name, what's new) with a chevron feel. */
+.pp-schoolindex .pp-sec-h { display: none; }
+.pp-schoolindex .pp-stile { flex-direction: row; align-items: center; min-block-size: 64px; padding-block: 12px; padding-inline: 16px; gap: 14px; }
+.pp-schoolindex .pp-stile:hover { background: var(--blue-50); }
+.pp-schoolindex .pp-stile-tx { flex: 1; }
+/* Design A: the selected section chip inside a school page is teal, like the rest of the app. */
+.pp-seg:not(.pp-seg--two) button[aria-pressed="true"] { background: var(--teal); border-color: var(--teal); color: #fff; }
+.pp[data-theme="dark"] .pp-seg:not(.pp-seg--two) button[aria-pressed="true"] { color: #04201D; }

@@ -78,6 +78,23 @@ test.describe.serial('10 · Parents P1: code-first entry, two children in two sc
     await expect(chips(page)).toHaveCount(1, { timeout: 30_000 });
     await expect(chips(page).first()).toContainText(state.firstA!);
     await expect(page.locator('.pp-header').getByRole('img', { name: 'Enara Parents' })).toBeVisible();
+    // Design A: bottom tabs on a phone (Home, Learning, More always; School and Messages when the school has them on) ...
+    for (const [k, label] of [['home', 'Home'], ['progress', 'Learning'], ['more', 'More']]) await expect(page.getByTestId(`pp-nav-${k}`)).toContainText(label);
+    await expect(page.getByTestId('pp-greet')).toContainText(/Good (morning|afternoon|evening)/);
+    expect(await page.locator('.pp-nav').evaluate((el) => getComputedStyle(el).flexDirection)).toBe('row');
+    // ... and a left sidebar (logo, children, sections) on a computer.
+    const phoneSize = page.viewportSize();
+    await page.setViewportSize({ width: 1366, height: 860 });
+    expect(await page.locator('.pp-nav').evaluate((el) => getComputedStyle(el).flexDirection)).toBe('column');
+    await expect(page.locator('.pp-switcher-h')).toBeVisible();
+    const navBox = await page.locator('.pp-nav').boundingBox(); const mainBox = await page.locator('#pp-main').boundingBox();
+    expect(navBox!.x + navBox!.width).toBeLessThanOrEqual(mainBox!.x + 1);
+    await shot(page, '10-parents-design-a-desktop');
+    if (phoneSize) await page.setViewportSize(phoneSize);
+    await page.getByTestId('pp-nav-more').click();
+    await expect(page).toHaveURL(/\/parents\/more$/);
+    await expect(page.getByRole('button', { name: 'Sign out' }).first()).toBeVisible();
+    await page.getByTestId('pp-nav-home').click();
     expect(page.url()).toBe(`${ENARA}/parents`);
     const device = await page.evaluate(() => localStorage.getItem('enara_parent_device'));
     expect(device).toMatch(/^pds_/);
