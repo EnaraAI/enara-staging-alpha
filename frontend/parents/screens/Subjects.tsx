@@ -55,6 +55,76 @@ const LevelLine: React.FC<{ s: Pick<SubjectCard, 'english' | 'cefr' | 'outcomes'
   );
 };
 
+/** A small ring with a label in the middle (subject rows, the subject header). */
+export const MiniRing: React.FC<{ pct: number | null; label: string; size?: number; color?: string }> = ({ pct, label, size = 56, color = 'var(--blue)' }) => {
+  const r = 22, c = 2 * Math.PI * r;
+  return (
+    <span className="pp-mring" style={{ inlineSize: size, blockSize: size }} aria-hidden="true">
+      <svg viewBox="0 0 54 54"><circle cx="27" cy="27" r={r} fill="none" stroke="var(--track)" strokeWidth="5" />{pct !== null && <circle className="pp-ringfill" cx="27" cy="27" r={r} fill="none" stroke={color} strokeWidth="5" strokeLinecap="round" strokeDasharray={`${(Math.max(0, Math.min(100, pct)) / 100) * c} ${c}`} transform="rotate(-90 27 27)" />}</svg>
+      <b style={{ fontSize: size > 70 ? 22 : 14 }}>{label}</b>
+    </span>
+  );
+};
+
+const SUBJECT_COLORS = ['#2B5CE6', '#E07A1F', '#14946F', '#B23C77', '#6D4AFF', '#0E7490'];
+export const subjectColor = (i: number) => SUBJECT_COLORS[i % SUBJECT_COLORS.length];
+
+/** Redesign step 3: the subject rows on Progress. Each opens the subject's page. */
+export const SubjectRows: React.FC<{ subjects: SubjectCard[]; onPick: (key: string) => void }> = ({ subjects, onPick }) => {
+  const { t, n, lang } = useP();
+  if (!subjects.length) return null;
+  return (
+    <>
+      <div className="pp-sec-h"><h2>{t.ui.subjectsTitle}</h2></div>
+      <section className="pp-card pp-card--flush pp-threads" aria-label={t.ui.subjectsTitle}>
+        {subjects.map((s, i) => {
+          const pct = s.english && s.cefr ? s.cefr.subLevelPct : s.latestResult ? s.latestResult.score : s.outcomes.total ? Math.round((s.outcomes.mastered / s.outcomes.total) * 100) : null;
+          const label = s.english && s.cefr ? s.cefr.cefr : s.latestResult ? `${n(s.latestResult.score)}%` : s.outcomes.total ? `${n(pct ?? 0)}%` : '–';
+          const sub = s.english && s.cefr ? (levelNextLine({ t, n, lang }, s.cefr) ?? bi(s.cefr.label, lang)) : s.latestResult ? s.latestResult.title : s.outcomes.total ? t.ui.outcomesShort(n(s.outcomes.mastered), n(s.outcomes.total)) : t.lessonsOf(n(s.lessons.done), n(s.lessons.total));
+          return (
+            <button type="button" key={s.key} className="pp-thread" onClick={() => onPick(s.key)} data-testid="pp-progress-subject" data-subject={s.key}>
+              <MiniRing pct={pct} label={label} color={subjectColor(i)} />
+              <span className="pp-thread-body"><span className="pp-thread-name">{bi(s.name, lang)}</span><span className="pp-thread-sub" dir="auto">{sub}</span></span>
+              {s.pointsCount > 0 ? <span className="pp-tag pp-tag--warn">{t.ui.toPractise(n(s.pointsCount))}</span> : <span className="pp-tag pp-tag--plain">{t.ui.nothingNew}</span>}
+              <Icon name="chevron" flip style={{ color: 'var(--muted)' }} />
+            </button>
+          );
+        })}
+      </section>
+    </>
+  );
+};
+
+/** One result: a score tile (or a dashed waiting tile with the three steps), title, date and passed / keep practising.
+ * Parents P3: a result the teacher has not released shows no score, only "Waiting for the teacher". */
+export const ResultRow: React.FC<{ a: { id: string; title: string; score: number | null; submittedAt: string | null; passed: boolean | null; waiting?: boolean; verified?: boolean }; extra?: string }> = ({ a, extra }) => {
+  const { t, n, lang } = useP();
+  const tone = a.waiting ? 'wait' : a.passed === false ? 'warn' : a.score !== null && a.score < 50 ? 'warn' : 'ok';
+  return (
+    <div className={`pp-res${a.waiting ? ' pp-res--waiting' : ''}`} data-testid="pp-result">
+      <div className="pp-res-main">
+        <span className={`pp-score pp-score--${tone}`} aria-hidden={a.waiting ? 'true' : undefined}>{a.waiting ? <Icon name="nudge" /> : a.score !== null ? `${n(a.score)}%` : '–'}</span>
+        <div className="pp-res-tx">
+          <p dir="auto">{a.title}</p>
+          <span className="pp-sub">{a.submittedAt ? cairoDate(a.submittedAt.slice(0, 10), lang) : ''}{!a.waiting && a.score !== null ? ` · ${n(a.score)}%` : ''}{extra ? ` · ${extra}` : ''}</span>
+        </div>
+        {a.waiting && <span className="pp-tag pp-tag--wait" data-testid="pp-result-waiting">{t.waitingForTeacher}</span>}
+        {a.passed !== null && a.verified !== false && (a.passed ? <span className="pp-tag pp-tag--ok"><Icon name="check" style={{ inlineSize: 14, blockSize: 14 }} />{t.passed}</span> : <span className="pp-tag pp-tag--warn">{t.notPassed}</span>)}
+      </div>
+      {a.waiting && (
+        <ol className="pp-steps" aria-label={t.waitingForTeacher}>
+          <li className="pp-step--done"><i><Icon name="check" /></i>{t.ui.stepHanded}</li>
+          <li className="pp-step--cur" aria-current="step"><i /> {t.ui.stepMarking}</li>
+          <li><i />{t.ui.stepReleased}</li>
+        </ol>
+      )}
+    </div>
+  );
+};
+
+/** Waiting results first (they are what a parent is looking for), then newest first as the server sends them. */
+export const waitingFirst = <T extends { waiting?: boolean }>(items: T[]): T[] => [...items.filter((x) => x.waiting), ...items.filter((x) => !x.waiting)];
+
 /** "All subjects": one small card per subject with its progress, latest released result, points to practise and top suggestion. */
 export const SubjectsOverview: React.FC<{ subjects: SubjectCard[]; onPick: (key: string) => void }> = ({ subjects, onPick }) => {
   const { t, n, lang } = useP();
@@ -98,11 +168,17 @@ export const SubjectView: React.FC<{ learner: LearnerChip; subjectKey: string; m
   const s = q.data.subject;
   const pct = s.lessons.total ? Math.round((s.lessons.done / s.lessons.total) * 100) : 0;
 
+  const headPct = s.english && s.cefr ? s.cefr.subLevelPct : s.outcomes.total ? Math.round((s.outcomes.mastered / s.outcomes.total) * 100) : s.lessons.total ? pct : null;
   const level = (
-    <section className="pp-card" aria-labelledby="pp-sub-level">
+    <section className="pp-card pp-shead" aria-labelledby="pp-sub-level">
+      <div className="pp-shead-top">
+        <MiniRing size={92} pct={headPct} label={s.english && s.cefr ? s.cefr.cefr : headPct !== null ? `${n(headPct)}%` : '–'} />
+        <div style={{ minInlineSize: 0 }}>
       <p className="pp-eyebrow" id="pp-sub-level">{t.subjectLevel}</p>
       <LevelLine s={s} />
       {s.english && s.cefr && levelNextLine(ctx, s.cefr) && <p className="pp-sub">{levelNextLine(ctx, s.cefr)}</p>}
+        </div>
+      </div>
       {s.lessons.total > 0 && (
         <>
           <div className="pp-bar" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct} aria-label={t.lessonsOf(n(s.lessons.done), n(s.lessons.total))}><i style={{ inlineSize: `${pct}%` }} /></div>
@@ -116,16 +192,7 @@ export const SubjectView: React.FC<{ learner: LearnerChip; subjectKey: string; m
     <section className="pp-card" aria-labelledby="pp-sub-results">
       <h2 className="pp-h2" id="pp-sub-results">{t.assessments}</h2>
       {s.results.length === 0 && <p className="pp-sub">{t.noAssessments}</p>}
-      {s.results.map((a) => (
-        <div className="pp-row" key={a.id} data-testid="pp-result">
-          <div style={{ flexGrow: 1, minInlineSize: 0 }}>
-            <p style={{ fontSize: 14, fontWeight: 600, lineHeight: '20px' }} dir="auto">{a.title}</p>
-            <p className="pp-sub">{a.submittedAt ? cairoDate(a.submittedAt.slice(0, 10), lang) : ''}{a.score !== null ? ` · ${n(a.score)}%` : ''}</p>
-          </div>
-          {a.waiting && <span className="pp-tag pp-tag--sky" data-testid="pp-result-waiting">{t.waitingForTeacher}</span>}
-          {a.passed !== null && (a.passed ? <span className="pp-tag pp-tag--ok"><Icon name="check" style={{ inlineSize: 14, blockSize: 14 }} />{t.passed}</span> : <span className="pp-tag pp-tag--warn">{t.notPassed}</span>)}
-        </div>
-      ))}
+      {waitingFirst(s.results).map((a) => <ResultRow key={a.id} a={a} />)}
     </section>
   );
 

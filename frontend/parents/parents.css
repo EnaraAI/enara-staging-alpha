@@ -450,3 +450,51 @@
   .pp-hero, .pp-needs, .pp-bus, .pp-sgrid { animation: pp-rise .45s ease-out both; }
   .pp-needs { animation-delay: .05s; } .pp-bus { animation-delay: .1s; } .pp-sgrid { animation-delay: .15s; }
 }
+
+/* ---- Redesign step 3: Progress and Subject ---- */
+.pp { --wait: #5A4FB8; --wait-bg: #EFEDFB; }
+.pp[data-theme="dark"] { --wait: #B4A9FF; --wait-bg: #26214A; }
+.pp-rings { display: flex; align-items: center; gap: 16px; }
+.pp-rings-svg { inline-size: 140px; block-size: 140px; flex: none; }
+.pp-legend { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; min-inline-size: 0; }
+.pp-legend li { display: flex; gap: 10px; align-items: flex-start; }
+.pp-legend b { display: block; font-size: 15px; }
+.pp-legend small { display: block; font-size: 12.5px; color: var(--muted); }
+.pp-sw { inline-size: 12px; block-size: 12px; border-radius: 4px; margin-block-start: 4px; flex: none; }
+.pp-wdots { list-style: none; margin: 4px 0 0; padding: 0; display: flex; justify-content: space-between; }
+.pp-wd { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; color: var(--muted); }
+.pp-wd i { inline-size: 28px; block-size: 28px; border-radius: 50%; background: var(--track); display: grid; place-items: center; }
+.pp-wd i svg { inline-size: 15px; block-size: 15px; fill: none; stroke: #0E2747; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.pp-wd--practised i { background: var(--amber); }
+.pp-wd--today i { background: none; border: 2px solid var(--blue); }
+.pp-wd--today { color: var(--text); font-weight: 700; }
+.pp-note-tip { display: flex; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 14px; background: var(--sun-100); color: var(--sun-ink); font-size: 14px; font-weight: 500; }
+.pp-mring { position: relative; display: grid; place-items: center; flex: none; }
+.pp-mring svg { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; }
+.pp-mring b { position: relative; color: var(--text); font-weight: 700; }
+.pp-tag--plain { color: var(--text-2); background: var(--track); }
+.pp-tag--wait { color: var(--wait); background: var(--wait-bg); font-weight: 600; }
+.pp-shead-top { display: flex; align-items: center; gap: 16px; }
+.pp-res { display: flex; flex-direction: column; gap: 10px; padding-block: 10px; border-block-end: 1px solid var(--row-line); }
+.pp-res:last-child { border-block-end: 0; }
+.pp-res-main { display: flex; align-items: center; gap: 12px; }
+.pp-res-tx { flex: 1; min-inline-size: 0; }
+.pp-res-tx p { font-size: 15px; font-weight: 600; line-height: 20px; }
+.pp-score { inline-size: 52px; block-size: 52px; border-radius: 16px; display: grid; place-items: center; font-weight: 700; font-size: 15px; flex: none; font-variant-numeric: tabular-nums; }
+.pp-score--ok { background: var(--emerald-50); color: var(--emerald); }
+.pp-score--warn { background: var(--warn-50); color: var(--warn); }
+.pp-score--wait { background: var(--wait-bg); color: var(--wait); border: 2px dashed color-mix(in srgb, var(--wait) 45%, transparent); }
+.pp-res--waiting { padding: 12px; margin-block: 4px; border-radius: 16px; border: 2px dashed color-mix(in srgb, var(--wait) 35%, transparent); background: color-mix(in srgb, var(--wait-bg) 45%, var(--card)); }
+.pp-steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; font-size: 12px; color: var(--muted); }
+.pp-steps li { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; position: relative; }
+.pp-steps i { inline-size: 22px; block-size: 22px; border-radius: 50%; border: 2px solid var(--line-2); background: var(--card); display: grid; place-items: center; }
+.pp-steps i .pp-icon { inline-size: 13px; block-size: 13px; stroke-width: 3; }
+.pp-step--done { color: var(--emerald); }
+.pp-step--done i { background: var(--emerald); border-color: var(--emerald); color: #fff; }
+.pp-step--cur { color: var(--wait); font-weight: 700; }
+.pp-step--cur i { border-color: var(--wait); }
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes pp-breathe { 50% { box-shadow: 0 0 0 5px color-mix(in srgb, var(--wait) 18%, transparent); } }
+  .pp-step--cur i { animation: pp-breathe 1.8s ease-in-out infinite; }
+}
+.pp-legend li > span:last-child { display: flex; flex-direction: column; }

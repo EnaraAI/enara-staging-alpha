@@ -181,3 +181,50 @@ export const SchoolTiles: React.FC<{ overview: SchoolOverview | null; open: (v: 
     </>
   );
 };
+
+/** Redesign step 3: the weekly rings on Progress (three concentric rings with a written legend, the days and what is left). */
+export const RingsCard: React.FC<{ status: WeeklyStatus; lessons: number }> = ({ status: s, lessons }) => {
+  const { t, n } = useP();
+  const practised = s.days.filter((d) => d.practised).length;
+  const rings = [
+    { r: 60, done: s.minutesDone, goal: s.goalMinutes, color: '#F5A524', label: t.ui.practiceTime, line: t.ofMin(n(s.minutesDone), n(s.goalMinutes)) },
+    { r: 45, done: lessons, goal: LESSONS_TARGET, color: '#2B5CE6', label: t.ui.lessonsDone, line: `${n(lessons)} ${t.ui.ofLessons(n(LESSONS_TARGET))}` },
+    { r: 30, done: practised, goal: DAYS_TARGET, color: '#1B8A58', label: t.ui.daysPractised, line: `${n(practised)} ${t.ui.ofDays(n(DAYS_TARGET))}` },
+  ];
+  const left = Math.max(0, s.goalMinutes - s.minutesDone);
+  return (
+    <section className="pp-card" aria-labelledby="pp-rings-h" data-testid="pp-rings">
+      <h2 className="pp-h2" id="pp-rings-h">{t.ui.thisWeekCard}</h2>
+      <div className="pp-rings">
+        <svg className="pp-rings-svg" viewBox="0 0 140 140" role="img" aria-label={rings.map((x) => t.ui.ringAria(x.label, n(x.done), n(x.goal))).join('; ')}>
+          {rings.map((x) => {
+            const c = 2 * Math.PI * x.r;
+            const pct = x.goal ? Math.min(1, x.done / x.goal) : 0;
+            return (
+              <g key={x.r}>
+                <circle cx="70" cy="70" r={x.r} fill="none" stroke="var(--track)" strokeWidth="11" />
+                <circle className="pp-ringfill" cx="70" cy="70" r={x.r} fill="none" stroke={x.color} strokeWidth="11" strokeLinecap="round" strokeDasharray={`${pct * c} ${c}`} transform="rotate(-90 70 70)" />
+              </g>
+            );
+          })}
+        </svg>
+        <ul className="pp-legend">
+          {rings.map((x) => <li key={x.r}><span className="pp-sw" style={{ background: x.color }} aria-hidden="true" /><span><b>{x.line}</b><small>{x.label}</small></span></li>)}
+        </ul>
+      </div>
+      <ul className="pp-wdots" aria-label={t.thisWeek}>
+        {s.days.map((d) => {
+          const wd = weekdayIndex(d.day);
+          const state = d.practised ? 'practised' : d.isToday ? 'today' : d.isFuture ? 'upcoming' : 'missed';
+          return (
+            <li key={d.day} className={`pp-wd pp-wd--${state}`}>
+              <i>{d.practised && <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12" /></svg>}</i>
+              <span aria-hidden="true">{t.weekdays[wd]}</span><span className="sr">{`${t.weekdaysLong[wd]}: ${t.dayState[state]}`}</span>
+            </li>
+          );
+        })}
+      </ul>
+      <p className="pp-note-tip"><Icon name={left ? 'target' : 'ontrack'} /><span>{left ? t.ui.toGo(n(left)) : t.ui.goalDone}</span></p>
+    </section>
+  );
+};
