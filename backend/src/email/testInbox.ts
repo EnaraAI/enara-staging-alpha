@@ -6,6 +6,7 @@ import { LmsEmailClaim, LmsEmailLog } from '../integrations/lms/models/email';
 import { recordAlert, recordAudit } from '../services/auditTrail';
 import { logger, serializeError } from '../utils/logging';
 import { cairoDay, resendSend } from './provider';
+import { isReservedRecipient } from './reservedRecipients';
 import type { SendTemplateResult } from './sendTemplate';
 
 export { cairoDay, CAIRO_TIME_ZONE } from './provider';
@@ -62,7 +63,14 @@ export interface EmailPolicy {
   ceiling?: number;
   /** LMS_OPS_EMAILS: who the ceiling alert is for. */
   opsEmails: string[];
+  /** LMS_EMAIL_OPEN_DELIVERY (owner, 25 Nov 2026): on staging, every email goes to its real recipients (no test-inbox
+   *  redirect, no subject prefix, no "Test copy" line); reserved addresses (.example, .test, .invalid, ...) are still never
+   *  sent to, and the daily safety ceiling still applies. */
+  open: boolean;
 }
+
+/** On staging with LMS_EMAIL_OPEN_DELIVERY=true, emails go to their real recipients. */
+export const openDelivery = (): boolean => process.env.LMS_EMAIL_OPEN_DELIVERY === 'true';
 
 /**
  * The rules in force. Staging is the loaded config's stagingMode or
@@ -84,6 +92,7 @@ export function emailPolicy(): EmailPolicy {
     capture: c?.lms?.emailCapture === true,
     ceiling: c?.email?.dailyCeiling ?? (staging ? DEFAULT_EMAIL_DAILY_CEILING : undefined),
     opsEmails: c?.lms?.opsEmails ?? [],
+    open: staging && openDelivery(),
   };
 }
 
@@ -235,7 +244,7 @@ export async function guardOutgoing(email: OutgoingEmail): Promise<GuardDecision
   const policy = emailPolicy();
   if (!policy.staging && !policy.ceiling) return null;
   const { kind, alias } = email;
-  if (policy.staging && !policy.redirect) {
+  if (policy.staging && !policy.redirect && !policy.open) {
     logger.warn('email.staging_refused', { kind, alias, code: 'staging_no_test_inbox' });
     return { send: false, result: { ok: false, code: 'staging_no_test_inbox', message: 'Staging sends email only to the test inbox (REMINDER_TEST_RECIPIENT), which is not set; nothing was sent' } };
   }
@@ -254,6 +263,22 @@ export async function guardOutgoing(email: OutgoingEmail): Promise<GuardDecision
   if (!policy.staging) {
     // Not staging, EMAIL_DAILY_CEILING set: counted, then the real recipients, unchanged.
     return { send: true, redirected: false, to: email.to, subject: email.subject, html: email.html, record: async () => undefined };
+  }
+  if (policy.open && !policy.capture) {
+    // Staging, open delivery: the real recipients, minus reserved addresses (made-up accounts never get mail).
+    const to = forWhom.filter((a) => !isReservedRecipient(a) && !/\.test$/i.test(a));
+    if (!to.length) {
+      await logRow(alias, 'held', day, { count: forWhom.length, redirected: false, code: 'no_deliverable_recipient' });
+      return { send: false, result: { ok: false, code: 'no_deliverable_recipient', message: 'Every recipient is a reserved address; nothing was sent' } };
+    }
+    // redirected: true tells the callers to send what this decision says (these recipients), as with the test inbox.
+    return {
+      send: true, redirected: true, to: to.length === 1 ? to[0] : to, subject: email.subject, html: email.html,
+      record: async (result) => {
+        const held = !result.ok && result.code === 'provider_quota';
+        await logRow(alias, result.ok ? 'sent' : held ? 'held' : 'failed', day, { count: to.length, redirected: false, code: result.ok ? undefined : result.code, resendId: result.ok ? result.id : undefined });
+      },
+    };
   }
   if (policy.capture) {
     await logRow(alias, 'captured', day, { count: forWhom.length, redirected });

@@ -119,3 +119,7 @@ the run if the app has a Resend key or LMS emails on without capture.
 
 Migration `2026-11-25-lms-emails` (additive): indexes of `lms_email_log`, `lms_email_claims`, `lms_email_optins`,
 and `{ event: 1, createdAt: 1 }` on `lms_audit_log`.
+
+
+## Open delivery on lms-test (owner, 25 Nov 2026)
+`LMS_EMAIL_OPEN_DELIVERY=true` (lms-test flag): on staging every email goes to its real recipients instead of the test inbox, with no `[lms-test]` prefix and no "Test copy" line. Reserved addresses (`.example`, `.test`, `.invalid`, `.localhost`) are still never sent to, and the daily safety ceiling (300 a Cairo day) still counts every email. Remove the flag to go back to the test inbox.
