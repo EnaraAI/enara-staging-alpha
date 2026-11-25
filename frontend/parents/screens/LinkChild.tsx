@@ -33,10 +33,18 @@ export const LinkChild: React.FC<{ onLinked: (studentId: string) => void; onCanc
 
   return (
     <>
-      <h1 className="pp-h1">{another ? t.addAnotherChild : t.linkTitle}</h1>
+      {/* Redesign step 6: a navy welcome card above the code form. */}
+      <section className="pp-hero pp-welcome" aria-labelledby="pp-link-h">
+        <svg className="pp-hero-art" viewBox="0 0 200 120" aria-hidden="true" focusable="false">
+          <circle className="pp-drift" cx="168" cy="22" r="42" fill="rgba(245,165,36,.16)" />
+          <path className="pp-twinkle" d="M150 18l1.6 4.4 4.4 1.6-4.4 1.6-1.6 4.4-1.6-4.4-4.4-1.6 4.4-1.6z" fill="#FFD58A" />
+        </svg>
+        <span className="pp-welcome-key" aria-hidden="true"><Icon name="link" /></span>
+        <h1 id="pp-link-h">{another ? t.addAnotherChild : t.linkTitle}</h1>
+        <p>{another ? t.addAnotherBody : t.linkBody}</p>
+      </section>
       {!preview && !done && (
         <form className="pp-card" onSubmit={check} noValidate>
-          <p style={{ fontSize: 14 }}>{another ? t.addAnotherBody : t.linkBody}</p>
           <div className="pp-input">
             <label htmlFor="pp-code">{t.codeLabel}</label>
             <input id="pp-code" dir="ltr" inputMode="text" autoComplete="one-time-code" autoCapitalize="characters" spellCheck={false} maxLength={24} placeholder={t.codePh}
@@ -44,7 +52,7 @@ export const LinkChild: React.FC<{ onLinked: (studentId: string) => void; onCanc
             <p className="pp-sub" id="pp-code-help">{t.whatYouSee}</p>
           </div>
           {/* Owner decision d): the secret-code warning on the code entry page. */}
-          <p className="pp-notice" role="note" data-testid="secret-code-warning" style={{ display: 'block', fontSize: 13, background: 'var(--warn-50)', color: 'var(--sun-ink)' }}>{t.secretCode}</p>
+          <p className="pp-notice pp-secret" role="note" data-testid="secret-code-warning"><Icon name="shield" /><span>{t.secretCode}</span></p>
           {error && <p className="pp-error" id="pp-code-err" role="alert"><Icon name="alert" />{error}</p>}
           <button type="submit" className="pp-btn pp-btn--primary pp-btn--block" disabled={busy}>{busy ? t.loading : t.check}</button>
           {onCancel && <button type="button" className="pp-btn pp-btn--block" onClick={onCancel}>{t.cancel}</button>}

@@ -228,3 +228,17 @@ export const RingsCard: React.FC<{ status: WeeklyStatus; lessons: number }> = ({
     </section>
   );
 };
+
+/** True on a wide screen (desktop layout). Follows window resizes. */
+export function useWide(query = '(min-width: 1180px)'): boolean {
+  const get = () => { try { return window.matchMedia(query).matches; } catch { return false; } };
+  const [wide, setWide] = React.useState(get);
+  React.useEffect(() => {
+    let mq: MediaQueryList | null = null;
+    try { mq = window.matchMedia(query); } catch { return undefined; }
+    const on = () => setWide(mq!.matches);
+    mq.addEventListener?.('change', on);
+    return () => mq?.removeEventListener?.('change', on);
+  }, [query]);
+  return wide;
+}

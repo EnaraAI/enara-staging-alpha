@@ -544,3 +544,18 @@
 .pp-bus-expected { font-size: 14px; font-weight: 700; color: var(--warn); text-align: end; margin-block-start: -6px; }
 .pp-bustrip .pp-school-list li:has(b), .pp-bustrip .pp-school-list li[style*="700"] { color: var(--blue); }
 .pp-pagehead .pp-btn { white-space: nowrap; flex: none; }
+
+/* ---- Redesign step 6: add-a-child welcome, code field, desktop Today ---- */
+.pp-welcome h1 { font-size: 24px; font-weight: 700; line-height: 1.2; margin-block-start: 6px; }
+.pp-welcome-key { inline-size: 48px; block-size: 48px; border-radius: 16px; display: grid; place-items: center; background: rgba(255,255,255,.12); color: #F5A524; }
+.pp-input input#pp-code { font-size: 22px; letter-spacing: .14em; text-align: center; min-block-size: 56px; border-radius: 14px; border-width: 2px; background: var(--card); color: var(--text); font-weight: 700; }
+.pp-input input#pp-code:focus { border-color: var(--blue); outline: none; box-shadow: 0 0 0 4px var(--blue-50); }
+.pp-secret { background: var(--warn-50); border-color: var(--warn-200); color: var(--sun-ink); font-size: 13.5px; line-height: 19px; align-items: flex-start; }
+.pp-secret .pp-icon { color: var(--warn); }
+.pp-today2 { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 20px; align-items: start; }
+.pp-today2-main, .pp-today2-side { display: flex; flex-direction: column; gap: 12px; min-inline-size: 0; }
+.pp-today2-side { position: sticky; inset-block-start: 16px; }
+@media (min-width: 1180px) {
+  .pp { max-inline-size: 1280px; }
+  .pp-main { max-inline-size: none; }
+}
