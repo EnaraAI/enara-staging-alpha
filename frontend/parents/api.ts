@@ -111,6 +111,7 @@ export const schoolApi = {
   chatRequest: (id: string, offer: { type: RequestType; details: string }) => apiRequest<SchoolRequestItem>('POST', `${S(id)}/chat/request`, { ...offer, confirmed: true }),
   requests: (id: string) => apiRequest<{ requests: SchoolRequestItem[]; canCreate: boolean; types: RequestType[] }>('GET', `${S(id)}/requests`),
   createRequest: (id: string, body: { type: RequestType; details: string; preferredDate?: string }) => apiRequest<SchoolRequestItem>('POST', `${S(id)}/requests`, body),
+  cancelRequest: (id: string, requestId: string) => apiRequest<{ id: string; status: string }>('POST', `${S(id)}/requests/${encodeURIComponent(requestId)}/cancel`, {}),
   consents: (id: string) => apiRequest<{ canSign: boolean; forms: ConsentFormItem[] }>('GET', `${S(id)}/consents`),
   signConsent: (id: string, formId: string, body: { choice: string; agree: true; textHash: string }) => apiRequest<{ choice: string; at: string }>('POST', `${S(id)}/consents/${encodeURIComponent(formId)}`, body),
   receipt: (id: string, instalmentId: string) => downloadFile(`${S(id)}/fees/${encodeURIComponent(instalmentId)}/receipt`, 'receipt'),

@@ -333,7 +333,15 @@ const Requests: React.FC<{ learner: LearnerChip; refreshKey: number }> = ({ lear
   const [f, setF] = useState<{ type: RequestType; details: string; preferredDate: string }>({ type: 'certificate', details: '', preferredDate: '' });
   const [state, setState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const [err, setErr] = useState('');
+  const [asking, setAsking] = useState<string | null>(null);
+  const [cancelling, setCancelling] = useState(false);
   if (!q.data) return q.error ? (q.error.status === 404 ? <p className="pp-notice">{t.sch.off}</p> : <ErrorBox onRetry={q.reload} />) : <Loading />;
+  const cancel = async (id: string) => {
+    setCancelling(true);
+    try { await schoolApi.cancelRequest(learner.studentId, id); setAsking(null); setBump((b) => b + 1); }
+    catch (x) { setErr((x as { message?: string })?.message || t.error); setState('error'); }
+    finally { setCancelling(false); }
+  };
   const send = async (e: React.FormEvent) => {
     e.preventDefault(); setState('sending');
     try { await schoolApi.createRequest(learner.studentId, { type: f.type, details: f.details, ...(f.preferredDate ? { preferredDate: f.preferredDate } : {}) }); setState('sent'); setF({ ...f, details: '', preferredDate: '' }); setBump((b) => b + 1); }
@@ -367,6 +375,15 @@ const Requests: React.FC<{ learner: LearnerChip; refreshKey: number }> = ({ lear
           <p className="pp-meta">{cairoDate(r.createdAt.slice(0, 10), lang)}{r.preferredDate ? ` · ${cairoDate(r.preferredDate, lang)}` : ''}</p>
           <p dir="auto" style={{ fontSize: 14, whiteSpace: 'pre-wrap' }}>{r.details}</p>
           {r.reply && <div className="pp-notice" style={{ display: 'block' }}><b style={{ display: 'block', fontSize: 13 }}>{t.sch.schoolReply}</b><span dir="auto" style={{ fontSize: 14 }} data-testid="pp-request-reply">{r.reply}</span></div>}
+          {q.data!.canCreate && (r.status === 'new' || r.status === 'in_progress') && (asking === r.id ? (
+            <div className="pp-notice" style={{ display: 'flex', flexDirection: 'column', gap: 10 }} role="group" data-testid="pp-request-cancel-confirm">
+              <p style={{ fontSize: 14 }}>{t.sch.cancelReqConfirm}</p>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                <button type="button" className="pp-btn pp-btn--danger" disabled={cancelling} onClick={() => cancel(r.id)} data-testid="pp-request-cancel-yes">{t.sch.cancelReqYes}</button>
+                <button type="button" className="pp-btn" onClick={() => setAsking(null)}>{t.sch.keepReq}</button>
+              </div>
+            </div>
+          ) : <button type="button" className="pp-btn" style={{ alignSelf: 'flex-start' }} onClick={() => setAsking(r.id)} data-testid="pp-request-cancel">{t.sch.cancelReq}</button>)}
         </article>
       )) : <p className="pp-notice" style={{ display: 'block' }}>{t.sch.noRequests}</p>}
     </>
