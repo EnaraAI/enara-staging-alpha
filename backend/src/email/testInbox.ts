@@ -71,6 +71,15 @@ export interface EmailPolicy {
 
 /** On staging with LMS_EMAIL_OPEN_DELIVERY=true, emails go to their real recipients. */
 export const openDelivery = (): boolean => process.env.LMS_EMAIL_OPEN_DELIVERY === 'true';
+/** Open delivery never mails an address that cannot be a real mailbox: reserved domains, and every subdomain of enara.app
+ *  (the accounts lms-test builds, e.g. @school.enara.app, have no mailbox: mail to them would bounce and hurt the sender).
+ *  Addresses at enara.app itself are real and still get mail. */
+export function openDeliverable(address: string): boolean {
+  const a = address.trim().toLowerCase();
+  if (isReservedRecipient(a) || /\.test$/.test(a)) return false;
+  const domain = a.split('@')[1] ?? '';
+  return !/\.enara\.app$/.test(domain);
+}
 
 /**
  * The rules in force. Staging is the loaded config's stagingMode or
@@ -266,7 +275,7 @@ export async function guardOutgoing(email: OutgoingEmail): Promise<GuardDecision
   }
   if (policy.open && !policy.capture) {
     // Staging, open delivery: the real recipients, minus reserved addresses (made-up accounts never get mail).
-    const to = forWhom.filter((a) => !isReservedRecipient(a) && !/\.test$/i.test(a));
+    const to = forWhom.filter(openDeliverable);
     if (!to.length) {
       await logRow(alias, 'held', day, { count: forWhom.length, redirected: false, code: 'no_deliverable_recipient' });
       return { send: false, result: { ok: false, code: 'no_deliverable_recipient', message: 'Every recipient is a reserved address; nothing was sent' } };

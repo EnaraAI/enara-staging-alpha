@@ -3,7 +3,7 @@ import { getConfig } from '../../../config/env';
 import { LMS_TEMPLATES_BUNDLE } from '../../../email/lms/lmsTemplatesBundle';
 import { isReservedRecipient } from '../../../email/reservedRecipients';
 import { deliverRendered, renderCodeTemplate, variablesMismatch, type CodeTemplate } from '../../../email/sendBundledTemplate';
-import { cairoDay, CAIRO_TIME_ZONE, ceilingAllows, openDelivery, testCopy } from '../../../email/testInbox';
+import { cairoDay, CAIRO_TIME_ZONE, ceilingAllows, openDeliverable, openDelivery, testCopy } from '../../../email/testInbox';
 import { Institution } from '../../../models/Institution';
 import { User } from '../../../models/User';
 import { logger, serializeError } from '../../../utils/logging';
@@ -271,6 +271,8 @@ export async function sendLmsEmail(input: LmsEmailInput): Promise<LmsEmailResult
     if (/\.test$/i.test(email)) continue;
     // Other reserved domains only as a redirected test copy (the email goes to the test inbox).
     if (!redirect && isReservedRecipient(email)) continue;
+    // Open delivery: no mail to addresses that cannot be real mailboxes (subdomains of enara.app).
+    if (open && !openDeliverable(email)) continue;
     seen.add(email);
     list.push({ ...r, email });
   }

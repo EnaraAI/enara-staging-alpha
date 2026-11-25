@@ -122,4 +122,4 @@ and `{ event: 1, createdAt: 1 }` on `lms_audit_log`.
 
 
 ## Open delivery on lms-test (owner, 25 Nov 2026)
-`LMS_EMAIL_OPEN_DELIVERY=true` (lms-test flag): on staging every email goes to its real recipients instead of the test inbox, with no `[lms-test]` prefix and no "Test copy" line. Reserved addresses (`.example`, `.test`, `.invalid`, `.localhost`) are still never sent to, and the daily safety ceiling (300 a Cairo day) still counts every email. Remove the flag to go back to the test inbox.
+`LMS_EMAIL_OPEN_DELIVERY=true` (lms-test flag): on staging every email goes to its real recipients instead of the test inbox, with no `[lms-test]` prefix and no "Test copy" line. Reserved addresses (`.example`, `.test`, `.invalid`, `.localhost`) and every subdomain of `enara.app` (the accounts lms-test builds, e.g. `@school.enara.app`, which have no mailbox) are never sent to; addresses at `enara.app` itself are. The daily safety ceiling (300 a Cairo day) still counts every email. Remove the flag to go back to the test inbox.
