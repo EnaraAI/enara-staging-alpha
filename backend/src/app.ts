@@ -53,7 +53,7 @@ import speakingRoutes from './routes/speaking.routes';
 import usageRoutes from './routes/usage.routes';
 import parentsRoutes from './parents/routes';
 import parentsAdminRoutes from './parents/adminRoutes';
-import { parentSchoolRoutes, schoolAppAdminRoutes } from './schoolApp/routes';
+import { busSupervisorRoutes, parentSchoolRoutes, schoolAppAdminRoutes } from './schoolApp/routes';
 import multiClassRoutes from './routes/multiClass.routes';
 import { ltiRouter, wellKnownRouter } from './integrations/lms/routes';
 import { lmsAdminRouter, lmsConfigProblemRouter } from './integrations/lms/admin/routes';
@@ -187,6 +187,7 @@ export function createApp() {
   app.use('/api/parents/link', makeLimiter('parent-link', 15 * 60 * 1000, parentCodeMax, 'Too many code attempts'));
   // Parents P1 code-first entry (public: no account, so no per-account lockout) and device sessions.
   app.use('/api/parents/start', makeLimiter('parent-start', 15 * 60 * 1000, parentCodeMax, 'Too many code attempts'));
+  app.use('/api/bus/start', makeLimiter('bus-start', 15 * 60 * 1000, parentCodeMax, 'Too many code attempts'));
   app.use('/api/parents/device/session', makeLimiter('parent-device', 15 * 60 * 1000, 60, 'Too many sign-in attempts'));
   // Parents P2: 6-digit email codes (sign-in, add your email, merge); per address limits are in parents/emailSignin.ts.
   app.use('/api/parents/email', makeLimiter('parent-email', 15 * 60 * 1000, 60, 'Too many code requests'));
@@ -368,6 +369,7 @@ export function createApp() {
   app.use('/api/parents-admin', parentsAdminRoutes);
   app.use('/api/parents/school', parentSchoolRoutes); // Parents school app (SCHOOL_APP_*_ENABLED; 404 when all off)
   app.use('/api/school-app', schoolAppAdminRoutes);
+  app.use('/api/bus', busSupervisorRoutes); // Live bus map: the supervisor's phone (SCHOOL_APP_BUS_LIVE_ENABLED; 404 while off)
   app.use('/api/parents', parentsRoutes);
   app.use('/api/multi-class', multiClassRoutes);
   // Test-deployment maintenance: 404 unless switched on AND pointed at the test cluster (maintenance/routes.ts).

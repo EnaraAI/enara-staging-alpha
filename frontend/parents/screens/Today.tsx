@@ -4,6 +4,8 @@ import { Icon, useP } from '../ui';
 import { bi } from '../i18n';
 import { useLive } from '../useLive';
 import type { SchoolView } from './School';
+import { BusLiveCard } from './BusLive';
+import type { BusLive as BusLiveData } from '../api';
 import { actionsCount } from './Actions';
 
 // Redesign step 2: the parts of the Today tab. Motion is CSS only (rings fill, the bus status dot pulses, the hero's sparks drift). No moving bus on a map: the app has no live bus position
@@ -93,15 +95,17 @@ export const NeedsYou: React.FC<{ overview: SchoolOverview | null; onOpen: () =>
 };
 
 /** "On the way": today's bus trips from the school's bus sheet, with a late or cancelled notice. Not live GPS. */
-export const BusCard: React.FC<{ overview: SchoolOverview | null; open: (v: SchoolView) => void }> = ({ overview: o, open }) => {
+export const BusCard: React.FC<{ overview: SchoolOverview | null; open: (v: SchoolView) => void; learner?: LearnerChip; live?: BusLiveData | null }> = ({ overview: o, open, learner, live }) => {
   const { t, n } = useP();
   if (!o?.sections.buses || !o.bus?.trips.length) return null;
+  const liveTrip = learner && live?.on && live.trips.length ? live : null;
   const hm = nowHm();
   const trip = o.bus.trips.find((tr) => tr.notice) ?? o.bus.trips.find((tr) => tr.direction === (hm < '12:00' ? 'morning' : 'afternoon')) ?? o.bus.trips[0];
   const nt = trip.notice;
   return (
     <>
       <div className="pp-sec-h"><h2>{t.ui.onTheWay}</h2></div>
+      {liveTrip && learner && <BusLiveCard learner={learner} live={liveTrip} compact />}
       <section className="pp-card pp-bus" aria-label={t.ui.onTheWay} data-testid="pp-today-bus">
         <div className="pp-row">
           <span className="pp-row" style={{ gap: 10, justifyContent: 'flex-start' }}>
@@ -115,7 +119,7 @@ export const BusCard: React.FC<{ overview: SchoolOverview | null; open: (v: Scho
           <span>{nt ? (nt.kind === 'cancel' ? t.sch.cancelled : t.sch.delay(n(nt.minutes ?? 0))) : t.ui.onTime}{nt?.message ? <span dir="auto"> · {nt.message}</span> : null}</span>
         </div>
         <button type="button" className="pp-btn pp-btn--ton pp-btn--block" onClick={() => open('buses')}>{t.ui.busDetails}<Icon name="chevron" flip /></button>
-        <p className="pp-note2"><Icon name="alert" style={{ inlineSize: 16, blockSize: 16 }} /><span>{t.ui.notGps}</span></p>
+        {!liveTrip && <p className="pp-note2"><Icon name="alert" style={{ inlineSize: 16, blockSize: 16 }} /><span>{t.ui.notGps}</span></p>}
       </section>
     </>
   );

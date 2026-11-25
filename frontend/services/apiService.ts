@@ -104,6 +104,9 @@ export async function refreshSession(): Promise<SessionUser | null> {
   return res?.user ?? null;
 }
 
+/** Full URL for a backend path (also used by the bus supervisor page, which signs its own requests). */
+export function apiUrl(path: string): string { return toUrl(path); }
+
 function toUrl(path: string): string {
   // Callers pass backend paths such as /api/students; the base already maps to /api.
   return `${API_BASE}${path.replace(/^\/api(?=\/|$)/, '')}`;

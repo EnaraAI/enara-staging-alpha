@@ -202,7 +202,8 @@ export const AdminSidebar: React.FC<{
   showLms?: boolean;
   /** Parents P1: show "Parents" (only when PARENT_SETTINGS_ENABLED is on). */
   showParents?: boolean;
-}> = ({ activeTab, onNavigate, isOpen, onClose, isEnaraAdmin, role, showLms, showParents }) => {
+  showBus?: boolean;
+}> = ({ activeTab, onNavigate, isOpen, onClose, isEnaraAdmin, role, showLms, showParents, showBus }) => {
   const adminMenuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'live-avatars', label: 'Live Avatar Control', icon: Radio },
@@ -236,6 +237,8 @@ export const AdminSidebar: React.FC<{
     ...(showLms ? [{ id: 'lms-status', label: 'LMS connection status', icon: ListChecks, workspaceAdminOnly: true }] : []),
     // Parents P1/P2: the school's Parents card and code tools (school admins; teachers only when their school lets them issue codes: App decides showParents).
     ...(showParents ? [{ id: 'parents-admin', label: 'Parents', icon: Users }] : []),
+    // Live bus map: the school's bus supervisors, switches, stop pins and running trips (school admins; off unless SCHOOL_APP_BUS_LIVE_ENABLED).
+    ...(showBus ? [{ id: 'bus-admin', label: 'Bus supervisors', icon: Radio, workspaceAdminOnly: true }] : []),
   ];
 
   const enaraMenuItems = [
