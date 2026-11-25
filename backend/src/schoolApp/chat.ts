@@ -28,7 +28,11 @@ type Lang = 'en' | 'ar';
 type Source = 'fees' | 'buses' | 'timetable' | 'attendance' | 'announcements' | 'consents' | 'requests' | 'results';
 export interface Fact { source: Source; updatedAt: string | null; data: unknown }
 export interface ChatContext { child: string; today: string; facts: Fact[]; notShared: { source: Source; reason: 'off' | 'main_guardian_only' }[] }
-export interface ChatAnswer { answer: string; lang: Lang; sources: { source: Source; updatedAt: string | null }[]; offerRequest: { type: 'certificate' | 'early_leave' | 'teacher_meeting' | 'other'; details: string } | null; engine: 'code' | 'model' }
+export interface ChatAnswer { answer: string; lang: Lang; sources: { source: Source; updatedAt: string | null }[]; offerRequest: { type: 'certificate' | 'early_leave' | 'teacher_meeting' | 'other'; details: string } | null; engine: 'code' | 'model'; chart?: ChatChart | null }
+/** A chart under a results answer, built by code from the same released data (never by the model). Marks are percents. */
+export type ChatChart =
+  | { kind: 'subjects'; rows: { subject: string; subjectAr: string; mark: number | null; markTitle: string | null; lessonsDone: number; lessonsTotal: number; waiting: number }[]; highlight: string | null; highlightKind: 'weakest' | 'strongest' | null }
+  | { kind: 'subject'; subject: string; subjectAr: string; points: { title: string; date: string | null; mark: number }[]; waiting: string[]; lessonsDone: number; lessonsTotal: number; outcomesMastered: number; outcomesTotal: number };
 
 const cairoDate = (d = new Date()) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Cairo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(d);
 const isArabic = (s: string) => /[؀-ۿ]/.test(s);
@@ -109,6 +113,39 @@ const SECTION_NAME: Record<Source, { en: string; ar: string }> = {
 };
 const TOPIC_SOURCE: Record<Exclude<Topic, 'help'>, Source> = { fees: 'fees', buses: 'buses', timetable: 'timetable', attendance: 'attendance', announcements: 'announcements', consents: 'consents', requests: 'requests', results: 'results' };
 
+type ResultRow = { title: string; date: string | null; scorePercent?: number | null; passed?: boolean | null; waitingForTeacher?: true };
+type ResultSubject = { subject: string; subjectAr: string; lessonsDone: number; lessonsTotal: number; outcomesMastered?: number; outcomesTotal?: number; results: ResultRow[] };
+/** The subjects a question names («الرياضيات», "Maths"…); none named → []. */
+function namedSubjects(all: ResultSubject[], q: string): ResultSubject[] {
+  const ql = q.toLowerCase();
+  return all.filter((s) => ql.includes(s.subject.toLowerCase()) || (s.subjectAr && q.includes(s.subjectAr.replace(/^ال/, ''))));
+}
+const WEAKEST = /\bweak(est)?\b|أضعف|اضعف|ضعيف|ضعيفة|محتاج يذاكر|محتاج مساعدة/i;
+const STRONGEST = /\bstrong(est)?\b|\bbest\b|أقوى|اقوى|أحسن|احسن|شاطر|شاطرة/i;
+const released = (r: ResultRow) => typeof r.scorePercent === 'number';
+
+/** The chart for a results answer: one subject named → its marks over time; otherwise every subject's latest mark. */
+export function chartFor(c: ChatContext, q: string): ChatChart | null {
+  const fact = c.facts.find((f) => f.source === 'results');
+  const all = ((fact?.data as { subjects?: ResultSubject[] } | undefined)?.subjects ?? []);
+  if (!all.length) return null;
+  const named = namedSubjects(all, q);
+  if (named.length === 1) {
+    const s = named[0];
+    const points = s.results.filter(released).map((r) => ({ title: r.title, date: r.date, mark: r.scorePercent as number })).reverse(); // oldest first
+    return { kind: 'subject', subject: s.subject, subjectAr: s.subjectAr, points, waiting: s.results.filter((r) => r.waitingForTeacher).map((r) => r.title), lessonsDone: s.lessonsDone, lessonsTotal: s.lessonsTotal, outcomesMastered: s.outcomesMastered ?? 0, outcomesTotal: s.outcomesTotal ?? 0 };
+  }
+  const rows = (named.length ? named : all).map((s) => {
+    const latest = s.results.find(released);
+    return { subject: s.subject, subjectAr: s.subjectAr, mark: latest ? (latest.scorePercent as number) : null, markTitle: latest?.title ?? null, lessonsDone: s.lessonsDone, lessonsTotal: s.lessonsTotal, waiting: s.results.filter((r) => r.waitingForTeacher).length };
+  });
+  const highlightKind = WEAKEST.test(q) ? 'weakest' : STRONGEST.test(q) ? 'strongest' : null;
+  const marked = rows.filter((r) => r.mark !== null);
+  if (highlightKind) rows.sort((a, b) => (a.mark === null ? 1 : b.mark === null ? -1 : highlightKind === 'weakest' ? a.mark - b.mark : b.mark - a.mark));
+  const pick = highlightKind && marked.length ? rows[0].subject : null;
+  return { kind: 'subjects', rows, highlight: pick, highlightKind: pick ? highlightKind : null };
+}
+
 export function codeAnswer(topic: Topic, c: ChatContext, lang: Lang, q: string): ChatAnswer {
   const ar = lang === 'ar';
   const offer = requestOffer(q);
@@ -151,11 +188,8 @@ export function codeAnswer(topic: Topic, c: ChatContext, lang: Lang, q: string):
     return done((ar ? `هذا الشهر: حاضر ${n.present ?? 0}، غائب ${n.absent ?? 0}، متأخر ${n.late ?? 0}، بعذر ${n.excused ?? 0}.` : `This month: present ${n.present ?? 0}, absent ${n.absent ?? 0}, late ${n.late ?? 0}, excused ${n.excused ?? 0}.`) + (last ? (ar ? ` آخرها: ${last}.` : ` Most recent: ${last}.`) : ''), ['attendance']);
   }
   if (topic === 'results') {
-    type R = { title: string; date: string | null; scorePercent?: number | null; passed?: boolean | null; waitingForTeacher?: true };
-    type S = { subject: string; subjectAr: string; lessonsDone: number; lessonsTotal: number; results: R[] };
-    const all = (d.subjects ?? []) as S[];
-    const ql = q.toLowerCase();
-    const named = all.filter((s) => ql.includes(s.subject.toLowerCase()) || (s.subjectAr && q.includes(s.subjectAr.replace(/^ال/, ''))));
+    const all = (d.subjects ?? []) as ResultSubject[];
+    const named = namedSubjects(all, q);
     const list = (named.length ? named : all).slice(0, 4);
     if (!list.length) return done(ar ? `لا توجد نتائج لـ${c.child} بعد.` : `There are no results for ${c.child} yet.`, ['results']);
     const lines = list.map((s) => {
@@ -277,6 +311,8 @@ export async function ask(ctx: LearnerContext, body: Record<string, unknown>, no
       else refused = chk.refused;
     }
   } catch (error) { refused = 'model_error'; logger.warn('school_chat_model_failed', { error: serializeError(error) }); }
+  // A chart under any answer about results (the code's topic, or the model citing results).
+  if (topic === 'results' || out.sources.some((s) => s.source === 'results')) out = { ...out, chart: chartFor(c, q) };
   await SchoolChatLog.create({ id: newId('scl'), institutionId: school, studentId: ctx.student.id, parentUserId: ctx.link.parentUserId, question: q, answer: out.answer, sources: out.sources.map((s) => s.source), engine: out.engine, refused });
   return out;
 }

@@ -47,6 +47,14 @@ test.describe.serial('39 · Parents school app (e2): the assistant on a phone', 
     await page.getByTestId('pp-chat-input').fill('How is he doing in his tests?');
     await page.getByTestId('pp-chat-send').click();
     await expect(page.getByTestId('pp-chat-answer').last().getByTestId('pp-chat-source')).toContainText('Source: results', { timeout: 30_000 });
+    // Charts (owner "go" 25 Nov 2026): a child with subjects gets the "latest mark in each subject" chart, one row per subject.
+    const subj = await enaraApi.get(`/api/parents/learners/${student}/subjects`, await page.evaluate(() => localStorage.getItem('enara_token') || ''));
+    const chart = page.getByTestId('pp-chat-answer').last().getByTestId('pp-chat-chart');
+    if ((subj.subjects ?? []).length) {
+      await expect(chart).toHaveAttribute('data-kind', 'subjects');
+      await expect(chart.getByTestId('pp-chat-chart-row')).toHaveCount(subj.subjects.length);
+      await shot(page, 'school-e2-03-chat-chart');
+    } else await expect(chart).toHaveCount(0);
     await page.keyboard.press('Escape');
 
     await page.locator('.pp-langbtn').click();

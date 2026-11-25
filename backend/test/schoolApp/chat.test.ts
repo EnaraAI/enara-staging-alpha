@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { checkModelReply, codeAnswer, forModel, requestOffer, topicOf, type ChatContext } from '../../src/schoolApp/chat';
+import { chartFor, checkModelReply, codeAnswer, forModel, requestOffer, topicOf, type ChatContext } from '../../src/schoolApp/chat';
 
 // Parents school app, step (e): the assistant's rules, without a model. The model's reply is only ever used if checkModelReply passes.
 const ctx: ChatContext = {
@@ -133,6 +133,36 @@ describe('results (the Learning screen\'s subjects and released marks)', () => {
   it('the model may use the results source, and only numbers that are in the data', () => {
     expect(checkModelReply('{"answer":"Omar scored 75% in Fractions check.","sources":["results"]}', withResults, 'grades?')).toMatchObject({ sources: ['results'] });
     expect(checkModelReply('{"answer":"Omar scored 90% in Greetings quiz.","sources":["results"]}', withResults, 'grades?').refused).toMatch(/number_not_in_data/);
+  });
+});
+
+describe('charts under results answers (drawn from released marks only)', () => {
+  const data = { subjects: [
+    { subject: 'Mathematics', subjectAr: 'الرياضيات', lessonsDone: 3, lessonsTotal: 8, outcomesMastered: 2, outcomesTotal: 6, results: [
+      { title: 'Fractions check', date: '2026-11-20', scorePercent: 75, passed: true }, { title: 'Pending test', date: '2026-11-22', waitingForTeacher: true }, { title: 'Numbers quiz', date: '2026-11-05', scorePercent: 50, passed: false }] },
+    { subject: 'Science', subjectAr: 'العلوم', lessonsDone: 1, lessonsTotal: 4, outcomesMastered: 0, outcomesTotal: 3, results: [{ title: 'Plants', date: '2026-11-18', scorePercent: 40, passed: false }] },
+    { subject: 'English', subjectAr: 'اللغة الإنجليزية', lessonsDone: 0, lessonsTotal: 3, outcomesMastered: 0, outcomesTotal: 4, results: [{ title: 'Greetings quiz', date: '2026-11-10', waitingForTeacher: true }] },
+  ] };
+  const c: ChatContext = { ...ctx, facts: [{ source: 'results', updatedAt: '2026-11-22', data }] };
+  it('every subject: the latest released mark (a mark waiting for the teacher is never plotted)', () => {
+    const ch = chartFor(c, 'درجاته عاملة إزاي؟');
+    expect(ch).toMatchObject({ kind: 'subjects', highlight: null });
+    if (ch?.kind !== 'subjects') throw new Error('kind');
+    expect(ch.rows.map((r) => [r.subject, r.mark, r.waiting])).toEqual([['Mathematics', 75, 1], ['Science', 40, 0], ['English', null, 1]]);
+  });
+  it('one subject named: its released marks over time, oldest first', () => {
+    const ch = chartFor(c, 'نتيجة الرياضيات؟');
+    expect(ch).toMatchObject({ kind: 'subject', subject: 'Mathematics', waiting: ['Pending test'], lessonsDone: 3, outcomesMastered: 2 });
+    if (ch?.kind !== 'subject') throw new Error('kind');
+    expect(ch.points.map((p) => p.mark)).toEqual([50, 75]);
+  });
+  it('weakest / strongest: sorted, and the right subject highlighted', () => {
+    expect(chartFor(c, 'إيه أضعف مادة عنده؟')).toMatchObject({ highlight: 'Science', highlightKind: 'weakest' });
+    expect(chartFor(c, 'Which is his strongest subject?')).toMatchObject({ highlight: 'Mathematics', highlightKind: 'strongest' });
+  });
+  it('no subjects: no chart', () => {
+    expect(chartFor({ ...ctx, facts: [{ source: 'results', updatedAt: null, data: { subjects: [] } }] }, 'grades?')).toBeNull();
+    expect(chartFor(ctx, 'grades?')).toBeNull();
   });
 });
 
