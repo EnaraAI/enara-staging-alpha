@@ -168,7 +168,9 @@ async function judge(l: Learner, lessonTitle: string, convo: { role: string; tex
 type LT = { postCheck?: string[]; assessment?: { verdict?: string }; activeItem?: { lessonItemId?: string } | null; answeringCheck?: boolean; hintLevel?: number; moves?: string[]; answerReleased?: boolean; rolePlay?: { phase?: string; beat?: number; tries?: number; help?: string; scene?: string } };
 const right = (v?: string) => v === 'CORRECT' || v === 'CORRECT_WITH_EQUIVALENT_FORMULATION';
 const wrong = (v?: string) => v === 'INCORRECT' || v === 'PARTIALLY_CORRECT';
-export function stuckMeasure(lts: (LT | undefined)[]): { sameMethodFails: boolean; unassistedRight: number; sceneUnaided: number; maxFailsOneItem: number } {
+/** Stuck measure. The ORIGINAL measure (runs 1-18, the decision rule) reads other subjects strictly: any three wrong answers in a row with no
+ *  item id count as one point with one method. sceneAware (runs 19-22, reported beside it) reads a scene beat as the point and the help given as the method. */
+export function stuckMeasure(lts: (LT | undefined)[], opts: { sceneAware?: boolean } = {}): { sameMethodFails: boolean; unassistedRight: number; sceneUnaided: number; maxFailsOneItem: number } {
   let run = 0; let runItem: string | undefined; let lastMoves = ''; let sameRun = 0; let sameMethodFails = false; let unassistedRight = 0; let maxFails = 0; let sceneUnaided = 0;
   let prevHint = 0; let prevReleased = false;
   for (let lt of lts) {
@@ -176,7 +178,7 @@ export function stuckMeasure(lts: (LT | undefined)[]): { sameMethodFails: boolea
     // Other subjects store a practice record with no item id and no moves: consecutive wrong answers count as the same point with the same method
     // (the strict reading), except inside a scene, where the point is the scene beat and the method is the help the reply gave (retry, hint, model).
     const v = lt.assessment?.verdict;
-    const inScene = !lt.moves && lt.rolePlay?.phase === 'beat';
+    const inScene = Boolean(opts.sceneAware) && !lt.moves && lt.rolePlay?.phase === 'beat';
     const item = lt.activeItem?.lessonItemId ?? (lt.moves ? undefined : inScene ? `${lt.rolePlay!.scene}#${lt.rolePlay!.beat}` : 'practice');
     if (inScene) lt = { ...lt, moves: undefined } as LT;
     const method = lt.moves ? (lt.moves ?? []).slice().sort().join(',') : inScene ? `help:${lt.rolePlay!.help ?? 'none'}` : '';
@@ -245,9 +247,11 @@ async function main() {
     // The stored turns (the engine's own evidence) for the stuck measure.
     const { TutorMessage } = await import('../models/TutorMessage');
     const msgs = await TutorMessage.find({ sessionId: sess.id ?? sess.session?.id, role: 'ai' }).sort({ timestamp: 1 }).lean();
-    const sm = stuckMeasure(msgs.map((m: any) => (m.meta?.languageTurn ?? (m.meta?.practiceTurn || m.meta?.rolePlay ? { ...(m.meta?.practiceTurn ?? {}), ...(m.meta?.rolePlay ? { rolePlay: m.meta.rolePlay } : {}) } : undefined)) as LT | undefined));
+    const lts = msgs.map((m: any) => (m.meta?.languageTurn ?? (m.meta?.practiceTurn || m.meta?.rolePlay ? { ...(m.meta?.practiceTurn ?? {}), ...(m.meta?.rolePlay ? { rolePlay: m.meta.rolePlay } : {}) } : undefined)) as LT | undefined);
+    const sm = stuckMeasure(lts);
+    const sa = stuckMeasure(lts, { sceneAware: true });
     const mine = replies.filter((x) => x.learner === l.label && x.cond === cond);
-    results.push({ learner: l.label, cond, replies: mine.length, accepted: mine.filter((x) => x.accept).length, sceneReplies: mine.filter((x) => x.rolePlay && !/:(after|declined)$/.test(x.rolePlay)).length, ...sm, stuck: sm.sameMethodFails || sm.unassistedRight === 0 });
+    results.push({ learner: l.label, cond, replies: mine.length, accepted: mine.filter((x) => x.accept).length, sceneReplies: mine.filter((x) => x.rolePlay && !/:(after|declined)$/.test(x.rolePlay)).length, ...sm, stuck: sm.sameMethodFails || sm.unassistedRight === 0, stuckSceneAware: sa.sameMethodFails || sa.unassistedRight === 0 });
     console.log(`done ${l.label} ${cond}: ${mine.filter((x) => x.accept).length}/${mine.length} accepted; stuck=${sm.sameMethodFails || sm.unassistedRight === 0}`);
   };
   const learners = LEARNERS.filter((l) => !ONLY || l.key === ONLY);
@@ -259,7 +263,7 @@ async function main() {
       await Promise.all(learners.slice(k, k + 4).map((l) => runOne(l, cond).catch((e) => { console.log(`FAILED ${l.label} ${cond}: ${String(e).slice(0, 300)}`); results.push({ learner: l.label, cond, error: String(e).slice(0, 300) }); })));
     }
   }
-  const sum = (cond: string) => { const r = results.filter((x) => x.cond === cond && !x.error); const n = r.reduce((a, x) => a + x.replies, 0); const acc = r.reduce((a, x) => a + x.accepted, 0); return { sessions: r.length, replies: n, accepted: acc, acceptedPct: n ? Math.round((1000 * acc) / n) / 10 : 0, stuckLearners: r.filter((x) => x.stuck).length, sceneReplies: r.reduce((a, x) => a + x.sceneReplies, 0) }; };
+  const sum = (cond: string) => { const r = results.filter((x) => x.cond === cond && !x.error); const n = r.reduce((a, x) => a + x.replies, 0); const acc = r.reduce((a, x) => a + x.accepted, 0); return { sessions: r.length, replies: n, accepted: acc, acceptedPct: n ? Math.round((1000 * acc) / n) / 10 : 0, stuckLearners: r.filter((x) => x.stuck).length, stuckLearnersSceneAware: r.filter((x) => x.stuckSceneAware).length, sceneReplies: r.reduce((a, x) => a + x.sceneReplies, 0) }; };
   const summary = { off: sum('off'), on: sum('on'), calls, tokens: { input: inTok, output: outTok }, switches: BASE_V2.join(','), turnsPerSession: TURNS, fake: FAKE };
   // 20 replies for a teacher to rate: 10 with the switch on (role-play replies first), 10 off; fixed order (no randomness).
   const pick = (cond: string, n: number) => { const r = replies.filter((x) => x.cond === cond); const rp = r.filter((x) => x.rolePlay && !/:(after|declined)$/.test(x.rolePlay)); const rest = r.filter((x) => !rp.includes(x)); const out: any[] = []; const step = (a: any[], k: number) => a.filter((_, i) => i % Math.max(1, Math.floor(a.length / k)) === 0).slice(0, k); out.push(...step(rp, cond === 'on' ? 7 : 0), ...step(rest, n)); return out.slice(0, n); };
