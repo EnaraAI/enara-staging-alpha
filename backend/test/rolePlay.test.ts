@@ -75,6 +75,11 @@ describe('beats, failed tries and the end', () => {
     expect(await rolePlayStep({ history: at(3), message: 'I would like the chicken, please.', signals: none, blocked: false, pick: pickRestaurant })).toMatchObject({ phase: 'beat', beat: 4, tries: 0 });
     expect(await rolePlayStep({ history: at(restaurant.beats.length), message: 'Thank you. Goodbye.', signals: none, blocked: false, pick: pickRestaurant })).toMatchObject({ phase: 'debrief' });
     expect(await rolePlayStep({ history: at(3), message: 'stop please', signals: none, blocked: false, pick: pickRestaurant })).toMatchObject({ phase: 'debrief' });
+    // a farewell ends the scene; the answer to the second-to-last beat brings the last line together with the debrief
+    expect(await rolePlayStep({ history: at(5), message: 'Thank you. Goodbye!', signals: none, blocked: false, pick: pickRestaurant })).toMatchObject({ phase: 'debrief' });
+    const close = await rolePlayStep({ history: at(restaurant.beats.length - 1), message: 'No, thank you. Can I have the bill, please?', signals: none, blocked: false, pick: pickRestaurant });
+    expect(close).toMatchObject({ phase: 'debrief', closing: true });
+    expect(rolePlayLine({ ...close!, entryId: 'EN-F-A2-FN-polite-requests' })).toContain(restaurant.beats.at(-1)!.say.en);
   });
   it('a failed try changes the method: first a simpler line with a choice, then the line said for them and the scene moves on (never a third try)', async () => {
     on();
@@ -151,8 +156,10 @@ describe('the model only voices the current beat; post-check keeps it in the sce
     process.env.ENARA_ENGINE_V2 = 'liveRolePlay';
     const language = { rolePlay: beat(2), learner: {}, lesson: { spec: {} }, signals: {}, moves: [] } as never;
     // a lesson task in the scene is unusable: the beat's own line
-    const g = applyReplyGuards(language, 'Good. Fill in: I would like ___ water.', '');
+    const g = applyReplyGuards(language, 'Fill in: I would like ___ water.', '');
     expect(g.text).toBe(restaurant.beats[1].say.en);
+    // the fixed line keeps the draft's short reaction to what they said, when it has one
+    expect(applyReplyGuards({ ...(language as object), rolePlay: beat(3) } as never, 'Some water, of course. Now try again: I would like ___ water.', '').text).toBe(`Some water, of course. ${restaurant.beats[2].say.en}`);
     expect(g.rolePlayFixed).toBe(true);
     expect(g.postCheck).toEqual(expect.arrayContaining(['roleplay_fallback', 'roleplay_hard:a_lesson_task_inside_the_scene']));
     // only the unusable sentence goes when what is left still voices the scene (the reaction and recast stay)

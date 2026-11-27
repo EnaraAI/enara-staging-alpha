@@ -36,6 +36,8 @@ export interface RolePlayTag {
   /** How the learner got in: asked, or accepted an offer. */
   via?: 'ask' | 'offer';
   help?: 'hint' | 'model';
+  /** debrief: the scene's last line, said in character first (the last beat flows into the debrief instead of a bare "goodbye"). */
+  closing?: boolean;
 }
 /** This turn's role-play decision (in the language context; never rendered as data, only through the system line). */
 export interface RolePlayTurn extends RolePlayTag {
@@ -87,9 +89,12 @@ export const saysYes = (text: string): boolean => YES.test(text) && !/^\s*(?:no|
 export const asksToStop = (text: string): boolean => STOP.test(text);
 
 /** The learner's reply to a beat: stop, stuck (a failed try: empty, "I don't know", asks for help or to repeat, only Arabic in an English scene), or ok. */
+const FAREWELL = /\b(good ?bye|bye(?: bye)?|see you(?: later| soon| next time)?|have a (?:nice|good) (?:day|evening|night))\b|مع السلامة|باي/i;
+/** The learner closes the conversation (a farewell): the scene ends there (its end condition), whatever beat it was on. */
+export const saysFarewell = (text: string): boolean => FAREWELL.test(text);
 export function classifyBeatReply(text: string, s: { dontKnow?: boolean; helpRequest?: boolean; repeatRequest?: boolean; answerRequest?: boolean }): 'stop' | 'stuck' | 'ok' {
   const t = text.trim();
-  if (asksToStop(t)) return 'stop';
+  if (asksToStop(t) || saysFarewell(t)) return 'stop';
   if (t.replace(/[^\p{L}\p{N}]/gu, '').length < 2) return 'stuck';
   if (s.dontKnow || s.helpRequest || s.repeatRequest || s.answerRequest) return 'stuck';
   if (/[؀-ۿ]/.test(t) && !/[A-Za-z]{2,}/.test(t)) return 'stuck';
@@ -263,9 +268,10 @@ export async function rolePlayStep(i: StepInput): Promise<RolePlayTurn | undefin
       const tries = (last.tries ?? 0) + 1;
       if (tries < 2) return { ...base, phase: 'beat', beat: n, tries, help: 'hint' };
       // second failed try on this beat: the line is said for them and the scene moves on (a change of method, never a third same try)
-      return n >= scene.beats.length ? { ...base, phase: 'debrief', help: 'model', beat: n } : { ...base, phase: 'beat', beat: n + 1, tries: 0, help: 'model' };
+      return n + 1 >= scene.beats.length ? { ...base, phase: 'debrief', help: 'model', beat: n, closing: true } : { ...base, phase: 'beat', beat: n + 1, tries: 0, help: 'model' };
     }
-    return n >= scene.beats.length ? { ...base, phase: 'debrief' } : { ...base, phase: 'beat', beat: n + 1, tries: 0 };
+    // The last beat (the character's goodbye) is said at the start of the debrief reply.
+    return n + 1 >= scene.beats.length ? { ...base, phase: 'debrief', closing: true } : { ...base, phase: 'beat', beat: n + 1, tries: 0 };
   }
   if (i.blocked) return last && (last.phase === 'debrief' || last.phase === 'after' || last.phase === 'declined' || last.phase === 'offer') ? carry(last) : undefined;
   // The learner asks for a role-play: a scene starts now (also after an earlier scene this session).
@@ -313,7 +319,8 @@ export function rolePlayLine(t: RolePlayTurn): string {
     const e = ruleBankEntry(t.entryId);
     const pair = e ? (t.under9 ? `"Right: ${q(e.right)}"` : `"Right: ${q(e.right)} Wrong: ${q(e.wrong)}"`) : '';
     const recast = t.error ? ` If their last message has the error "${q(t.error.evidence)}", say that part correctly once, in passing.` : '';
-    return `ROLE-PLAY DEBRIEF (set by the system): the scene "${s.title.en}" is over: step out of the role and speak as the tutor again.${recast} (1) One short sentence that says the role-play is finished and praises their effort, naming ONE thing they did in the scene (if you quote them, copy their exact words from the conversation above; never "you are clever"). ${e ? `(2) Then say you will look at one point from it, and give exactly these lines: "Rule: ${q(e.rule)}" and ${pair}. (3) Then ONE new practice item on this rule, as a clear fill-in or a one-sentence task set in the same place as the scene (a new sentence, not one from the scene), and stop.` : '(2) Then ONE new practice item on today\'s lesson point, and stop.'} No other rule, no recap ask, no second task. ${english} ${over}`;
+    const closing = t.closing ? ` First, still in character, react in a few words to what they said and close the scene with its last line: "${q(s.beats[s.beats.length - 1].say.en)}".` : '';
+    return `ROLE-PLAY DEBRIEF (set by the system): the scene "${s.title.en}" is over.${closing} Then step out of the role and speak as the tutor again.${recast} (1) One short sentence that says the role-play is finished and praises their effort, naming ONE thing they did in the scene (if you quote them, copy their exact words from the conversation above; never "you are clever"). ${e ? `(2) Then say you will look at one point from it, and give exactly these lines: "Rule: ${q(e.rule)}" and ${pair}. (3) Then ONE new practice item on this rule, as a clear fill-in or a one-sentence task set in the same place as the scene (a new sentence, not one from the scene), and stop.` : '(2) Then ONE new practice item on today\'s lesson point, and stop.'} No other rule, no recap ask, no second task. ${english} ${over}`;
   }
   if (t.phase !== 'beat' || !t.beat) return '';
   const beat = s.beats[t.beat - 1];
@@ -332,7 +339,7 @@ export function rolePlayLine(t: RolePlayTurn): string {
   const last = t.beat === s.beats.length ? ' This is the last line of the scene.' : '';
   const point = t.lessonPoint ? `Today's lesson point is ${q(t.lessonPoint)}: when their message has an error on it, always recast it.` : '';
   const react = t.beat === 1 ? '' : 'First react in a few words, in character, to what they actually said. If they asked you something, answer it briefly in character; if they already answered part of your line\'s question, do not ask that part again.';
-  return `ROLE-PLAY (set by the system), beat ${t.beat} of ${s.beats.length}: ${who} Stay in character. ${start} ${react} ${recast} ${point} ${help} Your line now (say it in character; you may fit it to what they said, but keep its meaning and add nothing new): "${q(beat.say.en)}"${last} ${len} Do not add new events, places, people or topics. Do not explain grammar, do not give an exercise, a rule, a score or a recap, do not ask them to say or write anything again (the lesson comes back by itself after the scene), never claim they said something they did not say, and do not ask for personal details. Then stop and wait for their answer. ${english} ${over}`.replace(/\s{2,}/g, ' ');
+  return `ROLE-PLAY (set by the system), beat ${t.beat} of ${s.beats.length}: ${who} Stay in character. ${start} ${react} ${recast} ${point} ${help} Your line now (say it in character; you may fit it to what they said, but keep its meaning and add nothing new; if it answers a question they did not ask, say it as new information instead): "${q(beat.say.en)}"${last} ${len} Do not add new events, places, people or topics. Do not explain grammar, do not give an exercise, a rule, a score or a recap, do not ask them to say or write anything again (the lesson comes back by itself after the scene), never claim they said something they did not say, and do not ask for personal details. Then stop and wait for their answer. ${english} ${over}`.replace(/\s{2,}/g, ' ');
 }
 
 // ------------------------------------------------------------------------------------------------ post-check
@@ -391,16 +398,22 @@ export function trimSceneReply(t: RolePlayTurn, reply: string): string | null {
   const kept = parts.filter((x) => !bad(x));
   if (!kept.length || kept.length === parts.length) return null;
   const text = kept.join(' ');
+  // What is left must still ask what the beat asks (a beat that asks a question keeps one).
+  const beatAsks = /\?/.test(sceneById(t.scene)?.beats[(t.beat ?? 1) - 1]?.say.en ?? '');
+  if (beatAsks && !/\?/.test(text)) return null;
   const left = sceneReplyProblems(t, text);
   return left.some((p) => HARD.test(p) || /^does not voice/.test(p)) ? null : text;
 }
 /** The fixed fallback when a regenerated reply still fails: the beat's own line (with the help the step asked for). */
-export function sceneFallback(t: RolePlayTurn): string {
+export function sceneFallback(t: RolePlayTurn, draft?: string): string {
   const s = sceneById(t.scene);
   if (!s || !t.beat) return '';
   const beat = s.beats[t.beat - 1];
   const prev = s.beats[t.beat - 2];
   const intro = t.beat === 1 ? `Let's do a short role-play: "${s.title.en}". I am ${s.character.en}. ` : '';
+  // The first usable sentence of the draft (the reaction to what they said) is kept before the fixed line, when there is one.
+  const lead = draft ? sentencesOf(draft).find((x) => !TASK.test(x) && !new RegExp(META.source, 'i').test(x) && !PERSONAL_DETAILS.test(x) && !/[\u0600-\u06FF]/.test(x) && toks(x).length <= 12 && !/\?\s*$/.test(x)) : undefined;
+  if (lead && t.beat > 1 && !t.help) return `${lead} ${beat.say.en}`;
   if (t.help === 'hint') return `${beat.say.en} For example: "${beat.example.en}"`;
   if (t.help === 'model' && prev) return `You can say: "${prev.example.en}" ${beat.say.en}`;
   return `${intro}${beat.say.en}`;

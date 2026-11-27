@@ -114,7 +114,7 @@ export function applyReplyGuards(language: LanguageTeachingContext, answer: stri
     if (soft.length) postCheck = [...(postCheck ?? []), ...soft.map((x) => `roleplay_soft:${x.split(' (')[0].replace(/\s+/g, '_')}`)];
     if (hard.length) {
       const trimmed = trimSceneReply(rp, text);
-      const fb = trimmed ?? sceneFallback(rp);
+      const fb = trimmed ?? sceneFallback(rp, text);
       if (fb) { text = fb; rolePlayFixed = true; postCheck = [...(postCheck ?? []), trimmed ? 'roleplay_trimmed' : 'roleplay_fallback', ...hard.map((x) => `roleplay_hard:${x.split(' (')[0].replace(/\s+/g, '_')}`)]; }
     }
   } else if (rp && rp.phase === 'debrief') {
