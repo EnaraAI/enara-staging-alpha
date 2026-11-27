@@ -1,5 +1,5 @@
 import { engineV2 } from '../services/engineV2';
-import { expressivePersona, SUBJECT_CUE_LINE, lookLine, panelSide, planTurnCues, secondSentenceAt, startExpressiveCall, stripCueTags, type Cue, type CuePlan, type ExpressiveCall, type VoiceProfile } from '../services/liveExpressive';
+import { expressivePersona, subjectCueLine, withLookLine, lookLine, panelSide, planTurnCues, secondSentenceAt, startExpressiveCall, stripCueTags, type Cue, type CuePlan, type ExpressiveCall, type VoiceProfile } from '../services/liveExpressive';
 import { guardedEmitter } from '../services/guardedStream';
 import { guardSpokenMarker, spokenLines } from '../services/spokenInput';
 import { DEMO_LIMITS, isDemoSessionInstitution } from '../config/demo';
@@ -916,7 +916,7 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
   const emit = (raw: string) => {
     let text = cueCall ? stripCueTags(raw) : raw;
     if (!text) return;
-    let lookChars = 0;
+    let splitAt: number | undefined; // where the second cue goes, once the look line is in
     if (cueCall && cuePlan === undefined) {
       const planned = planTurnCues({ call: cueCall, kind, language: languagePrep?.context, marker: languageMarker, reply: text, learnerText: last?.content ?? '', drawing: visualStarted });
       cuePlan = planned && { first: planned.first, ...(planned.then ? { then: planned.then } : {}) };
@@ -924,12 +924,12 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
       if (cuePlan) writeCue(cuePlan.first);
       // A drawing opens with this reply: the tutor tells the learner to look at it (Anam cannot turn the face to it).
       const look = visualStarted ? lookLine(text, !languagePrep && (spokenLanguage ?? session.language) === 'arabic' ? 'arabic' : 'english') : null;
-      if (look) { text = `${look} ${text}`; lookChars = look.length + 1; }
+      if (look) ({ text, at: splitAt } = withLookLine(text, look));
     }
     if (cuePlan?.then) {
       // The second cue (stuck: concerned, then supportive) starts with the reply's second sentence.
-      const second = secondSentenceAt(text.slice(lookChars));
-      const at = /[.!?؟]["')\]]*\s*$/.test(spoken) ? 0 : second < 0 ? -1 : second + lookChars;
+      // With a look line after the first sentence, the second cue starts with it.
+      const at = /[.!?؟]["')\]]*\s*$/.test(spoken) ? 0 : splitAt ?? secondSentenceAt(text);
       if (at >= 0) {
         emitText(text.slice(0, at));
         writeCue(cuePlan.then);
@@ -948,7 +948,7 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
       mode: 'voice',
       learner: learner ? describeSnapshot(learner) : undefined,
       // liveExpressive, every other subject: the reply opens with the hidden grading line, so its cue follows the verdict.
-      pedagogy: arbitratePedagogy([plan?.prompt, policyRule(tutorPolicy.policy), cueCall && !languagePrep ? SUBJECT_CUE_LINE : undefined, sceneActive || subjectRolePlay?.phase === 'after' ? rolePlayLine(subjectRolePlay!) : undefined].filter(Boolean).join('\n\n') || undefined, Boolean(languagePrep)),
+      pedagogy: arbitratePedagogy([plan?.prompt, policyRule(tutorPolicy.policy), cueCall && !languagePrep ? subjectCueLine((spokenLanguage ?? session.language) === 'arabic') : undefined, sceneActive || subjectRolePlay?.phase === 'after' ? rolePlayLine(subjectRolePlay!) : undefined].filter(Boolean).join('\n\n') || undefined, Boolean(languagePrep)),
       planActive: Boolean(plan),
       ...(languagePrep?.parts ? { languageContextStable: languagePrep.parts.stable, languageContextDynamic: `${languagePrep.parts.dynamic}${speakingLines}${heardLines}` } : { languageContext: languagePrep?.prompt ? `${languagePrep.prompt}${speakingLines}${heardLines}` : languagePrep?.prompt }),
     };

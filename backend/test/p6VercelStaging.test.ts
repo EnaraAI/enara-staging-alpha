@@ -82,7 +82,7 @@ describe('vercel.json', () => {
     expect(cfg.buildCommand).toMatch(/NODE_ENV=production VITE_API_URL=\/api npx vite build/);
     expect(cfg.outputDirectory).toBe('frontend/dist');
     expect(cfg.git.deploymentEnabled).toEqual({ main: false, 'staging-alpha': true });
-    expect(cfg.regions).toEqual(['iad1']);
+    expect(cfg.regions).toEqual(['cdg1']); // lms-test: Paris, next to the Atlas cluster (eu-west-3)
     expect(Object.keys(cfg.functions)).toEqual(['api/index.js']);
   });
 

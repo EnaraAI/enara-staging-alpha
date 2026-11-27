@@ -62,7 +62,7 @@
 
 | File | Change | Verified by |
 |---|---|---|
-| `vercel.json`, `api/index.js`, `package.json` (new, root) | one Vercel project: SPA built with `VITE_API_URL=/api`, backend as one function (`iad1`, 60 s). No crons, no external rewrites; only `staging-alpha` deploys | `p6VercelStaging`, local build, handler run |
+| `vercel.json`, `api/index.js`, `package.json` (new, root) | one Vercel project: SPA built with `VITE_API_URL=/api`, backend as one function (`cdg1` Paris since 27 Nov 2026, next to the lms-test database; 60 s). No crons, no external rewrites; only `staging-alpha` deploys | `p6VercelStaging`, local build, handler run |
 | `backend/src/config/stagingGuard.ts` | on Vercel, refuses to start without all four `R2_*` or with `SERVE_LOCAL_UPLOADS=true` (all files in R2). In staging, refuses `TRUST_PROXY=true` (requires a hop count), because `true` lets clients spoof their IP and bypass rate limits | `p6VercelStaging` (9 tests), `p6StagingGuard` |
 | `backend/staging.env.template` | `TRUST_PROXY=1` | — |
 | `backend/test/p6VercelStaging.test.ts` (new) | the tests above | full suite 746/746 |
