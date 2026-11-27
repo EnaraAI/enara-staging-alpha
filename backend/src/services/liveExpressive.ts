@@ -10,7 +10,8 @@ import { maintenanceAllowed, MIN_TOKEN_LENGTH } from '../maintenance/guards';
 import { Institution } from '../models/Institution';
 import { logger } from '../utils/logging';
 import { engineV2 } from './engineV2';
-import { loadTrustedAgeBand } from './languageTeachingContext';
+import { finalizeLanguageTurn, loadTrustedAgeBand, type LanguageTeachingContext } from './languageTeachingContext';
+import type { StrippedReply } from './languageLearningState';
 import { faceVersions } from './tutorFaceService';
 
 export const EXPRESS_MODEL = 'cara-4.1-express';
@@ -118,4 +119,99 @@ export async function startExpressiveCall(p: { headers: Record<string, unknown>;
   if (!on) return { on: false, ...(override !== undefined ? { test: true } : {}) };
   const [band, cara4] = await Promise.all([expressiveBand(p), faceSupportsExpress(p.avatarId)]);
   return { on: true, band, cara4, ...(override !== undefined ? { test: true } : {}) };
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// PR 2: cues chosen by code from the turn's verdict, never by the model (Anam inline cues / director_note_cue).
+//   right answer -> happy (children: warm, the calm one); wrong -> supportive; new question -> curious;
+//   stuck -> concerned, then supportive from the second sentence. Blocked: angry, sad, distressed, laughter.
+// The cue travels as its own NDJSON line ({"cue":"happy"}), never inside the reply text, so it is never spoken by
+// ENARA's own voice and never reaches a caption or the transcript. Any cue tag the model writes itself is removed.
+export type Cue = 'happy' | 'warm' | 'supportive' | 'curious' | 'concerned';
+export const ALLOWED_CUES: readonly Cue[] = ['happy', 'warm', 'supportive', 'curious', 'concerned'];
+export const BLOCKED_CUES = ['angry', 'sad', 'distressed', 'laughter'] as const;
+// Every tag Anam reads as a cue: its own eleven, and the ElevenLabs audio tags it maps onto them
+// (Anam docs integrations/elevenlabs/director-notes, "the complete alias list").
+const CUE_TAGS = [
+  'happy', 'warm', 'playful', 'curious', 'supportive', 'concerned', 'sad', 'surprised', 'angry', 'distressed', 'laughter',
+  'excited', 'happily', 'cheerfully', 'elated', 'laugh', 'laughs', 'laughing', 'laughs harder', 'starts laughing', 'chuckles', 'chuckling', 'giggles', 'giggling',
+  'whispers', 'whispering', 'quietly', 'sarcastic', 'playfully', 'curiously', 'quizzical', 'quizzically', 'sigh', 'sighs', 'exhales',
+  'sadly', 'sorrowful', 'tearful', 'crying', 'gasp', 'gasps', 'startled', 'angrily', 'furious', 'intensely', 'nervous', 'fearful', 'scared',
+];
+const CUE_TAG = new RegExp(`^[ \\t]*\\[\\s*(?:${CUE_TAGS.map((t) => t.replace(/ /g, '\\s+')).join('|')})\\s*\\][ \\t]*$`, 'i');
+/** The reply without any cue tag (the model may not choose cues). Other bracketed text ("[a] or [an]") is kept. */
+export function stripCueTags(text: string): string {
+  if (!text.includes('[')) return text;
+  let removed = false;
+  const out = text.replace(/[ \t]*\[[^\]\n]{1,40}\][ \t]*/g, (m, offset: number) => {
+    if (!CUE_TAG.test(m)) return m;
+    removed = true;
+    // Keep one space between words; none at the very start or before punctuation.
+    const after = text.charAt(offset + m.length);
+    return offset === 0 || /[\s.,!?؟;:]/.test(after) || after === '' ? '' : ' ';
+  });
+  return removed ? out : text;
+}
+export const isAllowedCue = (c: unknown): c is Cue => typeof c === 'string' && (ALLOWED_CUES as readonly string[]).includes(c);
+
+export interface TurnFacts {
+  kind: 'turn' | 'opening' | 'nudge';
+  /** The engine's verdict on the learner's answer (language courses), and what the reply does next. */
+  verdict?: string;
+  next?: string;
+  /** The learner says they don't know, asks for a hint, is confused, asks why after a try, or failed the same item 3+ times. */
+  stuck?: boolean;
+  /** A drawing opens with this reply. */
+  drawing?: boolean;
+  /** No language engine (another subject): the reply ends on a question. */
+  asks?: boolean;
+}
+export interface CuePlan { first: Cue; then?: Cue }
+const SUCCESS = new Set(['CORRECT', 'CORRECT_WITH_EQUIVALENT_FORMULATION']);
+const FAILURE = new Set(['INCORRECT', 'PARTIALLY_CORRECT']);
+/** The turn's cues, from code only. Null: no cue (the session's baseline style). */
+export function cuesForTurn(t: TurnFacts, band: ExpressiveBand): CuePlan | null {
+  if (t.kind === 'opening') return { first: 'warm' };
+  if (t.kind === 'nudge') return { first: 'supportive' };
+  if (t.stuck) return { first: 'concerned', then: 'supportive' };
+  if (t.verdict && SUCCESS.has(t.verdict)) return { first: band === 'child' ? 'warm' : 'happy', ...(t.next === 'NEW_ITEM' ? { then: 'curious' as const } : {}) };
+  if (t.verdict && FAILURE.has(t.verdict)) return { first: 'supportive' };
+  if (t.next === 'NEW_ITEM' || t.drawing || t.asks) return { first: 'curious' };
+  return null;
+}
+
+/** Stuck, from the language engine's signals for this learner message (current turn only). */
+export function stuckFromSignals(s: { learnerResponse?: string; whyAfterAttempt?: boolean; learning?: { attemptsOnItem?: number } } | undefined, verdict?: string): boolean {
+  if (!s) return false;
+  if (s.learnerResponse === 'dont_know' || s.learnerResponse === 'hint_request' || s.learnerResponse === 'confusion' || s.whyAfterAttempt) return true;
+  return Boolean(verdict && FAILURE.has(verdict) && (s.learning?.attemptsOnItem ?? 0) >= 2);
+}
+
+/** Where the second cue goes: after the first sentence of the reply (index into the text), or -1 when there is no second sentence. */
+export function secondSentenceAt(text: string): number {
+  const m = /[.!?؟](?:["')\]]*)\s+(?=\S)/.exec(text);
+  return m ? m.index + m[0].length : -1;
+}
+
+/** The turn's cues for an expressive call, from the language engine's own verdict on this reply (the same pure step that later
+ *  records the turn: finalizeLanguageTurn), the learner's signals and whether a drawing opens. Null: no cue. */
+export function planTurnCues(p: {
+  call: ExpressiveCall | undefined; kind: TurnFacts['kind']; language?: LanguageTeachingContext; marker?: StrippedReply;
+  reply: string; learnerText: string; drawing: boolean;
+}): CuePlan | null {
+  if (!p.call?.on || !p.call.cara4) return null;
+  let verdict: string | undefined;
+  let next: string | undefined;
+  if (p.language && p.kind === 'turn') {
+    try {
+      const f = finalizeLanguageTurn(p.language, { reply: p.reply, learnerText: p.learnerText, messageId: 'cue', parsed: p.marker?.assessment ?? null, malformed: p.marker?.malformed, untrustedMarkers: p.marker?.untrustedMarkers, firstMarkerNotLeading: p.marker?.firstMarkerNotLeading });
+      verdict = f.assessment.verdict;
+      next = f.assessment.next;
+    } catch {
+      verdict = undefined;
+    }
+  }
+  const stuck = p.kind === 'turn' && stuckFromSignals(p.language?.signals as Parameters<typeof stuckFromSignals>[0], verdict);
+  const asks = !p.language && /[?؟]\s*$/.test(p.reply.trim());
+  return cuesForTurn({ kind: p.kind, verdict, next, stuck, drawing: p.drawing, asks }, p.call.band ?? 'child');
 }
