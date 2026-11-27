@@ -45,9 +45,14 @@ async function login(email) {
 }
 const asUser = (token) => (path, init = {}) => site(path, { ...init, headers: { Authorization: `Bearer ${token}`, ...(init.body ? { 'Content-Type': 'application/json' } : {}), ...(init.headers ?? {}) } });
 async function deepseek(system, messages, maxTokens = 200) {
-  const r = await site('/api/maintenance/llm-compare', { method: 'POST', headers: { Authorization: `Bearer ${CI_TOKEN}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ system, messages, max_tokens: maxTokens }) });
-  const j = await r.json().catch(() => ({}));
-  return j.ok ? String(j.text ?? '').trim() : null;
+  // Up to 3 tries: a busy model endpoint must not count as a teacher's "no".
+  for (let i = 0; i < 3; i++) {
+    const r = await site('/api/maintenance/llm-compare', { method: 'POST', headers: { Authorization: `Bearer ${CI_TOKEN}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ system, messages, max_tokens: maxTokens }) }).catch(() => null);
+    const j = r ? await r.json().catch(() => ({})) : {};
+    if (j.ok && String(j.text ?? '').trim()) return String(j.text).trim();
+    await sleep(3000 * (i + 1));
+  }
+  return null;
 }
 
 async function subjectLesson(get, subject) {
