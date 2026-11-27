@@ -72,7 +72,8 @@ async function session(profile, arm) {
   const token = await login(profile.email);
   if (!token) return { profile: profile.id, arm, error: 'login' };
   const get = asUser(token);
-  const lesson = await subjectLesson(get, profile.subject);
+  let lesson = null;
+  for (let i = 0; i < 3 && !lesson; i++) { lesson = await subjectLesson(get, profile.subject).catch(() => null); if (!lesson) await sleep(5000); } // lms-test can answer slowly
   if (!lesson) return { profile: profile.id, arm, error: `no course for ${profile.subject}` };
   const start = await get('/api/avatar/session', { method: 'POST', headers: { 'x-enara-expressive-test': arm, 'x-enara-ci-token': CI_TOKEN }, body: JSON.stringify({ course_id: lesson.courseId, lesson_id: lesson.lessonId, lesson_title: lesson.lessonTitle, subject: lesson.subject, preferred_language: profile.lang }) });
   const sj = await start.json().catch(() => ({}));
@@ -217,7 +218,10 @@ async function main() {
     latencyMs: Object.fromEntries(arms.map((arm) => { const ms = ok.filter((s) => s.arm === arm).flatMap((s) => s.turns.filter((t) => t.status === 200).map((t) => t.ms)).sort((a, b) => a - b); return [arm, { median: ms[Math.floor(ms.length / 2)] ?? null, failedTurns: ok.filter((s) => s.arm === arm).flatMap((s) => s.turns).filter((t) => t.status !== 200).length }]; })),
     info: { stuckWordsCuedConcerned: `${stuckCued}/${stuckTurns.length}`, cueVsIndependentRightWrong: `${indepAgree}/${indep.length}`, subjects: [...new Set(ok.map((s) => `${s.profile}:${s.subject}/${s.lang}`))] },
   };
-  result.pass = result.cueMatch.pct >= 95 && blocked === 0 && childCalm && shown === 0 && result.teacherAccept.pct >= 90 && result.stuck.noWorse && result.failedSessions.length === 0;
+  // Added after run 3: an Arabic-medium lesson answered in English (the teacher pre-screen let it through).
+  const englishIn = (arm) => ok.filter((s) => s.arm === arm && s.lang === 'arabic').flatMap((s) => s.turns).filter((t) => t.text && !/[\u0600-\u06FF]/.test(t.text.slice(0, 60)) && (t.text.slice(0, 60).match(/[A-Za-z]/g) ?? []).length >= 12).length;
+  result.arabicRepliesInEnglish = { off: englishIn('off'), on: englishIn('on'), noWorse: englishIn('on') <= englishIn('off') };
+  result.pass = result.arabicRepliesInEnglish.noWorse && result.cueMatch.pct >= 95 && blocked === 0 && childCalm && shown === 0 && result.teacherAccept.pct >= 90 && result.stuck.noWorse && result.failedSessions.length === 0;
   writeFileSync(join(OUT, 'sim.json'), JSON.stringify({ result, sessions, judged }, null, 1));
   summary(`SIM ${JSON.stringify(result)}`);
   const mismatches = onTurns.filter((t) => !cueMatches(t, t.band)).map((t) => `${t.band} said "${t.said.slice(0, 60)}" verdict=${t.verdict} next=${t.next} cues=${t.cues.join('+') || '-'}`);
