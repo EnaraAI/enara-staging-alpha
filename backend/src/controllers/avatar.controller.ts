@@ -1,4 +1,5 @@
 import { engineV2 } from '../services/engineV2';
+import { expressivePersona, startExpressiveCall, type ExpressiveCall, type VoiceProfile } from '../services/liveExpressive';
 import { guardedEmitter } from '../services/guardedStream';
 import { guardSpokenMarker, spokenLines } from '../services/spokenInput';
 import { DEMO_LIMITS, isDemoSessionInstitution } from '../config/demo';
@@ -80,24 +81,35 @@ function requireAnam() {
 // - a quiet student is never hung up on by Anam (ENARA's call limits apply);
 // - the voice is the configured Arabic (Egyptian) or English voice, a woman's
 //   voice for faces that are women when one is configured.
+type AnamVoices = { voiceIdEn: string; voiceIdAr: string; voiceIdEnFemale?: string; voiceIdArFemale?: string };
+function anamVoiceId(language: Language, gender: 'woman' | 'man' | undefined, anam: AnamVoices): string {
+  return language === 'arabic'
+    ? (gender === 'woman' && anam.voiceIdArFemale) || anam.voiceIdAr
+    : (gender === 'woman' && anam.voiceIdEnFemale) || anam.voiceIdEn;
+}
 export function anamPersonaConfig(opts: {
   serverVoice: boolean;
   language: Language;
   avatarId: string;
   gender?: 'woman' | 'man';
-  anam: { voiceIdEn: string; voiceIdAr: string; voiceIdEnFemale?: string; voiceIdArFemale?: string };
+  anam: AnamVoices;
   listeningOptions?: boolean;
+  // liveExpressive: Cara 4.1 Express and the Director Notes style (services/liveExpressive.ts); absent = today's call.
+  expressive?: Record<string, unknown>;
 }): Record<string, unknown> {
   const { serverVoice, language, avatarId, gender, anam } = opts;
-  if (serverVoice) return { name: 'Enara', avatarId, enableAudioPassthrough: true };
+  if (serverVoice) {
+    // Audio passthrough: no Anam voice, so no voice settings (only the face's model and style).
+    const { voiceGenerationOptions: _voice, ...face } = opts.expressive ?? {};
+    return { name: 'Enara', avatarId, enableAudioPassthrough: true, ...face };
+  }
   const arabic = language === 'arabic';
-  const voiceId = arabic
-    ? (gender === 'woman' && anam.voiceIdArFemale) || anam.voiceIdAr
-    : (gender === 'woman' && anam.voiceIdEnFemale) || anam.voiceIdEn;
+  const voiceId = anamVoiceId(language, gender, anam);
   return {
     name: 'Enara',
     avatarId,
     voiceId,
+    ...(opts.expressive ?? {}),
     // Anam's own LLM stays off: the browser streams our answers to it.
     llmId: 'CUSTOMER_CLIENT_V1',
     languageCode: arabic ? 'ar' : 'en',
@@ -121,18 +133,28 @@ export function anamSessionOptions(): { dataRetention: { recording: false; trans
   return engineV2('anamNoRecording') ? { dataRetention: { recording: false, transcripts: false } } : undefined;
 }
 
-async function createAnamSessionToken(language: Language, avatarId?: string, opts: { serverVoice: boolean; gender?: 'woman' | 'man' } = { serverVoice: false }): Promise<string> {
+// liveExpressive: what the token asked Anam for (the face model and style, a child's slower voice) and the voice's provider.
+type ExpressiveApplied = { applied: boolean; speed: boolean; voice: VoiceProfile | null };
+async function createAnamSessionToken(language: Language, avatarId?: string, opts: { serverVoice: boolean; gender?: 'woman' | 'man'; expressive?: ExpressiveCall } = { serverVoice: false }): Promise<{ token: string; expressive: ExpressiveApplied }> {
   const anam = requireAnam();
   avatarId ||= anam.avatarId;
   const sessionOptions = anamSessionOptions();
-  const request = (listeningOptions: boolean) =>
+  const expr = await expressivePersona(opts.expressive, opts.serverVoice ? undefined : anamVoiceId(language, opts.gender, anam));
+  const request = (listeningOptions: boolean, expressive?: Record<string, unknown>) =>
     fetch('https://api.anam.ai/v1/auth/session-token', {
       method: 'POST',
       headers: { Authorization: `Bearer ${anam.apiKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ personaConfig: anamPersonaConfig({ ...opts, language, avatarId: avatarId!, anam, listeningOptions }), ...(sessionOptions ? { sessionOptions } : {}) }),
+      body: JSON.stringify({ personaConfig: anamPersonaConfig({ ...opts, language, avatarId: avatarId!, anam, listeningOptions, expressive }), ...(sessionOptions ? { sessionOptions } : {}) }),
       signal: AbortSignal.timeout(15_000),
     });
-  let res = await request(true);
+  let res = await request(true, expr?.fields);
+  let applied = Boolean(expr);
+  // Should Anam reject the expressive settings (face model, style, voice speed), start today's call instead, with no error.
+  if (res.status === 400 && expr) {
+    logger.warn('anam_expressive_rejected', { status: res.status });
+    applied = false;
+    res = await request(true);
+  }
   // Should Anam reject the listening settings, start the call without them.
   if (res.status === 400 && !opts.serverVoice) {
     logger.warn('anam_listening_options_rejected', { status: res.status });
@@ -143,7 +165,7 @@ async function createAnamSessionToken(language: Language, avatarId?: string, opt
     logger.warn('anam_session_token_failed', { status: res.status });
     throw new AppError('Could not start the live tutor', 502, 'AVATAR_UNAVAILABLE');
   }
-  return data.sessionToken;
+  return { token: data.sessionToken, expressive: { applied, speed: applied && Boolean(expr?.speed), voice: expr?.voice ?? null } };
 }
 
 // One database round trip on the common path: the lookup also records the
@@ -300,9 +322,12 @@ export const startAvatarSession = asyncHandler(async (req: AuthRequest, res: Res
   // ENARA's own voice when it works, else the video tutor's voice and listening.
   // avatarSpeaking (owner go 21 Nov 2026): the avatar uses Anam's own speech-to-text and voice; ElevenLabs is not used for it.
   const serverVoice = avatarSpeakingUsesAnamVoice() ? false : await isElevenLabsVoiceUsable();
+  // liveExpressive: style by age band on a Cara 4 face (or a CI-only per-call test override on lms-test).
+  const expressive = await startExpressiveCall({ headers: req.headers as Record<string, unknown>, institutionId: req.user!.institutionId, studentId: req.user!.studentId, avatarId: face?.avatarId || requireAnam().avatarId });
   let sessionToken: string;
+  let expressiveApplied: ExpressiveApplied;
   try {
-    sessionToken = await createAnamSessionToken(language, face?.avatarId, { serverVoice, gender: face?.gender });
+    ({ token: sessionToken, expressive: expressiveApplied } = await createAnamSessionToken(language, face?.avatarId, { serverVoice, gender: face?.gender, expressive }));
   } catch (error) {
     await releaseAiBudget(ticket);
     throw error;
@@ -328,6 +353,7 @@ export const startAvatarSession = asyncHandler(async (req: AuthRequest, res: Res
     avatarId: face?.avatarId,
     voiceGender: face?.gender,
     speech: serverVoice ? 'server' : 'avatar',
+    ...(expressive.on ? { expressive: { on: true, band: expressive.band, cara4: expressiveApplied.applied } } : {}),
   });
 
   // Students' calls are kept as a transcript with their tutor chats.
@@ -358,6 +384,8 @@ export const startAvatarSession = asyncHandler(async (req: AuthRequest, res: Res
     fallback_reason: null,
     // avatarSpeaking: record short sentence clips for pronunciation feedback (adults only, provider ready).
     pronunciation: await pronunciationClipsFor(session.studentId),
+    // The CI screenshot run only (per-call test override): what the call was started with. Names and numbers, no ids.
+    ...(expressive.test ? { expressive_test: { on: expressive.on, band: expressive.band ?? null, cara4: expressiveApplied.applied, speed: expressiveApplied.speed, voice: expressiveApplied.voice } } : {}),
   });
 });
 
@@ -374,7 +402,8 @@ export const listAvatarVoices = asyncHandler(async (req: AuthRequest, res: Respo
       .filter((e): e is [string, string] => Boolean(e[1]))
       .map(([use, id]) => [id, use]),
   );
-  const summary = (v: Record<string, unknown>) => ({ id: v.id, name: v.displayName, gender: v.gender, country: v.country, description: v.description, tags: v.displayTags, sample: v.sampleUrl });
+  // provider and model: whether a voice can be slowed (liveExpressive: ElevenLabs v3/v4 cannot).
+  const summary = (v: Record<string, unknown>) => ({ id: v.id, name: v.displayName, gender: v.gender, country: v.country, description: v.description, tags: v.displayTags, sample: v.sampleUrl, provider: v.provider ?? null, model: v.providerModelId ?? null });
   const inUse: Array<Record<string, unknown>> = [];
   const voices: Array<Record<string, unknown>> = [];
   for (let page = 1; page <= 10; page++) {
@@ -409,7 +438,7 @@ export const switchAvatarLanguage = asyncHandler(async (req: AuthRequest, res: R
   const ticket = await reserveAttempt({ feature: 'avatar_session', provider: 'anam', modelName: session.avatarId || 'anam-default', ...(requireAnam().reserveUsd ? { boundUsd: requireAnam().reserveUsd } : {}) }, `avatar:${session.id}:switch:${randomUUID()}`, 48 * 60 * 60 * 1000);
   let sessionToken: string;
   try {
-    sessionToken = await createAnamSessionToken(language, session.avatarId, { serverVoice: session.speech === 'server', gender: session.voiceGender });
+    ({ token: sessionToken } = await createAnamSessionToken(language, session.avatarId, { serverVoice: session.speech === 'server', gender: session.voiceGender, expressive: session.expressive?.on && session.expressive.cara4 ? { on: true, band: session.expressive.band, cara4: true } : undefined }));
   } catch (error) {
     await releaseAiBudget(ticket);
     throw error;
