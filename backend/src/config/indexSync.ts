@@ -11,7 +11,10 @@ import path from 'node:path';
 import mongoose from 'mongoose';
 import { logger, serializeError } from '../utils/logging';
 
-const MODEL_DEFINITION = /\bmodel(<[^>]*>)?\(\s*['"`][A-Z]/;
+// TypeScript source: model<IUser>('User', …) or mongoose.model('User', …). Compiled CommonJS (the build that runs on
+// lms-test): (0, mongoose_1.model)('User', …). All three name the model with a capital letter.
+const MODEL_DEFINITION = /\bmodel\)?(<[^>]*>)?\(\s*['"`][A-Z]/;
+const MODEL_NAME = /\bmodel\)?(?:<[^>]*>)?\(\s*['"`]([A-Z]\w*)['"`]/g;
 const SKIP_DIR = new Set(['scripts', 'node_modules', 'test', 'tests', '__tests__']);
 
 /** Files of this build that define a Mongoose model (scripts and tests excluded). */
@@ -29,12 +32,18 @@ export function modelFiles(root = path.resolve(__dirname, '..')): string[] {
   return out.sort();
 }
 
-export interface IndexSyncResult { files: number; models: number; failed: { model: string; error: string }[]; missing: { model: string; key: string }[]; ms: number }
+export interface IndexSyncResult { files: number; models: number; failed: { model: string; error: string }[]; missing: { model: string; key: string }[]; unloaded: string[]; ms: number }
 
 export async function ensureAllIndexes(files = modelFiles()): Promise<IndexSyncResult> {
   const t0 = Date.now();
-  for (const f of files) await import(f);
+  const declared = new Set<string>();
+  for (const f of files) {
+    for (const m of fs.readFileSync(f, 'utf8').matchAll(MODEL_NAME)) declared.add(m[1]);
+    await import(f);
+  }
   const names = mongoose.modelNames();
+  // Every model a file of this build defines must now be registered (else its indexes would be skipped).
+  const unloaded = [...declared].filter((n) => !names.includes(n)).sort();
   const failed: IndexSyncResult['failed'] = [];
   // A few at a time: gentle on the free tier, fast enough for the deploy step.
   const queue = [...names];
@@ -59,7 +68,7 @@ export async function ensureAllIndexes(files = modelFiles()): Promise<IndexSyncR
       if (!existing.has(key)) missing.push({ model: name, key });
     }
   }
-  const result = { files: files.length, models: names.length, failed, missing, ms: Date.now() - t0 };
-  logger.info('index_sync', { files: result.files, models: result.models, failed: failed.length, missing: missing.length, ms: result.ms });
+  const result = { files: files.length, models: names.length, failed, missing, unloaded, ms: Date.now() - t0 };
+  logger.info('index_sync', { files: result.files, models: result.models, failed: failed.length, missing: missing.length, unloaded: unloaded.length, ms: result.ms });
   return result;
 }
