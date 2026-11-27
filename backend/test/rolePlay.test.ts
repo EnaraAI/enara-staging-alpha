@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { rolePlayStep, pickScene, eligibleScenes, mayOffer, classifyBeatReply, detectSceneError, debriefEntry, rolePlayLine, sceneReplyProblems, sceneFallback, ensureDebrief, ensureOffer, sceneCard, asksForRolePlay, saysYes, ROLEPLAY_OFFER_FROM, type RolePlayTurn } from '../src/services/rolePlay';
+import { rolePlayStep, pickScene, eligibleScenes, mayOffer, classifyBeatReply, detectSceneError, debriefEntry, rolePlayLine, sceneReplyProblems, hardSceneProblems, lessonTargets, sceneFallback, ensureDebrief, ensureOffer, sceneCard, asksForRolePlay, saysYes, ROLEPLAY_OFFER_FROM, type RolePlayTurn } from '../src/services/rolePlay';
 import { applyReplyGuards } from '../src/services/languageTurnPipeline';
 import { sceneById, CHILD_SCENES, SCENES } from '../src/services/roleplayScenes';
 import { engineV2 } from '../src/services/engineV2';
@@ -114,6 +114,16 @@ describe('scene choice (code, not the model)', () => {
   });
 });
 
+describe('today\'s lesson point (its own words)', () => {
+  it('a scene that practises it scores higher; the debrief falls back to it; the beat line asks for recasts on it', () => {
+    expect(lessonTargets('Jobs and the verb be; be: am/is/are; Uses a/an before a job')).toEqual(expect.arrayContaining(['EN-F-A1-GR-copula-be', 'EN-F-A1-GR-article-a-an']));
+    expect(lessonTargets('Last holiday (past simple)')).toEqual(expect.arrayContaining(['EN-F-A2-GR-past-simple-regular', 'EN-F-A2-GR-past-simple-irregular']));
+    expect(pickScene({ child: false, ageBand: 'adult', level: 'B1', lessonText: 'Last holiday (past simple)', seed: 's' }).targets.some((t) => /past-simple/.test(t))).toBe(true);
+    expect(debriefEntry(sceneById('airport-checkin')!, [], undefined, 'Last holiday (past simple)')?.id).toMatch(/past-simple/);
+    expect(rolePlayLine({ scene: 'restaurant-order', phase: 'beat', beat: 3, tries: 0, lessonPoint: 'Daily routines (he/she -s)' })).toMatch(/Today's lesson point is Daily routines \(he\/she -s\): when their message has an error on it, always recast it/);
+  });
+});
+
 describe('the model only voices the current beat; post-check keeps it in the scene', () => {
   const beat = (n: number, extra: Partial<RolePlayTurn> = {}): RolePlayTurn => ({ scene: 'restaurant-order', phase: 'beat', beat: n, tries: 0, errs: [], ...extra });
   it('the system line gives the fixed line of this beat only', () => {
@@ -127,6 +137,8 @@ describe('the model only voices the current beat; post-check keeps it in the sce
   it('flags teaching talk, personal details, Arabic, length, a missing scene line; child replies outside the Starters words', () => {
     expect(sceneReplyProblems(beat(2), 'Here is the menu. Would you like something to drink?')).toEqual([]);
     expect(sceneReplyProblems(beat(2), 'Good grammar! The rule is: use some. Here is the menu. Would you like a drink?')[0]).toMatch(/teaching talk/);
+    expect(hardSceneProblems(beat(2), 'Here is the menu. Complete this sentence: I would like ___.')[0]).toMatch(/lesson task/);
+    expect(hardSceneProblems(beat(2), 'Good grammar! Here is the menu. Would you like a drink?')).toEqual([]);
     expect(sceneReplyProblems(beat(2), 'Here is the menu. What is your phone number? Would you like a drink?')).toContain('asks for personal details');
     expect(sceneReplyProblems(beat(2), 'Let us talk about football and your favourite team today instead.')).toContain('does not voice the scene line');
     const kid: RolePlayTurn = { scene: 'kids-fruit-shop', phase: 'beat', beat: 2, tries: 0, errs: [], child: true };
@@ -138,10 +150,16 @@ describe('the model only voices the current beat; post-check keeps it in the sce
   it('a reply still off the scene after the regeneration becomes the beat line (shared guards, both channels)', () => {
     process.env.ENARA_ENGINE_V2 = 'liveRolePlay';
     const language = { rolePlay: beat(2), learner: {}, lesson: { spec: {} }, signals: {}, moves: [] } as never;
-    const g = applyReplyGuards(language, 'Let us do a grammar exercise about some and any.', '');
+    // a lesson task in the scene is unusable: the beat's own line
+    const g = applyReplyGuards(language, 'Here is the menu. Fill in: I would like ___ water.', '');
     expect(g.text).toBe(restaurant.beats[1].say.en);
     expect(g.rolePlayFixed).toBe(true);
-    expect(g.postCheck).toContain('roleplay_fallback');
+    expect(g.postCheck).toEqual(expect.arrayContaining(['roleplay_fallback', 'roleplay_hard:a_lesson_task_inside_the_scene']));
+    // softer problems only asked for the regeneration: the reply stays, the problem is recorded
+    const soft = applyReplyGuards(language, 'Let us talk about grammar and football today instead.', '');
+    expect(soft.text).toBe('Let us talk about grammar and football today instead.');
+    expect(soft.rolePlayFixed).toBeUndefined();
+    expect(soft.postCheck).toEqual(expect.arrayContaining(['roleplay_soft:teaching_talk_inside_the_scene', 'roleplay_soft:does_not_voice_the_scene_line']));
     expect(sceneFallback(beat(4, { help: 'model' }))).toBe(`You can say: "${restaurant.beats[2].example.en}" ${restaurant.beats[3].say.en}`);
     expect(sceneFallback(beat(3, { help: 'hint' }))).toContain(restaurant.beats[2].example.en);
   });

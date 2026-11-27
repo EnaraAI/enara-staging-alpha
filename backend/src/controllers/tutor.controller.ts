@@ -15,7 +15,7 @@ import { OUT_OF_SCOPE_LINE, outOfScopeTurn } from '../services/groundedRefusal';
 import { asksToExplainAgain, retrieveWithRewrite, reusePassages } from '../services/retrievalBoost';
 import { gradeAllSubjectsOn, practiceOutcome, practiceTurnFrom, SUBJECT_GRADE_LINE } from '../services/subjectPractice';
 import { recordOutcomeForError, recordTutorOutcome, adaptiveSpacingOn, removeExamItems } from '../services/errorsToWorkOn';
-import { prepareLanguageContext, applyReplyGuards, completeLanguageTurn, languageHistoryFrom, arbitratePedagogy, exampleGuardCheck, exampleGuardRegenNote, rolePlayRegenNote, type ClosingAskStatus } from '../services/languageTurnPipeline'; // shared with the live avatar
+import { prepareLanguageContext, applyReplyGuards, completeLanguageTurn, languageHistoryFrom, arbitratePedagogy, exampleGuardCheck, exampleGuardRegenNote, rolePlayRegenNote, rolePlayDraftUsable, type ClosingAskStatus } from '../services/languageTurnPipeline'; // shared with the live avatar
 import { AssessmentMarkerFilter, filterSummary, stripAssessmentMarkers, type StrippedReply } from '../services/languageLearningState';
 import {
   curriculumFromCourse,
@@ -569,7 +569,7 @@ export const sendTutorMessage = asyncHandler(async (req: AuthRequest, res: Respo
       const again = await queryDirectTutorModel({ ...params, pedagogy: [params.pedagogy, sceneNote].filter(Boolean).join('\n\n') });
       if (again) {
         const stripped2 = stripAssessmentMarkers(again.answer);
-        if (stripped2.text && !rolePlayRegenNote(turn.language, stripped2.text)) { turn.languageMarker = turn.spoken ? guardSpokenMarker(stripped2, turn.text) : stripped2; reply = { ...again, answer: stripped2.text }; }
+        if (stripped2.text && rolePlayDraftUsable(turn.language, stripped2.text)) { turn.languageMarker = turn.spoken ? guardSpokenMarker(stripped2, turn.text) : stripped2; reply = { ...again, answer: stripped2.text }; }
       }
     }
     // repairOnce: a graded turn whose reply has no trusted hidden line gets ONE regeneration with the reason; otherwise the first draft stays.

@@ -14,7 +14,7 @@ import { exampleGuardHits, removeGuardHits, ruleLinePostCheck, GUARD_REGEN_REASO
 import { ruleBankEntry } from './ruleBank';
 import { removeFalseWrongs } from './pairCheck';
 import { under9 } from './languageTeachingContext';
-import { rolePlayActive, sceneReplyProblems, sceneFallback, ensureDebrief, ensureOffer, rolePlayTagOf, sceneCard, SCENE_REGEN_NOTE, type SceneCard } from './rolePlay';
+import { rolePlayActive, sceneReplyProblems, hardSceneProblems, sceneFallback, ensureDebrief, ensureOffer, rolePlayTagOf, sceneCard, SCENE_REGEN_NOTE, type SceneCard } from './rolePlay';
 import { recordRolePlayError } from './errorsToWorkOn';
 
 /** liveRolePlay: the note for ONE regeneration when a scene reply leaves the scene (both channels call this before the guards); undefined = keep it. */
@@ -24,6 +24,8 @@ export function rolePlayRegenNote(language: LanguageTeachingContext | null | und
   const p = sceneReplyProblems(t, answer);
   return p.length ? SCENE_REGEN_NOTE(p) : undefined;
 }
+/** liveRolePlay: a regenerated scene reply is kept unless it still has a problem that makes it unusable (then the guards use the beat's line). */
+export const rolePlayDraftUsable = (language: LanguageTeachingContext | null | undefined, answer: string): boolean => !language?.rolePlay || language.rolePlay.phase !== 'beat' || !hardSceneProblems(language.rolePlay, answer).length;
 /** liveRolePlay: the scene card for the client (the live call's side panel); null outside a scene. */
 export const rolePlayCardOf = (language: LanguageTeachingContext | null | undefined): SceneCard | null => sceneCard(language?.rolePlay);
 
@@ -105,8 +107,12 @@ export function applyReplyGuards(language: LanguageTeachingContext, answer: stri
   // right/wrong pair, and the offer question, are guaranteed by code.
   const rp = language.rolePlay; let rolePlayFixed = false;
   if (rp && rp.phase === 'beat') {
-    const p = sceneReplyProblems(rp, text);
-    if (p.length) { const fb = sceneFallback(rp); if (fb) { text = fb; rolePlayFixed = true; postCheck = [...(postCheck ?? []), 'roleplay_fallback']; } }
+    // Only a reply that is unusable (personal details, Arabic, a lesson task, words a young learner may not know) is replaced; softer problems
+    // (not voicing the line, too long, teaching words) only asked for the one regeneration and are recorded.
+    const hard = hardSceneProblems(rp, text);
+    const soft = sceneReplyProblems(rp, text).filter((x) => !hard.includes(x));
+    if (soft.length) postCheck = [...(postCheck ?? []), ...soft.map((x) => `roleplay_soft:${x.split(' (')[0].replace(/\s+/g, '_')}`)];
+    if (hard.length) { const fb = sceneFallback(rp); if (fb) { text = fb; rolePlayFixed = true; postCheck = [...(postCheck ?? []), 'roleplay_fallback', ...hard.map((x) => `roleplay_hard:${x.split(' (')[0].replace(/\s+/g, '_')}`)]; } }
   } else if (rp && rp.phase === 'debrief') {
     const d = ensureDebrief(rp, text);
     if (d.added) { text = d.text; rolePlayFixed = true; postCheck = [...(postCheck ?? []), 'roleplay_debrief_added']; }

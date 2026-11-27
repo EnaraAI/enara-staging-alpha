@@ -45,6 +45,8 @@ export interface RolePlayTurn extends RolePlayTag {
   entryId?: string;
   child?: boolean;
   under9?: boolean;
+  /** Today's lesson point in a few words (the lesson's title or grammar), for the recasts inside the scene. */
+  lessonPoint?: string;
 }
 
 export const ROLEPLAY_OFFER_FROM = 6; // tutor replies already given this session before the tutor may offer a scene
@@ -117,7 +119,35 @@ export interface PickInput {
   objectiveCode?: string;
   /** Tie-break seed (learner and day), so the choice varies but is reproducible. */
   seed?: string;
+  /** The lesson's own words (title, grammar, objectives, success criteria): a scene that practises today's point scores higher. */
+  lessonText?: string;
 }
+/** Today's lesson point in the lesson's own words, for the scene targets (a fixed, checked list of patterns; code only). */
+export const TARGET_HINTS: Record<string, RegExp> = {
+  'EN-F-A1-GR-copula-be': /\b(verb be|be:|am\/is\/are|am, is (?:and|or) are)\b/i,
+  'EN-F-A1-GR-article-a-an': /\b(a\/an|a or an|a and an)\b/i,
+  'EN-F-A1-GR-possessive-adjectives': /\b(possessive|my\/your|his\/her)\b/i,
+  'EN-F-A1-GR-prepositions-time': /\b(in\/on\/at|in, on (?:and|or) at|prepositions? of time)\b/i,
+  'EN-F-A1-GR-there-is-are': /\bthere (?:is|are)\b/i,
+  'EN-F-A1-GR-can-ability': /\bcan(?:'t| not|not)?\b/i,
+  'EN-F-A2-GR-third-person-s': /\b(he\/she\/it|he, she (?:and|or) it|third person|-s\/-es)\b/i,
+  'EN-F-A2-GR-present-continuous': /\bpresent continuous\b/i,
+  'EN-F-A2-GR-past-simple-regular': /\b(past simple|past tense|-ed)\b/i,
+  'EN-F-A2-GR-past-simple-irregular': /\b(past simple|past tense|irregular)\b/i,
+  'EN-F-A2-GR-frequency-adverbs': /\b(adverbs? of frequency|frequency|usually|always|sometimes)\b/i,
+  'EN-F-A2-GR-comparatives': /\bcomparatives?\b/i,
+  'EN-F-A2-GR-going-to': /\bgoing to\b/i,
+  'EN-F-A2-GR-some-any': /\bsome (?:and|or|\/) ?any\b/i,
+  'EN-F-A2-FN-polite-requests': /\b(polite(?:ly)?|would like|could i|can i have)\b/i,
+  'EN-F-A1-VO-food-drink': /\b(food|drinks?)\b/i,
+  'EN-F-A1-VO-numbers-time': /\b(numbers?|clock|telling the time|o'clock)\b/i,
+  'EN-F-A1-VO-days-months': /\b(days? of the week|months?)\b/i,
+  'EN-F-A2-VO-clothes-shopping': /\b(clothes|shopping)\b/i,
+  'EN-F-A1-VO-classroom-objects': /\bclassroom\b/i,
+  'EN-F-A1-VO-common-adjectives': /\badjectives?\b/i,
+};
+/** The rule-bank outcomes today's lesson practises (from its own words). */
+export const lessonTargets = (lessonText?: string): string[] => (lessonText ? Object.keys(TARGET_HINTS).filter((id) => TARGET_HINTS[id].test(lessonText)) : []);
 /** The scenes this learner may get at all (age and level). */
 export function eligibleScenes(p: Pick<PickInput, 'child' | 'ageBand' | 'level'>): RolePlayScene[] {
   if (p.child) {
@@ -144,7 +174,8 @@ export function pickScene(p: PickInput): RolePlayScene {
   }
   const fresh = pool.filter((s) => !(p.recent ?? []).includes(s.id));
   if (fresh.length) pool = fresh;
-  const score = (s: RolePlayScene) => (p.objectiveCode && s.targets.includes(p.objectiveCode) ? 3 : 0) + s.interests.filter((i) => (p.interests ?? []).includes(i)).length;
+  const lesson = lessonTargets(p.lessonText);
+  const score = (s: RolePlayScene) => (p.objectiveCode && s.targets.includes(p.objectiveCode) ? 3 : 0) + (s.targets.some((t) => lesson.includes(t)) ? 2 : 0) + s.interests.filter((i) => (p.interests ?? []).includes(i)).length;
   const best = Math.max(...pool.map(score));
   const top = pool.filter((s) => score(s) === best);
   return top[hashNum(`${p.seed ?? ''}|${top.map((s) => s.id).join(',')}`) % top.length];
@@ -195,12 +226,12 @@ export function detectSceneError(text: string): { code: string; evidence: string
 }
 
 /** The debrief's rule-bank entry: the error seen most in the scene (if it maps to an entry), else today's objective (when it is a rule-bank
- *  outcome), else the scene's first target. */
-export function debriefEntry(scene: RolePlayScene, errs: string[] = [], objectiveCode?: string): RuleBankEntry | undefined {
+ *  outcome), else today's lesson point (its own words), else the scene's first target. */
+export function debriefEntry(scene: RolePlayScene, errs: string[] = [], objectiveCode?: string, lessonText?: string): RuleBankEntry | undefined {
   const count = new Map<string, number>();
   for (const e of errs) { const o = ERROR_OUTCOME[e]; if (o && ruleBankEntry(o)) count.set(o, (count.get(o) ?? 0) + 1); }
   const top = [...count.entries()].sort((a, b) => b[1] - a[1])[0]?.[0];
-  return ruleBankEntry(top) ?? ruleBankEntry(objectiveCode) ?? scene.targets.map((t) => ruleBankEntry(t)).find(Boolean);
+  return ruleBankEntry(top) ?? ruleBankEntry(objectiveCode) ?? lessonTargets(lessonText).map((t) => ruleBankEntry(t)).find(Boolean) ?? scene.targets.map((t) => ruleBankEntry(t)).find(Boolean);
 }
 
 export interface StepInput {
@@ -256,7 +287,7 @@ export async function rolePlayStep(i: StepInput): Promise<RolePlayTurn | undefin
 }
 /** The tag stored with the reply. */
 export const rolePlayTagOf = (t: RolePlayTurn): RolePlayTag => {
-  const { error: _e, entryId: _x, child: _c, under9: _u, ...tag } = t;
+  const { error: _e, entryId: _x, child: _c, under9: _u, lessonPoint: _l, ...tag } = t;
   return tag;
 };
 /** A scene reply (offer, beat or debrief): the lesson exercise, the closing ask and the real chat wait. */
@@ -282,7 +313,7 @@ export function rolePlayLine(t: RolePlayTurn): string {
     const e = ruleBankEntry(t.entryId);
     const pair = e ? (t.under9 ? `"Right: ${q(e.right)}"` : `"Right: ${q(e.right)} Wrong: ${q(e.wrong)}"`) : '';
     const recast = t.error ? ` If their last message has the error "${q(t.error.evidence)}", say that part correctly once, in passing.` : '';
-    return `ROLE-PLAY DEBRIEF (set by the system): the scene "${s.title.en}" is over: step out of the role and speak as the tutor again.${recast} (1) One short sentence that says the role-play is finished and praises their effort, naming ONE thing they really said or did in the scene (only what is in the conversation above; never "you are clever"). ${e ? `(2) Then say you will look at one point from it, and give exactly these lines: "Rule: ${q(e.rule)}" and ${pair}. (3) Then ONE new practice item on this rule, as a clear fill-in or a one-sentence task in a new everyday situation (not from the scene), and stop.` : '(2) Then ONE new practice item on today\'s lesson point, and stop.'} No other rule, no recap ask, no second task. ${english} ${over}`;
+    return `ROLE-PLAY DEBRIEF (set by the system): the scene "${s.title.en}" is over: step out of the role and speak as the tutor again.${recast} (1) One short sentence that says the role-play is finished and praises their effort, naming ONE thing they did in the scene (if you quote them, copy their exact words from the conversation above; never "you are clever"). ${e ? `(2) Then say you will look at one point from it, and give exactly these lines: "Rule: ${q(e.rule)}" and ${pair}. (3) Then ONE new practice item on this rule, as a clear fill-in or a one-sentence task in a new everyday situation (not from the scene), and stop.` : '(2) Then ONE new practice item on today\'s lesson point, and stop.'} No other rule, no recap ask, no second task. ${english} ${over}`;
   }
   if (t.phase !== 'beat' || !t.beat) return '';
   const beat = s.beats[t.beat - 1];
@@ -299,12 +330,14 @@ export function rolePlayLine(t: RolePlayTurn): string {
       : '';
   const len = child ? 'At most 3 very short sentences, with simple Starters words only.' : 'At most 2 short sentences (one more if you start the scene or help them).';
   const last = t.beat === s.beats.length ? ' This is the last line of the scene.' : '';
+  const point = t.lessonPoint ? `Today's lesson point is ${q(t.lessonPoint)}: when their message has an error on it, always recast it.` : '';
   const react = t.beat === 1 ? '' : 'First react in a few words, in character, to what they actually said. If they asked you something, answer it briefly in character; if they already answered part of your line\'s question, do not ask that part again.';
-  return `ROLE-PLAY (set by the system), beat ${t.beat} of ${s.beats.length}: ${who} Stay in character. ${start} ${react} ${recast} ${help} Your line now (say it in character; you may fit it to what they said, but keep its meaning and add nothing new): "${q(beat.say.en)}"${last} ${len} Do not add new events, places, people or topics. Do not explain grammar, do not give an exercise, a rule, a score or a recap, and do not ask for personal details. Then stop and wait for their answer. ${english} ${over}`.replace(/\s{2,}/g, ' ');
+  return `ROLE-PLAY (set by the system), beat ${t.beat} of ${s.beats.length}: ${who} Stay in character. ${start} ${react} ${recast} ${point} ${help} Your line now (say it in character; you may fit it to what they said, but keep its meaning and add nothing new): "${q(beat.say.en)}"${last} ${len} Do not add new events, places, people or topics. Do not explain grammar, do not give an exercise, a rule, a score or a recap, and do not ask for personal details. Then stop and wait for their answer. ${english} ${over}`.replace(/\s{2,}/g, ' ');
 }
 
 // ------------------------------------------------------------------------------------------------ post-check
-const META = /\b(grammar|rule|exercise|lesson|practice item|correct answer|the answer is|well done|great job|good job|that'?s (?:right|correct)|that is (?:right|correct)|wrong|mistake|error|let'?s practi[sc]e|fill in|gap|verb form|past tense|present tense|past simple|present simple|sentence|complete:|say it again|write (?:one|a|your)|tell me one thing)\b|_{2,}/gi;
+const META = /\b(grammar|rule|exercise|lesson|practice item|correct answer|the answer is|great job|good job|that'?s (?:right|correct)|that is (?:right|correct)|wrong|mistake|error|let'?s practi[sc]e|verb form|past tense|present tense|past simple|present simple)\b/gi;
+const TASK = /_{2,}|\b(?:fill in|complete:|complete (?:this|the) sentence|write (?:one|a|your) (?:new )?sentence|tell me one thing you did|say it again:)/i;
 const STOP_WORDS = new Set(['the', 'and', 'you', 'your', 'are', 'for', 'with', 'this', 'that', 'here', 'there', 'what', 'would', 'like', 'have', 'from', 'please', 'thank', 'thanks', 'hello', 'good', 'very', 'they', 'them', 'will', 'want', 'does', 'time', 'today', 'also', 'just', 'over', 'than', 'then', 'when', 'where', 'which', 'it\'s', 'is', 'a', 'an', 'to', 'of', 'in', 'on', 'at', 'or', 'it', 'we', 'i', 'my', 'me', 'do', 'can', 'be']);
 const toks = (t: string) => t.toLowerCase().replace(/[’]/g, '\'').split(/[^a-z']+/).map((w) => w.replace(/^'+|'+$/g, '')).filter(Boolean);
 let childList: Set<string> | undefined;
@@ -326,6 +359,7 @@ export function sceneReplyProblems(t: RolePlayTurn, reply: string): string[] {
   const prev = s.beats[t.beat - 2];
   const own = new Set(toks([beat.say.en, beat.example.en, prev?.example.en ?? ''].join(' ')));
   const out: string[] = [];
+  if (TASK.test(reply)) out.push('a lesson task inside the scene (a gap, or write / complete)');
   const meta = [...reply.matchAll(META)].map((m) => m[0].toLowerCase()).filter((w) => !w.split(/\s+/).every((x) => own.has(x)));
   if (meta.length) out.push(`teaching talk inside the scene (${[...new Set(meta)].slice(0, 3).join(', ')})`);
   if (PERSONAL_DETAILS.test(reply)) out.push('asks for personal details');
@@ -343,6 +377,9 @@ export function sceneReplyProblems(t: RolePlayTurn, reply: string): string[] {
   }
   return out;
 }
+/** Problems that make a reply unusable (the beat's fixed line is used if the regeneration still has one); the others only ask for the regeneration. */
+const HARD = /^(asks for personal details|Arabic in an English scene|a lesson task inside the scene|words a young learner may not know)/;
+export const hardSceneProblems = (t: RolePlayTurn, reply: string): string[] => sceneReplyProblems(t, reply).filter((p) => HARD.test(p));
 /** The note added to the one regeneration. */
 export const SCENE_REGEN_NOTE = (problems: string[]) => `Your last draft left the role-play scene (${problems.join('; ')}). Write the reply again: only the scene line in character, as the role-play instruction says.`;
 

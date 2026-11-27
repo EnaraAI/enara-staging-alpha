@@ -12,7 +12,7 @@ import { ageFromBirthDate } from '../services/languageTeachingContext';
 import { Student } from '../models/Student';
 import { TutorSession } from '../models/TutorSession';
 import { appendTutorMessages, loadTutorMessages } from '../services/tutorMessages';
-import { prepareLanguageContext, applyReplyGuards, completeLanguageTurn, languageHistoryFrom, arbitratePedagogy, LANGUAGE_POLICY_VERSION, rolePlayRegenNote, rolePlayCardOf, type ClosingAskStatus } from '../services/languageTurnPipeline'; // the SAME engine the text chat uses
+import { prepareLanguageContext, applyReplyGuards, completeLanguageTurn, languageHistoryFrom, arbitratePedagogy, LANGUAGE_POLICY_VERSION, rolePlayRegenNote, rolePlayDraftUsable, rolePlayCardOf, type ClosingAskStatus } from '../services/languageTurnPipeline'; // the SAME engine the text chat uses
 import { AssessmentMarkerFilter, filterSummary, type StrippedReply } from '../services/languageLearningState';
 import { generateMessageId } from '../utils/idGenerator';
 import { randomUUID } from 'crypto';
@@ -862,7 +862,7 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
         const f2 = new AssessmentMarkerFilter(); let a2 = '';
         for await (const d of streamDirectTutorModel({ ...modelParams, pedagogy: [modelParams.pedagogy, sceneNote].filter(Boolean).join('\n\n') })) { if (closed) break; const v = f2.push(d); if (v) a2 += v; }
         const t2 = f2.end(); if (t2) a2 += t2;
-        if (a2.trim() && !rolePlayRegenNote(languagePrep.context, a2.trim())) { answer = a2; filter = f2; }
+        if (a2.trim() && rolePlayDraftUsable(languagePrep.context, a2.trim())) { answer = a2; filter = f2; }
       }
       languageMarker = heardLines ? guardSpokenMarker(filterSummary(filter, answer), last?.content ?? '') : filterSummary(filter, answer);
       const g = applyReplyGuards(languagePrep.context, answer.trim(), last?.content ?? '');

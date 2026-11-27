@@ -75,7 +75,7 @@ export const SCENES: RolePlayScene[] = [
     setting: { en: 'The school office on the first morning of term', ar: 'مكتب شؤون الطلاب في صباح أول يوم دراسي' },
     character: { en: 'Mrs Hoda, the school secretary', ar: 'السيدة هدى، سكرتيرة المدرسة' },
     goal: { en: 'Get your timetable and find out where and when your lessons are', ar: 'احصل على جدولك الدراسي واعرف أين ومتى تكون دروسك' },
-    targets: ['EN-F-A1-VO-days-months', 'EN-F-A1-GR-prepositions-time', 'EN-F-A1-GR-there-is-are'],
+    targets: ['EN-F-A1-VO-days-months', 'EN-F-A1-GR-prepositions-time', 'EN-F-A1-GR-there-is-are', 'EN-F-A1-GR-copula-be'],
     words: ['timetable', 'Monday', 'Tuesday', 'lesson', 'classroom', 'floor', 'canteen', 'library', 'o\'clock'],
     beats: [
       { say: { en: 'Good morning. Can I help you?', ar: 'صباح الخير. هل أستطيع مساعدتك؟' }, learner: { en: 'Say that you are a new student.', ar: 'قل إنك طالب جديد.' }, example: { en: 'Good morning. I am a new student.', ar: 'صباح الخير. أنا طالب جديد.' } },
@@ -230,7 +230,7 @@ export const SCENES: RolePlayScene[] = [
     setting: { en: 'A small pet shop', ar: 'متجر صغير للحيوانات الأليفة' },
     character: { en: 'Laila, a shop assistant', ar: 'ليلى، موظفة في المتجر' },
     goal: { en: 'Buy food and a toy for your cat', ar: 'اشترِ طعامًا ولعبة لقطتك' },
-    targets: ['EN-F-A1-GR-possessive-adjectives', 'EN-F-A1-GR-article-a-an', 'EN-F-A1-VO-common-adjectives'],
+    targets: ['EN-F-A1-GR-possessive-adjectives', 'EN-F-A1-GR-article-a-an', 'EN-F-A1-VO-common-adjectives', 'EN-F-A1-GR-copula-be'],
     words: ['cat', 'food', 'bag', 'small', 'big', 'young', 'old', 'toy', 'ball', 'mouse'],
     beats: [
       { say: { en: 'Hello! Can I help you?', ar: 'مرحبًا! هل أستطيع مساعدتك؟' }, learner: { en: 'Say what you need.', ar: 'قل ما تحتاج إليه.' }, example: { en: 'Yes, please. I need food for my cat.', ar: 'نعم، من فضلك. أحتاج إلى طعام لقطتي.' } },
