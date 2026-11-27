@@ -143,6 +143,7 @@ export class BatchedRateLimitStore implements Store {
     e.syncing = true;
     const now = Date.now();
     const resetAt = new Date(now + this.windowMs);
+    let written = false;
     try {
       const doc = (await RateLimit.findOneAndUpdate(
         { _id: this.id(key) },
@@ -159,6 +160,7 @@ export class BatchedRateLimitStore implements Store {
       e.pending -= n;
       e.shared = (doc?.hits ?? n);
       e.resetAt = (doc?.resetAt ?? resetAt).getTime();
+      written = true;
     } catch (error) {
       if (isDbUnavailableError(error)) {
         if (isDbDownError(error)) markDbUnavailable();
@@ -169,6 +171,8 @@ export class BatchedRateLimitStore implements Store {
       e.lastSync = Date.now();
       e.syncing = false;
     }
+    // Hits that arrived meanwhile: write them now if there are many (or the interval is up), else with the next hit.
+    if (written && e.pending > 0 && this.entries.get(key) === e && (e.pending >= SYNC_AT_PENDING || this.syncEveryMs === 0)) void this.sync(key, e);
   }
 
   async decrement(key: string): Promise<void> {
