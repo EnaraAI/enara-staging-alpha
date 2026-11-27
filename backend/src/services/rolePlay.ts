@@ -269,7 +269,9 @@ export function detectSceneError(text: string): { code: string; evidence: string
 
 // Numbers in the learner's answer: digits (Western and Arabic-Indic) and number words up to the thousands (English and Arabic).
 const EN_NUM: Record<string, number> = { zero: 0, one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12, thirteen: 13, fourteen: 14, fifteen: 15, sixteen: 16, seventeen: 17, eighteen: 18, nineteen: 19, twenty: 20, thirty: 30, forty: 40, fifty: 50, sixty: 60, seventy: 70, eighty: 80, ninety: 90 };
-const AR_NUM: [RegExp, number][] = [[/^(?:صفر)$/, 0], [/^(?:واحد|واحدة)$/, 1], [/^(?:اثنان|اثنين|اثنتان|اثنتين)$/, 2], [/^(?:ثلاث|ثلاثة)$/, 3], [/^(?:أربع|أربعة|اربع|اربعة)$/, 4], [/^(?:خمس|خمسة)$/, 5], [/^(?:ست|ستة)$/, 6], [/^(?:سبع|سبعة)$/, 7], [/^(?:ثماني|ثمانية|ثمان)$/, 8], [/^(?:تسع|تسعة)$/, 9], [/^(?:عشر|عشرة)$/, 10], [/^(?:عشرون|عشرين)$/, 20], [/^(?:ثلاثون|ثلاثين)$/, 30], [/^(?:أربعون|أربعين|اربعين)$/, 40], [/^(?:خمسون|خمسين)$/, 50], [/^(?:ستون|ستين)$/, 60], [/^(?:سبعون|سبعين)$/, 70], [/^(?:ثمانون|ثمانين)$/, 80], [/^(?:تسعون|تسعين)$/, 90], [/^(?:مئة|مائة)$/, 100], [/^(?:مئتان|مئتين|مائتان|مائتين)$/, 200]];
+// Egyptian colloquial forms learners say (and speech-to-text writes): اتناشر، تلاتين، أربعتاشر ...
+const AR_COLLOQUIAL: [RegExp, number][] = [[/^(?:حداشر|احداشر|إحداشر)$/, 11], [/^(?:اتناشر|إتناشر|اطناشر)$/, 12], [/^(?:تلتاشر|تلطاشر)$/, 13], [/^(?:اربعتاشر|أربعتاشر|اربعطاشر)$/, 14], [/^(?:خمستاشر|خمسطاشر)$/, 15], [/^(?:ستاشر|سطاشر)$/, 16], [/^(?:سبعتاشر|سبعطاشر)$/, 17], [/^(?:تمنتاشر|تمنطاشر)$/, 18], [/^(?:تسعتاشر|تسعطاشر)$/, 19], [/^(?:اتنين|إتنين)$/, 2], [/^(?:تلاتة|تلات|تلاته)$/, 3], [/^(?:تمانية|تمنية|تمن|تماني)$/, 8], [/^(?:تلاتين)$/, 30], [/^(?:تمانين)$/, 80], [/^(?:ميت|مية|ميه)$/, 100], [/^(?:ميتين)$/, 200]];
+const AR_NUM: [RegExp, number][] = [...AR_COLLOQUIAL,[/^(?:صفر)$/, 0], [/^(?:واحد|واحدة)$/, 1], [/^(?:اثنان|اثنين|اثنتان|اثنتين)$/, 2], [/^(?:ثلاث|ثلاثة)$/, 3], [/^(?:أربع|أربعة|اربع|اربعة)$/, 4], [/^(?:خمس|خمسة)$/, 5], [/^(?:ست|ستة)$/, 6], [/^(?:سبع|سبعة)$/, 7], [/^(?:ثماني|ثمانية|ثمان)$/, 8], [/^(?:تسع|تسعة)$/, 9], [/^(?:عشر|عشرة)$/, 10], [/^(?:أحد عشر|احد عشر)$/, 11], [/^(?:عشرون|عشرين)$/, 20], [/^(?:ثلاثون|ثلاثين)$/, 30], [/^(?:أربعون|أربعين|اربعين)$/, 40], [/^(?:خمسون|خمسين)$/, 50], [/^(?:ستون|ستين)$/, 60], [/^(?:سبعون|سبعين)$/, 70], [/^(?:ثمانون|ثمانين)$/, 80], [/^(?:تسعون|تسعين)$/, 90], [/^(?:مئة|مائة)$/, 100], [/^(?:مئتان|مئتين|مائتان|مائتين)$/, 200]];
 export function numbersIn(text: string): number[] {
   const t = text.replace(/[٠-٩]/g, (d) => String('٠١٢٣٤٥٦٧٨٩'.indexOf(d))).replace(/(\d),(\d{3})/g, '$1$2');
   const out = [...t.matchAll(/\d+(?:\.\d+)?/g)].map((m) => Number(m[0]));
@@ -411,7 +413,7 @@ const labels = (lang: LessonLang) => (lang === 'ar' ? { rule: 'القاعدة', 
 function recastLine(t: RolePlayTurn, s: RolePlayScene): string {
   const who = tx(s.character, t.lang ?? 'en');
   const e = t.error;
-  if (e?.code === 'wrong_number') return `Their answer has a wrong number: they said ${q(e.evidence)}, the right answer is ${q(e.expected ?? '')}. In character, say the right amount naturally with the short working (a recast, for example "Let me check: 100 minus 56... that is 44 pounds."). Never say "wrong" or "mistake", and do not ask them to calculate it again.`;
+  if (e?.code === 'wrong_number') return `Their answer has a wrong number: they said ${q(e.evidence)}, the right answer is ${q(e.expected ?? '')}. In character, say the right amount naturally with the short working (a recast, for example "Let me check: 100 minus 56... that is 44 pounds."). Do not call their answer right, correct or good (no "yes", "right", "صحيح", "أحسنت" before it), never say "wrong" or "mistake", and do not ask them to calculate it again.`;
   if (e?.code === 'idea_missing') return `Their answer may miss the key idea (a right answer mentions something like: ${q(e.expected ?? '')}). If what they said is wrong, say the right idea in character in a few words, kindly; if it is right in other words, accept it and go on. Never say "wrong".`;
   if (e) return `Their last message has a small error (${ERROR_LABEL[e.code] ?? e.code.replace(/_/g, ' ')}: "${q(e.evidence)}"). Before your line, say that part back correctly once, the way ${who} naturally would in the conversation (a recast: echo their words in the right form). No grammar explanation, never say "wrong" or "mistake", at most one correction.`;
   if (s.subject === 'english') return 'If their last message has an error in grammar, a word form or a missing small word (for example "I goed", "He go", "I have banana"), say that part back correctly once inside your line, the way the character naturally would (a recast: "Oh, you went to the beach!"). Never repeat a wrong form as if it were right, never call it right, and never explain it.';
@@ -569,9 +571,23 @@ export function ensureOffer(t: RolePlayTurn, reply: string): { text: string; add
 
 /** One place for the scene guards (language and other subjects alike): an unusable beat reply is trimmed or replaced by the fixed line; the
  *  debrief's rule and pair and the offer question are guaranteed. Returns the text, whether it changed, and post-check tags. */
-export function guardSceneReply(rp: RolePlayTurn | undefined, text: string): { text: string; fixed: boolean; postCheck: string[] } {
+const PRAISE_START = /(^|[.!?؟\n]\s*)(?:yes|right|correct|exactly|well done|good job|great|perfect|نعم|صحيح|صح|أحسنت|احسنت|ممتاز|برافو|تمام|بالضبط)[\s,،!.]*(?=\S)/gi;
+/** After a code-certain wrong number, praise at the start of a sentence is removed: a wrong sum is never called right. */
+export function dropPraiseOnWrong(rp: RolePlayTurn | undefined, text: string): { text: string; removed: boolean } {
+  if (rp?.error?.code !== 'wrong_number') return { text, removed: false };
+  const out = text.replace(PRAISE_START, (_m, lead: string) => lead);
+  return { text: out, removed: out !== text };
+}
+export function guardSceneReply(rp: RolePlayTurn | undefined, text0: string): { text: string; fixed: boolean; postCheck: string[] } {
   const postCheck: string[] = [];
-  if (!rp) return { text, fixed: false, postCheck };
+  if (!rp) return { text: text0, fixed: false, postCheck };
+  const dp = dropPraiseOnWrong(rp, text0);
+  if (dp.removed) postCheck.push('roleplay_praise_on_wrong_removed');
+  const text = dp.text;
+  if (dp.removed && (rp.phase !== 'beat' || !hardSceneProblems(rp, text).length)) {
+    const rest = rp.phase === 'debrief' ? ensureDebrief(rp, text) : { text, added: false };
+    return { text: rest.text, fixed: true, postCheck: rest.added ? [...postCheck, 'roleplay_debrief_added'] : postCheck };
+  }
   if (rp.phase === 'beat') {
     const hard = hardSceneProblems(rp, text);
     const soft = sceneReplyProblems(rp, text).filter((x) => !hard.includes(x));
