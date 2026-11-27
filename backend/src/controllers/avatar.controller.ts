@@ -113,14 +113,23 @@ export function anamPersonaConfig(opts: {
   };
 }
 
+// anamNoRecording: Anam keeps a video recording and a transcript of every
+// session by default. With the switch on, the session-token request asks it to
+// keep neither (sessionOptions.dataRetention, Anam docs
+// personas/session/recordings); ENARA keeps its own text transcript.
+export function anamSessionOptions(): { dataRetention: { recording: false; transcripts: false } } | undefined {
+  return engineV2('anamNoRecording') ? { dataRetention: { recording: false, transcripts: false } } : undefined;
+}
+
 async function createAnamSessionToken(language: Language, avatarId?: string, opts: { serverVoice: boolean; gender?: 'woman' | 'man' } = { serverVoice: false }): Promise<string> {
   const anam = requireAnam();
   avatarId ||= anam.avatarId;
+  const sessionOptions = anamSessionOptions();
   const request = (listeningOptions: boolean) =>
     fetch('https://api.anam.ai/v1/auth/session-token', {
       method: 'POST',
       headers: { Authorization: `Bearer ${anam.apiKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ personaConfig: anamPersonaConfig({ ...opts, language, avatarId: avatarId!, anam, listeningOptions }) }),
+      body: JSON.stringify({ personaConfig: anamPersonaConfig({ ...opts, language, avatarId: avatarId!, anam, listeningOptions }), ...(sessionOptions ? { sessionOptions } : {}) }),
       signal: AbortSignal.timeout(15_000),
     });
   let res = await request(true);
