@@ -18,6 +18,7 @@ import { UtteranceRecorder, base64 } from '../../services/utteranceRecorder';
 import { markRelayDown, relayBase } from '../../services/relay';
 import { notCaughtLine } from '../../services/voiceText';
 import { SpeechChunkCleaner, stripMarkdownForSpeech } from '../../services/speechText';
+import { cueAtSeconds, cueTag, isExpressiveCue } from '../../services/expressiveCues';
 import { WebAudioSink } from '../../services/webAudioSink';
 import { classifyMicError, isInFrame, micMessage } from '../../services/micCheck';
 import { MicProblemNotice, useMicGate, type MicProblem } from '../MicCheck';
@@ -189,6 +190,13 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
       return next.slice(-CAPTION_LINES);
     });
   }, []);
+  // liveExpressive: the last cue sent and the video tutor's own confirmations, as data attributes on the video's frame
+  // (read by the screenshot run; nothing is shown).
+  const videoFrameRef = useRef<HTMLDivElement | null>(null);
+  const markExpression = (key: 'cueSent' | 'cueApplied' | 'personaTurn' | 'personaDone', value: string) => {
+    const el = videoFrameRef.current;
+    if (el) el.dataset[key] = `${value}@${Date.now()}`;
+  };
   // Created on the student's click, so the browser lets it play sound later.
   const audioCtxRef = useRef<AudioContext | null>(null);
   const silenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -362,6 +370,17 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
         if (!trimmed) return;
         const data = JSON.parse(trimmed);
         if (data.visual === 'drawing') setArtifactHtml(DRAWING_PLACEHOLDER);
+        // liveExpressive: the cue goes into the talk stream only (the video tutor reads it; it is never spoken or shown).
+        if (isExpressiveCue(data.cue) && talkStream?.isActive()) {
+          const before = speech.flush();
+          if (before) {
+            talkStream.streamMessageChunk(before, false);
+            caption('tutor', before, 'append');
+          }
+          talkStream.streamMessageChunk(cueTag(data.cue), false);
+          markExpression('cueSent', data.cue);
+          return;
+        }
         if (data.content && talkStream?.isActive()) {
           const words = speech.push(data.content);
           if (words) {
@@ -467,6 +486,16 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
         if (!line.trim()) return;
         const data = JSON.parse(line);
         if (data.visual === 'drawing') setArtifactHtml(DRAWING_PLACEHOLDER);
+        // liveExpressive: ENARA speaks, so the cue goes to the face over the data channel, timed from the turn's start.
+        if (isExpressiveCue(data.cue)) {
+          try {
+            anamClientRef.current?.sendDirectorNoteCue(data.cue, { atSeconds: cueAtSeconds(reply.length) });
+            markExpression('cueSent', data.cue);
+          } catch {
+            // No face (voice only) or an older engine: the call goes on without the cue.
+          }
+          return;
+        }
         if (data.content) {
           reply += data.content;
           if (!inline) for (const sentence of splitter.push(data.content)) voice.say(sentence);
@@ -671,6 +700,17 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
     });
 
     if (!elevenlabs) client.addListener(AnamEvent.MESSAGE_HISTORY_UPDATED, streamEnaraAnswerToAnam);
+    // liveExpressive: when the video tutor confirms a cue, and when each spoken reply starts (screenshot run timing).
+    let lastPersonaId = '';
+    client.addListener(AnamEvent.DIRECTOR_NOTE_CUE_APPLIED, (e: { cueTag?: string }) => markExpression('cueApplied', String(e?.cueTag ?? '')));
+    client.addListener(AnamEvent.MESSAGE_STREAM_EVENT_RECEIVED, (e: { id?: string; role?: string; cueTag?: string; endOfSpeech?: boolean }) => {
+      if (e?.role === 'user' || !e?.id) return;
+      if (e.id !== lastPersonaId) {
+        lastPersonaId = e.id;
+        markExpression('personaTurn', e.cueTag ?? '');
+      }
+      if (e.endOfSpeech) markExpression('personaDone', e.id);
+    });
 
     client.addListener(AnamEvent.TALK_STREAM_INTERRUPTED, () => {
       answeringRef.current = false;
@@ -1188,6 +1228,8 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
           )}
 
           <div
+            ref={videoFrameRef}
+            data-testid="live-avatar-frame"
             className={`relative transition-all duration-500 shrink-0 ${
               artifactHtml ? 'h-[38%] lg:h-full w-full lg:w-[34%]' : 'h-full w-full'
             }`}

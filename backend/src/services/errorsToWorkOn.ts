@@ -277,6 +277,32 @@ export async function recordMoodleAnswers(p: { studentId: string; institutionId:
   return out;
 }
 
+/** liveRolePlay: an error the learner made inside a role-play scene (code-detected, corrected there by a recast). Tutor practice, not a test, so it is
+ *  usable at once. One row per (learner, objective, error code): the objective is the school's objective whose code is the rule-bank outcome
+ *  (else the outcome id itself). Ids and codes only. Never throws. */
+export async function recordRolePlayError(p: { institutionId?: string; studentId: string; code: string; outcomeId?: string; sceneId: string; messageId: string; at?: Date }): Promise<void> {
+  if (!workOnOn() || !p.outcomeId) return;
+  try {
+    const at = p.at ?? new Date();
+    const { LearningObjective } = await import('../models/LearningObjective');
+    const obj = await LearningObjective.findOne({ code: p.outcomeId, ...(p.institutionId ? { institutionId: p.institutionId } : {}) }).select('id').lean() as { id?: string } | null;
+    const objectiveId = obj?.id ?? p.outcomeId;
+    const src = { kind: 'roleplay' as const, attemptId: p.messageId, assessmentId: `roleplay:${p.sceneId}`, questionId: p.code, at };
+    const row = await ErrorToWorkOn.findOne({ studentId: p.studentId, objectiveId, errorCode: p.code });
+    if (row) {
+      if (row.status === 'dismissed') return;
+      if (!row.sources.some((x) => x.attemptId === p.messageId)) { row.sources.push(src); row.occurrences += 1; }
+      applyOutcome(row, { right: false, key: `roleplay:${p.messageId}`, at, by: 'tutor' });
+      if (at > row.lastSeenAt) row.lastSeenAt = at;
+      await row.save();
+    } else {
+      await ErrorToWorkOn.create({ id: `ewo_${randomUUID()}`, institutionId: p.institutionId, studentId: p.studentId, objectiveId, errorCode: p.code, sources: [src], occurrences: 1, firstSeenAt: at, lastSeenAt: at, status: 'open', rightStreak: 0, countedKeys: [], statusHistory: [{ at, by: 'tutor', to: 'open', reason: 'roleplay' }], ...(spacedReviewOn() ? { lastWrongAt: at, reviewStep: 0, nextReviewAt: new Date(at.getTime() + SPACED_DAYS[0] * DAY) } : {}) });
+    }
+  } catch (error) {
+    logger.warn('errors_to_work_on_roleplay_failed', { error: serializeError(error) });
+  }
+}
+
 /** Open errors the gate allows now (released AND over for this learner), optionally for one course. */
 export async function eligibleErrors(studentId: string, opts: { institutionId?: string; courseId?: string; now?: Date; ignoreDue?: boolean } = {}) {
   const { AssessmentAttempt } = await import('../models/AssessmentAttempt');
@@ -297,7 +323,7 @@ export async function eligibleErrors(studentId: string, opts: { institutionId?: 
     return Boolean(att && assignmentId && gateOpen({ attempt: att, assignment: asgOf.get(assignmentId), attemptsUsed: tries.filter((t) => t.status === 'submitted').length, attemptInProgress: tries.some((t) => t.status === 'in-progress'), now }));
   };
   // Moodle quiz errors are imported only after their own gate (closed or no attempts left, review allowed, finished): usable at once.
-  return rows.filter((r) => r.sources.some((s) => s.kind === 'practice_attempt' || s.kind === 'moodle_quiz_attempt' || ok(s.attemptId, s.assignmentId)));
+  return rows.filter((r) => r.sources.some((s) => s.kind === 'practice_attempt' || s.kind === 'moodle_quiz_attempt' || s.kind === 'roleplay' || ok(s.attemptId, s.assignmentId)));
 }
 
 /** The tutor's list for a session: synced, gated, prioritised, with objective titles and (server-side only) the source question texts for the guard. */

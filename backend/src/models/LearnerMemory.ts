@@ -28,6 +28,8 @@ export interface ISessionSummary extends Document {
   /** topicMemory: the course passages the session worked from (file and page, at most 3), and how many questions were not in the materials. */
   topics?: string[];
   outOfScope?: number;
+  /** liveRolePlay: the role-play scene ids of this session (so the next scene is a new one). */
+  roleplayScenes?: string[];
   version: string;
 }
 const summarySchema = new Schema<ISessionSummary>({
@@ -48,6 +50,7 @@ const summarySchema = new Schema<ISessionSummary>({
   nextStep: { type: String, enum: ['reteach', 'finish_item', 'next_point'], required: true },
   topics: { type: [String], default: undefined },
   outOfScope: Number,
+  roleplayScenes: { type: [String], default: undefined },
   version: { type: String, required: true },
 }, { timestamps: true });
 summarySchema.index({ studentId: 1, endedAt: -1 });

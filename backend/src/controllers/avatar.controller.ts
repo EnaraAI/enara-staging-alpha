@@ -1,5 +1,5 @@
 import { engineV2 } from '../services/engineV2';
-import { expressivePersona, startExpressiveCall, type ExpressiveCall, type VoiceProfile } from '../services/liveExpressive';
+import { expressivePersona, planTurnCues, secondSentenceAt, startExpressiveCall, stripCueTags, type Cue, type CuePlan, type ExpressiveCall, type VoiceProfile } from '../services/liveExpressive';
 import { guardedEmitter } from '../services/guardedStream';
 import { guardSpokenMarker, spokenLines } from '../services/spokenInput';
 import { DEMO_LIMITS, isDemoSessionInstitution } from '../config/demo';
@@ -13,7 +13,7 @@ import { ageFromBirthDate } from '../services/languageTeachingContext';
 import { Student } from '../models/Student';
 import { TutorSession } from '../models/TutorSession';
 import { appendTutorMessages, loadTutorMessages } from '../services/tutorMessages';
-import { prepareLanguageContext, applyReplyGuards, completeLanguageTurn, languageHistoryFrom, arbitratePedagogy, LANGUAGE_POLICY_VERSION, type ClosingAskStatus } from '../services/languageTurnPipeline'; // the SAME engine the text chat uses
+import { prepareLanguageContext, applyReplyGuards, completeLanguageTurn, languageHistoryFrom, arbitratePedagogy, LANGUAGE_POLICY_VERSION, rolePlayRegenNote, rolePlayCardOf, type ClosingAskStatus } from '../services/languageTurnPipeline'; // the SAME engine the text chat uses
 import { AssessmentMarkerFilter, filterSummary, type StrippedReply } from '../services/languageLearningState';
 import { generateMessageId } from '../utils/idGenerator';
 import { randomUUID } from 'crypto';
@@ -801,6 +801,8 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
     });
   };
   if (visualRequested || autoVisual) res.write(JSON.stringify({ visual: 'drawing' }) + '\n');
+  // liveRolePlay: the scene card for the side panel (null outside a scene), known before the reply is written.
+  if (languagePrep && engineV2('liveRolePlay')) res.write(JSON.stringify({ scene: rolePlayCardOf(languagePrep.context) }) + '\n');
 
   // avatarSpeaking (NEXT_PLAN item 5): speaking-practice line, and one pronunciation tip from the learner's last scored sentence (then cleared).
   const lastPron = avatarSpeakingOn() && languagePrep ? (session as { lastPronunciation?: { summary: string; words: string[] } }).lastPronunciation : undefined;
@@ -841,15 +843,40 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
   // it's clear whether it does.
   let head = '';
   let headDone = false;
-  const emit = (text: string) => {
+  const emitText = (text: string) => {
     if (!text) return;
     firstTextAt ??= Date.now();
     spoken += text;
     res.write(JSON.stringify({ content: text }) + '\n');
     if (inlineSpeech) for (const sentence of splitter.push(text)) sayInline(sentence);
   };
+  // liveExpressive: the turn's cues, chosen by code from the engine's verdict (never by the model). Each is its own line
+  // ({"cue":"happy"}) before the words it applies to, so it is never spoken by ENARA's voice, captioned or stored; any
+  // cue tag the model wrote is removed from the text.
+  const cueCall = session.expressive?.on && session.expressive.cara4 ? session.expressive : undefined;
+  let cuePlan: CuePlan | null | undefined;
+  const writeCue = (cue: Cue) => res.write(JSON.stringify({ cue }) + '\n');
+  const emit = (raw: string) => {
+    let text = cueCall ? stripCueTags(raw) : raw;
+    if (!text) return;
+    if (cueCall && cuePlan === undefined) {
+      cuePlan = planTurnCues({ call: cueCall, kind, language: languagePrep?.context, marker: languageMarker, reply: text, learnerText: last?.content ?? '', drawing: visualStarted });
+      if (cuePlan) writeCue(cuePlan.first);
+    }
+    if (cuePlan?.then) {
+      // The second cue (stuck: concerned, then supportive) starts with the reply's second sentence.
+      const at = /[.!?؟]["')\]]*\s*$/.test(spoken) ? 0 : secondSentenceAt(text);
+      if (at >= 0) {
+        emitText(text.slice(0, at));
+        writeCue(cuePlan.then);
+        cuePlan = { first: cuePlan.first };
+        text = text.slice(at);
+      }
+    }
+    emitText(text);
+  };
   try {
-    const modelStream = streamDirectTutorModel({
+    const modelParams: Parameters<typeof streamDirectTutorModel>[0] = {
       query,
       history: messages,
       teachingMethod: 'socratic',
@@ -859,7 +886,8 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
       pedagogy: arbitratePedagogy([plan?.prompt, policyRule(tutorPolicy.policy)].filter(Boolean).join('\n\n') || undefined, Boolean(languagePrep)),
       planActive: Boolean(plan),
       ...(languagePrep?.parts ? { languageContextStable: languagePrep.parts.stable, languageContextDynamic: `${languagePrep.parts.dynamic}${speakingLines}${heardLines}` } : { languageContext: languagePrep?.prompt ? `${languagePrep.prompt}${speakingLines}${heardLines}` : languagePrep?.prompt }),
-    });
+    };
+    const modelStream = streamDirectTutorModel(modelParams);
     // Language course: buffer the reply so the shared guards and marker handling run BEFORE anything is spoken or shown (same guarantees as the text chat).
     async function* chunks(): AsyncGenerator<string> {
       if (!languagePrep) { yield* modelStream; return; }
@@ -878,11 +906,19 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
         if (em.diverged) logger.info('avatar_sentence_guard_diverged', { removed: g.removed });
         return;
       }
-      const filter = new AssessmentMarkerFilter();
+      let filter = new AssessmentMarkerFilter();
       let answer = '';
       for await (const d of modelStream) { if (closed) break; const v = filter.push(d); if (v) answer += v; }
       const tail = filter.end();
       if (tail) answer += tail;
+      // liveRolePlay: a scene reply that leaves the scene gets ONE regeneration with the reason (the guards use the beat's fixed line if it still fails).
+      const sceneNote = closed ? undefined : rolePlayRegenNote(languagePrep.context, answer.trim());
+      if (sceneNote) {
+        const f2 = new AssessmentMarkerFilter(); let a2 = '';
+        for await (const d of streamDirectTutorModel({ ...modelParams, pedagogy: [modelParams.pedagogy, sceneNote].filter(Boolean).join('\n\n') })) { if (closed) break; const v = f2.push(d); if (v) a2 += v; }
+        const t2 = f2.end(); if (t2) a2 += t2;
+        if (a2.trim() && !rolePlayRegenNote(languagePrep.context, a2.trim())) { answer = a2; filter = f2; }
+      }
       languageMarker = heardLines ? guardSpokenMarker(filterSummary(filter, answer), last?.content ?? '') : filterSummary(filter, answer);
       const g = applyReplyGuards(languagePrep.context, answer.trim(), last?.content ?? '');
       guardedRemoved = g.removed; guardedClosingAsk = g.closingAsk;

@@ -72,6 +72,8 @@ export function summarizeTurns(msgs: MsgLike[]): Omit<ISessionSummary, keyof imp
     startedAt: new Date(ts[0]), endedAt: new Date(ts[ts.length - 1]), learnerTurns: msgs.filter((m) => m.role === 'user').length,
     right, wrong, answeredItemIds: [...answered], ...(stuckOn ? { stuckOn } : {}), stoppedWithOpenItem, nextStep,
     ...(topicMemoryOn() ? (({ topics, outOfScope }) => ({ ...(topics.length ? { topics } : {}), ...(outOfScope ? { outOfScope } : {}) }))(sessionTopics(msgs)) : {}),
+    // liveRolePlay: the scenes played in this session (ids only), so the next session picks a new one.
+    ...(engineV2('liveRolePlay') ? (() => { const sc = [...new Set(ai.map((m) => (ltOf(m) as { rolePlay?: { scene?: string; phase?: string } } | undefined)?.rolePlay).filter((r) => r?.scene && (r.phase === 'beat' || r.phase === 'debrief')).map((r) => r!.scene!))]; return sc.length ? { roleplayScenes: sc } : {}; })() : {}),
   };
 }
 const NEXT_WORDS = { reteach: 'reteach the point simply, then one easy item', finish_item: 'finish the exercise that was left open', next_point: 'a one-item recall check, then the next point' } as const;
