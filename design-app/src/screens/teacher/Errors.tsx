@@ -1,167 +1,207 @@
-import { ArrowRight, CalendarDays, CheckCircle2, Eye, Send, TrendingDown, TrendingUp } from 'lucide-react';
+// Errors to work on (class-wide), wired to lms-test:
+//   GET /api/assignments/classes                    the teacher's classes (switcher)
+//   GET /api/learning/classes/:classId/insights     misconceptionsToReview (grouped by outcome + description, with learners),
+//                                                   commonGaps (outcomes where learners show a gap) and the mastery heatmap
+// There is no class-level "errors to work on" endpoint yet (errors-to-work-on is per learner), so example mistakes,
+// trends and practice sets are shown as "Not available yet".
+import { useMemo, useState } from 'react';
+import { CalendarDays, Info, Target, Users } from 'lucide-react';
 import { useT, usePreview, num } from '@/lib/preview';
-import { Avatar, Badge, Button, Card, Progress, Tab, TabList, Tabs } from '@/components/ui';
+import { get } from '@/lib/api';
+import { Alert, Avatar, Card, Progress, Skeleton, Tab, TabList, Tabs } from '@/components/ui';
 import { cn } from '@/lib/utils';
-import { SourceBadge, TeacherShell, learner, type Source } from './common';
-
-interface Err {
-  id: string; title: { en: string; ar: string }; hint: { en: string; ar: string }; learners: string[]; mistakes: number; trend: 'up' | 'down' | 'flat';
-  examples: { wrong: string; bad: string; fix: string; who: string }[]; sources: Source[]; set: { en: string; ar: string }; assigned?: { en: string; ar: string; done: number };
-}
-
-const ERRORS: Err[] = [
-  {
-    id: 'e1', title: { en: 'Past simple of irregular verbs', ar: 'الماضي البسيط للأفعال الشاذة' }, hint: { en: 'Adding -ed to irregular verbs', ar: 'إضافة ‎-ed إلى الأفعال الشاذة' },
-    learners: ['l09', 'l17', 'l22', 'l20', 'l07', 'l02', 'l15', 'l26', 'l11', 'l16', 'l18', 'l23', 'l28', 'l05', 'l27', 'l08', 'l24'], mistakes: 46, trend: 'up',
-    examples: [{ wrong: 'We goed to the beach.', bad: 'goed', fix: 'went', who: 'l07' }, { wrong: 'She buyed a new bag.', bad: 'buyed', fix: 'bought', who: 'l22' }, { wrong: 'I eated breakfast at seven.', bad: 'eated', fix: 'ate', who: 'l09' }],
-    sources: ['rules', 'mishkat'], set: { en: '12 items · about 10 min', ar: '12 تمرينًا · نحو 10 دقائق' },
-  },
-  {
-    id: 'e2', title: { en: 'Articles a/an', ar: 'أداتا النكرة a وan' }, hint: { en: 'Choosing by the first sound, not the first letter', ar: 'الاختيار حسب أول صوت لا أول حرف' },
-    learners: ['l02', 'l15', 'l20', 'l09', 'l26', 'l17', 'l05', 'l28', 'l23', 'l11', 'l22', 'l18'], mistakes: 29, trend: 'flat',
-    examples: [{ wrong: 'I ate a apple.', bad: 'a apple', fix: 'an apple', who: 'l02' }, { wrong: 'He studies at an university.', bad: 'an university', fix: 'a university', who: 'l15' }, { wrong: 'We waited a hour.', bad: 'a hour', fix: 'an hour', who: 'l20' }],
-    sources: ['rules'], set: { en: '10 items · about 6 min', ar: '10 تمارين · نحو 6 دقائق' },
-  },
-  {
-    id: 'e3', title: { en: 'Subject–verb agreement', ar: 'التوافق بين الفاعل والفعل' }, hint: { en: 'Third person -s and there is / there are', ar: 'إضافة ‎-s مع الغائب، وthere is / there are' },
-    learners: ['l22', 'l09', 'l13', 'l16', 'l18', 'l20', 'l17', 'l01', 'l26', 'l27'], mistakes: 24, trend: 'down',
-    examples: [{ wrong: 'She don’t like tea.', bad: 'don’t', fix: 'doesn’t', who: 'l13' }, { wrong: 'There is many cars.', bad: 'is', fix: 'are', who: 'l16' }, { wrong: 'My brother play football.', bad: 'play', fix: 'plays', who: 'l22' }],
-    sources: ['mishkat', 'model'], set: { en: '12 items · about 9 min', ar: '12 تمرينًا · نحو 9 دقائق' },
-    assigned: { en: 'Practice assigned on 22 Nov', ar: 'عُيّن التدريب في 22 نوفمبر', done: 6 },
-  },
-  {
-    id: 'e4', title: { en: 'Prepositions of time (in/on/at)', ar: 'حروف الجر الزمنية: in وon وat' }, hint: { en: 'Days, dates, months and times of day', ar: 'الأيام والتواريخ والشهور وأوقات اليوم' },
-    learners: ['l05', 'l11', 'l23', 'l26', 'l02', 'l28', 'l15', 'l24'], mistakes: 15, trend: 'flat',
-    examples: [{ wrong: 'I was born on 2010.', bad: 'on', fix: 'in', who: 'l05' }, { wrong: 'See you at Monday.', bad: 'at', fix: 'on', who: 'l11' }],
-    sources: ['rules'], set: { en: '8 items · about 5 min', ar: '8 تمارين · نحو 5 دقائق' },
-  },
-  {
-    id: 'e5', title: { en: 'Spelling: doubling the final consonant', ar: 'الإملاء: مضاعفة الحرف الساكن الأخير' }, hint: { en: 'stop → stopped, begin → beginning', ar: 'مثل stopped وbeginning' },
-    learners: ['l17', 'l20', 'l09', 'l27', 'l02', 'l16'], mistakes: 11, trend: 'down',
-    examples: [{ wrong: 'The bus stoped suddenly.', bad: 'stoped', fix: 'stopped', who: 'l17' }, { wrong: 'At the begining of the trip…', bad: 'begining', fix: 'beginning', who: 'l27' }],
-    sources: ['rules'], set: { en: '10 words · about 5 min', ar: '10 كلمات · نحو 5 دقائق' },
-  },
-];
+import { ClassPicker, EmptyPanel, ErrorPanel, NoClasses, NotYet, SkeletonRows, TeacherShell, arr, learnersAr, numOr, obj, str, useLoad, useSelectedClass, useTeacherClasses } from './common';
 
 const T = {
   en: {
-    title: 'Errors to work on', sub: 'Grade 9 – B · common errors across the class',
-    w2: 'Last 2 weeks', unit: 'This unit', term: 'This term',
-    based: 'Based on 312 answers from 26 learners · updated today at 07:00',
-    learnersOf: (n: number) => `${n} of 28 learners`, mistakes: (n: number) => `${n} mistakes`,
-    trend: { up: 'More than last fortnight', down: 'Fewer than last fortnight', flat: 'About the same' },
-    examples: 'Example mistakes', who: 'Learners', found: 'Found by', more: (n: number) => `+${n} more`,
-    assign: 'Assign practice', assignTo: (n: number) => `Assign to ${n} learners`, previewSet: 'Preview set', practice: 'Practice set',
-    done: (d: number, n: number) => `${d} of ${n} finished`, remind: 'Send reminder',
+    title: 'Errors to work on', sub: (c: string) => `${c} · common errors across the class`,
+    tErrors: 'Common errors', tOutcomes: 'Weakest outcomes',
+    based: (n: number, d: number) => `Based on ${n} ${n === 1 ? 'learner' : 'learners'} · ${d} finished a diagnostic · computed from stored records`,
+    learnersOf: (n: number, m: number) => `${n} of ${m} learners`, assessed: (n: number) => `${n} assessed on this outcome`,
+    cat: {
+      conceptual_misunderstanding: 'Concept misunderstood', procedural_error: 'Procedure error', calculation_error: 'Calculation error', prerequisite_gap: 'Gap in an earlier skill',
+      misinterpretation: 'Question misread', incomplete_reasoning: 'Incomplete reasoning', l1_transfer: 'Carried over from Arabic', unknown: 'Other',
+    } as Record<string, string>,
+    confirmed: (n: number) => `${n} confirmed`, suspected: (n: number) => `${n} suspected`, avgConf: 'Average confidence', heuristic: 'a heuristic, not a probability',
+    who: 'Learners', more: (n: number) => `+${n} more`, examples: 'Example mistakes', trend: 'Trend', practice: 'Practice set',
+    mean: 'Class mastery', notAssessed: 'Not assessed yet',
+    noErrors: 'No common errors recorded yet', noErrorsBody: 'Errors appear here when ENARA finds the same mistake in learners’ work.',
+    noGaps: 'No weak outcomes yet', noGapsBody: 'Outcomes appear here when learners show a gap on independent work.',
+    gapNote: 'Example mistakes, trends over time and one-click practice sets need a class-level “errors to work on” summary, which ENARA does not provide yet.',
   },
   ar: {
-    title: 'أخطاء للعمل عليها', sub: 'الصف التاسع – ب · الأخطاء الشائعة في الفصل',
-    w2: 'آخر أسبوعين', unit: 'هذه الوحدة', term: 'هذا الفصل الدراسي',
-    based: 'بناءً على 312 إجابة من 26 طالبًا · حُدّث اليوم الساعة 07:00',
-    learnersOf: (n: number) => `${n} من 28 طالبًا`, mistakes: (n: number) => `${n} خطأً`,
-    trend: { up: 'أكثر من الأسبوعين السابقين', down: 'أقل من الأسبوعين السابقين', flat: 'تقريبًا بالمستوى نفسه' },
-    examples: 'أمثلة على الأخطاء', who: 'الطلاب', found: 'رُصد بواسطة', more: (n: number) => `+${n} آخرين`,
-    assign: 'تعيين تدريب', assignTo: (n: number) => `تعيين لـ ${n} ${n >= 3 && n <= 10 ? 'طلاب' : 'طالبًا'}`, previewSet: 'معاينة المجموعة', practice: 'مجموعة التدريب',
-    done: (d: number, n: number) => `أنهى ${d} من ${n}`, remind: 'إرسال تذكير',
+    title: 'أخطاء للعمل عليها', sub: (c: string) => `${c} · الأخطاء الشائعة في الفصل`,
+    tErrors: 'الأخطاء الشائعة', tOutcomes: 'أضعف نواتج التعلّم',
+    based: (n: number, d: number) => `بناءً على ${learnersAr(n)} · أنهى ${d} اختبارًا تشخيصيًا · محسوبة من السجلات المحفوظة`,
+    learnersOf: (n: number, m: number) => `${n} من ${m}`, assessed: (n: number) => `قُيّم ${n} في هذا الناتج`,
+    cat: {
+      conceptual_misunderstanding: 'سوء فهم للمفهوم', procedural_error: 'خطأ في الإجراء', calculation_error: 'خطأ حسابي', prerequisite_gap: 'فجوة في مهارة سابقة',
+      misinterpretation: 'سوء فهم للسؤال', incomplete_reasoning: 'استدلال غير مكتمل', l1_transfer: 'منقول من العربية', unknown: 'أخرى',
+    } as Record<string, string>,
+    confirmed: (n: number) => `${n} مؤكَّدة`, suspected: (n: number) => `${n} محتمَلة`, avgConf: 'متوسط الثقة', heuristic: 'تقدير تقريبي وليس احتمالًا',
+    who: 'الطلاب', more: (n: number) => `+${n} آخرين`, examples: 'أمثلة على الأخطاء', trend: 'الاتجاه', practice: 'مجموعة التدريب',
+    mean: 'إتقان الفصل', notAssessed: 'لم يُقيَّم بعد',
+    noErrors: 'لم تُسجَّل أخطاء شائعة بعد', noErrorsBody: 'تظهر الأخطاء هنا عندما تجد إنارة الخطأ نفسه في أعمال الطلاب.',
+    noGaps: 'لا توجد نواتج تعلّم ضعيفة بعد', noGapsBody: 'تظهر نواتج التعلّم هنا عندما يُظهر الطلاب فجوة في عمل مستقل.',
+    gapNote: 'أمثلة الأخطاء واتجاهها عبر الزمن ومجموعات التدريب بنقرة واحدة تحتاج إلى ملخص «أخطاء للعمل عليها» على مستوى الفصل، وهو غير متاح في إنارة بعد.',
   },
 };
 
-function Example({ e }: { e: Err['examples'][number] }) {
-  const { lang } = usePreview();
-  const [before, after] = e.wrong.split(e.bad);
+interface Person { id: string; name: string }
+function People({ people, label }: { people: Person[]; label: string }) {
+  const t = useT(T);
+  const shown = people.slice(0, 7);
   return (
-    <li className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 rounded-md bg-muted/60 px-2.5 py-1.5">
-      <span dir="ltr" lang="en" className="text-sm">
-        {before}<span className="rounded-sm bg-destructive-soft px-0.5 text-destructive line-through decoration-1">{e.bad}</span>
-        <ArrowRight className="mx-1 inline size-3 text-muted-foreground" aria-hidden />
-        <span className="rounded-sm bg-success-soft px-0.5 font-semibold text-success">{e.fix}</span>{after}
-      </span>
-      <span className="text-[11px] text-muted-foreground">— {learner(e.who)[lang]}</span>
-    </li>
+    <div className="flex flex-col gap-3">
+      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">{label}</p>
+      <ul className="flex flex-wrap gap-1.5">
+        {shown.map((p) => <li key={p.id} className="flex items-center gap-1.5 rounded-full border bg-card py-0.5 ps-0.5 pe-2.5 text-xs"><Avatar name={p.name || '?'} className="size-6 text-[10px]" />{(p.name || '—').split(' ')[0]}</li>)}
+        {people.length > shown.length && <li className="flex items-center rounded-full bg-muted px-2.5 py-1 text-xs font-semibold">{t.more(people.length - shown.length)}</li>}
+      </ul>
+    </div>
   );
 }
+const rankTone = (i: number) => (i === 0 ? 'bg-destructive text-destructive-foreground' : i < 3 ? 'bg-warning-soft text-warning-foreground' : 'bg-muted text-muted-foreground');
+const barTone = (i: number) => (i === 0 ? 'danger' : i < 3 ? 'warning' : 'info') as 'danger' | 'warning' | 'info';
 
 export default function Errors() {
   const t = useT(T);
   const { lang } = usePreview();
+  const classes = useTeacherClasses();
+  const cls = useSelectedClass(classes.data);
+  const classId = cls?.id ?? null;
+  const [tab, setTab] = useState<'errors' | 'outcomes'>('errors');
+  const insights = useLoad(classId ? async (signal) => obj(await get(`/api/learning/classes/${encodeURIComponent(classId)}/insights`, signal)) : null, [classId]);
+  const d = insights.data;
+  const classSize = numOr(d?.studentsShown) ?? arr(d?.heatmap).length;
+  const diag = numOr(obj(d?.diagnostics).studentsCompleted) ?? 0;
+
+  const errors = useMemo(() => arr(d?.misconceptionsToReview).map(obj).map((g, i) => {
+    const items = arr(g.items).map(obj);
+    const confs = items.map((x) => numOr(x.confidence)).filter((v): v is number => v !== null);
+    const people = new Map<string, Person>();
+    for (const x of items) if (str(x.studentId)) people.set(str(x.studentId), { id: str(x.studentId), name: str(x.name) });
+    return {
+      key: `${str(g.objectiveId)}|${str(g.description)}|${i}`, description: str(g.description), category: str(g.category), code: str(g.code),
+      people: [...people.values()], confirmed: items.filter((x) => x.status === 'confirmed').length, suspected: items.filter((x) => x.status === 'suspected').length,
+      avgConf: confs.length ? Math.round((confs.reduce((a, b) => a + b, 0) / confs.length) * 100) : null,
+    };
+  }).sort((a, b) => b.people.length - a.people.length), [d]);
+
+  const gaps = useMemo(() => {
+    const heat = arr(d?.heatmap).map(obj);
+    return arr(d?.commonGaps).map(obj).map((g) => {
+      const vals = heat.map((h) => obj(arr(h.cells).find((c) => str(obj(c).objectiveId) === str(g.objectiveId)))).map((c) => numOr(c.masteryEstimate)).filter((v): v is number => v !== null);
+      return {
+        id: str(g.objectiveId), code: str(g.code), title: str(g.title), assessed: numOr(g.assessed) ?? 0,
+        people: arr(g.studentsWithGap).map(obj).map((s) => ({ id: str(s.id), name: str(s.name) })).filter((p) => p.id),
+        mean: vals.length ? Math.round((vals.reduce((a, b) => a + b, 0) / vals.length) * 100) : null,
+      };
+    });
+  }, [d]);
+
+  if (classes.error) return <TeacherShell active="errors" title={t.title}><ErrorPanel error={classes.error} onRetry={classes.reload} /></TeacherShell>;
+  if (classes.data && !classes.data.length) return <TeacherShell active="errors" title={t.title}><NoClasses /></TeacherShell>;
+  const loading = !classes.data || (insights.loading && !d);
+
   return (
-    <TeacherShell active="errors" title={t.title} subtitle={t.sub}>
+    <TeacherShell active="errors" title={t.title} subtitle={cls ? t.sub(cls.courseName || cls.id) : undefined} badges={d && errors.length ? { errors: num(errors.length, lang) } : undefined}>
       <div className="flex flex-col gap-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <Tabs defaultSelectedKey="w2"><TabList aria-label={t.title}><Tab id="w2">{t.w2}</Tab><Tab id="unit">{t.unit}</Tab><Tab id="term">{t.term}</Tab></TabList></Tabs>
-          <p className="flex items-center gap-1.5 text-xs text-muted-foreground"><CalendarDays className="size-3.5" />{t.based}</p>
+          <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
+            {classes.data ? <ClassPicker classes={classes.data} value={classId} path="/teacher/errors" /> : <Skeleton className="h-11 w-full sm:w-72" />}
+            <Tabs selectedKey={tab} onSelectionChange={(k) => setTab(String(k) as 'errors' | 'outcomes')}>
+              <TabList aria-label={t.title}>
+                <Tab id="errors">{t.tErrors}{d && <span className="ms-1 text-muted-foreground">{num(errors.length, lang)}</span>}</Tab>
+                <Tab id="outcomes">{t.tOutcomes}{d && <span className="ms-1 text-muted-foreground">{num(gaps.length, lang)}</span>}</Tab>
+              </TabList>
+            </Tabs>
+          </div>
+          {d && <p className="flex items-center gap-1.5 text-xs text-muted-foreground"><CalendarDays className="size-3.5 shrink-0" />{t.based(classSize, diag)}</p>}
         </div>
 
-        <ol className="flex flex-col gap-3">
-          {ERRORS.map((e, i) => {
-            const n = e.learners.length, shown = e.learners.slice(0, 7);
-            const TrendI = e.trend === 'up' ? TrendingUp : e.trend === 'down' ? TrendingDown : null;
-            return (
-              <li key={e.id}>
-                <Card className="overflow-hidden">
-                  <div className="grid xl:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)_240px]">
-                    {/* What and how many */}
-                    <div className="flex flex-col gap-3 p-4 md:p-5">
-                      <div className="flex items-start gap-3">
-                        <span className={cn('grid size-8 shrink-0 place-items-center rounded-md text-sm font-bold', i === 0 ? 'bg-destructive text-destructive-foreground' : i < 3 ? 'bg-warning-soft text-warning-foreground' : 'bg-muted text-muted-foreground')}>{num(i + 1, lang)}</span>
-                        <div className="min-w-0 flex-1">
-                          <h2 className="text-base font-bold leading-snug">{e.title[lang]}</h2>
-                          <p className="text-xs text-muted-foreground">{e.hint[lang]}</p>
+        {loading ? (
+          <div className="flex flex-col gap-3">{[0, 1, 2].map((i) => <Card key={i} className="p-5"><SkeletonRows rows={2} /><Skeleton className="mt-4 h-2 w-48" /></Card>)}</div>
+        ) : insights.error ? (
+          <ErrorPanel error={insights.error} onRetry={insights.reload} />
+        ) : tab === 'errors' ? (
+          !errors.length ? <EmptyPanel icon={<Target />} title={t.noErrors} body={t.noErrorsBody} /> : (
+            <ol className="flex flex-col gap-3">
+              {errors.map((e, i) => {
+                const n = e.people.length;
+                return (
+                  <li key={e.key}>
+                    <Card className="overflow-hidden">
+                      <div className="grid xl:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)_240px]">
+                        <div className="flex flex-col gap-3 p-4 md:p-5">
+                          <div className="flex items-start gap-3">
+                            <span className={cn('grid size-8 shrink-0 place-items-center rounded-md text-sm font-bold', rankTone(i))}>{num(i + 1, lang)}</span>
+                            <div className="min-w-0 flex-1">
+                              <h2 className="text-base font-bold leading-snug" dir="auto">{e.description || '—'}</h2>
+                              <p className="text-xs text-muted-foreground">{[t.cat[e.category] ?? e.category.replace(/_/g, ' '), e.code].filter(Boolean).join(' · ')}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <Progress value={classSize ? (n / classSize) * 100 : 0} size="sm" tone={barTone(i)} className="max-w-48" ariaLabel={t.learnersOf(n, classSize)} />
+                            <span className="shrink-0 text-sm font-semibold tabular-nums">{t.learnersOf(n, classSize)}</span>
+                          </div>
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                            {e.confirmed > 0 && <span className="tabular-nums">{t.confirmed(e.confirmed)}</span>}
+                            {e.suspected > 0 && <span className="tabular-nums">{t.suspected(e.suspected)}</span>}
+                            {e.avgConf !== null && <span title={t.heuristic}>{t.avgConf}: <b className="tabular-nums text-foreground">{num(e.avgConf, lang)}%</b></span>}
+                          </div>
+                          <p className="text-xs text-muted-foreground"><span className="font-semibold">{t.examples}</span> · <NotYet /></p>
+                        </div>
+                        <div className="flex flex-col gap-3 border-t p-4 md:p-5 xl:border-s xl:border-t-0"><People people={e.people} label={t.who} /></div>
+                        <div className="flex flex-col justify-center gap-1.5 border-t bg-muted/30 p-4 md:p-5 xl:border-s xl:border-t-0">
+                          <p className="text-xs text-muted-foreground"><span className="font-semibold text-foreground">{t.trend}</span> · <NotYet /></p>
+                          <p className="text-xs text-muted-foreground"><span className="font-semibold text-foreground">{t.practice}</span> · <NotYet /></p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <Progress value={(n / 28) * 100} size="sm" tone={i === 0 ? 'danger' : i < 3 ? 'warning' : 'info'} className="max-w-48" />
-                        <span className="shrink-0 text-sm font-semibold tabular-nums">{t.learnersOf(n)}</span>
+                    </Card>
+                  </li>
+                );
+              })}
+            </ol>
+          )
+        ) : !gaps.length ? <EmptyPanel icon={<Users />} title={t.noGaps} body={t.noGapsBody} /> : (
+          <ol className="flex flex-col gap-3">
+            {gaps.map((g, i) => {
+              const n = g.people.length;
+              return (
+                <li key={g.id || i}>
+                  <Card className="overflow-hidden">
+                    <div className="grid xl:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)_240px]">
+                      <div className="flex flex-col gap-3 p-4 md:p-5">
+                        <div className="flex items-start gap-3">
+                          <span className={cn('grid size-8 shrink-0 place-items-center rounded-md text-sm font-bold', rankTone(i))}>{num(i + 1, lang)}</span>
+                          <div className="min-w-0 flex-1">
+                            <h2 className="text-base font-bold leading-snug" dir="auto">{g.title || g.code || g.id}</h2>
+                            {g.code && <p className="text-xs text-muted-foreground"><bdi>{g.code}</bdi></p>}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <Progress value={classSize ? (n / classSize) * 100 : 0} size="sm" tone={barTone(i)} className="max-w-48" ariaLabel={t.learnersOf(n, classSize)} />
+                          <span className="shrink-0 text-sm font-semibold tabular-nums">{t.learnersOf(n, classSize)}</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground tabular-nums">{t.assessed(g.assessed)}</p>
                       </div>
-                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                        <span className="tabular-nums">{t.mistakes(e.mistakes)}</span>
-                        <span className={cn('flex items-center gap-1', e.trend === 'up' && 'text-destructive', e.trend === 'down' && 'text-success')}>{TrendI && <TrendI className="size-3.5" />}{t.trend[e.trend]}</span>
-                      </div>
-                      <ul className="flex flex-col gap-1.5">
-                        <li className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">{t.examples}</li>
-                        {e.examples.map((x) => <Example key={x.wrong} e={x} />)}
-                      </ul>
-                    </div>
-
-                    {/* Who */}
-                    <div className="flex flex-col gap-3 border-t p-4 md:p-5 xl:border-s xl:border-t-0">
-                      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">{t.who}</p>
-                      <ul className="flex flex-wrap gap-1.5">
-                        {shown.map((id) => {
-                          const l = learner(id);
-                          return <li key={id} className="flex items-center gap-1.5 rounded-full border bg-card py-0.5 ps-0.5 pe-2.5 text-xs"><Avatar name={l[lang]} className="size-6 text-[10px]" />{l[lang].split(' ')[0]}</li>;
-                        })}
-                        {n > shown.length && <li className="flex items-center rounded-full bg-muted px-2.5 py-1 text-xs font-semibold">{t.more(n - shown.length)}</li>}
-                      </ul>
-                      <div className="mt-auto flex flex-wrap items-center gap-1.5">
-                        <span className="text-[11px] text-muted-foreground">{t.found}</span>
-                        {e.sources.map((s) => <SourceBadge key={s} source={s} />)}
+                      <div className="flex flex-col gap-3 border-t p-4 md:p-5 xl:border-s xl:border-t-0"><People people={g.people} label={t.who} /></div>
+                      <div className="flex flex-col justify-center gap-2 border-t bg-muted/30 p-4 md:p-5 xl:border-s xl:border-t-0">
+                        <p className="text-xs font-semibold">{t.mean}</p>
+                        {g.mean === null ? <p className="text-xs text-muted-foreground">{t.notAssessed}</p> : (
+                          <div className="flex items-center gap-2"><Progress value={g.mean} size="sm" tone={g.mean < 55 ? 'danger' : g.mean < 65 ? 'warning' : 'success'} ariaLabel={`${g.mean}%`} /><span className="text-xs font-semibold tabular-nums">{num(g.mean, lang)}%</span></div>
+                        )}
+                        <p className="text-xs text-muted-foreground"><span className="font-semibold text-foreground">{t.practice}</span> · <NotYet /></p>
                       </div>
                     </div>
-
-                    {/* Action */}
-                    <div className="flex flex-col justify-center gap-2 border-t bg-muted/30 p-4 md:p-5 xl:border-s xl:border-t-0">
-                      {e.assigned ? (
-                        <>
-                          <p className="flex items-center gap-1.5 text-sm font-semibold text-success"><CheckCircle2 className="size-4" />{e.assigned[lang]}</p>
-                          <Progress value={(e.assigned.done / n) * 100} size="sm" tone="success" />
-                          <p className="text-xs text-muted-foreground">{t.done(e.assigned.done, n)}</p>
-                          <Button variant="outline" size="sm" className="w-full">{t.remind}</Button>
-                        </>
-                      ) : (
-                        <>
-                          <p className="text-xs text-muted-foreground"><span className="font-semibold text-foreground">{t.practice}</span> · {e.set[lang]}</p>
-                          <Button className="w-full"><Send />{t.assignTo(n)}</Button>
-                          <Button variant="ghost" size="sm" className="w-full"><Eye />{t.previewSet}</Button>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </Card>
-              </li>
-            );
-          })}
-        </ol>
+                  </Card>
+                </li>
+              );
+            })}
+          </ol>
+        )}
+        {!loading && !insights.error && <Alert tone="info" icon={<Info />}>{t.gapNote}</Alert>}
       </div>
     </TeacherShell>
   );

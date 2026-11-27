@@ -1,2 +1,2 @@
 // Screens in this area that are wired to the lms-test API (the rest show the 'sample data' ribbon).
-export const wired: string[] = [];
+export const wired: string[] = ['teacher-class', 'teacher-grading', 'teacher-builder', 'teacher-errors'];
