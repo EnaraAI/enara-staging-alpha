@@ -29,7 +29,7 @@ export const PROFILES = [
   { id: 'a2-teen-maths', email: 'farida.fahmy@school.enara.app', band: 'teen', subject: /math/i, lang: 'english', persona: 'a 15-year-old school student (English level A2) in a maths lesson taught in English. You answer the maths questions yourself; you are right most of the time but sometimes make an arithmetic slip.' },
   { id: 'teen-science-arabic', email: 'nadine.nasser@school.enara.app', band: 'teen', subject: /science|علوم/i, lang: 'arabic', persona: 'طالبة عمرها 14 سنة في درس علوم باللغة العربية. تجيبين بجمل قصيرة، وتخطئين أحيانًا.' },
   { id: 'child-8-arabic', email: 'khaled.nasser@school.enara.app', band: 'child', subject: /العربية|arabic/i, lang: 'arabic', persona: 'طفل عمره 8 سنوات في درس اللغة العربية. يجيب بكلمات قليلة، وأحيانًا يخطئ.' },
-  { id: 'child-11-science-stuck', email: 'menna.osman@school.enara.app', band: 'child', subject: /science/i, lang: 'english', stuck: true, persona: 'an 11-year-old child in a science lesson taught in English, who finds this lesson hard. In your 2nd and 3rd replies you say you don\'t know (in your own words), once you ask why, and you often give a wrong answer even after help.' },
+  { id: 'child-11-maths-stuck', email: 'menna.osman@school.enara.app', band: 'child', subject: /math/i, lang: 'english', stuck: ["I don't know.", "I don't understand. Why?"], persona: 'an 11-year-old child in a maths lesson taught in English, who finds this lesson hard. You often give a wrong answer even after help.' },
 ];
 const LEARNER_RULES = {
   english: 'You are role-playing a learner in Egypt (first language Arabic) in a spoken video call with a tutor. Write ONLY what you say next, as speech: one or two short sentences, no emojis, no stage directions, never mention being an AI or role-playing. Answer the tutor\'s question or task yourself, at your level, with your typical mistakes.',
@@ -76,7 +76,8 @@ async function session(profile, arm) {
   const history = [];
   try {
     for (let n = 0; n < TURNS; n++) {
-      let said = n === 0 ? FIRST[profile.lang] : n === TURNS - 2 ? DRAW[profile.lang] : null;
+      // The stuck learner says it in turns 2 and 3 (scripted, so every run has the same stuck moments).
+      let said = n === 0 ? FIRST[profile.lang] : n === TURNS - 2 ? DRAW[profile.lang] : profile.stuck && (n === 2 || n === 3) ? profile.stuck[n - 2] : null;
       if (!said) {
         const convo = history.map((h) => ({ role: h.role === 'user' ? 'assistant' : 'user', content: h.content }));
         said = (await deepseek(`${LEARNER_RULES[profile.lang]}\n${profile.lang === 'arabic' ? 'أنت' : 'You are'} ${profile.persona}`, [{ role: 'user', content: '(The call starts.)' }, ...convo], 120)) ?? "I don't know.";
@@ -84,7 +85,8 @@ async function session(profile, arm) {
       }
       history.push({ role: 'user', content: said });
       const t0 = Date.now();
-      const r = await get('/api/avatar/query-stream', { method: 'POST', body: JSON.stringify({ session_id: sj.session_id, messages: history.slice(-12) }), timeoutMs: 120_000 });
+      let r = await get('/api/avatar/query-stream', { method: 'POST', body: JSON.stringify({ session_id: sj.session_id, messages: history.slice(-12) }), timeoutMs: 120_000 });
+      if (r.status >= 500) { await sleep(5000); r = await get('/api/avatar/query-stream', { method: 'POST', body: JSON.stringify({ session_id: sj.session_id, messages: history.slice(-12) }), timeoutMs: 120_000 }); }
       const lines = (await r.text().catch(() => '')).split('\n').filter(Boolean).map((l) => { try { return JSON.parse(l); } catch { return {}; } });
       const text = lines.filter((l) => l.content).map((l) => l.content).join('');
       const cues = lines.filter((l) => l.cue).map((l) => l.cue);
@@ -138,12 +140,12 @@ export function cueMatches(t, band) {
  *  so subjects without a stored verdict (switch off) are judged the same way. */
 export function stuckSession(s) {
   let run = 0; let worst = 0;
-  for (const t of s.turns) {
+  for (const t of s.turns.filter((x) => x.status === 200 && x.text)) {
     if (t.label === 'WRONG' || t.label === 'STUCK') { run += 1; worst = Math.max(worst, run); } else if (t.label === 'RIGHT') run = 0;
   }
   return worst >= 3 || !s.turns.some((t) => t.label === 'RIGHT');
 }
-const LABEL = 'You check a tutoring conversation. You see the tutor\'s previous message and the learner\'s reply. Label the learner\'s reply with exactly one word: RIGHT (a correct answer to the tutor\'s question or task), WRONG (an incorrect or partly incorrect answer), STUCK (says they do not know, are confused, ask for help or why), or OTHER (anything else).';
+const LABEL = 'You check a tutoring conversation. You see the tutor\'s previous message and the learner\'s reply. Label the learner\'s reply with exactly one word: RIGHT (a correct answer to the tutor\'s question or task), WRONG (an incorrect or partly incorrect answer), STUCK (says they do not know or do not understand, or asks why their answer is wrong), or OTHER (anything else, including asking for a picture, a new question or more practice).';
 async function label(s) {
   await Promise.all(s.turns.map(async (t, i) => {
     if (i === 0) { t.label = 'OTHER'; return; }
@@ -167,7 +169,9 @@ async function main() {
   if (!PW || !CI_TOKEN) throw new Error('secrets missing');
   const arms = ['off', 'on'];
   const sessions = [];
-  for (const arm of arms) sessions.push(...(await Promise.all(PROFILES.map((p) => session(p, arm).catch((e) => ({ profile: p.id, arm, error: String(e?.message ?? e).slice(0, 120) }))))));
+  // Off and on side by side for each learner (the same conditions on lms-test), two learners at a time.
+  const one = (p, arm) => session(p, arm).catch((e) => ({ profile: p.id, arm, error: String(e?.message ?? e).slice(0, 120) }));
+  for (let i = 0; i < PROFILES.length; i += 2) sessions.push(...(await Promise.all(PROFILES.slice(i, i + 2).flatMap((p) => arms.map((arm) => one(p, arm))))));
   await Promise.all(sessions.filter((s) => !s.error).map(label));
   for (const s of sessions) log(`SESSION ${s.profile} ${s.arm} ${s.error ?? `turns=${s.turns.length} band=${s.start?.band ?? '-'} cues=${JSON.stringify(s.turns.map((t) => t.cues.join('+') || '-'))} verdicts=${JSON.stringify(s.turns.map((t) => t.verdict ?? '-'))}`}`);
   const ok = sessions.filter((s) => !s.error);
@@ -205,6 +209,7 @@ async function main() {
     cueShownOrStored: shown, cueAfterWords: notBefore,
     teacherAccept: { accepted, sample: judged.length, pct: judged.length ? Math.round((accepted / judged.length) * 1000) / 10 : 0, bar: 90 },
     stuck: { off: stuckOff, on: stuckOn, noWorse: stuckOn.length <= stuckOff.length },
+    latencyMs: Object.fromEntries(arms.map((arm) => { const ms = ok.filter((s) => s.arm === arm).flatMap((s) => s.turns.filter((t) => t.status === 200).map((t) => t.ms)).sort((a, b) => a - b); return [arm, { median: ms[Math.floor(ms.length / 2)] ?? null, failedTurns: ok.filter((s) => s.arm === arm).flatMap((s) => s.turns).filter((t) => t.status !== 200).length }]; })),
     info: { stuckWordsCuedConcerned: `${stuckCued}/${stuckTurns.length}`, cueVsIndependentRightWrong: `${indepAgree}/${indep.length}`, subjects: [...new Set(ok.map((s) => `${s.profile}:${s.subject}/${s.lang}`))] },
   };
   result.pass = result.cueMatch.pct >= 95 && blocked === 0 && childCalm && shown === 0 && result.teacherAccept.pct >= 90 && result.stuck.noWorse && result.failedSessions.length === 0;
