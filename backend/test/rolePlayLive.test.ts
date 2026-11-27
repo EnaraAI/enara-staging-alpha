@@ -64,7 +64,7 @@ describe('role-play in the live call (switch liveRolePlay on)', () => {
     reply('Here is the menu. Would you like something to drink?');
     r = await say(sid, 'Yes, please.');
     expect(mocks.params.length).toBe(3);
-    expect(String(mocks.params[2].pedagogy)).toMatch(/Your last draft left the role-play scene \(teaching talk/);
+    expect(String(mocks.params[2].pedagogy)).toMatch(/Your last draft left the role-play scene \(a lesson task inside the scene/);
     expect(r.text).toBe('Here is the menu. Would you like something to drink?');
     // 3. beat 3: an error in their message: the recast line, and the error goes to errors to work on with its code
     reply('Some water, of course. Are you ready to order?');

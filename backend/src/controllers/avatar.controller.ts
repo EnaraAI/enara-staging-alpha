@@ -14,7 +14,9 @@ import { ageFromBirthDate } from '../services/languageTeachingContext';
 import { Student } from '../models/Student';
 import { TutorSession } from '../models/TutorSession';
 import { appendTutorMessages, loadTutorMessages } from '../services/tutorMessages';
-import { prepareLanguageContext, applyReplyGuards, completeLanguageTurn, languageHistoryFrom, arbitratePedagogy, LANGUAGE_POLICY_VERSION, rolePlayRegenNote, rolePlayCardOf, type ClosingAskStatus } from '../services/languageTurnPipeline'; // the SAME engine the text chat uses
+import { prepareSubjectRolePlay, completeSubjectRolePlay, subjectHistoryFrom } from '../services/rolePlaySubject';
+import { rolePlayLine, rolePlayActive, guardSceneReply } from '../services/rolePlay';
+import { prepareLanguageContext, applyReplyGuards, completeLanguageTurn, languageHistoryFrom, arbitratePedagogy, LANGUAGE_POLICY_VERSION, rolePlayRegenNote, rolePlayDraftUsable, rolePlayCardOf, type ClosingAskStatus } from '../services/languageTurnPipeline'; // the SAME engine the text chat uses
 import { AssessmentMarkerFilter, filterSummary, type StrippedReply } from '../services/languageLearningState';
 import { generateMessageId } from '../utils/idGenerator';
 import { randomUUID } from 'crypto';
@@ -692,10 +694,17 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
 
   // Language course: the SAME engine as the text chat (shared pipeline). Null for non-language courses (the call then teaches as before).
   // The engine reads stored turn state, so it gets the stored history (chat and voice turns alike), not the browser's copy.
-  const storedHistory = session.studentId && session.courseId ? languageHistoryFrom((await loadTutorMessages({ id: session.id, studentId: session.studentId } as never).catch(() => [])) as { role: string; text: string; meta?: unknown }[]) : [];
+  const storedRaw = session.studentId && session.courseId ? ((await loadTutorMessages({ id: session.id, studentId: session.studentId } as never).catch(() => [])) as { role: string; text: string; meta?: unknown }[]) : [];
+  const storedHistory = languageHistoryFrom(storedRaw);
   const languagePrep = session.studentId && course.curriculumId
     ? await prepareLanguageContext({ institutionId: session.institutionId, curriculumId: course.curriculumId, lessonId: session.lessonId, studentId: session.studentId, sessionId: session.id, courseId: session.courseId, message: last?.content ?? '', history: storedHistory, hintsOnly: tutorPolicy.policy === 'hints_only', masteryStatus: plan?.masteryStatus, planPrimary: plan?.teaching.primary, objectiveId: plan?.teaching.objectiveId, objectiveCode: plan?.objectiveCode }, 'voice').catch((error) => { logger.warn('avatar_language_context_failed', { error: serializeError(error) }); return null; })
     : null;
+  // liveRolePlay: maths, science, Arabic and social-studies courses run role-play here (language courses inside the language engine above).
+  const subjectRolePlay = !languagePrep && session.studentId && course.curriculumId
+    ? await prepareSubjectRolePlay({ institutionId: session.institutionId, studentId: session.studentId, curriculumId: course.curriculumId, lessonId: session.lessonId, lessonTitle: session.lessonTitle, sessionSubject: session.subject, message: last?.content ?? '', history: subjectHistoryFrom(storedRaw), hintsOnly: tutorPolicy.policy === 'hints_only', objectiveCode: plan?.objectiveCode, opening: kind === 'opening' })
+    : undefined;
+  const sceneActive = rolePlayActive(subjectRolePlay);
+  const scenePrep = languagePrep?.context ?? (subjectRolePlay ? { rolePlay: subjectRolePlay } : null);
 
   const lessonTitle =
     curriculum?.chapters.find((c) => c.id === curriculum.currentLessonId)?.title || session.lessonTitle;
@@ -803,7 +812,7 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
   };
   if (visualRequested || autoVisual) res.write(JSON.stringify({ visual: 'drawing' }) + '\n');
   // liveRolePlay: the scene card for the side panel (null outside a scene), known before the reply is written.
-  if (languagePrep && engineV2('liveRolePlay')) res.write(JSON.stringify({ scene: rolePlayCardOf(languagePrep.context) }) + '\n');
+  if ((languagePrep || course.curriculumId) && engineV2('liveRolePlay')) res.write(JSON.stringify({ scene: rolePlayCardOf(scenePrep) }) + '\n');
 
   // avatarSpeaking (NEXT_PLAN item 5): speaking-practice line, and one pronunciation tip from the learner's last scored sentence (then cleared).
   const lastPron = avatarSpeakingOn() && languagePrep ? (session as { lastPronunciation?: { summary: string; words: string[] } }).lastPronunciation : undefined;
@@ -813,6 +822,8 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
   if (lastPron) waitUntil(AvatarSession.updateOne({ id: session.id }, { $unset: { lastPronunciation: 1 } }).then(() => undefined, () => undefined));
   const languageLine = languagePrep
     ? '(Reply only in English.)'
+    : sceneActive
+    ? (subjectRolePlay!.lang === 'ar' ? '(Reply only in formal Arabic (fusha), whatever language earlier turns used.)' : '(Reply only in English.)')
     : spokenLanguage
     ? `(Reply only in ${spokenLanguage === 'arabic' ? 'Egyptian Arabic' : 'English'}, whatever language earlier turns used.)`
     : '';
@@ -889,13 +900,27 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
       mode: 'voice',
       learner: learner ? describeSnapshot(learner) : undefined,
       // liveExpressive, every other subject: the reply opens with the hidden grading line, so its cue follows the verdict.
-      pedagogy: arbitratePedagogy([plan?.prompt, policyRule(tutorPolicy.policy), cueCall && !languagePrep ? SUBJECT_GRADE_LINE : undefined].filter(Boolean).join('\n\n') || undefined, Boolean(languagePrep)),
+      pedagogy: arbitratePedagogy([plan?.prompt, policyRule(tutorPolicy.policy), cueCall && !languagePrep ? SUBJECT_GRADE_LINE : undefined, sceneActive ? rolePlayLine(subjectRolePlay!) : undefined].filter(Boolean).join('\n\n') || undefined, Boolean(languagePrep)),
       planActive: Boolean(plan),
       ...(languagePrep?.parts ? { languageContextStable: languagePrep.parts.stable, languageContextDynamic: `${languagePrep.parts.dynamic}${speakingLines}${heardLines}` } : { languageContext: languagePrep?.prompt ? `${languagePrep.prompt}${speakingLines}${heardLines}` : languagePrep?.prompt }),
     };
     const modelStream = streamDirectTutorModel(modelParams);
     // Language course: buffer the reply so the shared guards and marker handling run BEFORE anything is spoken or shown (same guarantees as the text chat).
     async function* chunks(): AsyncGenerator<string> {
+      if (!languagePrep && sceneActive) {
+        // liveRolePlay (other subjects): the scene reply is held until the scene guards ran (one regeneration if it left the scene).
+        const read = async (stream: AsyncIterable<string>) => { const f = new AssessmentMarkerFilter(); let a = ''; for await (const d of stream) { if (closed) break; const v = f.push(d); if (v) a += v; } a += f.end(); return { a, f }; };
+        let { a: answer, f: filter } = await read(modelStream);
+        const note = closed ? undefined : rolePlayRegenNote({ rolePlay: subjectRolePlay }, answer.trim());
+        if (note) {
+          const again = await read(streamDirectTutorModel({ ...modelParams, pedagogy: [modelParams.pedagogy, note].filter(Boolean).join('\n\n') }));
+          if (again.a.trim() && rolePlayDraftUsable({ rolePlay: subjectRolePlay }, again.a.trim())) { answer = again.a; filter = again.f; }
+        }
+        if (cueCall) languageMarker ??= filterSummary(filter, answer);
+        const g = guardSceneReply(subjectRolePlay, answer.trim());
+        if (g.text) yield g.text;
+        return;
+      }
       if (!languagePrep && !cueCall) { yield* modelStream; return; }
       if (!languagePrep) { // liveExpressive, another subject: still streamed; the hidden line is read and removed first
         const filter = new AssessmentMarkerFilter();
@@ -932,7 +957,7 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
         const f2 = new AssessmentMarkerFilter(); let a2 = '';
         for await (const d of streamDirectTutorModel({ ...modelParams, pedagogy: [modelParams.pedagogy, sceneNote].filter(Boolean).join('\n\n') })) { if (closed) break; const v = f2.push(d); if (v) a2 += v; }
         const t2 = f2.end(); if (t2) a2 += t2;
-        if (a2.trim() && !rolePlayRegenNote(languagePrep.context, a2.trim())) { answer = a2; filter = f2; }
+        if (a2.trim() && rolePlayDraftUsable(languagePrep.context, a2.trim())) { answer = a2; filter = f2; }
       }
       languageMarker = heardLines ? guardSpokenMarker(filterSummary(filter, answer), last?.content ?? '') : filterSummary(filter, answer);
       const g = applyReplyGuards(languagePrep.context, answer.trim(), last?.content ?? '');
@@ -986,11 +1011,12 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
   const languageTurn = spoken && session.studentId && languagePrep
     ? await completeLanguageTurn({ language: languagePrep.context, objectiveId: plan?.teaching.objectiveId, reply: spoken.trim(), learnerText: last?.content ?? '', messageId: aiMessageId, marker: languageMarker, removed: guardedRemoved, closingAsk: guardedClosingAsk, institutionId: session.institutionId as string, studentId: session.studentId }).catch((error) => { logger.warn('avatar_language_turn_failed', { error: serializeError(error) }); return undefined; })
     : undefined;
+  const subjectTag = spoken && session.studentId && subjectRolePlay ? await completeSubjectRolePlay(subjectRolePlay, { institutionId: session.institutionId, studentId: session.studentId, messageId: aiMessageId }).catch(() => undefined) : undefined;
   if (spoken && session.studentId) {
     const now = Date.now();
     const turn = [
       ...(last ? [{ id: generateMessageId(), role: 'user' as const, text: last.content, timestamp: new Date(now - 1) }] : []),
-      { id: aiMessageId, role: 'ai' as const, text: spoken.trim(), timestamp: new Date(now), ...(languageTurn || cueRecord ? { meta: { intent: 'tutor_voice', ...(languageTurn ? { version: LANGUAGE_POLICY_VERSION, languageTurn } : {}), ...(cueRecord ? { expressive: cueRecord } : {}) } } : {}) },
+      { id: aiMessageId, role: 'ai' as const, text: spoken.trim(), timestamp: new Date(now), ...(languageTurn || cueRecord || subjectTag ? { meta: { intent: 'tutor_voice', ...(languageTurn ? { version: LANGUAGE_POLICY_VERSION, languageTurn } : {}), ...(cueRecord ? { expressive: cueRecord } : {}), ...(subjectTag ? { rolePlay: subjectTag } : {}) } } : {}) },
     ];
     await appendTutorMessages(
       { id: session.id, studentId: session.studentId, institutionId: req.user!.institutionId, courseId: session.courseId, lessonId: session.lessonId },

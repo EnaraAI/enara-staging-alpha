@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { rolePlayStep, pickScene, eligibleScenes, mayOffer, classifyBeatReply, detectSceneError, debriefEntry, rolePlayLine, sceneReplyProblems, sceneFallback, ensureDebrief, ensureOffer, sceneCard, asksForRolePlay, saysYes, ROLEPLAY_OFFER_FROM, type RolePlayTurn } from '../src/services/rolePlay';
+import { rolePlayStep, pickScene, eligibleScenes, mayOffer, classifyBeatReply, detectSceneError, debriefEntry, rolePlayLine, sceneReplyProblems, hardSceneProblems, lessonTargets, sceneFallback, ensureDebrief, ensureOffer, sceneCard, asksForRolePlay, saysYes, ROLEPLAY_OFFER_FROM, type RolePlayTurn } from '../src/services/rolePlay';
 import { applyReplyGuards } from '../src/services/languageTurnPipeline';
 import { sceneById, CHILD_SCENES, SCENES } from '../src/services/roleplayScenes';
 import { engineV2 } from '../src/services/engineV2';
@@ -75,6 +75,11 @@ describe('beats, failed tries and the end', () => {
     expect(await rolePlayStep({ history: at(3), message: 'I would like the chicken, please.', signals: none, blocked: false, pick: pickRestaurant })).toMatchObject({ phase: 'beat', beat: 4, tries: 0 });
     expect(await rolePlayStep({ history: at(restaurant.beats.length), message: 'Thank you. Goodbye.', signals: none, blocked: false, pick: pickRestaurant })).toMatchObject({ phase: 'debrief' });
     expect(await rolePlayStep({ history: at(3), message: 'stop please', signals: none, blocked: false, pick: pickRestaurant })).toMatchObject({ phase: 'debrief' });
+    // a farewell ends the scene; the answer to the second-to-last beat brings the last line together with the debrief
+    expect(await rolePlayStep({ history: at(5), message: 'Thank you. Goodbye!', signals: none, blocked: false, pick: pickRestaurant })).toMatchObject({ phase: 'debrief' });
+    const close = await rolePlayStep({ history: at(restaurant.beats.length - 1), message: 'No, thank you. Can I have the bill, please?', signals: none, blocked: false, pick: pickRestaurant });
+    expect(close).toMatchObject({ phase: 'debrief', closing: true });
+    expect(rolePlayLine({ ...close!, entryId: 'EN-F-A2-FN-polite-requests' })).toContain(restaurant.beats.at(-1)!.say.en);
   });
   it('a failed try changes the method: first a simpler line with a choice, then the line said for them and the scene moves on (never a third try)', async () => {
     on();
@@ -114,6 +119,16 @@ describe('scene choice (code, not the model)', () => {
   });
 });
 
+describe('today\'s lesson point (its own words)', () => {
+  it('a scene that practises it scores higher; the debrief falls back to it; the beat line asks for recasts on it', () => {
+    expect(lessonTargets('Jobs and the verb be; be: am/is/are; Uses a/an before a job')).toEqual(expect.arrayContaining(['EN-F-A1-GR-copula-be', 'EN-F-A1-GR-article-a-an']));
+    expect(lessonTargets('Last holiday (past simple)')).toEqual(expect.arrayContaining(['EN-F-A2-GR-past-simple-regular', 'EN-F-A2-GR-past-simple-irregular']));
+    expect(pickScene({ child: false, ageBand: 'adult', level: 'B1', lessonText: 'Last holiday (past simple)', seed: 's' }).targets.some((t) => /past-simple/.test(t))).toBe(true);
+    expect(debriefEntry(sceneById('airport-checkin')!, [], undefined, 'Last holiday (past simple)')?.id).toMatch(/past-simple/);
+    expect(rolePlayLine({ scene: 'restaurant-order', phase: 'beat', beat: 3, tries: 0, lessonPoint: 'Daily routines (he/she -s)' })).toMatch(/Today's lesson point is Daily routines \(he\/she -s\): when their message has an error on it, always recast it/);
+  });
+});
+
 describe('the model only voices the current beat; post-check keeps it in the scene', () => {
   const beat = (n: number, extra: Partial<RolePlayTurn> = {}): RolePlayTurn => ({ scene: 'restaurant-order', phase: 'beat', beat: n, tries: 0, errs: [], ...extra });
   it('the system line gives the fixed line of this beat only', () => {
@@ -127,6 +142,8 @@ describe('the model only voices the current beat; post-check keeps it in the sce
   it('flags teaching talk, personal details, Arabic, length, a missing scene line; child replies outside the Starters words', () => {
     expect(sceneReplyProblems(beat(2), 'Here is the menu. Would you like something to drink?')).toEqual([]);
     expect(sceneReplyProblems(beat(2), 'Good grammar! The rule is: use some. Here is the menu. Would you like a drink?')[0]).toMatch(/teaching talk/);
+    expect(hardSceneProblems(beat(2), 'Here is the menu. Complete this sentence: I would like ___.')[0]).toMatch(/lesson task/);
+    expect(hardSceneProblems(beat(2), 'Good grammar! Here is the menu. Would you like a drink?')).toEqual([]);
     expect(sceneReplyProblems(beat(2), 'Here is the menu. What is your phone number? Would you like a drink?')).toContain('asks for personal details');
     expect(sceneReplyProblems(beat(2), 'Let us talk about football and your favourite team today instead.')).toContain('does not voice the scene line');
     const kid: RolePlayTurn = { scene: 'kids-fruit-shop', phase: 'beat', beat: 2, tries: 0, errs: [], child: true };
@@ -138,10 +155,22 @@ describe('the model only voices the current beat; post-check keeps it in the sce
   it('a reply still off the scene after the regeneration becomes the beat line (shared guards, both channels)', () => {
     process.env.ENARA_ENGINE_V2 = 'liveRolePlay';
     const language = { rolePlay: beat(2), learner: {}, lesson: { spec: {} }, signals: {}, moves: [] } as never;
-    const g = applyReplyGuards(language, 'Let us do a grammar exercise about some and any.', '');
+    // a lesson task in the scene is unusable: the beat's own line
+    const g = applyReplyGuards(language, 'Fill in: I would like ___ water.', '');
     expect(g.text).toBe(restaurant.beats[1].say.en);
+    // the fixed line keeps the draft's short reaction to what they said, when it has one
+    expect(applyReplyGuards({ ...(language as object), rolePlay: beat(3) } as never, 'Some water, of course. Now try again: I would like ___ water.', '').text).toBe(`Some water, of course. ${restaurant.beats[2].say.en}`);
     expect(g.rolePlayFixed).toBe(true);
-    expect(g.postCheck).toContain('roleplay_fallback');
+    expect(g.postCheck).toEqual(expect.arrayContaining(['roleplay_fallback', 'roleplay_hard:a_lesson_task_inside_the_scene']));
+    // only the unusable sentence goes when what is left still voices the scene (the reaction and recast stay)
+    const t = applyReplyGuards(language, 'Some water, of course. Here is the menu. Would you like something to drink? Now try again: I would like ___ water.', '');
+    expect(t.text).toBe('Some water, of course. Here is the menu. Would you like something to drink?');
+    expect(t.postCheck).toContain('roleplay_trimmed');
+    // softer problems only asked for the regeneration: the reply stays, the problem is recorded
+    const soft = applyReplyGuards(language, 'Let us talk about grammar and football today instead.', '');
+    expect(soft.text).toBe('Let us talk about grammar and football today instead.');
+    expect(soft.rolePlayFixed).toBeUndefined();
+    expect(soft.postCheck).toEqual(expect.arrayContaining(['roleplay_soft:teaching_talk_inside_the_scene', 'roleplay_soft:does_not_voice_the_scene_line']));
     expect(sceneFallback(beat(4, { help: 'model' }))).toBe(`You can say: "${restaurant.beats[2].example.en}" ${restaurant.beats[3].say.en}`);
     expect(sceneFallback(beat(3, { help: 'hint' }))).toContain(restaurant.beats[2].example.en);
   });
@@ -176,5 +205,65 @@ describe('debrief and offer are guaranteed by code', () => {
     expect(sceneCard({ scene: 'airport-checkin', phase: 'offer' })).toBeNull();
     expect(sceneCard(undefined)).toBeNull();
     expect(SCENES.length + CHILD_SCENES.length).toBeGreaterThan(15);
+  });
+});
+
+describe('every subject (owner correction 27 Nov 2026)', () => {
+  it('the course subject and lesson language come from the course itself', async () => {
+    const { subjectOf } = await import('../src/services/rolePlay');
+    expect(subjectOf({ type: 'Language', languages: ['English'] })).toEqual({ subject: 'english', lang: 'en' });
+    expect(subjectOf({ type: 'Language', languages: ['Arabic'] })).toEqual({ subject: 'arabic', lang: 'ar' });
+    expect(subjectOf({ type: 'National', courseName: 'Mathematics', languages: ['English'] })).toEqual({ subject: 'maths', lang: 'en' });
+    expect(subjectOf({ type: 'National', courseName: 'الرياضيات', languages: ['Arabic'] })).toEqual({ subject: 'maths', lang: 'ar' });
+    expect(subjectOf({ type: 'National', courseName: 'العلوم', languages: ['Arabic'] })).toEqual({ subject: 'science', lang: 'ar' });
+    expect(subjectOf({ type: 'National', courseName: 'اللغة العربية', languages: ['Arabic'] })).toEqual({ subject: 'arabic', lang: 'ar' });
+    expect(subjectOf({ type: 'National', courseName: 'Social Studies', languages: ['English'] })).toEqual({ subject: 'social', lang: 'en' });
+    expect(subjectOf({ type: 'National', courseName: 'Art', languages: ['English'] }).subject).toBeUndefined();
+  });
+  it('scene choice uses the subject and lesson language first; children keep their own safe list per subject', () => {
+    for (const subject of ['maths', 'science', 'social'] as const) for (const lang of ['en', 'ar'] as const) {
+      for (const child of [true, false]) {
+        const s = pickScene({ child, ageBand: child ? 'child' : 'adult', subject, lang, seed: 'x' })!;
+        expect(s.subject).toBe(subject); expect(s.langs).toContain(lang); expect(s.kind).toBe(child ? 'child' : 'adult');
+      }
+    }
+    expect(pickScene({ child: false, ageBand: 'teen', subject: 'arabic', lang: 'ar', seed: 'x' })!.subject).toBe('arabic');
+    expect(pickScene({ child: false, ageBand: 'adult', subject: 'english', lang: 'ar', seed: 'x' })).toBeUndefined(); // English practice is in English
+    expect(pickScene({ child: false, ageBand: 'adult', subject: 'maths', lang: 'en', ask: 'a role-play at the market', seed: 'x' })!.id).toBe('maths-market');
+  });
+  it('numbers in English and Arabic; a wrong sum is a code-certain error, a missing idea only a hint', async () => {
+    const { numbersIn, detectBeatError } = await import('../src/services/rolePlay');
+    expect(numbersIn('That is thirty-six pounds')).toContain(36);
+    expect(numbersIn('one hundred and fifty')).toContain(150);
+    expect(numbersIn('المبلغ ٣٦ جنيهًا')).toContain(36);
+    expect(numbersIn('ستة وثلاثون جنيهًا')).toContain(36);
+    const market = sceneById('maths-market')!;
+    expect(detectBeatError(market, 2, 'It is 30 pounds', 'en')).toMatchObject({ code: 'wrong_number', evidence: '30', expected: '36', outcome: 'MA-total-price', certain: true });
+    expect(detectBeatError(market, 2, 'thirty-six pounds', 'en')).toBeNull();
+    expect(detectBeatError(market, 6, 'الباقي أربعة وأربعون جنيهًا', 'ar')).toBeNull();
+    const kitchen = sceneById('science-kitchen')!;
+    expect(detectBeatError(kitchen, 2, 'It went away', 'en')).toMatchObject({ code: 'idea_missing' });
+    expect(detectBeatError(kitchen, 2, 'It went away', 'en')?.certain).toBeUndefined();
+    expect(detectBeatError(kitchen, 2, 'لقد ذاب', 'ar')).toBeNull();
+  });
+  it('the scene speaks the lesson language: fusha lines and an Arabic fallback for an Arabic lesson; Arabic replies to an Arabic-language scene are not a failed try', () => {
+    const t: RolePlayTurn = { scene: 'maths-market', phase: 'beat', beat: 2, tries: 0, subject: 'maths', lang: 'ar' };
+    const line = rolePlayLine(t);
+    expect(line).toContain('Formal Arabic (fusha) only');
+    expect(line).toContain(sceneById('maths-market')!.beats[1].say.ar);
+    expect(sceneFallback(t)).toBe(sceneById('maths-market')!.beats[1].say.ar);
+    expect(sceneReplyProblems(t, 'Three kilos at twelve pounds each, so how much is that altogether my friend?')).toContain('English in an Arabic scene');
+    expect(classifyBeatReply('أريد دفترًا من فضلك', {}, { subject: 'arabic', lang: 'ar' })).toBe('ok');
+    expect(classifyBeatReply('I want a notebook', {}, { subject: 'arabic', lang: 'ar' })).toBe('stuck');
+    expect(classifyBeatReply('44', {}, { subject: 'maths', lang: 'ar' })).toBe('ok');
+    expect(classifyBeatReply('لا أعرف', {}, { subject: 'maths', lang: 'ar' })).toBe('stuck');
+  });
+  it('the debrief uses the subject bank in the lesson language', async () => {
+    const { entryText } = await import('../src/services/rolePlay');
+    expect(debriefEntry(sceneById('maths-market')!, ['MA-money-change', 'MA-money-change', 'MA-total-price'])?.id).toBe('MA-money-change');
+    expect(entryText('MA-money-change', 'ar')?.rule).toBe('الباقي هو المبلغ الذي تدفعه ناقصًا الثمن.');
+    const d = ensureDebrief({ scene: 'maths-market', phase: 'debrief', entryId: 'MA-money-change', lang: 'ar' }, 'أحسنت!');
+    expect(d.text).toContain('القاعدة: الباقي هو المبلغ الذي تدفعه ناقصًا الثمن.');
+    expect(d.text).toContain('خطأ: أدفع خمسين جنيهًا');
   });
 });

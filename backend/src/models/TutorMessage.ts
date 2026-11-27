@@ -57,6 +57,8 @@ export interface ITutorMessageDoc extends Document {
     practiceTurn?: { assessment: { verdict: string }; answeringCheck: boolean; objectiveId?: string; lessonId?: string; next?: string };
     // liveExpressive: the live avatar's cues for this reply and the verdict they followed (tags only).
     expressive?: { cues: string[]; verdict?: string; stuck?: boolean };
+    // liveRolePlay (other subjects; language courses keep it in languageTurn): the scene tag, ids and codes only.
+    rolePlay?: { scene: string; phase: string; beat?: number; tries?: number; errs?: string[]; err?: string; via?: string; help?: string; closing?: boolean };
   };
 }
 
@@ -102,6 +104,7 @@ const tutorMessageDocSchema = new Schema<ITutorMessageDoc>(
       outOfScope: Boolean,
       repaired: Boolean,
       injection: { type: String, enum: ['learner', 'passage'] },
+      rolePlay: { type: { scene: String, phase: String, beat: Number, tries: Number, errs: { type: [String], default: undefined }, err: String, via: String, help: String, closing: Boolean, _id: false }, default: undefined },
       practiceTurn: {
         type: { assessment: { type: { verdict: String, _id: false } }, answeringCheck: Boolean, objectiveId: String, lessonId: String, next: String, _id: false },
         default: undefined,
@@ -178,7 +181,7 @@ const tutorMessageDocSchema = new Schema<ITutorMessageDoc>(
           // realChat (tag only): conversation reply 1 or 2. It was missing here, so the tag was dropped on save and the chat never counted as done.
           realChat: Number,
           // liveRolePlay (ids and codes only): scene, phase, beat, failed tries on the beat, error codes seen in the scene, how it started, help given.
-          rolePlay: { type: { scene: String, phase: String, beat: Number, tries: Number, errs: { type: [String], default: undefined }, err: String, via: String, help: String, _id: false }, default: undefined },
+          rolePlay: { type: { scene: String, phase: String, beat: Number, tries: Number, errs: { type: [String], default: undefined }, err: String, via: String, help: String, closing: Boolean, _id: false }, default: undefined },
           _id: false,
         },
         default: undefined,
