@@ -58,6 +58,8 @@ export interface RolePlayTurn extends RolePlayTag {
   under9?: boolean;
   /** Today's lesson point in a few words (the lesson's title or grammar), for the recasts inside the scene. */
   lessonPoint?: string;
+  /** The question in the learner's last message (they asked the character something), answered first, then back to the beat. */
+  learnerAsked?: string;
 }
 
 export const ROLEPLAY_OFFER_FROM = 6; // tutor replies already given this session before the tutor may offer a scene
@@ -245,6 +247,7 @@ export const ERROR_OUTCOME: Record<string, string> = {
   progressive_no_be: 'EN-F-A2-GR-present-continuous',
   subject_doubled: 'EN-F-A1-GR-word-order-svo',
   missing_third_person_s: 'EN-F-A2-GR-third-person-s',
+  past_overregular: 'EN-F-A2-GR-past-simple-irregular',
 };
 const ERROR_LABEL: Record<string, string> = {
   article_omitted: 'a or an is missing before one countable thing',
@@ -255,14 +258,33 @@ const ERROR_LABEL: Record<string, string> = {
   subject_doubled: 'the subject is said twice',
   resumptive_pronoun: 'an extra pronoun at the end',
   missing_third_person_s: 'the verb after he, she or it needs -s',
+  past_overregular: 'this verb has its own past form (went, bought, ate), not -ed',
+  past_base_form: 'the sentence is about the past, so the verb needs its past form',
 };
 const THIRD_VERBS = 'like|want|need|live|work|play|go|have|eat|know|love|drink|study|speak|watch|read|come|think';
 const THIRD = new RegExp(`(^|[.!?,]\\s*|\\s)(he|she|it|my (?:brother|sister|mother|father|friend|cat|dog))\\s+(${THIRD_VERBS})\\b`, 'i');
 const NOT_BEFORE = /\b(does|doesn't|did|didn't|can|can't|will|won't|would|should|could|must|may|might|let|make|help|to|'ll)\s*$/i;
-/** The error in the learner's message (code only, conservative): the Arabic-L1 patterns, then a missing third-person -s. */
+// Past simple (code only, conservative): an over-regular form ("goed", "buyed"), or a base verb after a subject in a sentence that names a past time.
+const OVER_REGULAR = /\b(goed|buyed|eated|runned|swimmed|teached|catched|bringed|thinked|maked|taked|writed|drinked|comed|seed|falled|feeled|leaved|sleeped|speaked|sitted|getted|gived|knowed|telled|finded|buyed|payed|weared|choosed|forgetted|meeted|readed)\b/i;
+const PAST_TIME = /\b(yesterday|last (?:week|night|year|month|summer|winter|weekend|time|monday|tuesday|wednesday|thursday|friday|saturday|sunday)|ago|this morning|in 20\d\d|when i was)\b/i;
+const BASE_AFTER_SUBJECT = /\b(i|we|he|she|they|you|my (?:wife|husband|friend|family|brother|sister|mother|father|son|daughter))\s+(go|buy|eat|visit|stay|see|travel|book|arrive|come|take|have|notice|ask|call|play|watch|walk|work|study|live|swim|drive|fly|make|get|leave|meet|find|forget|lose|break|fall|start|finish|want|need|like|love|try|stop|open|close|wait|pay|cook|clean|enjoy|decide|order)\b/i;
+const IRREGULAR_PAST: Record<string, string> = { go: 'went', buy: 'bought', eat: 'ate', see: 'saw', come: 'came', take: 'took', have: 'had', swim: 'swam', drive: 'drove', fly: 'flew', make: 'made', get: 'got', leave: 'left', meet: 'met', find: 'found', forget: 'forgot', lose: 'lost', break: 'broke', fall: 'fell', pay: 'paid' };
+export function detectPastError(text: string): { code: string; evidence: string; outcome: string } | null {
+  const o = OVER_REGULAR.exec(text);
+  if (o) return { code: 'past_overregular', evidence: o[1].toLowerCase(), outcome: 'EN-F-A2-GR-past-simple-irregular' };
+  for (const sentence of text.split(/[.!?\n;]+/)) {
+    if (!PAST_TIME.test(sentence)) continue;
+    const m = BASE_AFTER_SUBJECT.exec(sentence);
+    if (m) { const verb = m[2].toLowerCase(); return { code: 'past_base_form', evidence: `${m[1]} ${verb}`.toLowerCase(), outcome: IRREGULAR_PAST[verb] ? 'EN-F-A2-GR-past-simple-irregular' : 'EN-F-A2-GR-past-simple-regular' }; }
+  }
+  return null;
+}
+/** The error in the learner's message (code only, conservative): the Arabic-L1 patterns, the past simple, then a missing third-person -s. */
 export function detectSceneError(text: string): { code: string; evidence: string; outcome?: string } | null {
   const d = detectL1Transfer(text);
   if (d) return { code: d.code, evidence: d.evidence, ...(ERROR_OUTCOME[d.code] ? { outcome: ERROR_OUTCOME[d.code] } : {}) };
+  const p = detectPastError(text);
+  if (p) return p;
   const m = THIRD.exec(text);
   if (m && !NOT_BEFORE.test(text.slice(0, m.index + m[1].length))) return { code: 'missing_third_person_s', evidence: `${m[2]} ${m[3]}`.toLowerCase(), outcome: ERROR_OUTCOME.missing_third_person_s };
   return null;
@@ -328,8 +350,9 @@ export function debriefEntry(scene: RolePlayScene, errs: string[] = [], objectiv
   const count = new Map<string, number>();
   for (const e of errs) { const o = ERROR_OUTCOME[e] ?? e; if (known(o)) count.set(o, (count.get(o) ?? 0) + 1); }
   const top = [...count.entries()].sort((a, b) => b[1] - a[1])[0]?.[0];
-  const id = [top, objectiveCode, ...(scene.subject === 'english' ? lessonTargets(lessonText) : []), ...scene.targets].find((x) => known(x));
-  return id ? { id } : undefined;
+  // Only the learner's own logged errors choose the rule (coordinator, 27 Nov 2026): none logged = no rule, praise and one stretch item.
+  void objectiveCode; void lessonText;
+  return top ? { id: top } : undefined;
 }
 
 export interface StepInput {
@@ -358,8 +381,11 @@ export async function rolePlayStep(i: StepInput): Promise<RolePlayTurn | undefin
     const errs = last.errs ?? [];
     const error = kind === 'ok' ? detectBeatError(scene, last.beat ?? 1, i.message, lang) : null;
     // English errors are kept by their code; the other subjects' by the outcome they belong to (for the debrief).
-    const errsNow = error ? [...errs, scene.subject === 'english' ? error.code : error.outcome ?? error.code].slice(-8) : errs;
-    const base = { scene: scene.id, ...(last.via ? { via: last.via } : {}), errs: errsNow, ...(error ? { error, err: error.code } : {}) };
+    // Only code-certain errors (the ones logged to errors to work on) are kept for the debrief.
+    const errsNow = error?.certain ? [...errs, scene.subject === 'english' && ERROR_OUTCOME[error.code] ? error.code : error.outcome ?? error.code].slice(-8) : errs;
+    // A question in their message is answered first (then back to the beat).
+    const question = kind === 'ok' ? i.message.split(/(?<=[.!?؟])\s+/).find((x) => /[?؟]\s*$/.test(x.trim()))?.trim().slice(0, 160) : undefined;
+    const base = { scene: scene.id, ...(last.via ? { via: last.via } : {}), errs: errsNow, ...(error ? { error, err: error.code } : {}), ...(question ? { learnerAsked: question } : {}) };
     const n = last.beat ?? 1;
     if (kind === 'stop') return { ...base, phase: 'debrief' };
     if (kind === 'stuck') {
@@ -395,7 +421,7 @@ export async function rolePlayStep(i: StepInput): Promise<RolePlayTurn | undefin
 }
 /** The tag stored with the reply. */
 export const rolePlayTagOf = (t: RolePlayTurn): RolePlayTag => {
-  const { error: _e, entryId: _x, child: _c, under9: _u, lessonPoint: _l, subject: _s, lang: _g, ...tag } = t;
+  const { error: _e, entryId: _x, child: _c, under9: _u, lessonPoint: _l, subject: _s, lang: _g, learnerAsked: _q, ...tag } = t;
   return tag;
 };
 /** A scene reply (offer, beat or debrief): the lesson exercise, the closing ask and the real chat wait. */
@@ -444,7 +470,7 @@ export function rolePlayLine(t: RolePlayTurn): string {
     const recast = t.error?.code === 'wrong_number' ? ` Their last answer had a wrong number (${q(t.error.evidence)}; right: ${q(t.error.expected ?? '')}): say the right one in passing.` : t.error ? ` If their last message has the error "${q(t.error.evidence)}", say that part correctly once, in passing.` : '';
     const closing = t.closing ? ` First, still in character, react in a few words to what they said and close the scene with its last line: "${q(tx(s.beats[s.beats.length - 1].say, lang))}".` : '';
     const kind = s.subject === 'english' || s.subject === 'arabic' ? 'rule' : 'rule or method';
-    return `ROLE-PLAY DEBRIEF (set by the system): the scene "${tx(s.title, lang)}" is over.${closing} Then step out of the role and speak as the tutor again.${recast} If their last message asks you something, answer it in one short sentence first; if it has an error, say that part correctly in passing. (1) One short sentence that says the role-play is finished and praises their effort, naming ONE thing they did in the scene (if you quote them, copy their exact words from the conversation above; never "you are clever"). ${e ? `(2) Then say you will look at one point from it (do not say they made a mistake on it unless that mistake is in the conversation above), and give exactly these lines: "${L.rule}: ${q(e.rule)}" and ${pair}. (3) Then ONE new practice item on this ${kind}, as a clear question or a one-sentence task set in the same place as the scene (a new one, not one from the scene), and stop.` : '(2) Then ONE new practice item on today\'s lesson point, and stop.'} No other rule, no recap ask, no second task. ${only} ${over}`;
+    return `ROLE-PLAY DEBRIEF (set by the system): the scene "${tx(s.title, lang)}" is over.${closing} Then step out of the role and speak as the tutor again.${recast} If their last message asks you something, answer it in one short sentence first; if it has an error, say that part correctly in passing. (1) One short sentence that says the role-play is finished and praises their effort, naming ONE thing they did in the scene (if you quote them, copy their exact words from the conversation above; never "you are clever"). ${e ? `(2) Then say you will look at one point from it (do not say they made a mistake on it unless that mistake is in the conversation above), and give exactly these lines: "${L.rule}: ${q(e.rule)}" and ${pair}. (3) Then ONE new practice item on this ${kind}, as a clear question or a one-sentence task set in the same place as the scene (a new one, not one from the scene), and stop.` : '(2) They made no mistake that needed a rule: say so in a few words, then give ONE stretch item, a little harder than the scene, on today\'s lesson point and set in the same place as the scene, and stop. Do not state a rule and do not mention a mistake.'} No other rule, no recap ask, no second task. ${only} ${over}`;
   }
   if (t.phase === 'after') return `ROLE-PLAY OVER (set by the system): the role-play scene "${tx(s.title, lang)}" is finished. Speak as yourself, the tutor, not as ${tx(s.character, lang)}.`;
   if (t.phase !== 'beat' || !t.beat) return '';
@@ -460,7 +486,8 @@ export function rolePlayLine(t: RolePlayTurn): string {
   const len = child ? (lang === 'en' ? 'At most 3 very short sentences, with simple Starters words only.' : 'At most 3 very short, simple sentences.') : 'At most 2 short sentences (one more if you start the scene or help them).';
   const last = t.beat === s.beats.length ? ' This is the last line of the scene.' : '';
   const point = t.lessonPoint ? `Today's lesson point is ${q(t.lessonPoint)}: when their message has an error on it, always recast it.` : '';
-  const react = t.beat === 1 ? '' : 'First react in a few words, in character, to what they actually said. If they asked you something, answer it briefly in character; if they already answered part of your line\'s question, or chose something else, do not ask that part again: say the line so that it follows from what they chose, and keep the scene moving towards the goal.';
+  const asked = t.learnerAsked ? `They asked you: "${q(t.learnerAsked)}". Answer THAT first, in character, in one short sentence (a plain, harmless detail that fits the scene is fine, for example where the parking is), then steer back to your line.` : '';
+  const react = t.beat === 1 ? '' : `Your line must respond to what they actually said: first react in a few words, in character, to their words. ${asked} If they already answered part of your line's question, or chose something else, do not ask that part again: say the line so that it follows from what they said and chose, keep its information, and keep the scene moving towards the goal. Never answer a question they did not ask.`;
   return `ROLE-PLAY (set by the system), beat ${t.beat} of ${s.beats.length}: ${who} Stay in character. ${start} ${react} ${recastLine(t, s)} ${point} ${help} Your line now (say it in character; you may fit it to what they said, but keep its meaning and add nothing new; if it answers a question they did not ask, say it as new information instead): "${q(tx(beat.say, lang))}"${last} ${len} The numbers in your line are fixed by the scene: keep them exactly, even if the learner said other amounts. Do not add new events, places, people or topics. Do not explain grammar or a method, do not give an exercise, a rule, a score or a recap, do not ask them to say or write anything again (the lesson comes back by itself after the scene), never claim they said something they did not say, and do not ask for personal details. Then stop and wait for their answer. ${only} ${over}`.replace(/\s{2,}/g, ' ');
 }
 

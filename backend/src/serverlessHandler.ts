@@ -12,6 +12,10 @@ function sendUnavailable(res: ServerResponse) {
   res.end(JSON.stringify({ error: { code: 'SERVICE_UNAVAILABLE', message }, message }));
 }
 
+// /health reads no data (lms-speed-4): it answers at once on a fresh instance instead of waiting for the
+// database connection, which it still starts.
+const NO_DATABASE = /^\/health(\?|$)/;
+
 // Connects once per warm instance, then hands every request to the app. If the
 // connection fails (P20: Atlas refusing connections at a simultaneous start),
 // answer 503 with Retry-After at once instead of throwing, and do not try to
@@ -19,7 +23,9 @@ function sendUnavailable(res: ServerResponse) {
 export function serverlessHandler(app: Handler, connect: () => Promise<void>) {
   let ready: Promise<void> | undefined;
   return async function handler(req: IncomingMessage, res: ServerResponse) {
+    const noDatabase = NO_DATABASE.test(req.url ?? '');
     if (!ready) {
+      if (noDatabase && dbUnavailable()) return app(req, res);
       if (dbUnavailable()) return sendUnavailable(res);
       ready = connect();
       ready.catch((error) => {
@@ -28,6 +34,7 @@ export function serverlessHandler(app: Handler, connect: () => Promise<void>) {
         logger.error('serverless_connect_failed', { error: serializeError(error) });
       });
     }
+    if (noDatabase) return app(req, res);
     try {
       await ready;
     } catch {

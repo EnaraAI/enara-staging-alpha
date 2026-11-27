@@ -6,7 +6,7 @@
 //   - learner forms: "x = 7", "cm^2" / "cm²"; with no unit in the key, a trailing unit, %, ° or word is ignored;
 //   - expressions: equal when mathjs simplify(a - b) is 0, or the two agree at 6 sample points (variables only, no function calls
 //     beyond the safe list). Input over 120 characters is not parsed.
-import { create, all, type MathNode } from 'mathjs';
+import type { MathJsInstance, MathNode } from 'mathjs';
 import type { ClosedItem, GradeResult } from '../../../schema';
 import { westernDigits } from '../../../text/ar';
 import { isBlank, single } from './result';
@@ -15,8 +15,17 @@ type Numeric = Extract<ClosedItem, { type: 'numeric' }>;
 
 // Learner text is parsed into a tree and checked (symbolsOk) before anything is computed: only numbers, + - * / ^, brackets, the safe
 // functions below and plain variables. Nothing is ever run through math.evaluate.
-const math = create(all, {});
-const parse = math.parse;
+// mathjs (about 1,000 modules) loads on first use, not at start-up (lms-speed-4: cold starts).
+let mathjs: MathJsInstance | undefined;
+function math(): MathJsInstance {
+  if (!mathjs) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { create, all } = require('mathjs') as typeof import('mathjs');
+    mathjs = create(all, {});
+  }
+  return mathjs;
+}
+const parse = (text: string): MathNode => math().parse(text);
 const SAFE_FUNCS = new Set(['sqrt', 'abs', 'sin', 'cos', 'tan', 'log', 'ln', 'exp', 'pi', 'e']);
 const MAX_LEN = 120;
 
@@ -51,7 +60,7 @@ export function convert(amount: number, from: string, target: string): number | 
   const a = unitName(from); const b = unitName(target);
   if (a === b) return amount;
   if (CURRENCY.has(a) || CURRENCY.has(b)) return null;
-  try { return math.unit(amount, a).toNumber(b); } catch { return null; }
+  try { return math().unit(amount, a).toNumber(b); } catch { return null; }
 }
 
 function symbolsOk(node: MathNode): boolean {
@@ -86,7 +95,8 @@ export function sameExpression(a: string, b: string): boolean {
   try {
     const na = parse(a); const nb = parse(b);
     if (!symbolsOk(na) || !symbolsOk(nb)) return false;
-    const diff = math.simplify(new math.OperatorNode('-', 'subtract', [na, nb]));
+    const m = math();
+    const diff = m.simplify(new m.OperatorNode('-', 'subtract', [na, nb]));
     if (diff.type === 'ConstantNode' && Number((diff as unknown as { value: number }).value) === 0) return true;
     const names = new Set<string>();
     for (const n of [na, nb]) n.traverse((x) => { if (x.type === 'SymbolNode' && !SAFE_FUNCS.has((x as unknown as { name: string }).name)) names.add((x as unknown as { name: string }).name); });

@@ -6,24 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Enara | The Intelligence Layer for Education</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800;900&family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=IBM+Plex+Sans+Arabic:wght@400;600;700&family=JetBrains+Mono:wght@400;500&family=Poppins:wght@600&display=swap" rel="stylesheet">
-    <script>
-      // "Campus" theme: the app's teal/indigo utility classes resolve to the Campus blue scale.
-      (function () {
-        var blue = { 50: '#eef4ff', 100: '#dbe7fd', 200: '#bcd3f7', 300: '#8fb4f0', 400: '#5b8fe6', 500: '#2a6edc', 600: '#0056D2', 700: '#00419e', 800: '#0b3d91', 900: '#0b2a63', 950: '#071530' };
-        tailwind.config = {
-          theme: {
-            extend: {
-              colors: { teal: blue, indigo: blue, cyan: blue },
-              fontFamily: { sans: ['"Source Sans 3"', 'system-ui', 'sans-serif'] },
-            },
-          },
-        };
-      })();
-    </script>
+    <!-- Fonts load without blocking the first paint (lms-speed-3); display=swap shows the fallback until they arrive. -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800;900&family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=IBM+Plex+Sans+Arabic:wght@400;600;700&family=JetBrains+Mono:wght@400;500&family=Poppins:wght@600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700;800;900&family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=IBM+Plex+Sans+Arabic:wght@400;600;700&family=JetBrains+Mono:wght@400;500&family=Poppins:wght@600&display=swap"></noscript>
     <style>
         :root {
             --primary: #0056D2;
@@ -73,7 +60,6 @@
   }
 }
 </script>
-<link rel="stylesheet" href="/index.css">
 </head>
 <body>
     <div id="root"></div>

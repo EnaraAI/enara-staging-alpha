@@ -1,5 +1,6 @@
 // Vercel serverless entry: wraps the Express app and reuses one MongoDB
 // connection per warm function instance. Local and Docker runs use src/index.ts.
+import mongoose from 'mongoose';
 import { createApp } from './app';
 import { getConfig } from './config/env';
 import { assertStagingEntry } from './config/stagingGuard';
@@ -12,5 +13,8 @@ import { serverlessHandler } from './serverlessHandler';
 // connection or migration.
 assertStagingEntry(process.env);
 getConfig();
+// lms-speed-4b: no index builds by each new instance; the deploy's migration step builds every model's indexes
+// once (config/indexSync.ts, POST /api/maintenance/migrate).
+mongoose.set('autoIndex', false);
 const app = createApp();
 export default serverlessHandler(app as never, () => Promise.all([connectDB(), connectPostgres()]).then(() => undefined));

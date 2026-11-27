@@ -1,5 +1,5 @@
 import { engineV2 } from '../services/engineV2';
-import { expressivePersona, subjectCueLine, withLookLine, lookLine, panelSide, planTurnCues, secondSentenceAt, startExpressiveCall, stripCueTags, type Cue, type CuePlan, type ExpressiveCall, type VoiceProfile } from '../services/liveExpressive';
+import { expressivePersona, openedInEnglish, subjectCueLine, withLookLine, lookLine, panelSide, planTurnCues, secondSentenceAt, startExpressiveCall, stripCueTags, type Cue, type CuePlan, type ExpressiveCall, type VoiceProfile } from '../services/liveExpressive';
 import { guardedEmitter } from '../services/guardedStream';
 import { guardSpokenMarker, spokenLines } from '../services/spokenInput';
 import { DEMO_LIMITS, isDemoSessionInstitution } from '../config/demo';
@@ -940,6 +940,8 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
     emitText(text);
   };
   try {
+    // liveExpressive, every other subject: the hidden grading line (with the language rule in Arabic for an Arabic-medium call).
+    const subjectCue = cueCall && !languagePrep ? subjectCueLine((spokenLanguage ?? session.language) === 'arabic') : undefined;
     const modelParams: Parameters<typeof streamDirectTutorModel>[0] = {
       query,
       history: messages,
@@ -948,11 +950,15 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
       mode: 'voice',
       learner: learner ? describeSnapshot(learner) : undefined,
       // liveExpressive, every other subject: the reply opens with the hidden grading line, so its cue follows the verdict.
-      pedagogy: arbitratePedagogy([plan?.prompt, policyRule(tutorPolicy.policy), cueCall && !languagePrep ? subjectCueLine((spokenLanguage ?? session.language) === 'arabic') : undefined, sceneActive || subjectRolePlay?.phase === 'after' ? rolePlayLine(subjectRolePlay!) : undefined].filter(Boolean).join('\n\n') || undefined, Boolean(languagePrep)),
+      pedagogy: arbitratePedagogy([plan?.prompt, policyRule(tutorPolicy.policy), subjectCue, sceneActive || subjectRolePlay?.phase === 'after' ? rolePlayLine(subjectRolePlay!) : undefined].filter(Boolean).join('\n\n') || undefined, Boolean(languagePrep)),
       planActive: Boolean(plan),
       ...(languagePrep?.parts ? { languageContextStable: languagePrep.parts.stable, languageContextDynamic: `${languagePrep.parts.dynamic}${speakingLines}${heardLines}` } : { languageContext: languagePrep?.prompt ? `${languagePrep.prompt}${speakingLines}${heardLines}` : languagePrep?.prompt }),
     };
     const modelStream = streamDirectTutorModel(modelParams);
+    // liveExpressive, an Arabic-medium call in another subject: the simulation saw replies open in English after the hidden
+    // grading line (never with the switch off). If the first words are English, the reply is made again with today's prompt
+    // (no hidden line, so no verdict: a neutral cue).
+    const arabicSubjectCall = Boolean(subjectCue) && (spokenLanguage ?? session.language) === 'arabic';
     // Language course: buffer the reply so the shared guards and marker handling run BEFORE anything is spoken or shown (same guarantees as the text chat).
     async function* chunks(): AsyncGenerator<string> {
       if (!languagePrep && sceneActive) {
@@ -973,7 +979,39 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
       if (!languagePrep) { // liveExpressive, another subject: still streamed; the hidden line is read and removed first
         const filter = new AssessmentMarkerFilter();
         let seen = '';
-        for await (const d of modelStream) { if (closed) break; const v = filter.push(d); if (!v) continue; seen += v; languageMarker ??= filterSummary(filter, seen); yield v; }
+        let checked = !arabicSubjectCall;
+        // Made again with today's prompt (no hidden line, so no verdict: a neutral cue).
+        async function* again(): AsyncGenerator<string> {
+          logger.info('live_expressive_language_retry', { session: session.id });
+          languageMarker = undefined;
+          const f2 = new AssessmentMarkerFilter();
+          for await (const d2 of streamDirectTutorModel({ ...modelParams, pedagogy: modelParams.pedagogy?.replace(`\n\n${subjectCue}`, '').replace(subjectCue!, '') || undefined })) { if (closed) break; const v2 = f2.push(d2); if (v2) yield v2; }
+          const tail2 = f2.end();
+          if (tail2) yield tail2;
+        }
+        for await (const d of modelStream) {
+          if (closed) break;
+          const v = filter.push(d);
+          if (!v) continue;
+          seen += v;
+          if (!checked) {
+            if (seen.replace(/\s/g, '').length < 40) continue; // hold the first words until the language is clear
+            checked = true;
+            if (openedInEnglish(seen)) { yield* again(); return; }
+            languageMarker ??= filterSummary(filter, seen);
+            yield seen;
+            continue;
+          }
+          languageMarker ??= filterSummary(filter, seen);
+          yield v;
+        }
+        if (!checked && seen) { // a short reply: the same check at its end
+          seen += filter.end();
+          if (openedInEnglish(seen)) { yield* again(); return; }
+          languageMarker ??= filterSummary(filter, seen);
+          yield seen;
+          return;
+        }
         const tail = filter.end();
         languageMarker ??= filterSummary(filter, seen + tail);
         if (tail) yield tail;

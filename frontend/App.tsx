@@ -3,56 +3,9 @@ import React, { useEffect, useState } from 'react';
 import { Login } from './pages/Login';
 import { AccountLink, accountLinkFromLocation } from './pages/AccountLink';
 import { DemoPortal } from './pages/DemoPortal';
-import { People } from './pages/workspace/People';
-import { LearnerAgeBands } from './pages/workspace/LearnerAgeBands';
-import { StudentDashboard } from './pages/StudentDashboard';
-import { CoursePage } from './pages/CoursePage';
-import { AdminDashboard } from './pages/AdminDashboard';
-import { CurriculumCenter } from './pages/CurriculumCenter';
 import { StudentLayout, AdminSidebar, Header } from './components/Layout';
-import { StudentManagement } from './pages/StudentManagement';
-import { StudentProfile } from './pages/StudentProfile';
-import { AIAssistant } from './components/AIAssistant';
-import { ResearchInsights } from './pages/ResearchInsights';
-import { LearningEvents } from './pages/LearningEvents';
-import { LearningObjectives } from './pages/LearningObjectives';
-import { ClassInsights } from './pages/ClassInsights';
-import { SchoolInsights } from './pages/SchoolInsights';
-import { StudentAssignments } from './pages/StudentAssignments';
-import { StudyPlan } from './pages/StudyPlan';
-import { AssessmentBuilder } from './pages/teaching/AssessmentBuilder';
-import { ClassAssignments } from './pages/teaching/ClassAssignments';
-import { GradingReview } from './pages/teaching/GradingReview';
-import { QuestionBank } from './pages/teaching/QuestionBank';
-import { TeachingDashboard } from './pages/teaching/TeachingDashboard';
-import { LessonPlanner } from './pages/teaching/LessonPlanner';
-import { AssessmentInterface } from './pages/AssessmentInterface';
-import { AssessmentCenter } from './pages/AssessmentCenter';
-import { ManagementDashboard } from './pages/ManagementDashboard';
-import { AICredits } from './pages/AICredits';
-import { EnaraAdminDashboard } from './pages/EnaraAdminDashboard';
-import { EnaraCreditManagement } from './pages/EnaraCreditManagement';
-import { TestResults } from './pages/TestResults';
-import { RevenueGrowth } from './components/enara/RevenueGrowth';
-import { InstitutionCRM } from './components/enara/InstitutionCRM';
-import { ContractManagement } from './components/enara/ContractManagement';
-import { PlatformHealth } from './components/enara/PlatformHealth';
-import { AuditCompliance } from './components/enara/AuditCompliance';
-import { ROIMetrics } from './components/enara/ROIMetrics';
-import { Financials } from './components/enara/Financials';
-import { InstitutionAnalytics } from './pages/InstitutionAnalytics';
-import { CourseTeacherAnalytics } from './pages/CourseTeacherAnalytics';
-import { StudentDeepAnalytics } from './pages/StudentDeepAnalytics';
-import { Integrations } from '@/pages/Integrations';
-import { AdminAvatarControlCenter } from './components/enara/AdminAvatarControlCenter';
 import { LmsFrameBar, LmsLaunch, LmsPreviewBanner, onLmsLaunchPath } from './pages/LmsLaunch';
 import { LmsPicker, onLmsPickerPath } from './pages/LmsPicker';
-import { LmsConnections } from './pages/LmsConnections';
-import { LmsActivityOverview, LmsActivityStudent } from './pages/LmsActivity';
-import { LmsOnboarding } from './pages/LmsOnboarding';
-import { LmsSchoolStatus } from './pages/LmsSchoolStatus';
-import { ParentsAdmin } from './pages/ParentsAdmin';
-import { BusAdmin } from './pages/BusAdmin';
 import { LmsEmailOptIn } from './components/LmsEmailOptIn';
 import { isLmsPreview, isLmsSession, lmsSessionClassId, takeLmsTarget, type LmsLandingTarget, fetchLmsStatus, fetchAssessments, fetchKnowledgeMap, fetchMyAssignments, fetchMyStudyPlan, fetchMyAssessments, fetchStudents, getSessionUser, logout, refreshSession, SESSION_EXPIRED_EVENT, SessionUser, getParentDeviceToken, resumeParentDevice, fetchParentsAdminStatus, apiRequest, type ParentsAdminStatus } from './services/apiService';
 
@@ -67,16 +20,69 @@ const onParentsPath = () => /^\/parents(\/|$)/.test(window.location.pathname);
 export const isLmsStudent = () => isLmsSession() || getSessionUser()?.lmsAccount === true;
 export const usesKidsApp = (role: string | null | undefined, user: Pick<SessionUser, 'role' | 'uiMode'> | null | undefined) =>
   role === 'student' && user?.role === 'student' && user?.uiMode === 'kids';
-import { KnowledgeMap } from './pages/KnowledgeMap';
-import { Documents } from './pages/workspace/Documents';
-import { AIChat } from './pages/workspace/AIChat';
-import { Outcomes } from './pages/workspace/Outcomes';
-import { Usage } from './pages/workspace/Usage';
-import { SavingsCenter } from './pages/workspace/SavingsCenter';
 import { getSessionUser as sessionUser } from './services/apiService';
 import { ACADEMIC_MANAGER_PAGES, academicManagerPage, lmsActivityOfPage, lmsLandingPage, restoreUiRole, showOldAssessmentsTab, staffLandingPage, staffPageAllowed, UiRole } from './services/roleRouting';
 import { Assessment, Student } from './types';
 import { CheckCircle2 } from 'lucide-react';
+
+// Speed (lms-speed-3): every page loads on demand, so the first screen downloads only the shell
+// (sign-in, layout) and the page it shows; PageSuspense shows while a page's code arrives.
+const People = React.lazy(() => import('./pages/workspace/People').then((m) => ({ default: m.People })));
+const LearnerAgeBands = React.lazy(() => import('./pages/workspace/LearnerAgeBands').then((m) => ({ default: m.LearnerAgeBands })));
+const StudentDashboard = React.lazy(() => import('./pages/StudentDashboard').then((m) => ({ default: m.StudentDashboard })));
+const CoursePage = React.lazy(() => import('./pages/CoursePage').then((m) => ({ default: m.CoursePage })));
+const AdminDashboard = React.lazy(() => import('./pages/AdminDashboard').then((m) => ({ default: m.AdminDashboard })));
+const CurriculumCenter = React.lazy(() => import('./pages/CurriculumCenter').then((m) => ({ default: m.CurriculumCenter })));
+const StudentManagement = React.lazy(() => import('./pages/StudentManagement').then((m) => ({ default: m.StudentManagement })));
+const StudentProfile = React.lazy(() => import('./pages/StudentProfile').then((m) => ({ default: m.StudentProfile })));
+const AIAssistant = React.lazy(() => import('./components/AIAssistant').then((m) => ({ default: m.AIAssistant })));
+const ResearchInsights = React.lazy(() => import('./pages/ResearchInsights').then((m) => ({ default: m.ResearchInsights })));
+const LearningEvents = React.lazy(() => import('./pages/LearningEvents').then((m) => ({ default: m.LearningEvents })));
+const LearningObjectives = React.lazy(() => import('./pages/LearningObjectives').then((m) => ({ default: m.LearningObjectives })));
+const ClassInsights = React.lazy(() => import('./pages/ClassInsights').then((m) => ({ default: m.ClassInsights })));
+const SchoolInsights = React.lazy(() => import('./pages/SchoolInsights').then((m) => ({ default: m.SchoolInsights })));
+const StudentAssignments = React.lazy(() => import('./pages/StudentAssignments').then((m) => ({ default: m.StudentAssignments })));
+const StudyPlan = React.lazy(() => import('./pages/StudyPlan').then((m) => ({ default: m.StudyPlan })));
+const AssessmentBuilder = React.lazy(() => import('./pages/teaching/AssessmentBuilder').then((m) => ({ default: m.AssessmentBuilder })));
+const ClassAssignments = React.lazy(() => import('./pages/teaching/ClassAssignments').then((m) => ({ default: m.ClassAssignments })));
+const GradingReview = React.lazy(() => import('./pages/teaching/GradingReview').then((m) => ({ default: m.GradingReview })));
+const QuestionBank = React.lazy(() => import('./pages/teaching/QuestionBank').then((m) => ({ default: m.QuestionBank })));
+const TeachingDashboard = React.lazy(() => import('./pages/teaching/TeachingDashboard').then((m) => ({ default: m.TeachingDashboard })));
+const LessonPlanner = React.lazy(() => import('./pages/teaching/LessonPlanner').then((m) => ({ default: m.LessonPlanner })));
+const AssessmentInterface = React.lazy(() => import('./pages/AssessmentInterface').then((m) => ({ default: m.AssessmentInterface })));
+const AssessmentCenter = React.lazy(() => import('./pages/AssessmentCenter').then((m) => ({ default: m.AssessmentCenter })));
+const AICredits = React.lazy(() => import('./pages/AICredits').then((m) => ({ default: m.AICredits })));
+const EnaraAdminDashboard = React.lazy(() => import('./pages/EnaraAdminDashboard').then((m) => ({ default: m.EnaraAdminDashboard })));
+const EnaraCreditManagement = React.lazy(() => import('./pages/EnaraCreditManagement').then((m) => ({ default: m.EnaraCreditManagement })));
+const TestResults = React.lazy(() => import('./pages/TestResults').then((m) => ({ default: m.TestResults })));
+const RevenueGrowth = React.lazy(() => import('./components/enara/RevenueGrowth').then((m) => ({ default: m.RevenueGrowth })));
+const InstitutionCRM = React.lazy(() => import('./components/enara/InstitutionCRM').then((m) => ({ default: m.InstitutionCRM })));
+const ContractManagement = React.lazy(() => import('./components/enara/ContractManagement').then((m) => ({ default: m.ContractManagement })));
+const PlatformHealth = React.lazy(() => import('./components/enara/PlatformHealth').then((m) => ({ default: m.PlatformHealth })));
+const AuditCompliance = React.lazy(() => import('./components/enara/AuditCompliance').then((m) => ({ default: m.AuditCompliance })));
+const ROIMetrics = React.lazy(() => import('./components/enara/ROIMetrics').then((m) => ({ default: m.ROIMetrics })));
+const Financials = React.lazy(() => import('./components/enara/Financials').then((m) => ({ default: m.Financials })));
+const InstitutionAnalytics = React.lazy(() => import('./pages/InstitutionAnalytics').then((m) => ({ default: m.InstitutionAnalytics })));
+const CourseTeacherAnalytics = React.lazy(() => import('./pages/CourseTeacherAnalytics').then((m) => ({ default: m.CourseTeacherAnalytics })));
+const StudentDeepAnalytics = React.lazy(() => import('./pages/StudentDeepAnalytics').then((m) => ({ default: m.StudentDeepAnalytics })));
+const Integrations = React.lazy(() => import('@/pages/Integrations').then((m) => ({ default: m.Integrations })));
+const AdminAvatarControlCenter = React.lazy(() => import('./components/enara/AdminAvatarControlCenter').then((m) => ({ default: m.AdminAvatarControlCenter })));
+const LmsConnections = React.lazy(() => import('./pages/LmsConnections').then((m) => ({ default: m.LmsConnections })));
+const LmsActivityOverview = React.lazy(() => import('./pages/LmsActivity').then((m) => ({ default: m.LmsActivityOverview })));
+const LmsActivityStudent = React.lazy(() => import('./pages/LmsActivity').then((m) => ({ default: m.LmsActivityStudent })));
+const LmsOnboarding = React.lazy(() => import('./pages/LmsOnboarding').then((m) => ({ default: m.LmsOnboarding })));
+const LmsSchoolStatus = React.lazy(() => import('./pages/LmsSchoolStatus').then((m) => ({ default: m.LmsSchoolStatus })));
+const ParentsAdmin = React.lazy(() => import('./pages/ParentsAdmin').then((m) => ({ default: m.ParentsAdmin })));
+const BusAdmin = React.lazy(() => import('./pages/BusAdmin').then((m) => ({ default: m.BusAdmin })));
+const KnowledgeMap = React.lazy(() => import('./pages/KnowledgeMap').then((m) => ({ default: m.KnowledgeMap })));
+const Documents = React.lazy(() => import('./pages/workspace/Documents').then((m) => ({ default: m.Documents })));
+const AIChat = React.lazy(() => import('./pages/workspace/AIChat').then((m) => ({ default: m.AIChat })));
+const Outcomes = React.lazy(() => import('./pages/workspace/Outcomes').then((m) => ({ default: m.Outcomes })));
+const Usage = React.lazy(() => import('./pages/workspace/Usage').then((m) => ({ default: m.Usage })));
+const SavingsCenter = React.lazy(() => import('./pages/workspace/SavingsCenter').then((m) => ({ default: m.SavingsCenter })));
+const PageSuspense: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <React.Suspense fallback={<div className="p-8 text-center text-slate-500" aria-busy="true">Loading…</div>}>{children}</React.Suspense>
+);
 
 type AppState = {
   role: UiRole | null;
@@ -423,6 +429,7 @@ const App: React.FC = () => {
     if (state.page === 'taking-assessment' && state.activeAssessment) {
       return (
         <div className="min-h-screen bg-slate-50">
+          <PageSuspense>
           <AssessmentInterface 
             assessment={state.activeAssessment} 
             onComplete={completeAssessment}
@@ -435,6 +442,7 @@ const App: React.FC = () => {
               }
             }}
           />
+          </PageSuspense>
         </div>
       );
     }
@@ -492,6 +500,8 @@ const App: React.FC = () => {
             </div>
             
             <main className="flex-1 overflow-y-auto p-4 sm:p-8">
+            
+              <PageSuspense>
               {state.page === 'dashboard' && <StudentDashboard onStartAssessment={startAssessment} onNavigate={navigate} onOpenCourse={openCourse} onAskTutor={handleAskTutor} assessments={assessments} />}
               {state.page === 'courses' && <CoursePage initialCourseId={state.sharedCourseId} />}
               {state.page === 'progress' && <KnowledgeMap onAskTutor={handleAskTutor} onOpenCourses={() => navigate('courses')} />}
@@ -537,8 +547,10 @@ const App: React.FC = () => {
                   </div>
                 </div>
               )}
+              </PageSuspense>
             </main>
           </div>
+          <React.Suspense fallback={null}>
           <AIAssistant 
             students={students} 
             assessments={assessments} 
@@ -550,6 +562,7 @@ const App: React.FC = () => {
             onNavigate={navigate}
             onStartAssessment={startAssessment}
           />
+          </React.Suspense>
         </div>
       </div>
     );
@@ -572,11 +585,13 @@ const App: React.FC = () => {
           ))}
         </div>
         <main className="flex-1 overflow-y-auto">
+          <PageSuspense>
           {page === 'dashboard' && <InstitutionAnalytics />}
           {/* P4: read-only school outcome aggregates (no class filter, no student timeline). */}
           {page === 'dashboard' && <Outcomes allowClassFilter={false} showTimeline={false} />}
           {/* Option B: read-only for academic managers (the server returns canEdit=false and rejects writes). */}
           {page === 'age-bands' && <LearnerAgeBands />}
+          </PageSuspense>
         </main>
       </div>
     );
@@ -604,6 +619,7 @@ const App: React.FC = () => {
             showParents={parentsAdminEnabled}
           />
           <main className="flex-1 overflow-y-auto p-8">
+            <PageSuspense>
             {state.page === 'dashboard' && <EnaraAdminDashboard onNavigate={navigate} />}
             {state.page === 'revenue' && <RevenueGrowth />}
             {state.page === 'institutions' && <InstitutionCRM onNavigate={navigate} />}
@@ -624,6 +640,7 @@ const App: React.FC = () => {
             {state.page === 'parents-admin' && parentsAdmin && <ParentsAdmin status={parentsAdmin} />}
             {state.page === 'live-avatars' && <AdminAvatarControlCenter />}
             {state.page === 'settings' && <div className="p-20 text-center text-slate-400">Platform Global Settings</div>}
+            </PageSuspense>
           </main>
           {/* P22: the AI data assistant is for school admins only (server-enforced);
               ENARA admins use the read-only insight pages. */}
@@ -655,6 +672,7 @@ const App: React.FC = () => {
           showBus={busAdmin}
         />
         <main className="flex-1 overflow-y-auto">
+          <PageSuspense>
           {/* LMS emails (D2): a teacher from the LMS is asked once whether Enara may email them. */}
           {isLmsSession() && !isLmsPreview() && sessionUser()?.role === 'teacher' && <LmsEmailOptIn />}
           {state.page === 'dashboard' && <AdminDashboard onNavigate={navigate} students={students} setStudents={setStudents} onViewStudent={viewStudentProfile} onViewDeepAnalytics={viewStudentDeepAnalytics} />}
@@ -718,9 +736,11 @@ const App: React.FC = () => {
               onViewDeepAnalytics={() => viewStudentDeepAnalytics(state.selectedStudent!)}
             />
           )}
+          </PageSuspense>
         </main>
         {/* P22: model-backed analytics for school admins only (server-enforced). */}
         {sessionUser()?.role === 'admin' && (
+          <React.Suspense fallback={null}>
           <AIAssistant
             students={students}
             assessments={assessments}
@@ -730,6 +750,7 @@ const App: React.FC = () => {
             externalMessage={tutorMessage}
             onNavigate={navigate}
           />
+          </React.Suspense>
         )}
       </div>
     </div>

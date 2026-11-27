@@ -72,7 +72,8 @@ async function session(profile, arm) {
   const token = await login(profile.email);
   if (!token) return { profile: profile.id, arm, error: 'login' };
   const get = asUser(token);
-  const lesson = await subjectLesson(get, profile.subject);
+  let lesson = null;
+  for (let i = 0; i < 3 && !lesson; i++) { lesson = await subjectLesson(get, profile.subject).catch(() => null); if (!lesson) await sleep(5000); } // lms-test can answer slowly
   if (!lesson) return { profile: profile.id, arm, error: `no course for ${profile.subject}` };
   const start = await get('/api/avatar/session', { method: 'POST', headers: { 'x-enara-expressive-test': arm, 'x-enara-ci-token': CI_TOKEN }, body: JSON.stringify({ course_id: lesson.courseId, lesson_id: lesson.lessonId, lesson_title: lesson.lessonTitle, subject: lesson.subject, preferred_language: profile.lang }) });
   const sj = await start.json().catch(() => ({}));
@@ -104,7 +105,14 @@ async function session(profile, arm) {
   }
   // The engine's own record of each turn (verdict, next step) and what was stored as the transcript.
   await sleep(1500);
-  const stored = await (await get(`/api/me/tutor/sessions/${encodeURIComponent(sj.session_id)}`)).json().catch(() => null);
+  // lms-test can answer 503 under load: up to three tries for the stored transcript.
+  let stored = null;
+  for (let i = 0; i < 3 && !stored?.messages && !stored?.session?.messages; i++) {
+    const r = await get(`/api/me/tutor/sessions/${encodeURIComponent(sj.session_id)}`).catch(() => null);
+    stored = r?.ok ? await r.json().catch(() => null) : null;
+    if (!stored) await sleep(4000);
+  }
+  out.transcriptRead = Boolean(stored);
   const ai = (stored?.messages ?? stored?.session?.messages ?? []).filter((m) => m.role !== 'user');
   // Each turn's stored reply, matched by its text (a turn that produced no reply stores nothing).
   const used = new Set();
@@ -159,7 +167,7 @@ async function label(s) {
   }));
 }
 
-const JUDGE = 'You are an experienced English teacher of Egyptian learners. You will see the learner profile, the last part of a spoken lesson, and the tutor\'s latest reply. Decide whether a good teacher would accept this reply as it is: it must be correct English, fit the learner\'s age and level, respond to what the learner said, never mock or discourage, keep the lesson moving, and not give away an answer the learner should find. Answer with exactly one line: "YES: <short reason>" or "NO: <short reason>".';
+const JUDGE = 'You are an experienced teacher of Egyptian learners. You will see the learner profile, the last part of a spoken video lesson, and the tutor\'s latest reply. The call has a panel beside the tutor where the tutor\'s drawings appear: when the reply says a picture or drawing is on the screen, it is there. Decide whether a good teacher would accept this reply as it is: it must be correct English, fit the learner\'s age and level, respond to what the learner said, never mock or discourage, keep the lesson moving, and not give away an answer the learner should find. Answer with exactly one line: "YES: <short reason>" or "NO: <short reason>".';
 async function judge(sample) {
   const out = [];
   for (const s of sample) {
@@ -183,7 +191,8 @@ async function main() {
   const on = ok.filter((s) => s.arm === 'on');
   const onTurns = on.flatMap((s) => s.turns.filter((t) => t.status === 200 && t.text).map((t) => ({ ...t, band: s.band })));
   const allTurns = ok.flatMap((s) => s.turns);
-  const matches = onTurns.filter((t) => cueMatches(t, t.band)).length;
+  const checkable = onTurns.filter((t) => t.stored);
+  const matches = checkable.filter((t) => cueMatches(t, t.band)).length;
   const blocked = on.flatMap((s) => s.turns.flatMap((t) => t.cues)).filter((c) => BLOCKED.has(c)).length;
   const offCues = ok.filter((s) => s.arm === 'off').flatMap((s) => s.turns.flatMap((t) => t.cues)).length;
   const children = on.filter((s) => s.band === 'child');
@@ -207,9 +216,12 @@ async function main() {
   // Informational: the cue against an independent right/wrong label (the tutor's own grade can differ from it).
   const indep = onTurns.filter((t) => t.label === 'RIGHT' || t.label === 'WRONG');
   const indepAgree = indep.filter((t) => (t.label === 'RIGHT' ? ['happy', 'warm'] : ['supportive', 'concerned']).includes(t.cues[0])).length;
+  // Turns whose stored record could not be read are left out of the cue check (and counted).
+  const unread = onTurns.filter((t) => !t.stored).length;
   const result = {
+    transcriptsUnread: unread,
     sessions: sessions.length, failedSessions: sessions.filter((s) => s.error).map((s) => `${s.profile}/${s.arm}: ${s.error}`),
-    cueMatch: { matched: matches, turns: onTurns.length, pct: onTurns.length ? Math.round((matches / onTurns.length) * 1000) / 10 : 0, bar: 95 },
+    cueMatch: { matched: matches, turns: checkable.length, pct: checkable.length ? Math.round((matches / checkable.length) * 1000) / 10 : 0, bar: 95 },
     blockedCues: blocked, cuesWithSwitchOff: offCues, childrenCalm: childCalm, childBands: children.map((s) => `${s.profile}:${s.start?.band}`),
     cueShownOrStored: shown, cueAfterWords: notBefore,
     teacherAccept: { accepted, sample: judged.length, pct: judged.length ? Math.round((accepted / judged.length) * 1000) / 10 : 0, bar: 90 },
@@ -217,10 +229,15 @@ async function main() {
     latencyMs: Object.fromEntries(arms.map((arm) => { const ms = ok.filter((s) => s.arm === arm).flatMap((s) => s.turns.filter((t) => t.status === 200).map((t) => t.ms)).sort((a, b) => a - b); return [arm, { median: ms[Math.floor(ms.length / 2)] ?? null, failedTurns: ok.filter((s) => s.arm === arm).flatMap((s) => s.turns).filter((t) => t.status !== 200).length }]; })),
     info: { stuckWordsCuedConcerned: `${stuckCued}/${stuckTurns.length}`, cueVsIndependentRightWrong: `${indepAgree}/${indep.length}`, subjects: [...new Set(ok.map((s) => `${s.profile}:${s.subject}/${s.lang}`))] },
   };
-  result.pass = result.cueMatch.pct >= 95 && blocked === 0 && childCalm && shown === 0 && result.teacherAccept.pct >= 90 && result.stuck.noWorse && result.failedSessions.length === 0;
+  // Added after run 3: an Arabic-medium lesson answered in English (the teacher pre-screen let it through).
+  // Mostly Latin letters in the reply's opening (after run 5: "Great job! Yes, مشرقةٌ is the خبر" counts too).
+  const mostlyEnglish = (t) => { const a = t.slice(0, 80); const la = (a.match(/[A-Za-z]/g) ?? []).length; const ar = (a.match(/[\u0600-\u06FF]/g) ?? []).length; return la >= 12 && la > ar; };
+  const englishIn = (arm) => ok.filter((s) => s.arm === arm && s.lang === 'arabic').flatMap((s) => s.turns).filter((t) => t.text && mostlyEnglish(t.text)).length;
+  result.arabicRepliesInEnglish = { off: englishIn('off'), on: englishIn('on'), noWorse: englishIn('on') <= englishIn('off') };
+  result.pass = unread <= Math.ceil(onTurns.length / 10) && result.arabicRepliesInEnglish.noWorse && result.cueMatch.pct >= 95 && blocked === 0 && childCalm && shown === 0 && result.teacherAccept.pct >= 90 && result.stuck.noWorse && result.failedSessions.length === 0;
   writeFileSync(join(OUT, 'sim.json'), JSON.stringify({ result, sessions, judged }, null, 1));
   summary(`SIM ${JSON.stringify(result)}`);
-  const mismatches = onTurns.filter((t) => !cueMatches(t, t.band)).map((t) => `${t.band} said "${t.said.slice(0, 60)}" verdict=${t.verdict} next=${t.next} cues=${t.cues.join('+') || '-'}`);
+  const mismatches = checkable.filter((t) => !cueMatches(t, t.band)).map((t) => `${t.band} said "${t.said.slice(0, 60)}" verdict=${t.verdict} next=${t.next} cues=${t.cues.join('+') || '-'}`);
   writeFileSync(join(OUT, 'sim-mismatches.txt'), mismatches.join('\n'));
   for (const m of mismatches) log(`MISMATCH ${m}`);
   for (const j of judged.filter((x) => !x.accepted)) log(`REJECTED ${j.profile} t${j.turn}: ${j.verdict} | ${j.reply.slice(0, 160)}`);

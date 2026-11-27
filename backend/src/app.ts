@@ -229,7 +229,10 @@ export function createApp() {
   // trip before each spoken sentence. The per-IP ceiling below still applies.
   const callOwnLimiter = (req: Request) =>
     req.method === 'POST' && (req.path === '/avatar/speak' || req.path === '/avatar/query-stream' || /^\/avatar\/session\/[^/]+\/stt-token$/.test(req.path));
-  app.use('/api', makeLimiter('api', 60 * 1000, 300, 'Too many API requests', 'verified', (req) => learningOwnLimiter(req) || callOwnLimiter(req), true));
+  // API_RATE_LIMIT_MAX: 300 per minute per verified user unless set (the E2E stack, where one admin account drives many
+  // scenarios back to back, sets it higher; with a faster front end it went over 300 in a minute).
+  const apiUserMax = Math.max(1, Number(process.env.API_RATE_LIMIT_MAX) || 300);
+  app.use('/api', makeLimiter('api', 60 * 1000, apiUserMax, 'Too many API requests', 'verified', (req) => learningOwnLimiter(req) || callOwnLimiter(req), true));
   app.use('/api', makeLimiter('api-ip', 60 * 1000, 3000, 'Too many API requests from this network', false, learningOwnLimiter, true));
 
   app.use(express.json({ limit: config.requestBodyLimit, verify: captureRawBody }));
