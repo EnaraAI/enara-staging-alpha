@@ -267,3 +267,18 @@ describe('every subject (owner correction 27 Nov 2026)', () => {
     expect(d.text).toContain('خطأ: أدفع خمسين جنيهًا');
   });
 });
+
+describe('a wrong sum is never called right', () => {
+  it('Egyptian colloquial numbers are read; praise before a code-certain wrong number is removed', async () => {
+    const { numbersIn, guardSceneReply } = await import('../src/services/rolePlay');
+    expect(numbersIn('أربعتاشر جنيه')).toContain(14);
+    expect(numbersIn('تلاتين')).toContain(30);
+    expect(numbersIn('خمسة عشر جنيه')).toContain(15);
+    const t: RolePlayTurn = { scene: 'maths-market', phase: 'beat', beat: 3, tries: 0, subject: 'maths', lang: 'ar', error: { code: 'wrong_number', evidence: '15', expected: '36', certain: true } };
+    const g = guardSceneReply(t, 'صحيح، ستة وثلاثون جنيهًا. هل تريد شيئًا آخر؟ البرتقال بعشرة جنيهات للكيلو.');
+    expect(g.text).toBe('ستة وثلاثون جنيهًا. هل تريد شيئًا آخر؟ البرتقال بعشرة جنيهات للكيلو.');
+    expect(g.postCheck).toContain('roleplay_praise_on_wrong_removed');
+    // no wrong number: praise stays
+    expect(guardSceneReply({ ...t, error: undefined }, 'صحيح، ستة وثلاثون جنيهًا. هل تريد شيئًا آخر؟').fixed).toBe(false);
+  });
+});
