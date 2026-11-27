@@ -317,6 +317,8 @@ describe('liveExpressive: cues by code', () => {
       const res = await request(app).post('/api/avatar/query-stream').set('Authorization', auth).send({ session_id: ar.body.session_id, messages: [{ role: 'user', content: 'لا أعرف' }] });
       const lines = res.text.trim().split('\n').map((l) => JSON.parse(l));
       expect(lines.filter((l) => l.cue).map((l) => l.cue)).toEqual(['concerned', 'supportive']);
+      // The grading line never changes the reply's language (the simulation saw Arabic lessons drift into English).
+      expect(String((mocks.stream.mock.calls.at(-1)![0] as { pedagogy?: string }).pedagogy)).toContain('an Arabic lesson stays in Arabic');
     });
     // Switch off: the model is not asked for the line (today's prompt).
     await withSwitch('', async () => {
