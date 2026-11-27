@@ -154,6 +154,8 @@ const App: React.FC = () => {
   React.useEffect(() => {
     // The academic manager portal loads only its own read-only analytics.
     if (!state.role || state.role === 'academic-manager') return;
+    // Enara Kids loads its own lists; this layout's lists are not shown then (speed: no repeat call).
+    if (state.role === 'student' && kidsMode) return;
     let cancelled = false;
     // LMS students do their work through class assignments (P0 item 6): the
     // older assessment list is not loaded for them.
@@ -168,7 +170,7 @@ const App: React.FC = () => {
         .catch(err => console.warn('Could not load students:', err));
     }
     return () => { cancelled = true; };
-  }, [state.role]);
+  }, [state.role, kidsMode]);
 
   // Return to the login screen when the backend rejects the session.
   React.useEffect(() => {
@@ -322,15 +324,16 @@ const App: React.FC = () => {
   // "My progress" tab: only when the school has learning intelligence on.
   const [progressEnabled, setProgressEnabled] = useState(false);
   useEffect(() => {
-    if (state.role !== 'student') return setProgressEnabled(false);
+    // Enara Kids (KidsApp) checks its own tabs; this layout is not shown then (speed: no repeat probe).
+    if (state.role !== 'student' || kidsMode) return setProgressEnabled(false);
     fetchKnowledgeMap().then(() => setProgressEnabled(true)).catch(() => setProgressEnabled(false));
-  }, [state.role]);
+  }, [state.role, kidsMode]);
   // "Assignments" tab: only when the school has the teaching workflow on.
   const [assignmentsEnabled, setAssignmentsEnabled] = useState(false);
   useEffect(() => {
-    if (state.role !== 'student') return setAssignmentsEnabled(false);
+    if (state.role !== 'student' || kidsMode) return setAssignmentsEnabled(false);
     fetchMyAssignments().then(() => setAssignmentsEnabled(true)).catch(() => setAssignmentsEnabled(false));
-  }, [state.role]);
+  }, [state.role, kidsMode]);
   // "Assessments" tab: with class assignments on, a student's quizzes live
   // under "Assignments"; this older list is shown only when it has something,
   // so students don't see two similar tabs, one of them empty.
@@ -340,9 +343,9 @@ const App: React.FC = () => {
   // "Study plan" tab: only when the school has study plans on.
   const [studyPlanEnabled, setStudyPlanEnabled] = useState(false);
   useEffect(() => {
-    if (state.role !== 'student') return setStudyPlanEnabled(false);
+    if (state.role !== 'student' || kidsMode) return setStudyPlanEnabled(false);
     fetchMyStudyPlan().then(() => setStudyPlanEnabled(true)).catch(() => setStudyPlanEnabled(false));
-  }, [state.role]);
+  }, [state.role, kidsMode]);
 
   const handleAskTutor = (message: string, sessionId?: string) => {
     if (sessionId) setTutorSessionId(sessionId);
