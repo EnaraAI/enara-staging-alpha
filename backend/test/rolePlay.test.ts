@@ -151,10 +151,14 @@ describe('the model only voices the current beat; post-check keeps it in the sce
     process.env.ENARA_ENGINE_V2 = 'liveRolePlay';
     const language = { rolePlay: beat(2), learner: {}, lesson: { spec: {} }, signals: {}, moves: [] } as never;
     // a lesson task in the scene is unusable: the beat's own line
-    const g = applyReplyGuards(language, 'Here is the menu. Fill in: I would like ___ water.', '');
+    const g = applyReplyGuards(language, 'Good. Fill in: I would like ___ water.', '');
     expect(g.text).toBe(restaurant.beats[1].say.en);
     expect(g.rolePlayFixed).toBe(true);
     expect(g.postCheck).toEqual(expect.arrayContaining(['roleplay_fallback', 'roleplay_hard:a_lesson_task_inside_the_scene']));
+    // only the unusable sentence goes when what is left still voices the scene (the reaction and recast stay)
+    const t = applyReplyGuards(language, 'Some water, of course. Here is the menu. Would you like something to drink? Now try again: I would like ___ water.', '');
+    expect(t.text).toBe('Some water, of course. Here is the menu. Would you like something to drink?');
+    expect(t.postCheck).toContain('roleplay_trimmed');
     // softer problems only asked for the regeneration: the reply stays, the problem is recorded
     const soft = applyReplyGuards(language, 'Let us talk about grammar and football today instead.', '');
     expect(soft.text).toBe('Let us talk about grammar and football today instead.');

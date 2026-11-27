@@ -14,7 +14,7 @@ import { exampleGuardHits, removeGuardHits, ruleLinePostCheck, GUARD_REGEN_REASO
 import { ruleBankEntry } from './ruleBank';
 import { removeFalseWrongs } from './pairCheck';
 import { under9 } from './languageTeachingContext';
-import { rolePlayActive, sceneReplyProblems, hardSceneProblems, sceneFallback, ensureDebrief, ensureOffer, rolePlayTagOf, sceneCard, SCENE_REGEN_NOTE, type SceneCard } from './rolePlay';
+import { rolePlayActive, sceneReplyProblems, hardSceneProblems, sceneFallback, trimSceneReply, ensureDebrief, ensureOffer, rolePlayTagOf, sceneCard, SCENE_REGEN_NOTE, type SceneCard } from './rolePlay';
 import { recordRolePlayError } from './errorsToWorkOn';
 
 /** liveRolePlay: the note for ONE regeneration when a scene reply leaves the scene (both channels call this before the guards); undefined = keep it. */
@@ -112,7 +112,11 @@ export function applyReplyGuards(language: LanguageTeachingContext, answer: stri
     const hard = hardSceneProblems(rp, text);
     const soft = sceneReplyProblems(rp, text).filter((x) => !hard.includes(x));
     if (soft.length) postCheck = [...(postCheck ?? []), ...soft.map((x) => `roleplay_soft:${x.split(' (')[0].replace(/\s+/g, '_')}`)];
-    if (hard.length) { const fb = sceneFallback(rp); if (fb) { text = fb; rolePlayFixed = true; postCheck = [...(postCheck ?? []), 'roleplay_fallback', ...hard.map((x) => `roleplay_hard:${x.split(' (')[0].replace(/\s+/g, '_')}`)]; } }
+    if (hard.length) {
+      const trimmed = trimSceneReply(rp, text);
+      const fb = trimmed ?? sceneFallback(rp);
+      if (fb) { text = fb; rolePlayFixed = true; postCheck = [...(postCheck ?? []), trimmed ? 'roleplay_trimmed' : 'roleplay_fallback', ...hard.map((x) => `roleplay_hard:${x.split(' (')[0].replace(/\s+/g, '_')}`)]; }
+    }
   } else if (rp && rp.phase === 'debrief') {
     const d = ensureDebrief(rp, text);
     if (d.added) { text = d.text; rolePlayFixed = true; postCheck = [...(postCheck ?? []), 'roleplay_debrief_added']; }

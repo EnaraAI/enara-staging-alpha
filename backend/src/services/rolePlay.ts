@@ -313,7 +313,7 @@ export function rolePlayLine(t: RolePlayTurn): string {
     const e = ruleBankEntry(t.entryId);
     const pair = e ? (t.under9 ? `"Right: ${q(e.right)}"` : `"Right: ${q(e.right)} Wrong: ${q(e.wrong)}"`) : '';
     const recast = t.error ? ` If their last message has the error "${q(t.error.evidence)}", say that part correctly once, in passing.` : '';
-    return `ROLE-PLAY DEBRIEF (set by the system): the scene "${s.title.en}" is over: step out of the role and speak as the tutor again.${recast} (1) One short sentence that says the role-play is finished and praises their effort, naming ONE thing they did in the scene (if you quote them, copy their exact words from the conversation above; never "you are clever"). ${e ? `(2) Then say you will look at one point from it, and give exactly these lines: "Rule: ${q(e.rule)}" and ${pair}. (3) Then ONE new practice item on this rule, as a clear fill-in or a one-sentence task in a new everyday situation (not from the scene), and stop.` : '(2) Then ONE new practice item on today\'s lesson point, and stop.'} No other rule, no recap ask, no second task. ${english} ${over}`;
+    return `ROLE-PLAY DEBRIEF (set by the system): the scene "${s.title.en}" is over: step out of the role and speak as the tutor again.${recast} (1) One short sentence that says the role-play is finished and praises their effort, naming ONE thing they did in the scene (if you quote them, copy their exact words from the conversation above; never "you are clever"). ${e ? `(2) Then say you will look at one point from it, and give exactly these lines: "Rule: ${q(e.rule)}" and ${pair}. (3) Then ONE new practice item on this rule, as a clear fill-in or a one-sentence task set in the same place as the scene (a new sentence, not one from the scene), and stop.` : '(2) Then ONE new practice item on today\'s lesson point, and stop.'} No other rule, no recap ask, no second task. ${english} ${over}`;
   }
   if (t.phase !== 'beat' || !t.beat) return '';
   const beat = s.beats[t.beat - 1];
@@ -332,12 +332,12 @@ export function rolePlayLine(t: RolePlayTurn): string {
   const last = t.beat === s.beats.length ? ' This is the last line of the scene.' : '';
   const point = t.lessonPoint ? `Today's lesson point is ${q(t.lessonPoint)}: when their message has an error on it, always recast it.` : '';
   const react = t.beat === 1 ? '' : 'First react in a few words, in character, to what they actually said. If they asked you something, answer it briefly in character; if they already answered part of your line\'s question, do not ask that part again.';
-  return `ROLE-PLAY (set by the system), beat ${t.beat} of ${s.beats.length}: ${who} Stay in character. ${start} ${react} ${recast} ${point} ${help} Your line now (say it in character; you may fit it to what they said, but keep its meaning and add nothing new): "${q(beat.say.en)}"${last} ${len} Do not add new events, places, people or topics. Do not explain grammar, do not give an exercise, a rule, a score or a recap, and do not ask for personal details. Then stop and wait for their answer. ${english} ${over}`.replace(/\s{2,}/g, ' ');
+  return `ROLE-PLAY (set by the system), beat ${t.beat} of ${s.beats.length}: ${who} Stay in character. ${start} ${react} ${recast} ${point} ${help} Your line now (say it in character; you may fit it to what they said, but keep its meaning and add nothing new): "${q(beat.say.en)}"${last} ${len} Do not add new events, places, people or topics. Do not explain grammar, do not give an exercise, a rule, a score or a recap, do not ask them to say or write anything again (the lesson comes back by itself after the scene), never claim they said something they did not say, and do not ask for personal details. Then stop and wait for their answer. ${english} ${over}`.replace(/\s{2,}/g, ' ');
 }
 
 // ------------------------------------------------------------------------------------------------ post-check
 const META = /\b(grammar|rule|exercise|lesson|practice item|correct answer|the answer is|great job|good job|that'?s (?:right|correct)|that is (?:right|correct)|wrong|mistake|error|let'?s practi[sc]e|verb form|past tense|present tense|past simple|present simple)\b/gi;
-const TASK = /_{2,}|\b(?:fill in|complete:|complete (?:this|the) sentence|write (?:one|a|your) (?:new )?sentence|tell me one thing you did|say it again:)/i;
+const TASK = /_{2,}|\b(?:fill in|complete:|complete (?:this|the) sentence|write (?:one|a|your) (?:new )?sentence|tell me one thing you did|tell me about a real|say it again:|(?:now )?try again|now try|can you say (?:it|that|this) (?:with|again|correctly)|one last thing)\b/i;
 const STOP_WORDS = new Set(['the', 'and', 'you', 'your', 'are', 'for', 'with', 'this', 'that', 'here', 'there', 'what', 'would', 'like', 'have', 'from', 'please', 'thank', 'thanks', 'hello', 'good', 'very', 'they', 'them', 'will', 'want', 'does', 'time', 'today', 'also', 'just', 'over', 'than', 'then', 'when', 'where', 'which', 'it\'s', 'is', 'a', 'an', 'to', 'of', 'in', 'on', 'at', 'or', 'it', 'we', 'i', 'my', 'me', 'do', 'can', 'be']);
 const toks = (t: string) => t.toLowerCase().replace(/[’]/g, '\'').split(/[^a-z']+/).map((w) => w.replace(/^'+|'+$/g, '')).filter(Boolean);
 let childList: Set<string> | undefined;
@@ -383,6 +383,17 @@ export const hardSceneProblems = (t: RolePlayTurn, reply: string): string[] => s
 /** The note added to the one regeneration. */
 export const SCENE_REGEN_NOTE = (problems: string[]) => `Your last draft left the role-play scene (${problems.join('; ')}). Write the reply again: only the scene line in character, as the role-play instruction says.`;
 
+/** An unusable scene reply loses only its unusable sentences (a lesson task, teaching talk, personal details, Arabic) when what is left still
+ *  voices the scene and is usable; otherwise null (then the beat's fixed line is used). Keeps the reaction and the recast. */
+export function trimSceneReply(t: RolePlayTurn, reply: string): string | null {
+  const parts = sentencesOf(reply);
+  const bad = (x: string) => TASK.test(x) || new RegExp(META.source, 'i').test(x) || PERSONAL_DETAILS.test(x) || /[\u0600-\u06FF]/.test(x);
+  const kept = parts.filter((x) => !bad(x));
+  if (!kept.length || kept.length === parts.length) return null;
+  const text = kept.join(' ');
+  const left = sceneReplyProblems(t, text);
+  return left.some((p) => HARD.test(p) || /^does not voice/.test(p)) ? null : text;
+}
 /** The fixed fallback when a regenerated reply still fails: the beat's own line (with the help the step asked for). */
 export function sceneFallback(t: RolePlayTurn): string {
   const s = sceneById(t.scene);
