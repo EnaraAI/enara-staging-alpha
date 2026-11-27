@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto';
-import { ElevenLabsClient } from '@elevenlabs/elevenlabs-js';
+import type { ElevenLabsClient } from '@elevenlabs/elevenlabs-js';
 import { AppError } from '../middleware/errorHandler';
 import { isSpokenEngine } from '../assessment/questionBridge';
 import { getConfig } from '../config/env';
@@ -229,9 +229,11 @@ export function evidenceFor(questions: IQuestion[], turns: IConversationTurn[]):
 }
 
 let client: ElevenLabsClient | undefined;
-function eleven() {
+// The SDK loads on first use, not at start-up (lms-speed-4: cold starts).
+async function eleven() {
   const config = getConfig().elevenlabs;
   if (!config) throw new AppError('Spoken exams are not available: no speech service is configured', 503, 'VOICE_UNAVAILABLE');
+  const { ElevenLabsClient } = await import('@elevenlabs/elevenlabs-js');
   client ??= new ElevenLabsClient({ apiKey: config.apiKey, timeoutInSeconds: 30, maxRetries: 0 });
   return { client, config };
 }
@@ -240,7 +242,7 @@ function eleven() {
 // Duration comes from the provider's word timings when it reports them;
 // otherwise usage is recorded as unknown, never as free.
 export async function transcribeReply(audio: Buffer, mime: string, refs: { attemptId: string; assessmentId: string; sessionId: string }) {
-  const { client: el, config } = eleven();
+  const { client: el, config } = await eleven();
   const limits = getConfig().unpricedLimits;
   const res = await meteredCall(
     { feature: 'speaking_exam_stt', provider: 'elevenlabs', modelName: config.examSttModel, refs, ...(limits.speakingExamSttUsdPerReply ? { boundUsd: limits.speakingExamSttUsdPerReply } : {}) },
@@ -264,7 +266,7 @@ function audioSecondsOf(r: unknown) {
 // The examiner's words as 16 kHz PCM. A failure leaves the exam running with
 // the text on screen.
 export async function speakExaminer(text: string, s: ISpeakingSettings, refs: { attemptId?: string; assessmentId: string; sessionId: string }) {
-  const { client: el, config } = eleven();
+  const { client: el, config } = await eleven();
   const voiceId = s.examinerVoice === 'female' ? config.femaleVoiceId : config.voiceIdEn;
   try {
     const stream = await meteredSpeech({ feature: 'speaking_exam_tts', modelName: config.ttsModel, maxAttempts: 2, refs }, text.length, () =>

@@ -1,4 +1,4 @@
-import { ElevenLabsClient } from '@elevenlabs/elevenlabs-js';
+import type { ElevenLabsClient } from '@elevenlabs/elevenlabs-js';
 import { errorCodeOf, recordAiCall } from './aiCalls';
 import { meteredCall, meteredSpeech } from './aiGateway';
 import { getConfig } from '../config/env';
@@ -10,9 +10,11 @@ import type { AvatarLanguage } from './avatarLanguage';
 
 let client: ElevenLabsClient | undefined;
 
-function getElevenLabs() {
+// The SDK (about 5,500 modules) loads on first use, not at start-up (lms-speed-4: cold starts).
+async function getElevenLabs() {
   const config = getConfig().elevenlabs;
   if (!config) return undefined;
+  const { ElevenLabsClient } = await import('@elevenlabs/elevenlabs-js');
   // Retries happen in the gateway (metered), not in the SDK.
   client ??= new ElevenLabsClient({ apiKey: config.apiKey, timeoutInSeconds: 20, maxRetries: 0 });
   return { client, config };
@@ -45,7 +47,7 @@ export function resetVoiceStateForTests(): void {
 
 // Whether calls should use ENARA's own voice pipeline right now.
 export async function isElevenLabsVoiceUsable(): Promise<boolean> {
-  const el = getElevenLabs();
+  const el = await getElevenLabs();
   if (!el) return false;
   if (voiceState && Date.now() - voiceState.at < VOICE_CHECK_MS) return voiceState.ok;
   try {
@@ -70,7 +72,7 @@ export function elevenLabsSttModel(): string | undefined {
 // server never sees STT usage. Each token is metered as one STT use with
 // unknown usage (never as free).
 export async function createTranscriptionToken(refs: { sessionId?: string } = {}): Promise<string> {
-  const el = getElevenLabs();
+  const el = await getElevenLabs();
   if (!el) throw new Error('ElevenLabs is not configured');
   const { token } = await meteredCall({ feature: 'stt', provider: 'elevenlabs', modelName: el.config.sttModel, refs }, () =>
     el.client.tokens.singleUse.create('realtime_scribe'),
@@ -83,7 +85,7 @@ export async function synthesizeSpeech(
   language: AvatarLanguage,
   gender?: 'woman' | 'man',
 ): Promise<ReadableStream<Uint8Array>> {
-  const el = getElevenLabs();
+  const el = await getElevenLabs();
   if (!el) throw new Error('ElevenLabs is not configured');
   const voiceId =
     gender === 'woman' ? el.config.femaleVoiceId : language === 'arabic' ? el.config.voiceIdAr : el.config.voiceIdEn;
@@ -124,7 +126,7 @@ const statusOf = (error: unknown): number | undefined => {
 };
 
 export async function checkVoiceNow(): Promise<VoiceCheck> {
-  const el = getElevenLabs();
+  const el = await getElevenLabs();
   if (!el) return { configured: false, tts: { ok: false }, stt: { ok: false } };
   const out: VoiceCheck = { configured: true, tts: { ok: false }, stt: { ok: false } };
   let t = Date.now();
