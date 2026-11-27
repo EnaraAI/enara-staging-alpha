@@ -1,7 +1,9 @@
+import { lazy } from 'react';
 import type { ScreenDef } from '../types';
-import PlatformSchools from './Schools';
-import PlatformUsage from './Usage';
-import PlatformModels from './Models';
+// lms-speed-6: each screen's code loads when its route opens (App.tsx shows a fallback meanwhile).
+const PlatformSchools = lazy(() => import('./Schools'));
+const PlatformUsage = lazy(() => import('./Usage'));
+const PlatformModels = lazy(() => import('./Models'));
 
 export const screens: ScreenDef[] = [
   { id: 'platform-schools', area: 'platform', theme: 'admin', title: { en: 'Schools', ar: 'المدارس' }, render: PlatformSchools },

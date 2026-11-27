@@ -1,7 +1,9 @@
+import { lazy } from 'react';
 import type { ScreenDef } from '../types';
-import Fees from './B_Fees';
-import Bus from './B_Bus';
-import Attendance from './B_Attendance';
+// lms-speed-6: each screen's code loads when its route opens (App.tsx shows a fallback meanwhile).
+const Fees = lazy(() => import('./B_Fees'));
+const Bus = lazy(() => import('./B_Bus'));
+const Attendance = lazy(() => import('./B_Attendance'));
 
 export const screens: ScreenDef[] = [
   { id: 'parent-fees', area: 'parent', theme: 'learner', title: { en: 'Fees', ar: 'الرسوم' }, render: Fees },

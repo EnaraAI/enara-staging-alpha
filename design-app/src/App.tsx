@@ -100,7 +100,10 @@ function Router() {
   }
   return (
     <PreviewContext.Provider value={state}>
-      <screen.render />
+      {/* lms-speed-6: screens load on demand (screens/<area>/index.ts). */}
+      <Suspense fallback={<div className="grid min-h-screen place-items-center text-sm text-muted-foreground">…</div>}>
+        <screen.render />
+      </Suspense>
       {!WIRED.has(screen.id) && (
         <div role="note" data-testid="sample-ribbon" className="pointer-events-none fixed inset-x-0 top-2 z-50 mx-auto w-fit rounded-full bg-warning px-3 py-1 text-xs font-bold text-warning-foreground shadow">
           {state.lang === 'ar' ? 'بيانات تجريبية: لم تُربط هذه الشاشة بعد' : 'Sample data: this screen is not wired yet'}

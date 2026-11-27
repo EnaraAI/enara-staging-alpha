@@ -1,7 +1,9 @@
+import { lazy } from 'react';
 import type { ScreenDef } from '../types';
-import ParentHome from './A_Home';
-import ParentProgress from './A_Progress';
-import ParentChat from './A_Chat';
+// lms-speed-6: each screen's code loads when its route opens (App.tsx shows a fallback meanwhile).
+const ParentHome = lazy(() => import('./A_Home'));
+const ParentProgress = lazy(() => import('./A_Progress'));
+const ParentChat = lazy(() => import('./A_Chat'));
 
 export const screens: ScreenDef[] = [
   { id: 'parent-home', area: 'parent', theme: 'learner', title: { en: 'Parent home', ar: 'الصفحة الرئيسية لولي الأمر' }, render: ParentHome },
