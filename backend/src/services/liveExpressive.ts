@@ -189,8 +189,13 @@ export const SUBJECT_CUE_LINE = `${SUBJECT_GRADE_LINE}\nAfter the hidden line, r
 // An Arabic-medium call: the same, plus the language rule in Arabic itself (the English-only line still let 1 reply in 8 drift).
 export const SUBJECT_CUE_LINE_AR = `${SUBJECT_CUE_LINE}\nبعد السطر المخفي اكتب ردك كله باللغة العربية فقط، حتى لو كان السطر المخفي بالإنجليزية. لا تكتب جملة واحدة بالإنجليزية.`;
 export const subjectCueLine = (arabicCall: boolean): string => (arabicCall ? SUBJECT_CUE_LINE_AR : SUBJECT_CUE_LINE);
-/** An Arabic-medium reply that opened in English (no Arabic letter in its first words): the hidden line pulled it out of Arabic. */
-export const openedInEnglish = (start: string): boolean => !/[\u0600-\u06FF]/.test(start) && (start.match(/[A-Za-z]/g) ?? []).length >= 12;
+/** An Arabic-medium reply that opened in English: its first words are mostly Latin letters ("Great job! Yes, مشرقةٌ is the خبر"
+ *  counts; an Arabic sentence quoting one English word does not). The hidden line pulled it out of Arabic. */
+export function openedInEnglish(start: string): boolean {
+  const latin = (start.match(/[A-Za-z]/g) ?? []).length;
+  const arabic = (start.match(/[\u0600-\u06FF]/g) ?? []).length;
+  return latin >= 12 && latin > arabic;
+}
 
 // Every other subject (maths, science, Arabic, social studies...): the learner's own words say they are stuck.
 const STUCK_WORDS = /\b(i\s*(really\s*)?(don'?t|do not|dont) (know|understand|get it)|no idea|not sure|i'?m (confused|lost|stuck)|i give up|give me a hint|can you help|why is (that|it) wrong)\b|مش عارف|مش فاهم|لا أعرف|لا اعرف|لا أفهم|لا افهم|ما فهمت|ساعدني|محتار/i;
