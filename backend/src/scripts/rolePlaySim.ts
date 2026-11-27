@@ -171,12 +171,17 @@ const wrong = (v?: string) => v === 'INCORRECT' || v === 'PARTIALLY_CORRECT';
 export function stuckMeasure(lts: (LT | undefined)[]): { sameMethodFails: boolean; unassistedRight: number; sceneUnaided: number; maxFailsOneItem: number } {
   let run = 0; let runItem: string | undefined; let lastMoves = ''; let sameRun = 0; let sameMethodFails = false; let unassistedRight = 0; let maxFails = 0; let sceneUnaided = 0;
   let prevHint = 0; let prevReleased = false;
-  for (const lt of lts) {
+  for (let lt of lts) {
     if (!lt) continue;
-    // Other subjects store a practice record with no item id and no moves: consecutive wrong answers count as the same point with the same method (the strict reading).
-    const v = lt.assessment?.verdict; const item = lt.activeItem?.lessonItemId ?? (lt.moves ? undefined : 'practice');
+    // Other subjects store a practice record with no item id and no moves: consecutive wrong answers count as the same point with the same method
+    // (the strict reading), except inside a scene, where the point is the scene beat and the method is the help the reply gave (retry, hint, model).
+    const v = lt.assessment?.verdict;
+    const inScene = !lt.moves && lt.rolePlay?.phase === 'beat';
+    const item = lt.activeItem?.lessonItemId ?? (lt.moves ? undefined : inScene ? `${lt.rolePlay!.scene}#${lt.rolePlay!.beat}` : 'practice');
+    if (inScene) lt = { ...lt, moves: undefined } as LT;
+    const method = lt.moves ? (lt.moves ?? []).slice().sort().join(',') : inScene ? `help:${lt.rolePlay!.help ?? 'none'}` : '';
     if (lt.answeringCheck && wrong(v)) {
-      if (item && item === runItem) { run += 1; const mv = (lt.moves ?? []).slice().sort().join(','); sameRun = mv === lastMoves ? sameRun + 1 : 1; lastMoves = mv; } else { run = 1; runItem = item; sameRun = 1; lastMoves = (lt.moves ?? []).slice().sort().join(','); }
+      if (item && item === runItem) { run += 1; sameRun = method === lastMoves ? sameRun + 1 : 1; lastMoves = method; } else { run = 1; runItem = item; sameRun = 1; lastMoves = method; }
       maxFails = Math.max(maxFails, run);
       if (sameRun >= 3) sameMethodFails = true;
     } else if (lt.answeringCheck && right(v)) {
@@ -235,7 +240,7 @@ async function main() {
       const lt = (meta.languageTurn ?? { ...(meta.practiceTurn ?? {}), ...(meta.rolePlay ? { rolePlay: meta.rolePlay } : {}), postCheck: meta.postCheck }) as LT | undefined;
       convo.push({ role: 'ai', text: reply });
       const j = await judge(l, LESSONS[l.lesson].title, convo.slice(0, -1), reply);
-      replies.push({ learner: l.label, cond, turn: t, learnerSaid: said, tutor: reply, accept: j.accept, reason: j.reason, postCheck: (lt?.postCheck ?? []).join(' '), rolePlay: lt?.rolePlay ? `${lt.rolePlay.scene}:${lt.rolePlay.phase}${lt.rolePlay.beat ? `#${lt.rolePlay.beat}` : ''}${lt.rolePlay.help ? `:${lt.rolePlay.help}` : ''}` : '' });
+      replies.push({ learner: l.label, cond, turn: t, learnerSaid: said, tutor: reply, accept: j.accept, reason: j.reason, postCheck: (lt?.postCheck ?? []).join(' '), verdict: lt?.assessment?.verdict ?? '', rolePlay: lt?.rolePlay ? `${lt.rolePlay.scene}:${lt.rolePlay.phase}${lt.rolePlay.beat ? `#${lt.rolePlay.beat}` : ''}${lt.rolePlay.help ? `:${lt.rolePlay.help}` : ''}` : '' });
     }
     // The stored turns (the engine's own evidence) for the stuck measure.
     const { TutorMessage } = await import('../models/TutorMessage');
