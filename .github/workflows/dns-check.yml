@@ -1,0 +1,19 @@
+# Owner, 27 Nov 2026: check where enara.app's DNS is hosted (for design.enara.app). Read-only lookups; no secrets.
+name: dns check (enara.app)
+on:
+  push:
+    branches: ['claude/tutor-lms-dscompare-run']
+    paths: ['deploy/dnscheck/trigger.txt']
+permissions:
+  contents: read
+jobs:
+  dns:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Lookups
+        run: |
+          for q in "NS enara.app" "SOA enara.app" "A enara.app" "CNAME lms-test.enara.app" "A lms-test.enara.app" "CNAME test.enara.app" "A design.enara.app" "CNAME design.enara.app" "CNAME www.enara.app"; do
+            echo "== $q"; dig +short $q @1.1.1.1 || true
+          done
+          echo "== HTTP server header for enara.app"; curl -sI -m 10 https://enara.app | grep -iE '^(server|cf-ray):' || true
