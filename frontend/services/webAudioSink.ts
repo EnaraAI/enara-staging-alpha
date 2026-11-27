@@ -6,8 +6,17 @@ import type { AudioSink } from './avatarVoice';
 export class WebAudioSink implements AudioSink {
   private nextTime = 0;
   private sources = new Set<AudioBufferSourceNode>();
+  // liveMute: the learner can silence the tutor's voice; speech keeps being scheduled, only unheard.
+  private readonly output: GainNode;
 
-  constructor(private readonly ctx: AudioContext) {}
+  constructor(private readonly ctx: AudioContext) {
+    this.output = ctx.createGain();
+    this.output.connect(ctx.destination);
+  }
+
+  setMuted(muted: boolean): void {
+    this.output.gain.value = muted ? 0 : 1;
+  }
 
   sendAudioChunk(chunk: Uint8Array): void {
     const samples = Math.floor(chunk.length / 2);
@@ -19,7 +28,7 @@ export class WebAudioSink implements AudioSink {
 
     const source = this.ctx.createBufferSource();
     source.buffer = buffer;
-    source.connect(this.ctx.destination);
+    source.connect(this.output);
     const start = Math.max(this.ctx.currentTime + 0.05, this.nextTime);
     source.start(start);
     this.nextTime = start + buffer.duration;
