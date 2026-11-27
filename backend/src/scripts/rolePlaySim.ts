@@ -145,7 +145,7 @@ async function judge(l: Learner, lessonTitle: string, convo: { role: string; tex
 }
 
 // ------------------------------------------------------------------------------------------------ stuck measure (code, from the stored turns)
-type LT = { assessment?: { verdict?: string }; activeItem?: { lessonItemId?: string } | null; answeringCheck?: boolean; hintLevel?: number; moves?: string[]; answerReleased?: boolean; rolePlay?: { phase?: string; beat?: number; tries?: number; help?: string; scene?: string } };
+type LT = { postCheck?: string[]; assessment?: { verdict?: string }; activeItem?: { lessonItemId?: string } | null; answeringCheck?: boolean; hintLevel?: number; moves?: string[]; answerReleased?: boolean; rolePlay?: { phase?: string; beat?: number; tries?: number; help?: string; scene?: string } };
 const right = (v?: string) => v === 'CORRECT' || v === 'CORRECT_WITH_EQUIVALENT_FORMULATION';
 const wrong = (v?: string) => v === 'INCORRECT' || v === 'PARTIALLY_CORRECT';
 export function stuckMeasure(lts: (LT | undefined)[]): { sameMethodFails: boolean; unassistedRight: number; sceneUnaided: number; maxFailsOneItem: number } {
@@ -213,7 +213,7 @@ async function main() {
       const lt = r.assistantMessage?.meta?.languageTurn as LT | undefined;
       convo.push({ role: 'ai', text: reply });
       const j = await judge(l, LESSONS[l.lesson].title, convo.slice(0, -1), reply);
-      replies.push({ learner: l.label, cond, turn: t, learnerSaid: said, tutor: reply, accept: j.accept, reason: j.reason, rolePlay: lt?.rolePlay ? `${lt.rolePlay.scene}:${lt.rolePlay.phase}${lt.rolePlay.beat ? `#${lt.rolePlay.beat}` : ''}${lt.rolePlay.help ? `:${lt.rolePlay.help}` : ''}` : '' });
+      replies.push({ learner: l.label, cond, turn: t, learnerSaid: said, tutor: reply, accept: j.accept, reason: j.reason, postCheck: (lt?.postCheck ?? []).join(' '), rolePlay: lt?.rolePlay ? `${lt.rolePlay.scene}:${lt.rolePlay.phase}${lt.rolePlay.beat ? `#${lt.rolePlay.beat}` : ''}${lt.rolePlay.help ? `:${lt.rolePlay.help}` : ''}` : '' });
     }
     // The stored turns (the engine's own evidence) for the stuck measure.
     const { TutorMessage } = await import('../models/TutorMessage');

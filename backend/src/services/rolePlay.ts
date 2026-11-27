@@ -194,12 +194,13 @@ export function detectSceneError(text: string): { code: string; evidence: string
   return null;
 }
 
-/** The debrief's rule-bank entry: the error seen most in the scene (if it maps to an entry), else the scene's first target. */
-export function debriefEntry(scene: RolePlayScene, errs: string[] = []): RuleBankEntry | undefined {
+/** The debrief's rule-bank entry: the error seen most in the scene (if it maps to an entry), else today's objective (when it is a rule-bank
+ *  outcome), else the scene's first target. */
+export function debriefEntry(scene: RolePlayScene, errs: string[] = [], objectiveCode?: string): RuleBankEntry | undefined {
   const count = new Map<string, number>();
   for (const e of errs) { const o = ERROR_OUTCOME[e]; if (o && ruleBankEntry(o)) count.set(o, (count.get(o) ?? 0) + 1); }
   const top = [...count.entries()].sort((a, b) => b[1] - a[1])[0]?.[0];
-  return ruleBankEntry(top) ?? scene.targets.map((t) => ruleBankEntry(t)).find(Boolean);
+  return ruleBankEntry(top) ?? ruleBankEntry(objectiveCode) ?? scene.targets.map((t) => ruleBankEntry(t)).find(Boolean);
 }
 
 export interface StepInput {
@@ -281,7 +282,7 @@ export function rolePlayLine(t: RolePlayTurn): string {
     const e = ruleBankEntry(t.entryId);
     const pair = e ? (t.under9 ? `"Right: ${q(e.right)}"` : `"Right: ${q(e.right)} Wrong: ${q(e.wrong)}"`) : '';
     const recast = t.error ? ` If their last message has the error "${q(t.error.evidence)}", say that part correctly once, in passing.` : '';
-    return `ROLE-PLAY DEBRIEF (set by the system): the scene "${s.title.en}" is over: step out of the role and speak as the tutor again.${recast} (1) One short sentence that praises their effort in the scene (what they did, never "you are clever"). ${e ? `(2) Then exactly these lines: "Rule: ${q(e.rule)}" and ${pair}. (3) Then ONE new practice item on this rule, in a new situation that is not from the scene, and stop.` : '(2) Then ONE new practice item on today\'s lesson point, and stop.'} No other rule, no recap ask, no second task. ${english} ${over}`;
+    return `ROLE-PLAY DEBRIEF (set by the system): the scene "${s.title.en}" is over: step out of the role and speak as the tutor again.${recast} (1) One short sentence that says the role-play is finished and praises their effort, naming ONE thing they really said or did in the scene (only what is in the conversation above; never "you are clever"). ${e ? `(2) Then say you will look at one point from it, and give exactly these lines: "Rule: ${q(e.rule)}" and ${pair}. (3) Then ONE new practice item on this rule, as a clear fill-in or a one-sentence task in a new everyday situation (not from the scene), and stop.` : '(2) Then ONE new practice item on today\'s lesson point, and stop.'} No other rule, no recap ask, no second task. ${english} ${over}`;
   }
   if (t.phase !== 'beat' || !t.beat) return '';
   const beat = s.beats[t.beat - 1];
@@ -289,7 +290,7 @@ export function rolePlayLine(t: RolePlayTurn): string {
   const who = `You are ${s.character.en}, in this scene: ${s.setting.en}. The learner's goal: ${lc1(s.goal.en)}.`;
   const recast = t.error
     ? `Their last message has a small error (${ERROR_LABEL[t.error.code] ?? t.error.code.replace(/_/g, ' ')}: "${q(t.error.evidence)}"). Before your line, say that part back correctly once, the way ${s.character.en} naturally would in the conversation (a recast: echo their words in the right form). No grammar explanation, never say "wrong" or "mistake", at most one correction.`
-    : 'If their last message has a small error, you may say that part back correctly once inside your line (a recast); never explain it.';
+    : 'If their last message has an error in grammar, a word form or a missing small word (for example "I goed", "He go", "I have banana"), say that part back correctly once inside your line, the way the character naturally would (a recast: "Oh, you went to the beach!"). Never repeat a wrong form as if it were right, never call it right, and never explain it.';
   const start = t.beat === 1 ? `Start the scene: in a few words say you are starting a short role-play called "${s.title.en}" and who you are, then your first line.` : '';
   const help = t.help === 'hint'
     ? `They could not answer your last line. Say the same line again, more simply, and give them a choice of two short answers (one of them: "${q(beat.example.en)}").`
@@ -298,11 +299,12 @@ export function rolePlayLine(t: RolePlayTurn): string {
       : '';
   const len = child ? 'At most 3 very short sentences, with simple Starters words only.' : 'At most 2 short sentences (one more if you start the scene or help them).';
   const last = t.beat === s.beats.length ? ' This is the last line of the scene.' : '';
-  return `ROLE-PLAY (set by the system), beat ${t.beat} of ${s.beats.length}: ${who} Stay in character. ${start} ${recast} ${help} Your line now (say it in character; you may fit it to what they said, but keep its meaning and add nothing new): "${q(beat.say.en)}"${last} ${len} Do not add new events, places, people or topics. Do not explain grammar, do not give an exercise, a rule, a score or a recap, and do not ask for personal details. Then stop and wait for their answer. ${english} ${over}`.replace(/\s{2,}/g, ' ');
+  const react = t.beat === 1 ? '' : 'First react in a few words, in character, to what they actually said. If they asked you something, answer it briefly in character; if they already answered part of your line\'s question, do not ask that part again.';
+  return `ROLE-PLAY (set by the system), beat ${t.beat} of ${s.beats.length}: ${who} Stay in character. ${start} ${react} ${recast} ${help} Your line now (say it in character; you may fit it to what they said, but keep its meaning and add nothing new): "${q(beat.say.en)}"${last} ${len} Do not add new events, places, people or topics. Do not explain grammar, do not give an exercise, a rule, a score or a recap, and do not ask for personal details. Then stop and wait for their answer. ${english} ${over}`.replace(/\s{2,}/g, ' ');
 }
 
 // ------------------------------------------------------------------------------------------------ post-check
-const META = /\b(grammar|rule|exercise|lesson|practice item|correct answer|the answer is|well done|great job|good job|that'?s (?:right|correct)|that is (?:right|correct)|wrong|mistake|error|let'?s practi[sc]e|fill in|gap|verb form|past tense|present tense|sentence)\b/gi;
+const META = /\b(grammar|rule|exercise|lesson|practice item|correct answer|the answer is|well done|great job|good job|that'?s (?:right|correct)|that is (?:right|correct)|wrong|mistake|error|let'?s practi[sc]e|fill in|gap|verb form|past tense|present tense|past simple|present simple|sentence|complete:|say it again|write (?:one|a|your)|tell me one thing)\b|_{2,}/gi;
 const STOP_WORDS = new Set(['the', 'and', 'you', 'your', 'are', 'for', 'with', 'this', 'that', 'here', 'there', 'what', 'would', 'like', 'have', 'from', 'please', 'thank', 'thanks', 'hello', 'good', 'very', 'they', 'them', 'will', 'want', 'does', 'time', 'today', 'also', 'just', 'over', 'than', 'then', 'when', 'where', 'which', 'it\'s', 'is', 'a', 'an', 'to', 'of', 'in', 'on', 'at', 'or', 'it', 'we', 'i', 'my', 'me', 'do', 'can', 'be']);
 const toks = (t: string) => t.toLowerCase().replace(/[’]/g, '\'').split(/[^a-z']+/).map((w) => w.replace(/^'+|'+$/g, '')).filter(Boolean);
 let childList: Set<string> | undefined;

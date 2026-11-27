@@ -2400,7 +2400,7 @@ async function rolePlayForTurn(i: { params: { studentId?: string; message: strin
     const out: RolePlayTurn = { ...step, ...(i.child ? { child: true } : {}), ...(under9(i.learner.ageYears) ? { under9: true } : {}) };
     if (out.phase === 'debrief') {
       const scene = sceneById(out.scene);
-      const e = scene ? debriefEntry(scene, out.errs) : undefined;
+      const e = scene ? debriefEntry(scene, out.errs, i.params.objectiveCode) : undefined;
       if (e) out.entryId = e.id;
     }
     return out;
