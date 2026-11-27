@@ -8,11 +8,12 @@ on:
     paths: ['design-app/**', '.github/workflows/design-checks.yml']
 permissions:
   contents: read
-concurrency: { group: design-checks, cancel-in-progress: true }
+concurrency: { group: 'design-checks-${{ github.ref }}', cancel-in-progress: true }
 jobs:
   checks:
     if: github.repository == 'EnaraAI/enara-staging-alpha'
     runs-on: ubuntu-latest
+    container: { image: 'mcr.microsoft.com/playwright:v1.56.1-noble' }  # browsers included
     timeout-minutes: 25
     defaults: { run: { working-directory: design-app } }
     steps:
@@ -21,7 +22,7 @@ jobs:
         with: { node-version: 22 }
       - run: npm ci --no-audit --no-fund
       - run: npx tsc --noEmit -p . && VITE_API_BASE=https://lms-test.enara.app npx vite build
-      - run: npm i --no-save playwright@1.56.1 && npx playwright install --with-deps chromium
+      - run: npm i --no-save playwright@1.56.1
       - name: Checks (lms-test, seed accounts)
         env:
           SEED_USER_PASSWORD: ${{ secrets.SEED_USER_PASSWORD }}
