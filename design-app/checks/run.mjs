@@ -91,9 +91,10 @@ async function kidsSide(side, view) {
   const page = await ctx.newPage();
   const errors = [], apiFail = [];
   page.on('pageerror', (e) => errors.push(String(e).slice(0, 200)));
-  page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text().slice(0, 200)); });
+  // Requests the check itself blocks (paid calls, the relay health probe) are not failures.
+  page.on('console', (m) => { if (m.type() === 'error' && !/ERR_BLOCKED_BY_CLIENT/.test(m.text())) errors.push(m.text().slice(0, 200)); });
   page.on('response', (r) => { if (r.url().startsWith(`${KIDS.lmsTest}/api/`) && r.status() >= 400) apiFail.push(`${r.status()} ${new URL(r.url()).pathname}`); });
-  page.on('requestfailed', (r) => { if (!/ERR_ABORTED/.test(r.failure()?.errorText ?? '') || PAID.test(r.url())) apiFail.push(`failed ${r.url().slice(0, 80)} ${r.failure()?.errorText}`); });
+  page.on('requestfailed', (r) => { if (!/ERR_ABORTED|ERR_BLOCKED_BY_CLIENT/.test(r.failure()?.errorText ?? '')) apiFail.push(`failed ${r.url().slice(0, 80)} ${r.failure()?.errorText}`); });
   const role = side === 'design' ? 'kids' : 'kids (lms-test)';
   // Sign in through each site's own login page.
   if (side === 'design') {
@@ -151,7 +152,8 @@ async function kidsSide(side, view) {
 if (!only.length || only.includes('kids')) {
   // One side failing (or lms-test being slow) never stops the run: it is recorded as a failure with a screenshot.
   const safe = (side, view) => kidsSide(side, view).catch((e) => { results.push({ role: 'kids (compare)', view: view.name, screen: `kids:${side}`, ok: false, note: `crashed: ${String(e?.message ?? e).split('\n')[0]}` }); });
-  for (const view of VIEWS) await Promise.all([safe('design', view), safe('lmstest', view)]);
+  // One side at a time: each kids screen makes many calls, and both sites share the one lms-test backend.
+  for (const view of VIEWS) { await safe('design', view); await safe('lmstest', view); }
 }
 
 await browser.close();
