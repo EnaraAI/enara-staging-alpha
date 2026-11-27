@@ -839,7 +839,7 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
       curriculum,
       mode: 'voice',
       learner: learner ? describeSnapshot(learner) : undefined,
-      pedagogy: arbitratePedagogy([plan?.prompt, policyRule(tutorPolicy.policy), sceneActive ? rolePlayLine(subjectRolePlay!) : undefined].filter(Boolean).join('\n\n') || undefined, Boolean(languagePrep)),
+      pedagogy: arbitratePedagogy([plan?.prompt, policyRule(tutorPolicy.policy), sceneActive || subjectRolePlay?.phase === 'after' ? rolePlayLine(subjectRolePlay!) : undefined].filter(Boolean).join('\n\n') || undefined, Boolean(languagePrep)),
       planActive: Boolean(plan),
       ...(languagePrep?.parts ? { languageContextStable: languagePrep.parts.stable, languageContextDynamic: `${languagePrep.parts.dynamic}${speakingLines}${heardLines}` } : { languageContext: languagePrep?.prompt ? `${languagePrep.prompt}${speakingLines}${heardLines}` : languagePrep?.prompt }),
     };
