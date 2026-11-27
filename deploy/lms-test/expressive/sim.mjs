@@ -45,9 +45,14 @@ async function login(email) {
 }
 const asUser = (token) => (path, init = {}) => site(path, { ...init, headers: { Authorization: `Bearer ${token}`, ...(init.body ? { 'Content-Type': 'application/json' } : {}), ...(init.headers ?? {}) } });
 async function deepseek(system, messages, maxTokens = 200) {
-  const r = await site('/api/maintenance/llm-compare', { method: 'POST', headers: { Authorization: `Bearer ${CI_TOKEN}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ system, messages, max_tokens: maxTokens }) });
-  const j = await r.json().catch(() => ({}));
-  return j.ok ? String(j.text ?? '').trim() : null;
+  // Up to 3 tries: a busy model endpoint must not count as a teacher's "no".
+  for (let i = 0; i < 3; i++) {
+    const r = await site('/api/maintenance/llm-compare', { method: 'POST', headers: { Authorization: `Bearer ${CI_TOKEN}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ system, messages, max_tokens: maxTokens }) }).catch(() => null);
+    const j = r ? await r.json().catch(() => ({})) : {};
+    if (j.ok && String(j.text ?? '').trim()) return String(j.text).trim();
+    await sleep(3000 * (i + 1));
+  }
+  return null;
 }
 
 async function subjectLesson(get, subject) {
@@ -67,7 +72,8 @@ async function session(profile, arm) {
   const token = await login(profile.email);
   if (!token) return { profile: profile.id, arm, error: 'login' };
   const get = asUser(token);
-  const lesson = await subjectLesson(get, profile.subject);
+  let lesson = null;
+  for (let i = 0; i < 3 && !lesson; i++) { lesson = await subjectLesson(get, profile.subject).catch(() => null); if (!lesson) await sleep(5000); } // lms-test can answer slowly
   if (!lesson) return { profile: profile.id, arm, error: `no course for ${profile.subject}` };
   const start = await get('/api/avatar/session', { method: 'POST', headers: { 'x-enara-expressive-test': arm, 'x-enara-ci-token': CI_TOKEN }, body: JSON.stringify({ course_id: lesson.courseId, lesson_id: lesson.lessonId, lesson_title: lesson.lessonTitle, subject: lesson.subject, preferred_language: profile.lang }) });
   const sj = await start.json().catch(() => ({}));
