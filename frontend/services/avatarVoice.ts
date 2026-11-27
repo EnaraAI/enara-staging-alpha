@@ -69,6 +69,9 @@ export class AvatarVoice {
   private echoUntil = 0;
   // Sentences already passed on, so the same words reported twice are answered once.
   private recentHeard: { text: string; at: number }[] = [];
+  // liveMute: the learner turned the microphone off. No transcription session
+  // is open meanwhile (nothing is sent), and none reconnects until it is on again.
+  private micMuted = false;
 
   constructor(
     private readonly sessionId: string,
@@ -85,13 +88,40 @@ export class AvatarVoice {
     return isEcho(text, [...this.recentSpoken, this.spokenText].join(' '));
   }
 
+  get isMicMuted(): boolean {
+    return this.micMuted;
+  }
+
+  // liveMute: microphone off closes the transcription session (the tutor hears
+  // nothing, and no audio leaves the browser); on opens a new one.
+  setMicMuted(muted: boolean): void {
+    if (muted === this.micMuted) return;
+    this.micMuted = muted;
+    if (muted) {
+      const connection = this.connection;
+      this.connection = null;
+      try {
+        connection?.close();
+      } catch {
+        // already closed
+      }
+      return;
+    }
+    if (!this.stopped && !this.connection) {
+      this.quickCloses = 0;
+      void this.startListening().catch(() => this.callbacks.onError('Voice transcription stopped.'));
+    }
+  }
+
   async startListening(): Promise<void> {
-    if (this.stopped) return;
+    if (this.stopped || this.micMuted) return;
     const res = await avatarFetch(`/session/${this.sessionId}/stt-token`, { method: 'POST' });
     if (!res.ok) throw new Error(`Transcription token failed (${res.status})`);
     const { token, model_id } = await res.json();
     // Through Enara's relay when it answers; directly otherwise.
     const relay = await relayBase();
+    // Turned off while the token was on its way: open nothing.
+    if (this.stopped || this.micMuted) return;
 
     const connection = Scribe.connect({
       ...(relay ? { baseUri: `${relayWsBase(relay)}/s` } : {}),
@@ -109,11 +139,13 @@ export class AvatarVoice {
       // Live text only from the current session (an old one may still be closing).
       if (connection !== this.connection) return;
       const text = msg.text?.trim();
+      if (this.micMuted) return;
       if (text && !this.isOwnEcho(text)) this.callbacks.onHearing?.(text);
     });
     connection.on(RealtimeEvents.COMMITTED_TRANSCRIPT_WITH_TIMESTAMPS, (msg) => {
       const text = msg.text?.trim();
-      if (!text) return;
+      // Microphone off: nothing said reaches the tutor (a closing session may still report).
+      if (!text || this.micMuted) return;
       // The mic hears the avatar too; never answer its own words.
       if (this.isOwnEcho(text)) return;
       // The old and the new session overlap for a moment: one answer per sentence.
@@ -165,7 +197,7 @@ export class AvatarVoice {
       this.connection = null;
       // Tokens and sessions are time-limited: reconnect while the call is open,
       // but never in a tight loop (each reconnect buys a new token).
-      if (this.stopped) return;
+      if (this.stopped || this.micMuted) return;
       this.quickCloses = performance.now() - openedAt < QUICK_CLOSE_MS ? this.quickCloses + 1 : 0;
       const delay = transcriptionReconnectDelayMs(this.quickCloses, this.fatal);
       if (delay === null) {
@@ -183,7 +215,7 @@ export class AvatarVoice {
   // Opens the next transcription session before closing this one, so nothing
   // said in between is lost.
   private async rotate(): Promise<void> {
-    if (this.stopped || this.rotating) return;
+    if (this.stopped || this.rotating || this.micMuted) return;
     this.rotating = true;
     const old = this.connection;
     try {
