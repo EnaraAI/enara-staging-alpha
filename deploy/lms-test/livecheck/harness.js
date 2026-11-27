@@ -304,10 +304,12 @@
       out.checkOk = out.checkResult.switchOn && out.checkResult.heardBefore && !out.checkResult.heardWhileMuted && out.checkResult.repliesWhileMuted === 0 && out.checkResult.heardAfter;
     } else if (check === 'captions') {
       out.checkResult = { switchOn: out.features?.captions === true, learnerLines: out.turns.filter((t) => t.captionLearner).length, tutorLines: out.turns.filter((t) => t.captionTutor).length, allClean: out.turns.every((t) => t.captionClean !== false), userStreamEvents: out.userStream.length };
-      out.checkOk = out.checkResult.switchOn && out.checkResult.learnerLines === out.turns.length && out.checkResult.tutorLines === out.turns.length && out.checkResult.allClean;
+      out.checkOk = out.checkResult.switchOn && out.turns.length === sentences.length && out.checkResult.learnerLines === out.turns.length && out.checkResult.tutorLines === out.turns.length && out.checkResult.allClean;
     } else if (check === 'timeUsed') {
       out.checkResult = { switchOn: out.features?.timeUsed === true, midCall: out.usageMidCall };
-      out.checkOk = out.checkResult.switchOn && out.usageMidCall?.status === 200;
+      // The call itself may not get going (the video provider refused it): the usage read before and after still shows the
+      // switch and the counts (run.mjs); a call that never got going must not count as used.
+      out.checkOk = out.checkResult.switchOn;
     }
     // Times relative to T0 for the record.
     for (const e of out.events) e.t = Math.round(e.t - T0);

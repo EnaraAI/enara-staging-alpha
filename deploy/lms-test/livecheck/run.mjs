@@ -129,7 +129,18 @@ async function calls(audioDir) {
       console.log(`AVUSAGE ${JSON.stringify({ call: rid, found: c.found, speech: c.speech, basis: c.usageEndBasis, ledger: c.ledger, llm: c.llm })}`);
     }
   }
-  for (const r of results) summaryLine(`CHECK ${r.id}: ${r.checkOk ? 'PASS' : 'FAIL'} ${JSON.stringify(r.checkResult ?? r.errors ?? null)}`);
+  for (const r of results) {
+    // timeUsed: the learner's numbers around the call. A call that got going adds one used call and its minutes; one
+    // the video provider refused adds nothing (failed starts never use up the day).
+    if (r.check === 'timeUsed') {
+      const b = r.usageBefore?.body, a = r.usageAfter?.body;
+      const got = typeof r.readyMs === 'number'; // the video connected: heartbeats were sent
+      const ok = r.usageBefore?.status === 200 && r.usageAfter?.status === 200 && a.callsUsedToday === b.callsUsedToday + (got ? 1 : 0) && a.callsLeftToday === b.callsLeftToday - (got ? 1 : 0) && a.secondsUsedToday >= b.secondsUsedToday;
+      r.checkResult = { ...(r.checkResult ?? {}), gotGoing: got, before: b, after: a };
+      r.checkOk = r.checkOk && ok;
+    }
+    summaryLine(`CHECK ${r.id}: ${r.checkOk ? 'PASS' : 'FAIL'} ${JSON.stringify(r.checkResult ?? r.errors ?? null)} ${r.errors?.length ? `errors: ${JSON.stringify(r.errors)}` : ''}`);
+  }
   if (results.some((r) => !r.checkOk)) process.exitCode = 1;
 }
 
