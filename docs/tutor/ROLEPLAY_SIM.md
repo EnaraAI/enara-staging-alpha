@@ -1,27 +1,52 @@
 # Role-play lessons: learner simulation (switch `liveRolePlay`)
 
-*27 Nov 2026. Live tutor upgrade, item 4, PR 4. SIMULATION ONLY: fake learners, a fake school, and a throwaway database.*
+*27 Nov 2026 (updated after runs 23–26). Live tutor upgrade, item 4. SIMULATION ONLY: fake learners, a fake school, and a throwaway database.*
 
-## Decision: the switch stays **off**
-The owner's rule is that the switch goes on only when both bars pass **in every subject**.
+## Decision (updated after runs 23–26): the switch stays **off**
+**What blocks it now:** English, maths and Arabic language are each under 90% with the switch on. The decision rule was set before the runs and was not changed.
 
-| Bar | Result with the final code (runs 15 and 16) | Pass |
-|---|---|---|
-| ≥ 90% of replies a teacher would accept, switch on (all replies) | run 15: 103/112 (92.0%) · run 16: 104/112 (92.9%) | yes |
-| ≥ 90% in **every subject**, switch on (runs 15 and 16 together) | English 52/56 (92.9%) · **maths 49/56 (87.5%)** · science 55/56 (98.2%) · Arabic language 51/56 (91.1%) | **no (maths)** |
-| Stuck learners: no worse than off | 0 of 8 off, 0 of 8 on, in both runs | yes |
+**Decision rule** (set before run 23): pool runs 23–26 (the final code, 4 runs × 112 replies per condition). `liveRolePlay` goes on only if both hold:
+- every subject has at least 90% of replies accepted with the switch on;
+- stuck learners with the switch on are no more than with it off, under the **original** stuck measure (runs 1–18).
 
-**Why maths misses the bar:**
-- The model judge prefers that a wrong sum be **left for the learner to try again**. The owner's design is that the character **fixes it in character** (a recast with the short working), and the rule comes in the debrief. Two of the seven maths rejections say exactly that.
-- The other rejections are real model slips. The 8-year-old's picnic produced:
-  - a "good" said after a wrong count;
-  - a right answer called wrong after the scene;
-  - a counting-back hint with a wrong count.
-- The judge also erred twice in other runs: it called 7 − 4 = 3 wrong, and "30" wrong when it was right.
-- **Next step (needs the owner):**
-  1. Choose between the recast (now) and a retry-first for a wrong sum.
-  2. Have a teacher rate the 20-reply sheet.
-  3. Rerun the simulation (it now runs in about 10 minutes).
+| Subject (runs 23–26 pooled) | Off | On | ≥ 90% on |
+|---|---|---|---|
+| English | 100/112 (89.3%) | **97/112 (86.6%)** | **no** |
+| Maths | 109/112 (97.3%) | **97/112 (86.6%)** | **no** |
+| Science | 108/112 (96.4%) | 109/112 (97.3%) | yes |
+| Arabic language | 106/112 (94.6%) | **99/112 (88.4%)** | **no** |
+| All | 423/448 (94.4%) | 402/448 (89.7%) | – |
+
+**Stuck learners, runs 23–26 (4 runs × 8 learners):**
+
+| Measure | Off | On | No worse |
+|---|---|---|---|
+| Original (runs 1–18; the decision measure). For subjects without item ids, any 3 wrong answers in a row count as one point with one method. | 1 (child 8, maths, run 25) | 1 (teen 14, maths, run 24) | yes |
+| Scene-aware (runs 19–22; reported only). Inside a scene, the beat is the point and the help given is the method. | 1 | 0 | yes |
+
+**Earlier rounds, under the same rule:**
+- **Runs 19–22** (retry-first maths): English 91/112 (**81.2%**), maths 101/112 (90.2%), science 110/112 (98.2%), Arabic 106/112 (94.6%).
+  - Stuck: off 0, on 0. These runs recorded only the scene-aware measure, which replaced the original one in run 19.
+  - Run 18, the last run under the original measure, had off 0, on 1.
+  - From run 23, both measures are recorded.
+- **Runs 15–16:** maths 87.5% blocked the switch.
+
+**The English round** (runs 23–26; coordinator, 27 Nov 2026), all behind the switch:
+- **The scene line responds to what the learner said.** A question in their message ("Where can I park?") is answered first, in character, and then the scene steers back to the beat. The post-check is unchanged.
+- **Past-simple errors are found by code** ("goed", "buyed"; or a base verb in a sentence that names a past time, such as "I notice it an hour ago"). They are recast in the scene and logged with their code.
+- **The debrief comes only from the learner's logged (code-certain) errors.** With none, it gives praise and one stretch item, and no rule.
+- **Effect:** English moved from 81.2% to 86.6%, still under the bar. Maths and Arabic moved down (90.2% to 86.6%, and 94.6% to 88.4%), within the spread between runs.
+
+**What the judge still rejects in English:**
+- about half are lesson replies outside the scene (the first replies, and the replies after the scene); these also lower the off condition (89.3%);
+- recasts the judge wants as explicit corrections ("models the correction without explaining");
+- some past-tense errors the code does not catch;
+- the hotel's fixed lines (the gym answer).
+
+**Per the coordinator: no more rounds without the owner.**
+
+---
+*Earlier decision (runs 15–16): maths was 87.5%, under the bar. The owner then chose "try again first" for a wrong sum (PR #165).*
 
 ## What ran
 - **The real text tutor.** `createApp` and `POST /api/me/tutor/sessions/:id/messages` (the JSON path, with its guards and regenerations), with every `ENARA_ENGINE_V2` switch that lms-test has, without the DeepSeek adapter parts (they run once, on lms-test).
@@ -37,7 +62,7 @@ The owner's rule is that the switch goes on only when both bars pass **in every 
   - script: `backend/src/scripts/rolePlaySim.ts`;
   - workflow: `.github/workflows/lms-roleplay-sim.yml`, which runs on a push to `claude/lms-live-roleplay-sim`;
   - results: the run's artifact (`summary.json`, `replies.json`, `teacher-sample.csv`).
-- **Learners** (runs 7 to 16; 14 messages each). Message 1 is "Hello". Message 4 asks for a role-play (in Arabic in Arabic lessons), in both conditions.
+- **Learners** (runs 7 to 26; 14 messages each). Message 1 is "Hello". Message 4 asks for a role-play (in Arabic in Arabic lessons), in both conditions.
 
   | Learner | Subject, lesson language | Lesson (fake course) |
   |---|---|---|
@@ -55,14 +80,16 @@ The owner's rule is that the switch goes on only when both bars pass **in every 
 
 ## The two scores
 - **Score 1: would a teacher accept this reply.** DeepSeek pre-screens all 224 replies of a run.
-  - **A sample of 20 replies for a teacher to rate:** `docs/tutor/ROLEPLAY_SIM_SAMPLE.csv`, from run 16.
+  - **A sample of 20 replies for a teacher to rate:** `docs/tutor/ROLEPLAY_SIM_SAMPLE.csv`, from run 26 (the final code).
     - 10 with the switch on (7 of them scene replies) and 10 with it off, across all eight learners.
-    - It has the model's verdict and reason, plus empty columns for the teacher's yes/no and reason. The model accepted 18 of the 20.
+    - It has the model's verdict and reason, plus empty columns for the teacher's yes/no and reason. The model accepted all 20. Ten are with the switch on, and seven of those are scene lines.
 - **Score 2: stuck learners**, computed by code from the turns the engine stored. A learner counts as stuck if either:
   - they failed 3 or more times on one item with no change of method; or, in a scene, 3 or more failed tries on one beat;
     - For the other subjects, any 3 wrong answers in a row count, because the tutor stores no item or method there. That is the strict reading.
   - the session ends with no unassisted right answer (a graded right answer after no more than a level-1 hint and no released answer).
   - Scene lines answered without help are counted separately and do **not** count.
+  - This is the **original** measure (runs 1–18 and 23–26), and it is the one the decision uses.
+  - **Scene-aware measure** (runs 19–26; reported only): the same, except that in a scene the beat is the item and the help given is the method. So three wrong tries are stuck only if the help did not change between them.
 
 ## All runs
 | Run | Change before the run | Off: accepted | On: accepted | Stuck off / on |
@@ -78,6 +105,16 @@ The owner's rule is that the switch goes on only when both bars pass **in every 
 | 14 | the simulation waits on 429 and runs 4 learners at a time | 108/112 (96.4%) | 99/112 (88.4%) | 0 / 0 |
 | 15 | the debrief never claims a mistake that was not made; lines follow what the learner chose | 107/112 (95.5%) | 103/112 (92.0%) | 0 / 0 |
 | 16 | none (run 15 again) | 108/112 (96.4%) | 104/112 (92.9%) | 0 / 0 |
+| 17 | owner: a wrong computed answer is tried again first (#165) | 109/112 (97.3%) | 107/112 (95.5%) | 0 / 0 |
+| 18 | none (run 17 again) | 108/112 (96.4%) | 104/112 (92.9%) | 0 / **1** (original measure) |
+| 19 | none; the scene-aware stuck measure added | 108/112 (96.4%) | 107/112 (95.5%) | 0 / 0 (scene-aware only) |
+| 20 | none | 110/112 (98.2%) | 105/112 (93.8%) | 0 / 0 (scene-aware only) |
+| 21 | none | 109/112 (97.3%) | 96/112 (85.7%) | 0 / 0 (scene-aware only) |
+| 22 | none (rule: pool 19–22 → English 81.2%, switch off) | 109/112 (97.3%) | 100/112 (89.3%) | 0 / 0 (scene-aware only) |
+| 23 | **English round:** lines answer what was said then steer back; past-simple errors found and recast; the debrief only from logged errors | 107/112 (95.5%) | 101/112 (90.2%) | 0 / 0 (original), 0 / 0 (scene-aware) |
+| 24 | none | 104/112 (92.9%) | 103/112 (92.0%) | 0 / 1, 0 / 0 |
+| 25 | none | 106/112 (94.6%) | 99/112 (88.4%) | 1 / 0, 1 / 0 |
+| 26 | none (rule: pool 23–26 → English, maths and Arabic under 90%, switch off) | 106/112 (94.6%) | 99/112 (88.4%) | 0 / 0, 0 / 0 |
 
 **Notes:**
 - **Spread:** one subject in one run is 28 replies, so one reply is 3.6 points. The same code moved between 88.4% and 94.6% overall (runs 12 and 14). The switch-on condition is 1 to 5 points below the switch-off condition in most runs.
@@ -85,7 +122,7 @@ The owner's rule is that the switch goes on only when both bars pass **in every 
   - fixed scene lines that ignore what the learner chose (asking about apples after the learner asked for bananas; a price that does not match an earlier one);
   - a wrong sum fixed instead of retried;
   - a debrief rule that does not match the item set right after it.
-- **Fixes in this PR** (behind the switch):
+- **Fixes in PR #163** (behind the switch):
   - Egyptian colloquial numbers ("أربعتاشر", "تلاتين") are read.
   - After a code-certain wrong number, praise at the start of a sentence ("صحيح"، "Yes,") is removed.
   - The debrief never claims a mistake that is not in the conversation.
@@ -95,6 +132,6 @@ The owner's rule is that the switch goes on only when both bars pass **in every 
 - One run (8 learners × 14 messages × 2 conditions): about 650 model calls, about 1.1 million input and 47,000 output tokens.
   - At ENARA's cautious upper-bound prices for this model ($1 and $4 per million tokens), that is at most **about $1.30 per run**.
   - The model runs on ENARA's own Modal endpoint, which bills GPU time, so the real cost is lower and was not measured.
-- 16 runs in all (1 void).
+- 26 runs in all (1 void).
 - No Anthropic spending.
 - No Anam minutes.
