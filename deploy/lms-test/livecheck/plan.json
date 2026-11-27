@@ -1,6 +1,6 @@
 {
   "$comment": "Live tutor quick fixes: one short scripted call per feature on lms-test.enara.app ONLY, after its deploy (owner: a few cents per call, at most 3 calls in total). Reuses the avatar cost harness (branch claude/tutor-lms-avatarcost-run, deploy/lms-test/avatarcost). run.ids: the calls to run on this push; run.used: calls made so far (never above 3).",
-  "run": { "ids": [], "used": 0, "cap": 3 },
+  "run": { "ids": ["mute"], "used": 0, "cap": 3 },
   "voices": { "amy": { "model": "en/en_US/amy/medium/en_US-amy-medium", "sex": "F" } },
   "calls": [
     { "id": "mute", "check": "mute", "voice": "amy", "sentences": ["My name is Sara.", "I have a red bag.", "I like apples."] },
