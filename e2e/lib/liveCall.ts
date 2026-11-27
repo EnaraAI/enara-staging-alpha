@@ -27,10 +27,14 @@ export interface LiveCall {
   learnerSays(text: string, language?: string): Promise<void>;
   /** The call-start response's features (the server's live call switches); change before the next start. */
   features: Record<string, boolean> | undefined;
+  /** The tutor's reply text for a request (Markdown allowed: the server sends what the model wrote, cleaned by the browser). */
+  reply: (q: LiveQuery) => string;
+  /** The visual aid the call's side panel shows (null: none). */
+  artifactHtml: string | null;
 }
 
-/** The tutor's reply lines: text only (the browser asks /speak for each sentence's audio). */
-export let tutorReply = (q: LiveQuery) =>
+/** The tutor's default reply lines: text only (the browser asks /speak for each sentence's audio). */
+export const tutorReply = (q: LiveQuery) =>
   q.kind === 'opening' ? 'Hello! I am your tutor today. What is your name?' : q.kind === 'nudge' ? 'Take your time. What is your name?' : 'Nice to meet you. Let us practise greetings.';
 
 export async function liveCallSession(browser: Browser, opts: { features?: Record<string, boolean> } = {}): Promise<LiveCall> {
@@ -44,7 +48,7 @@ export async function liveCallSession(browser: Browser, opts: { features?: Recor
   await context.addInitScript(() => { try { localStorage.setItem('enara.relay', 'off'); } catch { /* storage blocked */ } });
 
   const call: LiveCall = {
-    context, page, queries: [], stt: [], features: opts.features,
+    context, page, queries: [], stt: [], features: opts.features, reply: tutorReply, artifactHtml: null,
     async learnerSays(text: string, language = 'en') {
       await expect.poll(() => call.stt.filter((s) => !s.closed).length, { timeout: 30_000, message: 'an open transcription session' }).toBeGreaterThan(0);
       const open = call.stt.filter((s) => !s.closed);
@@ -68,12 +72,12 @@ export async function liveCallSession(browser: Browser, opts: { features?: Recor
     if (url.endsWith('/heartbeat')) return route.fulfill({ status: 204, body: '' });
     return json(route, { error: { code: 'NOT_FOUND', message: 'not in this test' } }, 404);
   });
-  await context.route(new RegExp(`/api/avatar/artifact/${SESSION_ID}$`), (route) => json(route, { html: null }));
+  await context.route(new RegExp(`/api/avatar/artifact/${SESSION_ID}$`), (route) => json(route, { html: call.artifactHtml }));
   await context.route(/\/api\/avatar\/query-stream$/, (route) => {
     const body = route.request().postDataJSON() as { kind?: string; messages?: LiveQuery['messages'] };
     const q: LiveQuery = { kind: body.kind ?? 'turn', messages: body.messages ?? [], at: Date.now() };
     call.queries.push(q);
-    const text = tutorReply(q);
+    const text = call.reply(q);
     const lines = text.split(/(?<=[.!?]) /).map((part, i, all) => JSON.stringify({ content: i < all.length - 1 ? `${part} ` : part }));
     return route.fulfill({ status: 200, contentType: 'application/x-ndjson', body: `${lines.join('\n')}\n` });
   });

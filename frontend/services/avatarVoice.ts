@@ -28,6 +28,8 @@ export interface VoiceCallbacks {
   onHearing?(text: string): void;
   // The student talked over the avatar: stop its current speech.
   onInterrupt?(): void;
+  // A sentence's audio starts playing now (its spoken words: liveCaptions).
+  onSpeaking?(text: string): void;
   // Speech that came back in neither English nor Arabic: ask again, don't answer it.
   onNotCaught?(): void;
   // ENARA's voice was refused (account blocked or out of credit): the call
@@ -246,7 +248,7 @@ export class AvatarVoice {
       method: 'POST',
       body: { session_id: this.sessionId, text: clean, language: languageOfText(clean) },
     });
-    this.playback = this.playback.then(() => this.play(audio, generation)).catch(() => {});
+    this.playback = this.playback.then(() => this.play(audio, generation, clean)).catch(() => {});
   }
 
   // Queues one sentence whose audio the server sends inside the reply stream
@@ -260,7 +262,7 @@ export class AvatarVoice {
       return queue;
     }
     this.spokenText += ` ${clean}`;
-    this.playback = this.playback.then(() => this.playChunks(queue.chunks(), generation, () => queue.end())).catch(() => {});
+    this.playback = this.playback.then(() => this.playChunks(queue.chunks(), generation, () => queue.end(), clean)).catch(() => {});
     return queue;
   }
 
@@ -294,7 +296,7 @@ export class AvatarVoice {
     this.echoUntil = performance.now() + 6000;
   }
 
-  private async play(audio: Promise<Response>, generation: number): Promise<void> {
+  private async play(audio: Promise<Response>, generation: number, text: string): Promise<void> {
     const res = await audio;
     if (res.status === 503) {
       const body = await res.clone().json().catch(() => null);
@@ -312,10 +314,11 @@ export class AvatarVoice {
       })(),
       generation,
       () => void reader.cancel().catch(() => {}),
+      text,
     );
   }
 
-  private async playChunks(source: AsyncIterable<Uint8Array>, generation: number, cancel: () => void): Promise<void> {
+  private async playChunks(source: AsyncIterable<Uint8Array>, generation: number, cancel: () => void, text = ''): Promise<void> {
     if (this.stopped || generation !== this.generation) {
       cancel();
       return;
@@ -350,6 +353,13 @@ export class AvatarVoice {
       } catch {
         cancel();
         return;
+      }
+      if (sent === 0 && text) {
+        try {
+          this.callbacks.onSpeaking?.(text);
+        } catch {
+          // captions never stop the voice
+        }
       }
       sent += chunk.length;
     }
