@@ -23,16 +23,21 @@ for (const id of ids.filter((i) => !only.length || only.includes(i))) {
     const page = await ctx.newPage();
     const errors = []; page.on('pageerror', (e) => errors.push(String(e).slice(0, 200)));
     for (const lang of ['en', 'ar']) {
-      await page.goto(`${BASE}#/s/${id}?lang=${lang}`); await page.reload(); await page.waitForLoadState('networkidle'); await page.evaluate(() => document.fonts.ready); await page.waitForTimeout(150);
+      await page.goto(`${BASE}#/s/${id}?lang=${lang}${process.env.DARK ? '&dark=1' : ''}`); await page.reload(); await page.waitForLoadState('networkidle'); await page.evaluate(() => document.fonts.ready); await page.waitForTimeout(150);
       const scrollW = await page.evaluate(() => document.documentElement.scrollWidth);
-      const file = `${id}--${v.name}--${lang}.jpg`;
+      const file = `${id}--${v.name}--${lang}${process.env.DARK ? '--dark' : ''}.jpg`;
+      // Grow the viewport to the page height, so pinned bars (tab bar, chat input) sit at the bottom as a user sees them
+      // after scrolling to the end, instead of where the first screen ends.
+      const fullH = await page.evaluate(() => document.documentElement.scrollHeight);
+      if (fullH > v.viewport.height) { await page.setViewportSize({ width: v.viewport.width, height: fullH }); await page.waitForTimeout(150); }
       await page.screenshot({ path: out + file, type: 'jpeg', quality: 82, fullPage: true });
+      await page.setViewportSize(v.viewport);
       index.push({ id, view: v.name, lang, file, overflowX: scrollW > v.viewport.width, errors: [...errors] });
     }
     await ctx.close();
   }
 }
-if (!only.length) writeFileSync(out + 'index.json', JSON.stringify(index, null, 1));
+if (!only.length && !process.env.DARK) writeFileSync(out + 'index.json', JSON.stringify(index, null, 1));
 await browser.close(); server.kill();
 const bad = index.filter((x) => x.overflowX || x.errors.length);
 console.log(`shots: ${index.length}, sideways scroll or errors: ${bad.length}`); for (const b of bad) console.log('  ', b.file, b.overflowX ? 'overflow-x' : '', b.errors.join(' | '));

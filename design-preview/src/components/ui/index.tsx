@@ -162,11 +162,11 @@ export function Toggle({ className, ...p }: ToggleButtonProps) {
 }
 
 // ---------------------------------------------------------------- Progress / Meter
-export function Progress({ value, label, showValue, tone = 'primary', className, size = 'md' }: { value: number; label?: string; showValue?: boolean; tone?: 'primary' | 'success' | 'warning' | 'danger' | 'accent' | 'info'; className?: string; size?: 'sm' | 'md' | 'lg' }) {
+export function Progress({ value, label, ariaLabel, showValue, tone = 'primary', className, size = 'md' }: { value: number; label?: string; ariaLabel?: string; showValue?: boolean; tone?: 'primary' | 'success' | 'warning' | 'danger' | 'accent' | 'info'; className?: string; size?: 'sm' | 'md' | 'lg' }) {
   const bar = { primary: 'bg-primary', success: 'bg-success', warning: 'bg-warning', danger: 'bg-destructive', accent: 'bg-accent', info: 'bg-info' }[tone];
   const h = { sm: 'h-1.5', md: 'h-2.5', lg: 'h-4' }[size];
   return (
-    <AriaProgressBar value={value} aria-label={label ?? 'progress'} className={cn('flex flex-col gap-1.5 w-full', className)}>
+    <AriaProgressBar value={value} aria-label={ariaLabel ?? label ?? 'progress'} className={cn('flex flex-col gap-1.5 w-full', className)}>
       {({ percentage, valueText }) => (
         <>
           {(label || showValue) && <div className="flex justify-between text-xs font-semibold"><span>{label}</span>{showValue && <span className="text-muted-foreground">{valueText}</span>}</div>}
@@ -176,10 +176,10 @@ export function Progress({ value, label, showValue, tone = 'primary', className,
     </AriaProgressBar>
   );
 }
-export function Ring({ value, size = 64, stroke = 7, tone = 'var(--primary)', children }: { value: number; size?: number; stroke?: number; tone?: string; children?: React.ReactNode }) {
+export function Ring({ value, size = 64, stroke = 7, tone = 'var(--primary)', children, ariaLabel }: { value: number; size?: number; stroke?: number; tone?: string; children?: React.ReactNode; ariaLabel?: string }) {
   const r = (size - stroke) / 2, c = 2 * Math.PI * r;
   return (
-    <AriaMeter value={value} aria-label="progress" className="relative inline-grid place-items-center" style={{ width: size, height: size }}>
+    <AriaMeter value={value} aria-label={ariaLabel ?? 'progress'} className="relative inline-grid place-items-center" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="-rotate-90"><circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--muted)" strokeWidth={stroke} /><circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={tone} strokeWidth={stroke} strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c * (1 - value / 100)} /></svg>
       <span className="absolute text-sm font-bold">{children}</span>
     </AriaMeter>
@@ -197,7 +197,7 @@ export const Cell = (p: CellProps) => <AriaCell {...p} className={cn('border-b p
 // ---------------------------------------------------------------- Small pieces
 export const Separator = ({ className }: { className?: string }) => <div role="separator" className={cn('h-px w-full bg-border', className)} />;
 export function Avatar({ name, src, className, tone = 'bg-secondary text-secondary-foreground' }: { name: string; src?: string; className?: string; tone?: string }) {
-  const initials = name.split(/\s+/).map((w) => w[0]).slice(0, 2).join('');
+  const initials = name.split(/\s+/).filter((w) => w && !/\.$/.test(w)).map((w) => w[0]).slice(0, 2).join(''); // skips titles like "Ms." or "أ."
   return src ? <img src={src} alt={name} className={cn('size-10 rounded-full object-cover', className)} /> : <span aria-hidden className={cn('grid size-10 shrink-0 place-items-center rounded-full text-sm font-bold', tone, className)}>{initials}</span>;
 }
 export function Alert({ tone = 'info', icon, title, children, className }: { tone?: 'info' | 'success' | 'warning' | 'danger'; icon?: React.ReactNode; title?: React.ReactNode; children?: React.ReactNode; className?: string }) {

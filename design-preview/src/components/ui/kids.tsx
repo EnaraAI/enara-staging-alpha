@@ -20,7 +20,7 @@ export function KidButton({ tone = 'primary', className, children, ...p }: Butto
       {...p}
       className={cn(
         'kid-pressable inline-flex min-h-[75px] min-w-[75px] select-none items-center justify-center gap-3 rounded-2xl px-6 text-xl font-bold outline-none transition-transform',
-        'data-[pressed]:translate-y-1 data-[pressed]:shadow-none data-[focus-visible]:ring-4 data-[focus-visible]:ring-ring [&_svg]:size-9',
+        'data-[pressed]:translate-y-1 data-[pressed]:shadow-none data-[focus-visible]:ring-4 data-[focus-visible]:ring-ring [&>svg]:size-9',
         tones[tone], className,
       )}
     >

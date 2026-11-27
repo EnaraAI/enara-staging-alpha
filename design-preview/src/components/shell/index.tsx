@@ -24,7 +24,8 @@ export function Logo({ className, compact }: { className?: string; compact?: boo
 export interface NavItem { id: string; label: string; icon: React.ReactNode; badge?: string }
 
 /** Learners and parents: phone = top bar + bottom tab bar; desktop = side rail on the start side. */
-export function AppShell({ title, subtitle, nav, active, children, actions, back, topExtra }: { title?: string; subtitle?: string; nav: NavItem[]; active: string; children: React.ReactNode; actions?: React.ReactNode; back?: boolean; topExtra?: React.ReactNode }) {
+export function AppShell({ title, subtitle, nav, active, children, actions, back, topExtra, bottomBar }: { title?: string; subtitle?: string; nav: NavItem[]; active: string; children: React.ReactNode; actions?: React.ReactNode; back?: boolean; topExtra?: React.ReactNode; bottomBar?: React.ReactNode }) {
+  const { lang } = usePreview();
   return (
     <div className="flex min-h-screen bg-background">
       <aside className="hidden md:flex w-64 shrink-0 flex-col gap-1 border-e bg-card p-4">
@@ -37,16 +38,19 @@ export function AppShell({ title, subtitle, nav, active, children, actions, back
       </aside>
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-10 flex items-center gap-3 border-b bg-card/90 px-4 py-3 backdrop-blur md:px-8">
-          {back ? <a href="#" aria-label="Back" className="grid size-tap place-items-center rounded-lg hover:bg-muted"><Dir><ChevronLeft className="size-5" /></Dir></a> : <Logo compact className="md:hidden" />}
+          {back ? <a href="#" aria-label={lang === 'ar' ? 'رجوع' : 'Back'} className="grid size-tap place-items-center rounded-lg hover:bg-muted"><Dir><ChevronLeft className="size-5" /></Dir></a> : <Logo compact className="md:hidden" />}
           <div className="min-w-0 flex-1">
             {title && <h1 className="truncate text-lg font-bold leading-tight md:text-xl">{title}</h1>}
             {subtitle && <p className="truncate text-xs text-muted-foreground md:text-sm">{subtitle}</p>}
           </div>
-          {actions ?? <a href="#" aria-label="Notifications" className="relative grid size-tap place-items-center rounded-full hover:bg-muted"><Bell className="size-5" /><span className="absolute end-2 top-2 size-2 rounded-full bg-destructive" /></a>}
+          {actions ?? <a href="#" aria-label={lang === 'ar' ? 'الإشعارات' : 'Notifications'} className="relative grid size-tap place-items-center rounded-full hover:bg-muted"><Bell className="size-5" /><span className="absolute end-2 top-2 size-2 rounded-full bg-destructive" /></a>}
         </header>
         {topExtra}
-        <main className="flex-1 px-4 py-5 pb-28 md:px-8 md:py-8 md:pb-10">{children}</main>
-        <nav className="fixed inset-x-0 bottom-0 z-10 flex border-t bg-card/95 px-2 pb-[max(env(safe-area-inset-bottom),0.5rem)] pt-1 backdrop-blur md:hidden">
+        <main className="flex-1 px-4 py-5 md:px-8 md:py-8 md:pb-10">{children}</main>
+        {/* Pinned to the bottom while scrolling (sticky, so it also sits at the page end in full-page screenshots).
+            bottomBar: an optional bar pinned above the tabs, e.g. a chat input. */}
+        {bottomBar && <div className="sticky bottom-[calc(3.75rem+max(env(safe-area-inset-bottom),0.5rem))] z-10 border-t bg-card/95 px-4 py-3 backdrop-blur md:bottom-0 md:px-8">{bottomBar}</div>}
+        <nav className="sticky bottom-0 z-10 flex border-t bg-card/95 px-2 pb-[max(env(safe-area-inset-bottom),0.5rem)] pt-1 backdrop-blur md:hidden">
           {nav.slice(0, 5).map((n) => (
             <a key={n.id} href="#" aria-current={n.id === active ? 'page' : undefined} className={cn('flex flex-1 flex-col items-center gap-0.5 rounded-lg py-1.5 text-[11px] font-semibold [&_svg]:size-6', n.id === active ? 'text-primary' : 'text-muted-foreground')}>
               {n.icon}<span>{n.label}</span>
@@ -59,13 +63,13 @@ export function AppShell({ title, subtitle, nav, active, children, actions, back
 }
 
 /** Teachers, school admins and platform admins: dense side navigation on desktop, menu button on phone. */
-export function AdminShell({ title, subtitle, nav, active, children, actions, school, user }: { title: string; subtitle?: string; nav: NavItem[]; active: string; children: React.ReactNode; actions?: React.ReactNode; school: string; user: string }) {
+export function AdminShell({ title, subtitle, nav, active, children, actions, school, user, scopeLabel, searchPlaceholder }: { title: string; subtitle?: string; nav: NavItem[]; active: string; children: React.ReactNode; actions?: React.ReactNode; school: string; user: string; scopeLabel?: string; searchPlaceholder?: string }) {
   const { lang } = usePreview();
   return (
     <div className="flex min-h-screen bg-background">
       <aside className="hidden lg:flex w-60 shrink-0 flex-col border-e bg-card">
         <div className="flex items-center gap-2 border-b px-4 py-3"><Logo /></div>
-        <div className="px-3 py-3"><div className="rounded-lg bg-muted px-3 py-2"><p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">{lang === 'ar' ? 'المدرسة' : 'School'}</p><p className="truncate text-sm font-semibold">{school}</p></div></div>
+        <div className="px-3 py-3"><div className="rounded-lg bg-muted px-3 py-2"><p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">{scopeLabel ?? (lang === 'ar' ? 'المدرسة' : 'School')}</p><p className="truncate text-sm font-semibold">{school}</p></div></div>
         <nav className="flex flex-1 flex-col gap-0.5 px-3">
           {nav.map((n) => (
             <a key={n.id} href="#" aria-current={n.id === active ? 'page' : undefined} className={cn('flex items-center gap-2.5 rounded-md px-2.5 h-9 text-sm font-medium [&_svg]:size-4', n.id === active ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted hover:text-foreground')}>
@@ -77,14 +81,14 @@ export function AdminShell({ title, subtitle, nav, active, children, actions, sc
       </aside>
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-10 flex items-center gap-3 border-b bg-card/90 px-4 py-2.5 backdrop-blur lg:px-6">
-          <a href="#" aria-label="Menu" className="grid size-tap place-items-center rounded-md hover:bg-muted lg:hidden"><Menu className="size-5" /></a>
+          <a href="#" aria-label={lang === 'ar' ? 'القائمة' : 'Menu'} className="grid size-tap place-items-center rounded-md hover:bg-muted lg:hidden"><Menu className="size-5" /></a>
           <div className="min-w-0 flex-1">
             <h1 className="truncate text-base font-bold lg:text-lg">{title}</h1>
             {subtitle && <p className="truncate text-xs text-muted-foreground">{subtitle}</p>}
           </div>
-          <div className="hidden items-center gap-2 rounded-md border bg-background px-2.5 h-9 text-sm text-muted-foreground md:flex w-64"><Search className="size-4" />{lang === 'ar' ? 'ابحث عن طالب أو فصل…' : 'Search learners, classes…'}<kbd className="ms-auto rounded border px-1 text-[10px]">⌘K</kbd></div>
+          <div className="hidden items-center gap-2 rounded-md border bg-background px-2.5 h-9 text-sm text-muted-foreground md:flex w-64"><Search className="size-4" />{searchPlaceholder ?? (lang === 'ar' ? 'ابحث عن طالب أو فصل…' : 'Search learners, classes…')}<kbd className="ms-auto rounded border px-1 text-[10px]">⌘K</kbd></div>
           {actions}
-          <a href="#" aria-label="Notifications" className="relative grid size-9 place-items-center rounded-md hover:bg-muted"><Bell className="size-4" /><span className="absolute end-1.5 top-1.5 size-2 rounded-full bg-destructive" /></a>
+          <a href="#" aria-label={lang === 'ar' ? 'الإشعارات' : 'Notifications'} className="relative grid size-9 place-items-center rounded-md hover:bg-muted"><Bell className="size-4" /><span className="absolute end-1.5 top-1.5 size-2 rounded-full bg-destructive" /></a>
         </header>
         <main className="flex-1 px-4 py-5 lg:px-6 lg:py-6">{children}</main>
       </div>
@@ -99,7 +103,7 @@ export function KidsShell({ children, title, listenLabel, homeLabel, stars }: { 
       <header className="flex items-center gap-3 px-4 pt-4 md:px-10 md:pt-6">
         <KidButton tone="white" aria-label={homeLabel} className="px-0"><Home /></KidButton>
         <div className="min-w-0 flex-1 text-center">{title && <h1 className="truncate text-2xl font-extrabold">{title}</h1>}</div>
-        {stars !== undefined && <span className="flex h-[75px] items-center gap-2 rounded-2xl bg-card px-4 text-2xl font-extrabold border-2" aria-label={`${stars} stars`}><Star className="size-8" />{stars}</span>}
+        {stars !== undefined && <span className="flex h-[75px] items-center gap-2 rounded-2xl bg-card px-4 text-2xl font-extrabold border-2" aria-label={usePreview().lang === 'ar' ? `${stars} نجمة` : `${stars} stars`}><Star className="size-8" />{stars}</span>}
         <KidButton tone="sun" aria-label={listenLabel} className="px-0"><Volume2 /></KidButton>
       </header>
       <main className="flex flex-1 flex-col px-4 pt-6 pb-16 md:px-10 md:pb-20">{children}</main>
