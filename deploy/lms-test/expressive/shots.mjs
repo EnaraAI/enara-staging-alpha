@@ -184,7 +184,7 @@ async function clickOne(page, label, locators, timeout = 20_000) {
   while (Date.now() < until) {
     for (const l of locators) {
       const el = l.first();
-      if (await el.isVisible().catch(() => false)) { await el.click(); log(`  click ${label}`); await page.waitForLoadState('networkidle', { timeout: 15_000 }).catch(() => undefined); return true; }
+      if (await el.isVisible().catch(() => false) && await el.isEnabled().catch(() => false)) { await el.click(); log(`  click ${label}`); await page.waitForLoadState('networkidle', { timeout: 15_000 }).catch(() => undefined); return true; }
     }
     // lms-test can be slow to load a page: press its own "Try again" / "Retry".
     const retry = page.getByRole('button', { name: /^(Try again|Retry)$/ }).first();

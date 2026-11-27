@@ -99,15 +99,21 @@ async function session(profile, arm) {
   await sleep(1500);
   const stored = await (await get(`/api/me/tutor/sessions/${encodeURIComponent(sj.session_id)}`)).json().catch(() => null);
   const ai = (stored?.messages ?? stored?.session?.messages ?? []).filter((m) => m.role !== 'user');
-  out.turns.forEach((t, i) => {
-    const lt = ai[i]?.meta?.languageTurn;
-    const ex = ai[i]?.meta?.expressive;
+  // Each turn's stored reply, matched by its text (a turn that produced no reply stores nothing).
+  const used = new Set();
+  out.turns.forEach((t) => {
+    const k = ai.findIndex((m, j) => !used.has(j) && String(m.text ?? '').trim() === t.text.trim());
+    if (k >= 0) used.add(k);
+    const doc = k >= 0 ? ai[k] : null;
+    t.stored = Boolean(doc);
+    const lt = doc?.meta?.languageTurn;
+    const ex = doc?.meta?.expressive;
     t.verdict = ex?.verdict ?? lt?.assessment?.verdict ?? null;
     t.next = lt?.assessment?.next ?? null;
     t.stuckRecorded = Boolean(ex?.stuck);
     t.storedCues = ex?.cues ?? null;
     t.item = lt?.assessment?.item ?? lt?.activeItem?.id ?? null;
-    t.storedCueInText = ai[i]?.text ? CUE_TEXT.test(ai[i].text) : null;
+    t.storedCueInText = doc?.text ? CUE_TEXT.test(doc.text) : null;
   });
   return out;
 }
