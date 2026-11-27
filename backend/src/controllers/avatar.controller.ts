@@ -358,8 +358,17 @@ export const startAvatarSession = asyncHandler(async (req: AuthRequest, res: Res
     fallback_reason: null,
     // avatarSpeaking: record short sentence clips for pronunciation feedback (adults only, provider ready).
     pronunciation: await pronunciationClipsFor(session.studentId),
+    // Live call controls the browser may show (each its own switch); absent when none is on.
+    ...liveCallFeatures(),
   });
 });
+
+// Live call controls (ENARA_ENGINE_V2 named switches, off by default): only the ones that are on are listed.
+export function liveCallFeatures(): { features?: { mute?: true } } {
+  const features: { mute?: true } = {};
+  if (engineV2('liveMute')) features.mute = true;
+  return Object.keys(features).length ? { features } : {};
+}
 
 // Enara admins only (route): the video tutor's voice catalogue, filtered by a
 // search (name, description or tags) and/or accent country (country=EG for

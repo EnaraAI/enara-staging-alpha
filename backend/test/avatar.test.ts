@@ -775,6 +775,26 @@ describe('live avatar', () => {
     expect((await request(app).post('/api/avatar/session').send({})).status).toBe(401);
   });
 
+  it('tells the browser about the mute buttons only when liveMute is on (named only, not in "all")', async () => {
+    const saved = process.env.ENARA_ENGINE_V2;
+    try {
+      for (const value of [undefined, 'all', 'avatarSentences']) {
+        if (value === undefined) delete process.env.ENARA_ENGINE_V2;
+        else process.env.ENARA_ENGINE_V2 = value;
+        const off = await request(app).post('/api/avatar/session').set('Authorization', await token('mute-off')).send({});
+        expect(off.status).toBe(200);
+        expect(off.body).not.toHaveProperty('features');
+      }
+      process.env.ENARA_ENGINE_V2 = 'all,liveMute';
+      const on = await request(app).post('/api/avatar/session').set('Authorization', await token('mute-on')).send({});
+      expect(on.status).toBe(200);
+      expect(on.body.features).toEqual({ mute: true });
+    } finally {
+      if (saved === undefined) delete process.env.ENARA_ENGINE_V2;
+      else process.env.ENARA_ENGINE_V2 = saved;
+    }
+  });
+
   it('detects the language the student switched to', () => {
     expect(detectLanguageSwitch('ما هو المتغير؟', 'english')).toBe('arabic');
     expect(detectLanguageSwitch('ya3ni eh el variable', 'english')).toBe('arabic');

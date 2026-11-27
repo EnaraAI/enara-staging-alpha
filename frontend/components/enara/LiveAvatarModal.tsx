@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { EnaraMark } from '../brand/EnaraLogo';
-import { X, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
+import { X, Loader2, AlertCircle, RefreshCw, Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
 import { createClient, AnamEvent } from '@anam-ai/js-sdk';
 import { Assessment } from '../../types';
 import {
@@ -50,7 +50,12 @@ type AvatarSessionResponse = {
   speech?: 'server' | 'avatar' | 'anam' | 'elevenlabs';
   // avatarSpeaking: record each finished sentence as a short clip for pronunciation feedback (adults only; the server decides).
   pronunciation?: boolean;
+  // Live call controls whose switch is on (absent: none).
+  features?: LiveCallFeatures;
 };
+
+// The server's live call switches (ENARA_ENGINE_V2 liveMute, ...): off means the call looks as before.
+type LiveCallFeatures = { mute?: boolean };
 
 const MIC_PERMISSION_DENIED_REASON = 'CONNECTION_CLOSED_CODE_MICROPHONE_PERMISSION_DENIED';
 
@@ -140,6 +145,15 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
   const [tutorPickerOpen, setTutorPickerOpen] = useState(false);
   const [tutorSaving, setTutorSaving] = useState<string | null>(null);
   const anamReadyRef = useRef(false);
+  const [features, setFeatures] = useState<LiveCallFeatures>({});
+  // liveMute: the learner's microphone (the tutor hears nothing) and the tutor's
+  // voice (the tutor keeps talking, face moving, unheard). Kept across reconnects
+  // within a call; a new call starts with both on.
+  const [micMuted, setMicMuted] = useState(false);
+  const [voiceMuted, setVoiceMuted] = useState(false);
+  const micMutedRef = useRef(false);
+  const voiceMutedRef = useRef(false);
+  const voiceSinkRef = useRef<WebAudioSink | null>(null);
   // Created on the student's click, so the browser lets it play sound later.
   const audioCtxRef = useRef<AudioContext | null>(null);
   const silenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -188,6 +202,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
     heartbeatRef.current = null;
     voiceRef.current?.stop();
     voiceRef.current = null;
+    voiceSinkRef.current = null;
     clipRecorderRef.current?.stop();
     clipRecorderRef.current = null;
     const client = anamClientRef.current;
@@ -226,6 +241,11 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
     lastHeardLanguageRef.current = null;
     switchingLanguageRef.current = false;
     setLanguageChoice(null);
+    setFeatures({});
+    micMutedRef.current = false;
+    voiceMutedRef.current = false;
+    setMicMuted(false);
+    setVoiceMuted(false);
   }, []);
 
   const switchToTavus = useCallback(async (reason: string) => {
@@ -437,9 +457,10 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
       await voice.finishTurn();
       // Ended on a question: if the student stays quiet, help them along.
       // One nudge per student turn, after a longer pause: thinking time first.
-      if (current() && /[?؟]\s*$/.test(reply) && nudgesRef.current < 1) {
+      if (current() && /[?؟]\s*$/.test(reply) && nudgesRef.current < 1 && !micMutedRef.current) {
         silenceTimerRef.current = setTimeout(() => {
-          if (!current()) return;
+          // Microphone off: the learner can't answer, so no nudge.
+          if (!current() || micMutedRef.current) return;
           nudgesRef.current += 1;
           void answerSpokenTurnRef.current(null, undefined, 'nudge');
         }, 22_000);
@@ -491,6 +512,8 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
       onError: (message) => setError(message),
     });
     voiceRef.current = voice;
+    // liveMute: a reconnect keeps the learner's microphone choice.
+    if (micMutedRef.current) voice.setMicMuted(true);
     voice
       .startListening()
       .then(() => {
@@ -515,6 +538,8 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
     }
     void ctx.resume().catch(() => {});
     const sink = new WebAudioSink(ctx);
+    sink.setMuted(voiceMutedRef.current);
+    voiceSinkRef.current = sink;
     setProvider('voice');
     setLoading(false);
     setStatus('Voice only');
@@ -542,6 +567,14 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
       ...(relay ? { api: { apiGateway: { enabled: true, baseUrl: `${relay}/v`, wsPath: '/v/ws' } } } : {}),
     });
     anamClientRef.current = client;
+    // liveMute: a new video connection (reconnect, language switch) keeps the microphone off.
+    if (!elevenlabs && micMutedRef.current) {
+      try {
+        client.muteInputAudio();
+      } catch {
+        // applied again once the session is ready
+      }
+    }
 
     client.addListener(AnamEvent.CONNECTION_ESTABLISHED, () => {
       setStatus('Connected');
@@ -550,6 +583,13 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
     client.addListener(AnamEvent.SESSION_READY, () => {
       setLoading(false);
       setStatus('Connected');
+      if (!elevenlabs && micMutedRef.current) {
+        try {
+          client.muteInputAudio();
+        } catch {
+          // best effort
+        }
+      }
       const beat = () => {
         const sessionId = sessionIdRef.current;
         if (!sessionId || anamClientRef.current !== client) return;
@@ -717,6 +757,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
 
       const data: AvatarSessionResponse = await res.json();
       sessionIdRef.current = data.session_id;
+      setFeatures(data.features ?? {});
       // 'server' (and the older 'elevenlabs'): ENARA speaks and listens itself.
       speechModeRef.current = data.speech === 'server' || data.speech === 'elevenlabs' ? 'elevenlabs' : 'anam';
       // A reconnect continues the same conversation.
@@ -778,6 +819,43 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
     resetUi();
     onClose();
   }, [endServerSession, onClose, resetUi, stopAnam, stopPolling]);
+
+  // liveMute: microphone off/on. With the video tutor listening, its input is
+  // muted; with ENARA listening, the transcription session closes (nothing is
+  // sent) until the microphone is on again.
+  const toggleMic = useCallback(() => {
+    const muted = !micMutedRef.current;
+    micMutedRef.current = muted;
+    setMicMuted(muted);
+    if (muted) clearSilenceTimer();
+    if (speechModeRef.current === 'elevenlabs') {
+      voiceRef.current?.setMicMuted(muted);
+      return;
+    }
+    const client = anamClientRef.current;
+    try {
+      if (muted) client?.muteInputAudio();
+      else client?.unmuteInputAudio();
+    } catch {
+      // not connected yet: applied when the session is ready
+    }
+  }, [clearSilenceTimer]);
+
+  // liveMute: tutor voice off/on. The tutor keeps talking (the face keeps
+  // moving); only what the learner hears is silenced: the video's sound, or
+  // the browser's own playback in a voice-only call.
+  const toggleVoice = useCallback(() => {
+    const muted = !voiceMutedRef.current;
+    voiceMutedRef.current = muted;
+    setVoiceMuted(muted);
+    voiceSinkRef.current?.setMuted(muted);
+  }, []);
+
+  useEffect(() => {
+    if (provider !== 'anam') return;
+    const video = document.getElementById('enara-anam-video') as HTMLVideoElement | null;
+    if (video) video.muted = voiceMuted;
+  }, [provider, voiceMuted]);
 
   useEffect(() => {
     if (isOpen) {
@@ -890,7 +968,8 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
             <p className="text-white font-bold text-sm">Enara AI Tutor</p>
             <p className="text-slate-400 text-xs">
               {lessonTitle}
-              {status ? ` · ${status}` : ''}
+              {/* liveMute: never "Listening…" while the learner's microphone is off. */}
+              {features.mute && micMuted && status === 'Listening…' ? ' · Microphone off · الميكروفون مُغلَق' : status ? ` · ${status}` : ''}
             </p>
           </div>
           <button
@@ -900,6 +979,44 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
             <X size={18} />
           </button>
         </div>
+
+        {/* liveMute: call controls (video or voice-only call; the backup video has its own) */}
+        {features.mute && (provider === 'anam' || provider === 'voice') && (
+          <div className="flex flex-wrap items-center gap-2 px-5 py-2 border-b border-white/10 shrink-0" role="group" aria-label="Call controls · أدوات المكالمة">
+            <button
+              type="button"
+              data-testid="live-mic-toggle"
+              data-state={micMuted ? 'off' : 'on'}
+              onClick={toggleMic}
+              aria-label={micMuted
+                ? 'Microphone off: the tutor cannot hear you. Turn it on · الميكروفون مُغلَق: لا يسمعك المعلّم. شغِّله'
+                : 'Microphone on: the tutor can hear you. Turn it off · الميكروفون يعمل: يسمعك المعلّم. أغلِقه'}
+              className={`flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-bold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-300 ${
+                micMuted ? 'bg-rose-600 text-white hover:bg-rose-500' : 'bg-white/10 text-white hover:bg-white/20'
+              }`}
+            >
+              {micMuted ? <MicOff size={16} aria-hidden="true" /> : <Mic size={16} aria-hidden="true" />}
+              <span>{micMuted ? 'Microphone off' : 'Microphone on'}</span>
+              <span lang="ar" dir="rtl">{micMuted ? 'الميكروفون مُغلَق' : 'الميكروفون يعمل'}</span>
+            </button>
+            <button
+              type="button"
+              data-testid="live-voice-toggle"
+              data-state={voiceMuted ? 'off' : 'on'}
+              onClick={toggleVoice}
+              aria-label={voiceMuted
+                ? 'Tutor voice off: you cannot hear the tutor. Turn it on · صوت المعلّم مكتوم: لا تسمع المعلّم. شغِّله'
+                : 'Tutor voice on: you can hear the tutor. Turn it off · صوت المعلّم يعمل: تسمع المعلّم. اكتمه'}
+              className={`flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-bold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-300 ${
+                voiceMuted ? 'bg-rose-600 text-white hover:bg-rose-500' : 'bg-white/10 text-white hover:bg-white/20'
+              }`}
+            >
+              {voiceMuted ? <VolumeX size={16} aria-hidden="true" /> : <Volume2 size={16} aria-hidden="true" />}
+              <span>{voiceMuted ? 'Tutor voice off' : 'Tutor voice on'}</span>
+              <span lang="ar" dir="rtl">{voiceMuted ? 'صوت المعلّم مكتوم' : 'صوت المعلّم يعمل'}</span>
+            </button>
+          </div>
+        )}
 
         {/* Body */}
         <div className="flex-1 relative bg-black flex flex-col lg:flex-row overflow-hidden">
