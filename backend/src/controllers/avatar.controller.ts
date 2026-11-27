@@ -395,9 +395,10 @@ export const startAvatarSession = asyncHandler(async (req: AuthRequest, res: Res
 });
 
 // Live call controls (ENARA_ENGINE_V2 named switches, off by default): only the ones that are on are listed.
-export function liveCallFeatures(): { features?: { mute?: true } } {
-  const features: { mute?: true } = {};
+export function liveCallFeatures(): { features?: { mute?: true; captions?: true } } {
+  const features: { mute?: true; captions?: true } = {};
   if (engineV2('liveMute')) features.mute = true;
+  if (engineV2('liveCaptions')) features.captions = true;
   return Object.keys(features).length ? { features } : {};
 }
 
