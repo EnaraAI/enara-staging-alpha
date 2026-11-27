@@ -1,44 +1,51 @@
-import { Captions, ChevronLeft, Clock, Mic, PhoneOff, Settings2, Volume2 } from 'lucide-react';
+// Live avatar tutor (teens and adults). What is wired to lms-test:
+//   GET /api/me/tutor-face          the tutor's face and name the school (or the learner) chose
+//   GET /api/me/courses             the course the call is about (?course=… or the first enrolled course)
+//   GET /api/me/tutor/sessions      past live calls (mode 'voice'), only when the learner asks to see them
+//   GET /api/me/tutor/sessions/:id  one past call's transcript
+// Not connected yet: a live call (POST /api/avatar/session → session_token, then the Anam client through the relay
+// rt.enara.app, heartbeat, DELETE /api/avatar/session/:id) needs the Anam JS SDK, which this app does not include
+// (today's app uses @anam-ai/js-sdk 4.29.1). "Start session" explains this and makes no call: a session token is a paid
+// provider session, so none is created until the SDK is in place. The API gives no "time used today" or daily-limit read.
+import { useState } from 'react';
+import { Captions, ChevronLeft, Clock, History, Info, MessageCircle, Mic, Video } from 'lucide-react';
+import { get } from '@/lib/api';
 import { num, usePreview, useT } from '@/lib/preview';
-import { Badge, Button, Card, Dir, Progress, Toggle } from '@/components/ui';
+import { SessionMenu } from '@/components/shell';
+import { Alert, Badge, Button, Card, Dir, LinkButton, Skeleton, Toggle } from '@/components/ui';
 import { cn } from '@/lib/utils';
+import { InlineError, NotAvailable, arr, fmtDate, fmtTime, mediaUrl, str, useHashQuery, useLoad, type CourseSummary } from './common';
 
 const T = {
   en: {
-    back: 'Back', title: 'Speaking practice: Travel', sub: 'English · B1 · Live tutor', live: 'Live',
-    tutor: 'ENARA tutor', speaking: 'Speaking', listening: 'Listening', you: 'You', micOn: 'Mic on',
-    capLead: 'That sounds lovely. Now tell me one thing:', capNow: 'what did you enjoy most', capTail: 'about Alexandria?',
-    mute: 'Mute', captions: 'Captions', sound: 'Sound', settings: 'Settings', end: 'End session',
-    used: 'Time used today', usedOf: '12 of 30 min', left: '18 minutes left today',
-    transcript: 'Transcript', transcriptNote: 'Saved to this lesson so you and your teacher can read it later.',
-    lines: [
-      { who: 'tutor', at: '4:20 pm', text: 'Hello Salma! Today we will practise talking about a trip. Where did you go last summer?' },
-      { who: 'you', at: '4:21 pm', text: 'I went to Alexandria with my family for one week.' },
-      { who: 'tutor', at: '4:21 pm', text: 'Great sentence. One small thing: we say “for a week” or “for one week”. Both are fine! How did you travel there?' },
-      { who: 'you', at: '4:22 pm', text: 'We travelled by train. It was very comfortable and fast.' },
-    ],
-    nowLine: 'That sounds lovely. Now tell me one thing: what did you enjoy most about Alexandria?',
-    tutorWho: 'Tutor', youWho: 'You',
-    tip: 'Speak when the ring turns green. You can interrupt at any time.',
+    back: 'Back', title: 'Live tutor', sub: 'Speaking practice with your tutor', notConnected: 'Not connected',
+    tutor: 'ENARA tutor', you: 'You', mute: 'Mute', captions: 'Captions', start: 'Start session',
+    notYetTitle: 'The live tutor is not connected in this app yet',
+    notYet: 'Live video calls need the tutor’s video service (the Anam video SDK), which is not installed in this app yet. Nothing was started and nothing was charged. You can use the chat tutor now.',
+    useChat: 'Use the chat tutor',
+    used: 'Time used today', limit: 'Daily limit',
+    transcript: 'Past live calls', transcriptNote: 'Calls are saved with your tutor chats so you and your teacher can read them later.',
+    showPast: 'Show my past calls', noPast: 'No live calls yet.', messages: (n: string) => `${n} messages`, backToList: 'All past calls',
+    tutorWho: 'Tutor', youWho: 'You', tip: 'When the live tutor is connected, speak when the ring turns green. You can interrupt at any time.',
+    faceFailed: 'We couldn’t load your tutor’s face.',
   },
   ar: {
-    back: 'رجوع', title: 'تدريب على المحادثة: السفر', sub: 'اللغة الإنجليزية · B1 · معلّم مباشر', live: 'مباشر',
-    tutor: 'معلّم إنارة', speaking: 'يتحدث', listening: 'يستمع', you: 'أنتِ', micOn: 'الميكروفون يعمل',
-    capLead: 'That sounds lovely. Now tell me one thing:', capNow: 'what did you enjoy most', capTail: 'about Alexandria?',
-    mute: 'كتم الصوت', captions: 'الترجمة النصية', sound: 'الصوت', settings: 'الإعدادات', end: 'إنهاء الجلسة',
-    used: 'الوقت المستخدم اليوم', usedOf: '12 من 30 دقيقة', left: 'بقيت 18 دقيقة اليوم',
-    transcript: 'نص المحادثة', transcriptNote: 'يُحفَظ مع هذا الدرس لتقرئيه أنتِ ومعلّمتك لاحقًا.',
-    lines: [
-      { who: 'tutor', at: '4:20 م', text: 'Hello Salma! Today we will practise talking about a trip. Where did you go last summer?' },
-      { who: 'you', at: '4:21 م', text: 'I went to Alexandria with my family for one week.' },
-      { who: 'tutor', at: '4:21 م', text: 'Great sentence. One small thing: we say “for a week” or “for one week”. Both are fine! How did you travel there?' },
-      { who: 'you', at: '4:22 م', text: 'We travelled by train. It was very comfortable and fast.' },
-    ],
-    nowLine: 'That sounds lovely. Now tell me one thing: what did you enjoy most about Alexandria?',
-    tutorWho: 'المعلّم', youWho: 'أنتِ',
-    tip: 'تحدّثي عندما تتحوّل الحلقة إلى اللون الأخضر. يمكنك المقاطعة في أي وقت.',
+    back: 'رجوع', title: 'المعلّم المرئي', sub: 'تدريب على المحادثة مع معلّمك', notConnected: 'غير متصل',
+    tutor: 'معلّم إنارة', you: 'أنت', mute: 'كتم الصوت', captions: 'الترجمة النصية', start: 'بدء الجلسة',
+    notYetTitle: 'المعلّم المرئي غير متصل في هذا التطبيق بعد',
+    notYet: 'تحتاج المكالمات المرئية المباشرة إلى خدمة الفيديو الخاصة بالمعلّم (حزمة Anam للفيديو)، وهي غير مثبّتة في هذا التطبيق بعد. لم تبدأ أي جلسة ولم يُخصم أي رصيد. يمكنك استخدام المحادثة الكتابية مع المعلّم الآن.',
+    useChat: 'المحادثة الكتابية مع المعلّم',
+    used: 'الوقت المستخدم اليوم', limit: 'الحد اليومي',
+    transcript: 'المكالمات السابقة', transcriptNote: 'تُحفَظ المكالمات مع محادثاتك مع المعلّم لتقرأها أنت ومعلّمك لاحقًا.',
+    showPast: 'عرض مكالماتي السابقة', noPast: 'لا توجد مكالمات مباشرة بعد.', messages: (n: string) => `${n} رسالة`, backToList: 'كل المكالمات السابقة',
+    tutorWho: 'المعلّم', youWho: 'أنت', tip: 'عند اتصال المعلّم المرئي، تحدّث عندما تتحوّل الحلقة إلى اللون الأخضر. يمكنك المقاطعة في أي وقت.',
+    faceFailed: 'تعذّر تحميل صورة معلّمك.',
   },
 };
+
+interface Face { avatarId?: string; name?: string; imageUrl?: string }
+interface PastCall { id?: string; title?: string; mode?: string; messageCount?: number; lastMessageAt?: string; courseId?: string }
+interface CallDoc { id?: string; title?: string; messages?: { id?: string; role?: string; text?: string; timestamp?: string }[] }
 
 /** Stylised tutor portrait: shapes and gradients only, no external image. */
 function TutorPortrait() {
@@ -84,43 +91,50 @@ function TutorPortrait() {
   );
 }
 
-function Wave({ className }: { className?: string }) {
-  return (
-    <span className={cn('flex h-3.5 items-end gap-[3px]', className)} aria-hidden>
-      {[60, 100, 45, 85, 55].map((h, i) => <span key={i} className="w-[3px] animate-pulse rounded-full bg-current" style={{ height: `${h}%`, animationDelay: `${i * 120}ms` }} />)}
-    </span>
-  );
-}
-
 export default function StudentAvatar() {
   const t = useT(T);
   const { lang } = usePreview();
+  const q = useHashQuery();
+  const qCourse = q.get('course') ?? '';
+  const [explain, setExplain] = useState(false);
+
+  // Cheap reads only: no avatar session, no AI call.
+  const ctx = useLoad(async (signal) => {
+    const [face, courses] = await Promise.all([
+      get<{ current?: Face | null }>('/api/me/tutor-face', signal).then((r) => ({ ok: true as const, face: r?.current ?? null }), (e) => ({ ok: false as const, error: e })),
+      get<CourseSummary[]>('/api/me/courses', signal).catch(() => []),
+    ]);
+    const list = arr<CourseSummary>(courses);
+    return { face, course: list.find((c) => c.id === qCourse) ?? list[0] ?? null };
+  }, qCourse);
+
+  const face = ctx.data?.face.ok ? ctx.data.face.face : null;
+  const img = mediaUrl(face?.imageUrl);
+  const tutorName = face?.name || t.tutor;
+  const course = ctx.data?.course;
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <header className="flex items-center gap-3 border-b bg-card px-4 py-3 md:px-8">
-        <a href="#" aria-label={t.back} className="grid size-tap shrink-0 place-items-center rounded-lg hover:bg-muted"><Dir><ChevronLeft className="size-5" /></Dir></a>
+        <a href={qCourse ? `#/student/chat?course=${encodeURIComponent(qCourse)}` : '#/student'} aria-label={t.back} className="grid size-tap shrink-0 place-items-center rounded-lg hover:bg-muted"><Dir><ChevronLeft className="size-5" /></Dir></a>
         <div className="min-w-0 flex-1">
           <h1 className="truncate text-base font-bold leading-tight md:text-xl">{t.title}</h1>
-          <p className="truncate text-xs text-muted-foreground md:text-sm">{t.sub}</p>
+          <p dir="auto" className="truncate text-xs text-muted-foreground md:text-sm">{[course?.title, t.sub].filter(Boolean).join(' · ')}</p>
         </div>
-        <Badge tone="danger" className="gap-1.5"><span className="size-2 animate-pulse rounded-full bg-destructive" />{t.live}</Badge>
-        <span className="hidden items-center gap-1.5 rounded-full bg-muted px-3 py-1.5 text-sm font-semibold tabular-nums md:flex"><Clock className="size-4 text-muted-foreground" />12:40</span>
+        <Badge tone="neutral" className="gap-1.5"><span className="size-2 rounded-full bg-muted-foreground" />{t.notConnected}</Badge>
+        <SessionMenu compact />
       </header>
 
       <main className="mx-auto grid w-full max-w-7xl flex-1 gap-5 p-4 md:p-8 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-6">
         <div className="flex min-w-0 flex-col gap-4">
-          {/* Video tile */}
-          <div className="relative h-[480px] overflow-hidden rounded-2xl bg-primary shadow-lg md:h-auto md:aspect-video">
-            <TutorPortrait />
+          {/* Video tile: the chosen tutor's face, waiting */}
+          <div className="relative h-[420px] overflow-hidden rounded-2xl bg-primary shadow-lg md:aspect-video md:h-auto">
+            {ctx.loading && !ctx.data ? <Skeleton className="absolute inset-0 rounded-none" /> : img ? <img src={img} alt={tutorName} className="absolute inset-0 size-full object-cover" /> : <TutorPortrait />}
             <div className="absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-3 md:p-4">
-              <span className="flex items-center gap-2 rounded-full bg-black/40 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur">
-                <span className="relative flex size-2"><span className="absolute inset-0 animate-ping rounded-full bg-success opacity-60" /><span className="relative size-2 rounded-full bg-success" /></span>
-                {t.tutor}
+              <span dir="auto" className="flex min-w-0 items-center gap-2 truncate rounded-full bg-black/40 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur">
+                <span className="size-2 shrink-0 rounded-full bg-white/60" />{tutorName}
               </span>
-              <span className="flex items-center gap-2 rounded-full bg-accent px-3 py-1.5 text-xs font-bold text-accent-foreground shadow"><Wave />{t.speaking}</span>
             </div>
-
-            {/* Self view */}
             <div className="absolute end-3 top-14 flex w-24 flex-col overflow-hidden rounded-xl border-2 border-white/25 bg-[oklch(0.32_0.04_262)] shadow-lg md:end-4 md:top-16 md:w-36">
               <div className="relative grid aspect-[4/5] place-items-center">
                 <svg viewBox="0 0 80 100" className="absolute inset-0 size-full" preserveAspectRatio="xMidYMax slice" aria-hidden>
@@ -128,65 +142,94 @@ export default function StudentAvatar() {
                   <path d="M12 100c2-22 14-34 28-34s26 12 28 34Z" fill="oklch(0.55 0.04 262)" />
                 </svg>
               </div>
-              <div className="flex items-center justify-between gap-1 bg-black/35 px-2 py-1 text-[10px] font-semibold text-white md:text-xs">
-                <span>{t.you}</span><span className="flex items-center gap-1 text-success"><Mic className="size-3" /></span>
+              <div className="flex items-center justify-between gap-1 bg-black/35 px-2 py-1 text-[10px] font-semibold text-white md:text-xs"><span>{t.you}</span><Mic className="size-3 opacity-60" /></div>
+            </div>
+            {explain && (
+              <div className="absolute inset-x-3 bottom-3 md:inset-x-10 md:bottom-6">
+                <p className="mx-auto w-fit max-w-2xl rounded-xl bg-black/70 px-4 py-2.5 text-center text-sm leading-relaxed text-white backdrop-blur md:text-base">{t.notYetTitle}</p>
               </div>
-            </div>
-
-            {/* Live captions */}
-            <div className="absolute inset-x-3 bottom-3 md:inset-x-10 md:bottom-6">
-              <p dir="ltr" className="mx-auto w-fit max-w-2xl rounded-xl bg-black/65 px-4 py-2.5 text-center text-[15px] leading-relaxed text-white/75 backdrop-blur md:text-lg">
-                {t.capLead} <span className="text-white">{t.capNow}</span> <span className="text-white/40">{t.capTail}</span>
-              </p>
-            </div>
+            )}
           </div>
+          {ctx.data && !ctx.data.face.ok && <InlineError error={ctx.data.face.error} onRetry={ctx.reload} />}
 
-          {/* Controls */}
+          {/* Controls: only Start works; the rest wait for a live call */}
           <div className="flex items-center justify-between gap-3 rounded-2xl border bg-card p-2.5 md:p-3">
             <div className="flex items-center gap-2">
-              <Toggle aria-label={t.mute} className="size-12 rounded-full px-0 md:h-12 md:w-auto md:px-4"><Mic className="!size-5" /><span className="hidden md:inline">{t.mute}</span></Toggle>
-              <Toggle defaultSelected aria-label={t.captions} className="size-12 rounded-full px-0 md:h-12 md:w-auto md:px-4"><Captions className="!size-5" /><span className="hidden md:inline">{t.captions}</span></Toggle>
-              <Button variant="ghost" aria-label={t.sound} className="hidden size-12 rounded-full px-0 sm:inline-flex"><Volume2 className="!size-5" /></Button>
-              <Button variant="ghost" aria-label={t.settings} className="hidden size-12 rounded-full px-0 sm:inline-flex"><Settings2 className="!size-5" /></Button>
+              <Toggle isDisabled aria-label={t.mute} className="size-12 rounded-full px-0 md:h-12 md:w-auto md:px-4"><Mic className="!size-5" /><span className="hidden md:inline">{t.mute}</span></Toggle>
+              <Toggle isDisabled aria-label={t.captions} className="size-12 rounded-full px-0 md:h-12 md:w-auto md:px-4"><Captions className="!size-5" /><span className="hidden md:inline">{t.captions}</span></Toggle>
             </div>
-            <div className="hidden items-center gap-2 text-sm font-semibold text-success md:flex"><span className="grid size-7 place-items-center rounded-full bg-success-soft"><Mic className="size-3.5" /></span>{t.micOn}</div>
-            <Button variant="destructive" className="h-12 rounded-full px-5"><PhoneOff />{t.end}</Button>
+            <Button className="h-12 rounded-full px-5" onPress={() => setExplain(true)}><Video />{t.start}</Button>
           </div>
 
+          {explain && (
+            <Alert tone="info" icon={<Info />} title={t.notYetTitle}>
+              <p>{t.notYet}</p>
+              <LinkButton href={qCourse ? `#/student/chat?course=${encodeURIComponent(qCourse)}` : '#/student/chat'} variant="outline" size="sm" className="mt-2"><MessageCircle />{t.useChat}</LinkButton>
+            </Alert>
+          )}
           <p className="text-center text-xs text-muted-foreground">{t.tip}</p>
 
           {/* Phone: time used */}
           <Card className="flex flex-col gap-2 p-4 lg:hidden">
-            <div className="flex items-center justify-between text-sm"><span className="font-semibold">{t.used}</span><span className="tabular-nums text-muted-foreground">{t.usedOf}</span></div>
-            <Progress value={40} tone="success" />
+            <div className="flex items-center justify-between gap-3 text-sm"><span className="font-semibold">{t.used}</span><NotAvailable /></div>
+            <div className="flex items-center justify-between gap-3 text-sm"><span className="font-semibold">{t.limit}</span><NotAvailable /></div>
           </Card>
+          <div className="lg:hidden"><PastCalls /></div>
         </div>
 
-        {/* Desktop: time and transcript */}
         <aside className="hidden flex-col gap-4 lg:flex">
           <Card className="flex flex-col gap-3 p-5">
-            <div className="flex items-baseline justify-between"><h2 className="font-bold">{t.used}</h2><span className="text-sm tabular-nums text-muted-foreground">{t.usedOf}</span></div>
-            <Progress value={40} tone="success" size="md" />
-            <p className="text-xs text-muted-foreground">{t.left}</p>
+            <div className="flex items-center justify-between gap-3"><h2 className="flex items-center gap-2 font-bold"><Clock className="size-4 text-muted-foreground" />{t.used}</h2><NotAvailable /></div>
+            <div className="flex items-center justify-between gap-3"><h2 className="font-bold">{t.limit}</h2><NotAvailable /></div>
           </Card>
-          <Card className="flex min-h-0 flex-1 flex-col p-5">
-            <h2 className="font-bold">{t.transcript}</h2>
-            <p className="mb-4 mt-1 text-xs text-muted-foreground">{t.transcriptNote}</p>
-            <ol className="flex flex-col gap-3.5">
-              {t.lines.map((l, i) => (
-                <li key={i} className="flex flex-col gap-0.5">
-                  <span className={cn('text-xs font-bold', l.who === 'tutor' ? 'text-primary' : 'text-muted-foreground')}>{l.who === 'tutor' ? t.tutorWho : t.youWho} <span className="font-normal text-muted-foreground">· {l.at}</span></span>
-                  <p dir="ltr" className="text-start text-sm leading-relaxed">{l.text}</p>
-                </li>
-              ))}
-              <li className="flex flex-col gap-0.5 rounded-lg bg-accent/10 p-2.5 -mx-2.5">
-                <span className="flex items-center gap-2 text-xs font-bold text-primary">{t.tutorWho}<Wave className="text-accent-foreground" /></span>
-                <p dir="ltr" className="text-start text-sm leading-relaxed">{t.nowLine}</p>
-              </li>
-            </ol>
-          </Card>
+          <PastCalls />
         </aside>
       </main>
     </div>
+  );
+}
+
+/** Past live calls: loaded only when the learner asks (the list request also wakes the tutor model). */
+function PastCalls() {
+  const t = useT(T);
+  const { lang } = usePreview();
+  const [shown, setShown] = useState(false);
+  const [openId, setOpenId] = useState<string | null>(null);
+  const list = useLoad(async (signal) => (shown ? arr<PastCall>(await get<PastCall[]>('/api/me/tutor/sessions?limit=50', signal)).filter((s) => s?.mode === 'voice') : []), shown ? 'shown' : 'hidden');
+  const call = useLoad(async (signal) => (openId ? await get<CallDoc>(`/api/me/tutor/sessions/${encodeURIComponent(openId)}`, signal) : null), openId ?? '');
+  return (
+    <Card className="flex min-h-0 flex-1 flex-col p-5">
+      <h2 className="flex items-center gap-2 font-bold"><History className="size-4 text-muted-foreground" />{t.transcript}</h2>
+      <p className="mb-4 mt-1 text-xs text-muted-foreground">{t.transcriptNote}</p>
+      {!shown ? <Button variant="outline" onPress={() => setShown(true)}>{t.showPast}</Button>
+        : list.loading ? <div className="flex flex-col gap-2"><Skeleton className="h-12" /><Skeleton className="h-12" /></div>
+        : list.error ? <InlineError error={list.error} onRetry={list.reload} />
+        : openId ? (
+          <div className="flex flex-col gap-3">
+            <button type="button" onClick={() => setOpenId(null)} className="flex w-fit items-center gap-1 text-sm font-semibold text-primary"><Dir><ChevronLeft className="size-4" /></Dir>{t.backToList}</button>
+            {call.loading ? <Skeleton className="h-32" /> : call.error ? <InlineError error={call.error} onRetry={call.reload} /> : (
+              <ol className="flex max-h-[60vh] flex-col gap-3.5 overflow-y-auto">
+                {arr<NonNullable<CallDoc['messages']>[number]>(call.data?.messages).filter((m) => str(m?.text)).map((m, i) => (
+                  <li key={m.id ?? i} className="flex flex-col gap-0.5">
+                    <span className={cn('text-xs font-bold', m.role === 'user' ? 'text-muted-foreground' : 'text-primary')}>{m.role === 'user' ? t.youWho : t.tutorWho}{m.timestamp && <span className="font-normal text-muted-foreground"> · {fmtTime(m.timestamp, lang)}</span>}</span>
+                    <p dir="auto" className="whitespace-pre-wrap break-words text-start text-sm leading-relaxed">{m.text}</p>
+                  </li>
+                ))}
+              </ol>
+            )}
+          </div>
+        ) : arr<PastCall>(list.data).length === 0 ? <p className="text-sm text-muted-foreground">{t.noPast}</p> : (
+          <ul className="flex flex-col gap-1">
+            {arr<PastCall>(list.data).map((s, i) => (
+              <li key={s.id ?? i}>
+                <button type="button" onClick={() => s.id && setOpenId(s.id)} className="flex w-full flex-col items-start gap-0.5 rounded-lg px-2 py-2 text-start hover:bg-muted">
+                  <span dir="auto" className="w-full truncate text-sm font-semibold">{s.title}</span>
+                  <span className="text-xs text-muted-foreground">{[fmtDate(s.lastMessageAt, lang), typeof s.messageCount === 'number' ? t.messages(num(s.messageCount, lang)) : ''].filter(Boolean).join(' · ')}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+    </Card>
   );
 }
