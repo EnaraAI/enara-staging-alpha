@@ -137,6 +137,38 @@ describe('live avatar', () => {
     expect(sent.personaConfig).toMatchObject({ voiceId: 'voice-ar', llmId: 'CUSTOMER_CLIENT_V1', languageCode: 'ar' });
   });
 
+  it('anamNoRecording: asks Anam to keep no recording or transcript, on the start and the language switch', async () => {
+    const tokenBodies = () => anamFetch.mock.calls.filter((c) => String(c[0]).includes('session-token')).map((c) => JSON.parse(c[1].body));
+    const { anamSessionOptions } = await import('../src/controllers/avatar.controller');
+    const prev = process.env.ENARA_ENGINE_V2;
+    try {
+      // Off (the default, and not part of "all"): no data-retention setting is sent.
+      process.env.ENARA_ENGINE_V2 = 'all';
+      expect(anamSessionOptions()).toBeUndefined();
+      const auth = await token('no-rec');
+      const off = await request(app).post('/api/avatar/session').set('Authorization', auth).send({});
+      expect(off.status, JSON.stringify(off.body)).toBe(200);
+      expect(tokenBodies().at(-1)).not.toHaveProperty('sessionOptions');
+
+      process.env.ENARA_ENGINE_V2 = 'anamNoRecording';
+      expect(anamSessionOptions()).toEqual({ dataRetention: { recording: false, transcripts: false } });
+      anamFetch.mockClear();
+      const on = await request(app).post('/api/avatar/session').set('Authorization', auth).send({});
+      expect(on.status, JSON.stringify(on.body)).toBe(200);
+      const switched = await request(app).post(`/api/avatar/session/${on.body.session_id}/language`).set('Authorization', auth).send({ target_language: 'arabic' });
+      expect(switched.status, JSON.stringify(switched.body)).toBe(200);
+      const bodies = tokenBodies();
+      expect(bodies).toHaveLength(2);
+      for (const body of bodies) {
+        expect(body.sessionOptions).toEqual({ dataRetention: { recording: false, transcripts: false } });
+        expect(body.personaConfig).not.toHaveProperty('dataRetention'); // it belongs to the request, not the persona
+      }
+    } finally {
+      if (prev === undefined) delete process.env.ENARA_ENGINE_V2;
+      else process.env.ENARA_ENGINE_V2 = prev;
+    }
+  });
+
   it('streams the answer as NDJSON and signals a language switch', async () => {
     const start = await request(app).post('/api/avatar/session').set('Authorization', await token('u2')).send({});
     const res = await request(app)
