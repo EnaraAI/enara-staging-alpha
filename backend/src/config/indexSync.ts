@@ -29,7 +29,7 @@ export function modelFiles(root = path.resolve(__dirname, '..')): string[] {
   return out.sort();
 }
 
-export interface IndexSyncResult { files: number; models: number; failed: { model: string; error: string }[]; ms: number }
+export interface IndexSyncResult { files: number; models: number; failed: { model: string; error: string }[]; missing: { model: string; key: string }[]; ms: number }
 
 export async function ensureAllIndexes(files = modelFiles()): Promise<IndexSyncResult> {
   const t0 = Date.now();
@@ -48,7 +48,18 @@ export async function ensureAllIndexes(files = modelFiles()): Promise<IndexSyncR
       }
     }
   }));
-  const result = { files: files.length, models: names.length, failed, ms: Date.now() - t0 };
-  logger.info('index_sync', { files: result.files, models: result.models, failed: failed.length, ms: result.ms });
+  // The guarantee: every index a schema declares exists afterwards (same keys; nothing is dropped or changed). An index whose
+  // options conflict with an existing one of the same keys is left as it is, as autoIndex leaves it, and is not missing.
+  const missing: IndexSyncResult['missing'] = [];
+  for (const name of names) {
+    const model = mongoose.model(name);
+    const existing = new Set((await model.collection.indexes().catch(() => [])).map((i) => JSON.stringify(i.key)));
+    for (const [fields] of model.schema.indexes()) {
+      const key = JSON.stringify(fields);
+      if (!existing.has(key)) missing.push({ model: name, key });
+    }
+  }
+  const result = { files: files.length, models: names.length, failed, missing, ms: Date.now() - t0 };
+  logger.info('index_sync', { files: result.files, models: result.models, failed: failed.length, missing: missing.length, ms: result.ms });
   return result;
 }

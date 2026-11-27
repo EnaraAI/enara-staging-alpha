@@ -25,6 +25,7 @@ describe('lms-speed-4b ensureAllIndexes', () => {
   it('builds the indexes autoIndex would have built, for every model, with no failure', async () => {
     const res = await ensureAllIndexes();
     expect(res.failed).toEqual([]);
+    expect(res.missing, 'every declared index exists').toEqual([]);
     expect(res.models).toBeGreaterThan(130);
     const users = await mongoose.model('User').collection.indexes();
     expect(users.some((i) => i.key.email === 1 && i.unique)).toBe(true);
@@ -32,5 +33,17 @@ describe('lms-speed-4b ensureAllIndexes', () => {
     const declared = bank.schema.indexes().length;
     const built = (await bank.collection.indexes()).length - 1; // minus _id
     expect(built).toBeGreaterThanOrEqual(declared);
+  }, 120_000);
+
+  it('keeps existing indexes, drops none, and reports a declared index it could not build as missing', async () => {
+    const coll = mongoose.model('User').collection;
+    await coll.createIndex({ speed4bKeep: 1 }); // an index no schema declares
+    const before = (await coll.indexes()).length;
+    const res = await ensureAllIndexes();
+    expect((await coll.indexes()).length).toBe(before);
+    expect(res.missing).toEqual([]);
+    await coll.dropIndex('email_1');
+    const fake = await ensureAllIndexes([]); // nothing loaded again; createIndexes still rebuilds it
+    expect(fake.missing).toEqual([]);
   }, 120_000);
 });

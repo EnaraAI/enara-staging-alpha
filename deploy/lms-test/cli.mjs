@@ -220,6 +220,15 @@ async function maintenance(what) {
     if (r.json.pending?.length) throw new Error(`migrate: still pending ${r.json.pending.join(',')}`);
     output('migrations_applied', r.json.applied.join(' ') || 'none');
     summary(`**Migrations applied:** ${r.json.applied.map((m) => `\`${m}\``).join(', ') || 'none'}`);
+    // lms-speed-4b: the lms-test entry has Mongoose autoIndex off; this step builds every model's indexes and must leave
+    // none missing (an index missing here fails the step, so the deploy rolls back).
+    const ix = r.json.indexes;
+    if (ix) {
+      console.log(`indexes: ${ix.models} models from ${ix.files} files, ${ix.failed?.length ?? 0} not built, ${ix.missing?.length ?? 0} missing, ${ix.ms} ms`);
+      for (const f of ix.failed ?? []) console.log(`::warning::index not built: ${f.model}: ${String(f.error).slice(0, 160)}`);
+      summary(`**Indexes:** ${ix.models} models, ${ix.missing?.length ?? 0} missing, ${ix.failed?.length ?? 0} not built (${ix.ms} ms)`);
+      if (ix.missing?.length) throw new Error(`migrate: ${ix.missing.length} indexes missing (${ix.missing.slice(0, 5).map((m) => `${m.model} ${m.key}`).join('; ')})`);
+    }
     return;
   }
   if (what === 'setup') {
