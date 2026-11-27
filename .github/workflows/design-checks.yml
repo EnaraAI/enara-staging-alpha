@@ -31,6 +31,7 @@ jobs:
       - name: Publish screenshots and summary (orphan branch design-check-results, overwritten each run)
         if: always()
         working-directory: design-app/checks/out
+        shell: bash
         run: |
           git init -q && git checkout -q -b r && git config user.name github-actions && git config user.email github-actions@users.noreply.github.com
           git add -A && git commit -qm "design checks ${GITHUB_SHA::8} (${GITHUB_REF_NAME})" && git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" "r:design-check-results-${GITHUB_REF_NAME//\//-}"
