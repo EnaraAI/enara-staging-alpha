@@ -14,6 +14,8 @@ import { MISSING_MARKER_NOTE, hasTrustedMarker, needsRepair } from '../services/
 import { OUT_OF_SCOPE_LINE, outOfScopeTurn } from '../services/groundedRefusal';
 import { asksToExplainAgain, retrieveWithRewrite, reusePassages } from '../services/retrievalBoost';
 import { gradeAllSubjectsOn, practiceOutcome, practiceTurnFrom, SUBJECT_GRADE_LINE } from '../services/subjectPractice';
+import { prepareSubjectRolePlay, completeSubjectRolePlay, subjectHistoryFrom } from '../services/rolePlaySubject';
+import { rolePlayLine, rolePlayActive, guardSceneReply, type RolePlayTurn } from '../services/rolePlay';
 import { recordOutcomeForError, recordTutorOutcome, adaptiveSpacingOn, removeExamItems } from '../services/errorsToWorkOn';
 import { prepareLanguageContext, applyReplyGuards, completeLanguageTurn, languageHistoryFrom, arbitratePedagogy, exampleGuardCheck, exampleGuardRegenNote, rolePlayRegenNote, rolePlayDraftUsable, type ClosingAskStatus } from '../services/languageTurnPipeline'; // shared with the live avatar
 import { AssessmentMarkerFilter, filterSummary, stripAssessmentMarkers, type StrippedReply } from '../services/languageLearningState';
@@ -194,6 +196,8 @@ interface TutorTurn {
   languageMarker?: StrippedReply;
   // gradeAllSubjects: a non-language turn whose reply carries the hidden grading line.
   subjectGrading?: boolean;
+  // liveRolePlay (subjects other than a language course): this turn's role-play step.
+  rolePlay?: RolePlayTurn;
   // groundedRefusal: a subject question the course materials do not cover.
   outOfScope?: boolean;
   // repairOnce: one regeneration was made because the hidden grading line was missing.
@@ -351,7 +355,12 @@ async function prepareTutorTurn(req: AuthRequest): Promise<TutorTurn> {
     // reviewFirst: the spaced reviews due in this turn's brief open the session (REVIEW_FIRST_PLAN).
     ...(turn.plan?.workOn?.errorIds.length ? { reviewsDue: turn.plan.workOn.errorIds.length } : {}),
   }, 'chat'))?.context ?? null;
-  if (enaraCourseId && !extraRules.length && !turn.plan && !turn.language) {
+  // liveRolePlay: maths, science, Arabic and social-studies courses run role-play here (language courses inside the language engine).
+  if (!turn.language && resolvedCurriculumId) {
+    const rp = await prepareSubjectRolePlay({ institutionId: session.institutionId, studentId, curriculumId: resolvedCurriculumId, lessonId: session.lessonId, lessonTitle, sessionSubject: context?.subject, message: text.trim(), history: subjectHistoryFrom(earlier as never), hintsOnly: tutorPolicy.policy === 'hints_only', objectiveCode: turn.plan?.objectiveCode });
+    if (rp) turn.rolePlay = rp;
+  }
+  if (enaraCourseId && !extraRules.length && !turn.plan && !turn.language && !rolePlayActive(turn.rolePlay)) {
     turn.orchestrator = {
       course_id: enaraCourseId,
       query: enrichedQuery,
@@ -394,7 +403,7 @@ async function prepareTutorTurn(req: AuthRequest): Promise<TutorTurn> {
       history,
       teachingMethod: method,
       curriculum,
-      pedagogy: arbitratePedagogy([turn.plan?.prompt, ...extraRules, turn.subjectGrading ? SUBJECT_GRADE_LINE : undefined, turn.outOfScope ? OUT_OF_SCOPE_LINE : undefined, turn.injection === 'learner' ? INJECTION_NOTE : undefined, turn.spoken && turn.language ? spokenLines(turn.text).trim() : undefined].filter(Boolean).join('\n\n') || undefined, Boolean(turn.language)),
+      pedagogy: arbitratePedagogy([turn.plan?.prompt, ...extraRules, turn.subjectGrading ? SUBJECT_GRADE_LINE : undefined, turn.outOfScope ? OUT_OF_SCOPE_LINE : undefined, turn.injection === 'learner' ? INJECTION_NOTE : undefined, turn.spoken && turn.language ? spokenLines(turn.text).trim() : undefined, rolePlayActive(turn.rolePlay) ? rolePlayLine(turn.rolePlay!) : undefined].filter(Boolean).join('\n\n') || undefined, Boolean(turn.language)),
       planActive: Boolean(turn.plan),
       sourcesPrompt: turn.sources.length ? sourcesPrompt(turn.sources) : undefined,
       ...(engineV2('cache') && turn.language?.parts ? { languageContextStable: turn.language.parts.stable, languageContextDynamic: turn.language.parts.dynamic } : { languageContext: turn.language?.prompt }),
@@ -451,6 +460,10 @@ async function finishTutorTurn(turn: TutorTurn, reply: TutorReply | null) {
     if (g.removed || g.text !== aiResult.answer) { aiResult = { ...aiResult, answer: g.text }; preAttemptRemoved = g.removed; }
     closingAsk = g.closingAsk;
     rolePlayFixed = Boolean(g.rolePlayFixed);
+  } else if (turn.rolePlay && reply) {
+    // liveRolePlay (other subjects): the same scene guards as the language engine.
+    const sg = guardSceneReply(turn.rolePlay, aiResult.answer);
+    if (sg.fixed) { aiResult = { ...aiResult, answer: sg.text }; rolePlayFixed = true; }
   }
   // workOn (learner memory phase 1): never the learner's own assessment questions in a tutor reply (the brief's errors; server-side texts).
   if (reply && turn.plan?.workOn?.guardTexts.length) {
@@ -488,6 +501,7 @@ async function finishTutorTurn(turn: TutorTurn, reply: TutorReply | null) {
   const practiceTurn = turn.subjectGrading && reply ? practiceTurnFrom(turn.languageMarker, { objectiveId: turn.plan?.teaching.objectiveId ?? turn.session.objectiveId, lessonId: turn.session.lessonId }) : undefined;
   const practice = practiceOutcome(practiceTurn);
   if (practice && engineV2('workOn')) await recordTutorOutcome({ studentId: turn.session.studentId, objectiveId: practiceTurn?.objectiveId, sessionId: turn.session.id, right: practice === 'right' });
+  const rolePlayTag = turn.rolePlay && reply && !turn.language ? await completeSubjectRolePlay(turn.rolePlay, { institutionId: turn.session.institutionId, studentId: turn.studentId, messageId: assistantId }) : undefined;
   const assistantMessage = {
     id: assistantId,
     role: 'ai' as const,
@@ -504,6 +518,7 @@ async function finishTutorTurn(turn: TutorTurn, reply: TutorReply | null) {
       // Recorded only for a model reply (the moves were actually given to it).
       ...(languageTurn ? { languageTurn } : {}),
       ...(practiceTurn ? { practiceTurn } : {}),
+      ...(rolePlayTag ? { rolePlay: rolePlayTag } : {}),
       ...(turn.outOfScope && reply ? { outOfScope: true } : {}),
       ...(turn.repaired ? { repaired: true } : {}),
       ...(turn.injection ? { injection: turn.injection } : {}),
@@ -564,12 +579,13 @@ export const sendTutorMessage = asyncHandler(async (req: AuthRequest, res: Respo
       }
     }
     // liveRolePlay: a scene reply that leaves the scene gets ONE regeneration with the reason (the guards use the beat's fixed line if it still fails).
-    const sceneNote = reply && turn.language ? rolePlayRegenNote(turn.language, reply.answer) : undefined;
-    if (reply && turn.language && sceneNote) {
+    const sceneHolder = turn.language ?? (turn.rolePlay ? { rolePlay: turn.rolePlay } : null);
+    const sceneNote = reply && sceneHolder ? rolePlayRegenNote(sceneHolder, reply.answer) : undefined;
+    if (reply && sceneHolder && sceneNote) {
       const again = await queryDirectTutorModel({ ...params, pedagogy: [params.pedagogy, sceneNote].filter(Boolean).join('\n\n') });
       if (again) {
         const stripped2 = stripAssessmentMarkers(again.answer);
-        if (stripped2.text && rolePlayDraftUsable(turn.language, stripped2.text)) { turn.languageMarker = turn.spoken ? guardSpokenMarker(stripped2, turn.text) : stripped2; reply = { ...again, answer: stripped2.text }; }
+        if (stripped2.text && rolePlayDraftUsable(sceneHolder, stripped2.text)) { turn.languageMarker = turn.spoken && turn.language ? guardSpokenMarker(stripped2, turn.text) : stripped2; reply = { ...again, answer: stripped2.text }; }
       }
     }
     // repairOnce: a graded turn whose reply has no trusted hidden line gets ONE regeneration with the reason; otherwise the first draft stays.

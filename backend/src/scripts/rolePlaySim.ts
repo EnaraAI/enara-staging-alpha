@@ -80,7 +80,8 @@ async function startShim(): Promise<string> {
 
 // ------------------------------------------------------------------------------------------------ the fake school
 interface Learner { key: string; label: string; band: 'adult' | 'teen' | 'child'; age?: number; level: string; interests: string[]; lesson: string; persona: string; stuck?: boolean; ask: string }
-const LESSONS: Record<string, { title: string; level: string; spec: Record<string, unknown> }> = {
+interface Lesson { title: string; level: string; spec?: Record<string, unknown>; course?: { type: string; courseName: string; languages: string[]; subject: string } }
+const LESSONS: Record<string, Lesson> = {
   jobs: { title: 'Jobs and the verb be', level: 'A1', spec: { objectives: ['Say what people do with am, is and are'], successCriteria: ['Uses am/is/are after the subject', 'Uses a/an before a job'], grammar: ['be: am/is/are', 'a/an + job'], vocabulary: ['teacher', 'doctor', 'engineer', 'nurse', 'driver'], items: [
     { id: 'j1', prompt: 'Complete: My brother ___ a driver.', acceptedAnswers: ['is'], targetForms: ['is'], criteria: [1] },
     { id: 'j2', prompt: 'Complete: I ___ a nurse.', acceptedAnswers: ['am'], targetForms: ['am'], criteria: [1] },
@@ -105,17 +106,33 @@ const LESSONS: Record<string, { title: string; level: string; spec: Record<strin
     { id: 'n2', prompt: 'Complete: A cat ___ fly.', acceptedAnswers: ["can't", 'cannot', 'can not'], targetForms: ["can't"], criteria: [2] },
     { id: 'n3', prompt: 'Correct the sentence: "A bird can flies."', acceptedAnswers: ['A bird can fly', 'can fly'], targetForms: ['fly'], criteria: [1] }] } },
 };
+// Other subjects (owner correction 27 Nov 2026): national-curriculum courses taught in English or Arabic (no language spec; the tutor grades
+// open practice with its subject line).
+Object.assign(LESSONS, {
+  'maths-ar': { title: 'النقود: المجموع والباقي', level: 'Grade 8', course: { type: 'National', courseName: 'الرياضيات', languages: ['Arabic'], subject: 'maths' } },
+  'maths-en': { title: 'Adding and taking away to 10', level: 'Grade 2', course: { type: 'National', courseName: 'Mathematics', languages: ['English'], subject: 'maths' } },
+  'science-ar': { title: 'حالات المادة', level: 'Grade 9', course: { type: 'National', courseName: 'العلوم', languages: ['Arabic'], subject: 'science' } },
+  'science-en': { title: 'What plants need', level: 'Grade 5', course: { type: 'National', courseName: 'Science', languages: ['English'], subject: 'science' } },
+  'arabic-teen': { title: 'أدوات الاستفهام والصفة', level: 'Grade 9', course: { type: 'National', courseName: 'اللغة العربية', languages: ['Arabic'], subject: 'arabic' } },
+  'arabic-child': { title: 'أسماء الفاكهة والسؤال بأين وكم', level: 'Grade 5', course: { type: 'National', courseName: 'اللغة العربية', languages: ['Arabic'], subject: 'arabic' } },
+});
 const LEARNERS: Learner[] = [
-  { key: 'a1-adult', label: 'A1 adult', band: 'adult', level: 'A1', interests: ['cooking', 'travel'], lesson: 'jobs', ask: 'Can we do a role-play?',
+  { key: 'a1-adult', label: 'A1 adult, English', band: 'adult', level: 'A1', interests: ['cooking', 'travel'], lesson: 'jobs', ask: 'Can we do a role-play?',
     persona: 'an Egyptian adult beginner (A1), 34, works in an office. Short simple sentences; you often leave out am/is/are ("He teacher") and a/an. You try hard.' },
-  { key: 'a2-teen', label: 'A2 teen (stuck)', band: 'teen', age: 15, level: 'A2', interests: ['football', 'games'], lesson: 'routine', stuck: true, ask: 'Can we practise with a role-play?',
-    persona: 'an Egyptian teenager (A2), 15. You are STUCK on he/she -s: for your first four answers to exercises you keep the base verb ("She go", "He watch") or say "I don\'t know"; after that you slowly get it right. In a role-play, for the first two lines you say "I don\'t know" or "what?", then you answer.' },
-  { key: 'b1-adult', label: 'B1 adult', band: 'adult', level: 'B1', interests: ['travel', 'technology'], lesson: 'holiday', ask: "Let's do a role-play, please.",
+  { key: 'b1-adult', label: 'B1 adult, English', band: 'adult', level: 'B1', interests: ['travel', 'technology'], lesson: 'holiday', ask: "Let's do a role-play, please.",
     persona: 'an Egyptian adult (B1), 41, an engineer. Mostly fluent; sometimes uses the base verb for the past ("We visit") or "goed". Answers with 1-2 sentences.' },
-  { key: 'child-8', label: 'Child aged 8', band: 'child', age: 8, level: 'Pre-A1', interests: ['animals', 'cooking'], lesson: 'food', ask: 'Can we play a role-play game?',
-    persona: 'an Egyptian child aged 8 (Pre A1). Very short answers of 1-5 words, sometimes one word or a word in Arabic; you like animals and food.' },
-  { key: 'child-11', label: 'Child aged 11', band: 'child', age: 11, level: 'A1', interests: ['animals', 'reading'], lesson: 'animals', ask: 'Can we do a role-play?',
-    persona: 'an Egyptian child aged 11 (A1). Short sentences; sometimes "can swims" or leaves out a/an. Polite and keen.' },
+  { key: 'maths-teen-ar', label: 'Teen aged 14, maths in Arabic (stuck)', band: 'teen', age: 14, level: 'Grade 8', interests: ['football', 'games'], lesson: 'maths-ar', stuck: true, ask: 'هل يمكن أن نمثّل مشهدًا في السوق؟',
+    persona: 'an Egyptian teenager aged 14 in a maths lesson taught in Arabic; you write in Arabic (some Egyptian colloquial is fine). You are STUCK: for your first four answers to sums you add when you should multiply or subtract (3 kilos at 12 pounds = 15) or say "لا أعرف"; after that you slowly get them right. In a role-play, for the first two lines you say "لا أعرف" or "ماذا؟", then you answer.' },
+  { key: 'maths-child-8', label: 'Child aged 8, maths in English', band: 'child', age: 8, level: 'Grade 2', interests: ['animals', 'cooking'], lesson: 'maths-en', ask: 'Can we play a role-play game?',
+    persona: 'an Egyptian child aged 8 learning maths in English. Very short answers of 1-5 words; usually right with small numbers, sometimes off by one.' },
+  { key: 'science-adult-ar', label: 'Adult, science in Arabic', band: 'adult', level: 'Grade 9', interests: ['cooking', 'science'], lesson: 'science-ar', ask: 'هل يمكن أن نمثّل مشهدًا في المطبخ؟',
+    persona: 'an Egyptian adult in a science class taught in Arabic (adult education); you write in Arabic. You mostly know the ideas but sometimes mix up melting and boiling.' },
+  { key: 'science-child-11', label: 'Child aged 11, science in English', band: 'child', age: 11, level: 'Grade 5', interests: ['nature', 'animals'], lesson: 'science-en', ask: 'Can we do a role-play?',
+    persona: 'an Egyptian child aged 11 learning science in English. Short sentences; you know plants need water but forget light or air sometimes.' },
+  { key: 'arabic-teen', label: 'Teen aged 15, Arabic language', band: 'teen', age: 15, level: 'Grade 9', interests: ['reading', 'art'], lesson: 'arabic-teen', ask: 'هل يمكن أن نمثّل مشهدًا؟',
+    persona: 'an Egyptian teenager aged 15 in an Arabic language lesson. You answer in Arabic, mostly formal, but sometimes with agreement errors ("تفاحة أحمر") or colloquial words.' },
+  { key: 'arabic-child-11', label: 'Child aged 11, Arabic language', band: 'child', age: 11, level: 'Grade 5', interests: ['cooking', 'animals'], lesson: 'arabic-child', ask: 'هل يمكن أن نمثّل مشهدًا؟',
+    persona: 'an Egyptian child aged 11 in an Arabic language lesson. Very short Arabic answers, sometimes in colloquial Egyptian Arabic.' },
 ];
 
 async function seed(M: Record<string, any>, l: Learner, cond: string) {
@@ -127,18 +144,20 @@ async function seed(M: Record<string, any>, l: Learner, cond: string) {
   await M.StudentCredit.create({ studentId: `s-${id}`, institutionId: 'sim-school', limit: 100000, usage: 0, period: 'monthly', status: 'active', restrictedFeatures: [] });
   await M.User.create({ email: `${id}@sim.test`, password: pw, role: 'student', name: `Sim ${l.label}`, status: 'active', institutionId: 'sim-school', studentId: `s-${id}` });
   await M.LearnerProfile.create({ studentId: `s-${id}`, institutionId: 'sim-school', interests: l.interests, accommodations: [] });
-  await M.Curriculum.create({ id: `cur-${id}`, name: `English ${lesson.level}`, institutionId: 'sim-school', courseName: `English ${lesson.level}`, type: 'Language', level: lesson.level, languages: ['English'], summary: 'x', lastUpdated: '2026-11-27', status: 'deployed', chapters: [{ id: `lsn-${id}`, title: lesson.title, description: lesson.title, languageSpec: lesson.spec }] });
-  await M.CourseInstance.create({ id: `cls-${id}`, courseId: `crs-${id}`, courseName: `English ${lesson.level}`, institutionId: 'sim-school', academicYear: '2026', batchId: `b-${id}`, curriculumId: `cur-${id}`, studentIds: [`s-${id}`], instructorIds: [], visibility: 'student' });
+  const c = lesson.course ?? { type: 'Language', courseName: `English ${lesson.level}`, languages: ['English'], subject: 'english' };
+  await M.Curriculum.create({ id: `cur-${id}`, name: c.courseName, institutionId: 'sim-school', courseName: c.courseName, type: c.type, level: lesson.level, languages: c.languages, summary: 'x', lastUpdated: '2026-11-27', status: 'deployed', chapters: [{ id: `lsn-${id}`, title: lesson.title, description: lesson.title, ...(lesson.spec ? { languageSpec: lesson.spec } : {}) }] });
+  await M.CourseInstance.create({ id: `cls-${id}`, courseId: `crs-${id}`, courseName: c.courseName, institutionId: 'sim-school', academicYear: '2026', batchId: `b-${id}`, curriculumId: `cur-${id}`, studentIds: [`s-${id}`], instructorIds: [], visibility: 'student' });
   return { email: `${id}@sim.test`, course: `crs-${id}`, lesson: `lsn-${id}`, student: `s-${id}` };
 }
 
 // ------------------------------------------------------------------------------------------------ learners, judge
 const LEARNER_SYSTEM = (l: Learner) => `You are a simulated language learner in a test of an English tutor (SIMULATION ONLY). You are ${l.persona}
 Reply to the tutor's LAST message as this learner would: only your own words, 1-2 short sentences (children: very short), no explanations of what you are doing, never in the role of the tutor. If the tutor sets an exercise, try it at your level (mistakes are fine). If the tutor plays a character in a role-play, answer that character. Never write anything but the learner's message.`;
-const JUDGE_SYSTEM = `You are an experienced English teacher reviewing an AI tutor's replies for a school (SIMULATION ONLY). For the tutor's LAST reply, decide: would a good teacher accept this reply, as it is, for this learner at this point? Accept means: correct English and correct feedback (no wrong answer praised as right, no right answer called wrong), suitable for the learner's age and level, one clear task or question, it follows on from what the learner said, it stays on the lesson or on the role-play scene that is running, it does not just give away the answer to a new exercise before any try, and it is safe and kind. Context a teacher would know: in some lessons the tutor runs a short role-play scene (the tutor plays a character), then steps out of it for a short debrief (a rule line, a right/wrong example and one new practice item), then the lesson goes on; that structure is planned. Small style issues are still acceptable. Reply ONLY with JSON: {"accept": true or false, "reason": "one short sentence"}`;
+const JUDGE_SYSTEM = `You are an experienced English teacher reviewing an AI tutor's replies for a school (SIMULATION ONLY). For the tutor's LAST reply, decide: would a good teacher accept this reply, as it is, for this learner at this point? Accept means: correct English and correct feedback (no wrong answer praised as right, no right answer called wrong), suitable for the learner's age and level, one clear task or question, it follows on from what the learner said, it stays on the lesson or on the role-play scene that is running, it does not just give away the answer to a new exercise before any try, and it is safe and kind. Context a teacher would know: in some lessons the tutor runs a short role-play scene (the tutor plays a character), then steps out of it for a short debrief (a rule line, a right/wrong example and one new practice item), then the lesson goes on; that structure is planned. For a lesson taught in Arabic the tutor writes formal Arabic (fusha). Small style issues are still acceptable. Reply ONLY with JSON: {"accept": true or false, "reason": "one short sentence"}`;
 async function judge(l: Learner, lessonTitle: string, convo: { role: string; text: string }[], reply: string): Promise<{ accept: boolean; reason: string }> {
   const ctx = convo.slice(-6).map((m) => `${m.role === 'user' ? 'Learner' : 'Tutor'}: ${m.text}`).join('\n');
-  const prompt = `Learner: ${l.label}${l.age ? `, aged ${l.age}` : ''}, level ${l.level}, Arabic first language.\nLesson: ${lessonTitle}.\n\nConversation so far:\n${ctx}\n\nThe tutor's LAST reply (judge this one):\n${reply}`;
+  const c = LESSONS[l.lesson].course;
+  const prompt = `Learner: ${l.label}${l.age ? `, aged ${l.age}` : ''}, level ${l.level}, Arabic first language.\nSubject: ${c?.subject ?? 'English (language practice)'}; lesson language: ${c?.languages[0] ?? 'English'}.\nLesson: ${lessonTitle}.\n\nConversation so far:\n${ctx}\n\nThe tutor's LAST reply (judge this one):\n${reply}`;
   const raw = await llm(JUDGE_SYSTEM, [{ role: 'user', content: prompt }], 200);
   const m = /\{[\s\S]*\}/.exec(raw);
   try { const j = JSON.parse(m?.[0] ?? '') as { accept?: unknown; reason?: unknown }; return { accept: j.accept === true, reason: String(j.reason ?? '').slice(0, 300) }; } catch { return { accept: false, reason: `unreadable judge reply: ${raw.slice(0, 120)}` }; }
@@ -153,7 +172,8 @@ export function stuckMeasure(lts: (LT | undefined)[]): { sameMethodFails: boolea
   let prevHint = 0; let prevReleased = false;
   for (const lt of lts) {
     if (!lt) continue;
-    const v = lt.assessment?.verdict; const item = lt.activeItem?.lessonItemId;
+    // Other subjects store a practice record with no item id and no moves: consecutive wrong answers count as the same point with the same method (the strict reading).
+    const v = lt.assessment?.verdict; const item = lt.activeItem?.lessonItemId ?? (lt.moves ? undefined : 'practice');
     if (lt.answeringCheck && wrong(v)) {
       if (item && item === runItem) { run += 1; const mv = (lt.moves ?? []).slice().sort().join(','); sameRun = mv === lastMoves ? sameRun + 1 : 1; lastMoves = mv; } else { run = 1; runItem = item; sameRun = 1; lastMoves = (lt.moves ?? []).slice().sort().join(','); }
       maxFails = Math.max(maxFails, run);
@@ -210,7 +230,8 @@ async function main() {
       convo.push({ role: 'user', text: said });
       const r = await api(`/api/me/tutor/sessions/${sess.id ?? sess.session?.id}/messages`, token, { text: said });
       const reply = String(r.assistantMessage?.text ?? '');
-      const lt = r.assistantMessage?.meta?.languageTurn as LT | undefined;
+      const meta = r.assistantMessage?.meta ?? {};
+      const lt = (meta.languageTurn ?? { ...(meta.practiceTurn ?? {}), ...(meta.rolePlay ? { rolePlay: meta.rolePlay } : {}), postCheck: meta.postCheck }) as LT | undefined;
       convo.push({ role: 'ai', text: reply });
       const j = await judge(l, LESSONS[l.lesson].title, convo.slice(0, -1), reply);
       replies.push({ learner: l.label, cond, turn: t, learnerSaid: said, tutor: reply, accept: j.accept, reason: j.reason, postCheck: (lt?.postCheck ?? []).join(' '), rolePlay: lt?.rolePlay ? `${lt.rolePlay.scene}:${lt.rolePlay.phase}${lt.rolePlay.beat ? `#${lt.rolePlay.beat}` : ''}${lt.rolePlay.help ? `:${lt.rolePlay.help}` : ''}` : '' });
@@ -218,7 +239,7 @@ async function main() {
     // The stored turns (the engine's own evidence) for the stuck measure.
     const { TutorMessage } = await import('../models/TutorMessage');
     const msgs = await TutorMessage.find({ sessionId: sess.id ?? sess.session?.id, role: 'ai' }).sort({ timestamp: 1 }).lean();
-    const sm = stuckMeasure(msgs.map((m: any) => m.meta?.languageTurn as LT | undefined));
+    const sm = stuckMeasure(msgs.map((m: any) => (m.meta?.languageTurn ?? (m.meta?.practiceTurn || m.meta?.rolePlay ? { ...(m.meta?.practiceTurn ?? {}), ...(m.meta?.rolePlay ? { rolePlay: m.meta.rolePlay } : {}) } : undefined)) as LT | undefined));
     const mine = replies.filter((x) => x.learner === l.label && x.cond === cond);
     results.push({ learner: l.label, cond, replies: mine.length, accepted: mine.filter((x) => x.accept).length, sceneReplies: mine.filter((x) => x.rolePlay && !/:(after|declined)$/.test(x.rolePlay)).length, ...sm, stuck: sm.sameMethodFails || sm.unassistedRight === 0 });
     console.log(`done ${l.label} ${cond}: ${mine.filter((x) => x.accept).length}/${mine.length} accepted; stuck=${sm.sameMethodFails || sm.unassistedRight === 0}`);

@@ -10,7 +10,7 @@ import type { RolePlayScene } from './roleplayScenes';
 
 export const SCENES: RolePlayScene[] = [
   {
-    id: 'shop-clothes', kind: 'adult', cefr: 'A2', ages: ['teen', 'adult'], interests: ['fashion'],
+    id: 'shop-clothes', kind: 'adult', subject: 'english', langs: ['en'], cefr: 'A2', ages: ['teen', 'adult'], interests: ['fashion'],
     title: { en: 'Buying a jacket', ar: 'شراء سترة' },
     setting: { en: 'A clothes shop in the city centre', ar: 'متجر ملابس في وسط المدينة' },
     character: { en: 'Nour, a shop assistant', ar: 'نور، موظفة في المتجر' },
@@ -30,7 +30,7 @@ export const SCENES: RolePlayScene[] = [
     end: { en: 'The learner has chosen a jacket, paid and said goodbye.', ar: 'اختار المتعلم سترة ودفع ثمنها وودّع الموظفة.' },
   },
   {
-    id: 'airport-checkin', kind: 'adult', cefr: 'A2', ages: ['teen', 'adult'], interests: ['travel'],
+    id: 'airport-checkin', kind: 'adult', subject: 'english', langs: ['en'], cefr: 'A2', ages: ['teen', 'adult'], interests: ['travel'],
     title: { en: 'Checking in at the airport', ar: 'إنهاء إجراءات السفر في المطار' },
     setting: { en: 'The check-in desk at Cairo Airport', ar: 'مكتب إنهاء إجراءات السفر في مطار القاهرة' },
     character: { en: 'Omar, a check-in agent', ar: 'عمر، موظف إجراءات السفر' },
@@ -50,7 +50,7 @@ export const SCENES: RolePlayScene[] = [
     end: { en: 'The learner has checked in and knows the gate and the boarding time.', ar: 'أنهى المتعلم إجراءات السفر وعرف رقم البوابة وموعد الصعود.' },
   },
   {
-    id: 'doctor-visit', kind: 'adult', cefr: 'A2', ages: ['teen', 'adult'], interests: ['sports', 'football'],
+    id: 'doctor-visit', kind: 'adult', subject: 'english', langs: ['en'], cefr: 'A2', ages: ['teen', 'adult'], interests: ['sports', 'football'],
     title: { en: 'At the doctor\'s', ar: 'عند الطبيب' },
     setting: { en: 'A doctor\'s room at a local clinic', ar: 'غرفة الطبيب في عيادة قريبة' },
     character: { en: 'Dr Salma, a family doctor', ar: 'الدكتورة سلمى، طبيبة الأسرة' },
@@ -70,7 +70,7 @@ export const SCENES: RolePlayScene[] = [
     end: { en: 'The learner has explained the injury and repeated what to do.', ar: 'شرح المتعلم إصابته وفهم ما يجب عليه فعله.' },
   },
   {
-    id: 'school-office', kind: 'adult', cefr: 'A1', ages: ['teen', 'adult'], interests: ['reading', 'science'],
+    id: 'school-office', kind: 'adult', subject: 'english', langs: ['en'], cefr: 'A1', ages: ['teen', 'adult'], interests: ['reading', 'science'],
     title: { en: 'First day at a new school', ar: 'اليوم الأول في مدرسة جديدة' },
     setting: { en: 'The school office on the first morning of term', ar: 'مكتب شؤون الطلاب في صباح أول يوم دراسي' },
     character: { en: 'Mrs Hoda, the school secretary', ar: 'السيدة هدى، سكرتيرة المدرسة' },
@@ -89,7 +89,7 @@ export const SCENES: RolePlayScene[] = [
     end: { en: 'The learner has the timetable and knows where and when to go.', ar: 'حصل المتعلم على جدوله ويعرف أين يذهب ومتى.' },
   },
   {
-    id: 'restaurant-order', kind: 'adult', cefr: 'A1', ages: ['teen', 'adult'], interests: ['cooking'],
+    id: 'restaurant-order', kind: 'adult', subject: 'english', langs: ['en'], cefr: 'A1', ages: ['teen', 'adult'], interests: ['cooking'],
     title: { en: 'Ordering at a restaurant', ar: 'الطلب في مطعم' },
     setting: { en: 'A small restaurant in the evening', ar: 'مطعم صغير في المساء' },
     character: { en: 'Karim, a waiter', ar: 'كريم، نادل' },
@@ -109,7 +109,7 @@ export const SCENES: RolePlayScene[] = [
     end: { en: 'The learner has ordered a drink and a meal and asked for the bill.', ar: 'طلب المتعلم مشروبًا ووجبة ثم طلب الحساب.' },
   },
   {
-    id: 'train-tickets', kind: 'adult', cefr: 'A1', ages: ['teen', 'adult'], interests: ['travel'],
+    id: 'train-tickets', kind: 'adult', subject: 'english', langs: ['en'], cefr: 'A1', ages: ['teen', 'adult'], interests: ['travel'],
     title: { en: 'Buying a train ticket', ar: 'شراء تذكرة قطار' },
     setting: { en: 'The ticket office at Ramses Station', ar: 'شباك التذاكر في محطة رمسيس' },
     character: { en: 'Mr Adel, a ticket clerk', ar: 'الأستاذ عادل، موظف التذاكر' },
@@ -128,7 +128,7 @@ export const SCENES: RolePlayScene[] = [
     end: { en: 'The learner has a ticket and knows the time and the platform.', ar: 'اشترى المتعلم تذكرته ويعرف الموعد ورقم الرصيف.' },
   },
   {
-    id: 'cinema-tickets', kind: 'adult', cefr: 'A2', ages: ['teen', 'adult'], interests: ['films'],
+    id: 'cinema-tickets', kind: 'adult', subject: 'english', langs: ['en'], cefr: 'A2', ages: ['teen', 'adult'], interests: ['films'],
     title: { en: 'At the cinema', ar: 'في السينما' },
     setting: { en: 'The ticket desk of a cinema', ar: 'شباك التذاكر في دار السينما' },
     character: { en: 'Mona, a ticket seller', ar: 'منى، بائعة التذاكر' },
@@ -147,7 +147,7 @@ export const SCENES: RolePlayScene[] = [
     end: { en: 'The learner has two tickets and knows where to go.', ar: 'اشترى المتعلم تذكرتين ويعرف إلى أين يذهب.' },
   },
   {
-    id: 'football-club', kind: 'adult', cefr: 'A1', ages: ['teen', 'adult'], interests: ['football', 'sports'],
+    id: 'football-club', kind: 'adult', subject: 'english', langs: ['en'], cefr: 'A1', ages: ['teen', 'adult'], interests: ['football', 'sports'],
     title: { en: 'Joining a football club', ar: 'الانضمام إلى نادي كرة القدم' },
     setting: { en: 'The office of a local sports club', ar: 'مكتب نادٍ رياضي في الحي' },
     character: { en: 'Coach Hassan', ar: 'المدرب حسن' },
@@ -166,7 +166,7 @@ export const SCENES: RolePlayScene[] = [
     end: { en: 'The learner has joined the club and knows the training days and times.', ar: 'انضم المتعلم إلى النادي ويعرف أيام التدريب ومواعيده.' },
   },
   {
-    id: 'hotel-reception', kind: 'adult', cefr: 'B1', ages: ['teen', 'adult'], interests: ['travel'],
+    id: 'hotel-reception', kind: 'adult', subject: 'english', langs: ['en'], cefr: 'B1', ages: ['teen', 'adult'], interests: ['travel'],
     title: { en: 'At the hotel reception', ar: 'في استقبال الفندق' },
     setting: { en: 'The reception desk of a hotel by the Nile', ar: 'مكتب الاستقبال في فندق على النيل' },
     character: { en: 'Yasmin, a receptionist', ar: 'ياسمين، موظفة الاستقبال' },
@@ -186,7 +186,7 @@ export const SCENES: RolePlayScene[] = [
     end: { en: 'The learner has checked in, asked about the hotel and reported the problem.', ar: 'سجّل المتعلم وصوله وسأل عن الفندق وأبلغ عن المشكلة.' },
   },
   {
-    id: 'job-interview', kind: 'adult', cefr: 'B1', ages: ['adult'], interests: ['technology'],
+    id: 'job-interview', kind: 'adult', subject: 'english', langs: ['en'], cefr: 'B1', ages: ['adult'], interests: ['technology'],
     title: { en: 'A job interview', ar: 'مقابلة عمل' },
     setting: { en: 'An office, for a job at a computer shop', ar: 'مكتب، لوظيفة في متجر حواسيب' },
     character: { en: 'Mr Samir, the shop manager', ar: 'الأستاذ سمير، مدير المتجر' },
@@ -206,7 +206,7 @@ export const SCENES: RolePlayScene[] = [
     end: { en: 'The learner has answered the questions and asked one question about the job.', ar: 'أجاب المتعلم عن الأسئلة وسأل سؤالًا واحدًا عن الوظيفة.' },
   },
   {
-    id: 'museum-visit', kind: 'adult', cefr: 'A2', ages: ['teen', 'adult'], interests: ['science', 'space', 'art', 'technology'],
+    id: 'museum-visit', kind: 'adult', subject: 'english', langs: ['en'], cefr: 'A2', ages: ['teen', 'adult'], interests: ['science', 'space', 'art', 'technology'],
     title: { en: 'A visit to the museum', ar: 'زيارة إلى المتحف' },
     setting: { en: 'The ticket desk of a science museum', ar: 'شباك التذاكر في متحف للعلوم' },
     character: { en: 'Tarek, a museum guide', ar: 'طارق، مرشد في المتحف' },
@@ -225,7 +225,7 @@ export const SCENES: RolePlayScene[] = [
     end: { en: 'The learner has a ticket and knows where to go and when the museum closes.', ar: 'اشترى المتعلم تذكرة ويعرف إلى أين يذهب ومتى يغلق المتحف.' },
   },
   {
-    id: 'pet-shop', kind: 'adult', cefr: 'A1', ages: ['teen', 'adult'], interests: ['animals', 'nature'],
+    id: 'pet-shop', kind: 'adult', subject: 'english', langs: ['en'], cefr: 'A1', ages: ['teen', 'adult'], interests: ['animals', 'nature'],
     title: { en: 'At the pet shop', ar: 'في متجر الحيوانات الأليفة' },
     setting: { en: 'A small pet shop', ar: 'متجر صغير للحيوانات الأليفة' },
     character: { en: 'Laila, a shop assistant', ar: 'ليلى، موظفة في المتجر' },
@@ -249,7 +249,7 @@ export const SCENES: RolePlayScene[] = [
 // No doctor scene, no free topic, no personal details; short lines (at most 3 sentences of at most 10 words, the under-9 rule).
 export const CHILD_SCENES: RolePlayScene[] = [
   {
-    id: 'kids-fruit-shop', kind: 'child', cefr: 'preA1', ages: ['child'], interests: ['cooking'],
+    id: 'kids-fruit-shop', kind: 'child', subject: 'english', langs: ['en'], cefr: 'preA1', ages: ['child'], interests: ['cooking'],
     title: { en: 'The fruit shop', ar: 'متجر الفاكهة' },
     setting: { en: 'A fruit shop', ar: 'متجر للفاكهة' },
     character: { en: 'Mr Pat, the man in the shop', ar: 'السيد بات، صاحب المتجر' },
@@ -267,7 +267,7 @@ export const CHILD_SCENES: RolePlayScene[] = [
     end: { en: 'The child has some fruit and said goodbye.', ar: 'حصل الطفل على الفاكهة وودّع البائع.' },
   },
   {
-    id: 'kids-lost-pencil', kind: 'child', cefr: 'preA1', ages: ['child'], interests: ['art'],
+    id: 'kids-lost-pencil', kind: 'child', subject: 'english', langs: ['en'], cefr: 'preA1', ages: ['child'], interests: ['art'],
     title: { en: 'Where is my pencil?', ar: 'أين قلمي؟' },
     setting: { en: 'A classroom', ar: 'فصل دراسي' },
     character: { en: 'Miss Lucy, the teacher', ar: 'الآنسة لوسي، المعلمة' },
@@ -285,7 +285,7 @@ export const CHILD_SCENES: RolePlayScene[] = [
     end: { en: 'The child has found the pencil.', ar: 'عثر الطفل على قلمه.' },
   },
   {
-    id: 'kids-toy-shop', kind: 'child', cefr: 'preA1', ages: ['child'], interests: ['games'],
+    id: 'kids-toy-shop', kind: 'child', subject: 'english', langs: ['en'], cefr: 'preA1', ages: ['child'], interests: ['games'],
     title: { en: 'The toy shop', ar: 'متجر الألعاب' },
     setting: { en: 'A toy shop', ar: 'متجر للألعاب' },
     character: { en: 'Mrs Sue, the woman in the shop', ar: 'السيدة سو، صاحبة المتجر' },
@@ -303,7 +303,7 @@ export const CHILD_SCENES: RolePlayScene[] = [
     end: { en: 'The child has chosen a toy.', ar: 'اختار الطفل لعبة.' },
   },
   {
-    id: 'kids-ice-cream', kind: 'child', cefr: 'preA1', ages: ['child'], interests: ['cooking'],
+    id: 'kids-ice-cream', kind: 'child', subject: 'english', langs: ['en'], cefr: 'preA1', ages: ['child'], interests: ['cooking'],
     title: { en: 'The ice cream shop', ar: 'محل المثلجات' },
     setting: { en: 'An ice cream shop', ar: 'محل للمثلجات' },
     character: { en: 'Ben, the man in the shop', ar: 'بن، البائع في المحل' },
@@ -321,7 +321,7 @@ export const CHILD_SCENES: RolePlayScene[] = [
     end: { en: 'The child has an ice cream and a drink.', ar: 'حصل الطفل على المثلجات والمشروب.' },
   },
   {
-    id: 'kids-zoo', kind: 'child', cefr: 'A1', ages: ['child'], interests: ['animals', 'nature'],
+    id: 'kids-zoo', kind: 'child', subject: 'english', langs: ['en'], cefr: 'A1', ages: ['child'], interests: ['animals', 'nature'],
     title: { en: 'At the zoo', ar: 'في حديقة الحيوان' },
     setting: { en: 'The zoo', ar: 'حديقة الحيوان' },
     character: { en: 'Mr Tom at the zoo', ar: 'السيد توم في حديقة الحيوان' },
@@ -340,7 +340,7 @@ export const CHILD_SCENES: RolePlayScene[] = [
     end: { en: 'The child has talked about three animals.', ar: 'تحدث الطفل عن ثلاثة حيوانات.' },
   },
   {
-    id: 'kids-bookshop', kind: 'child', cefr: 'A1', ages: ['child'], interests: ['reading'],
+    id: 'kids-bookshop', kind: 'child', subject: 'english', langs: ['en'], cefr: 'A1', ages: ['child'], interests: ['reading'],
     title: { en: 'The bookshop', ar: 'متجر الكتب' },
     setting: { en: 'A bookshop', ar: 'متجر للكتب' },
     character: { en: 'Miss May in the bookshop', ar: 'الآنسة ماي في متجر الكتب' },
@@ -358,7 +358,7 @@ export const CHILD_SCENES: RolePlayScene[] = [
     end: { en: 'The child has chosen a book.', ar: 'اختار الطفل كتابًا.' },
   },
   {
-    id: 'kids-park-ball', kind: 'child', cefr: 'A1', ages: ['child'], interests: ['football', 'sports', 'games'],
+    id: 'kids-park-ball', kind: 'child', subject: 'english', langs: ['en'], cefr: 'A1', ages: ['child'], interests: ['football', 'sports', 'games'],
     title: { en: 'A ball game in the park', ar: 'لعبة الكرة في الحديقة' },
     setting: { en: 'The park', ar: 'الحديقة العامة' },
     character: { en: 'Sam, a boy in the park', ar: 'سام، صبي في الحديقة' },
