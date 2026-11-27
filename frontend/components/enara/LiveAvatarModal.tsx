@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { EnaraMark } from '../brand/EnaraLogo';
-import { X, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
+import { X, Loader2, AlertCircle, RefreshCw, Mic, MicOff, Volume2, VolumeX, Captions, CaptionsOff, Clock } from 'lucide-react';
 import { createClient, AnamEvent } from '@anam-ai/js-sdk';
 import { Assessment } from '../../types';
 import {
@@ -13,14 +13,17 @@ import {
 } from '../../services/apiService';
 import { toast } from '../../services/toastService';
 import { FaceGallery } from './FaceGallery';
-import { AvatarVoice, SentenceSplitter, type VoiceLanguage } from '../../services/avatarVoice';
+import { AvatarVoice, SentenceSplitter, languageOfText, type VoiceLanguage } from '../../services/avatarVoice';
 import { UtteranceRecorder, base64 } from '../../services/utteranceRecorder';
 import { markRelayDown, relayBase } from '../../services/relay';
 import { notCaughtLine } from '../../services/voiceText';
-import { SpeechChunkCleaner } from '../../services/speechText';
+import { SpeechChunkCleaner, stripMarkdownForSpeech } from '../../services/speechText';
+import { cueAtSeconds, cueTag, isExpressiveCue } from '../../services/expressiveCues';
 import { WebAudioSink } from '../../services/webAudioSink';
 import { classifyMicError, isInFrame, micMessage } from '../../services/micCheck';
 import { MicProblemNotice, useMicGate, type MicProblem } from '../MicCheck';
+import { LiveUsageLine, NO_CALLS_LEFT, clock, noCallsLeft, useLiveUsage } from './LiveUsage';
+import { fetchMyLiveUsage, type LiveUsage } from '../../services/apiService';
 
 interface LiveAvatarModalProps {
   isOpen: boolean;
@@ -50,6 +53,28 @@ type AvatarSessionResponse = {
   speech?: 'server' | 'avatar' | 'anam' | 'elevenlabs';
   // avatarSpeaking: record each finished sentence as a short clip for pronunciation feedback (adults only; the server decides).
   pronunciation?: boolean;
+  // Live call controls whose switch is on (absent: none).
+  features?: LiveCallFeatures;
+};
+
+// The server's live call switches (ENARA_ENGINE_V2 liveMute, ...): off means the call looks as before.
+type LiveCallFeatures = { mute?: boolean; captions?: boolean; timeUsed?: boolean };
+
+// liveTimeUsed: the warning shows this long before the call's maximum length.
+const CALL_END_WARNING_SECONDS = 120;
+
+// liveCaptions: one caption line (the tutor's spoken words, or what was heard from the learner). An open
+// line still grows: the tutor's current turn, or the learner's words while they are talking.
+type CaptionLine = { id: number; who: 'tutor' | 'learner'; text: string; open: boolean };
+const CAPTION_LINES = 4;
+const CAPTION_CHARS = 220;
+const CAPTIONS_KEY = 'enara.liveCaptions';
+const readCaptionsChoice = (): boolean => {
+  try {
+    return localStorage.getItem(CAPTIONS_KEY) === 'on';
+  } catch {
+    return false;
+  }
 };
 
 const MIC_PERMISSION_DENIED_REASON = 'CONNECTION_CLOSED_CODE_MICROPHONE_PERMISSION_DENIED';
@@ -140,6 +165,50 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
   const [tutorPickerOpen, setTutorPickerOpen] = useState(false);
   const [tutorSaving, setTutorSaving] = useState<string | null>(null);
   const anamReadyRef = useRef(false);
+  const [features, setFeatures] = useState<LiveCallFeatures>({});
+  // liveTimeUsed: before the call, the learner's calls today (null when the switch is off); during it, the
+  // usage read when this call started, when it started, and a once-a-second tick for the clock.
+  // (read again each time the modal opens)
+  const { usage: startUsage } = useLiveUsage(isOpen && isStudent);
+  const [callUsage, setCallUsage] = useState<LiveUsage | null>(null);
+  const [callStartedAt, setCallStartedAt] = useState<number | null>(null);
+  const [clockNow, setClockNow] = useState(() => Date.now());
+  // liveMute: the learner's microphone (the tutor hears nothing) and the tutor's
+  // voice (the tutor keeps talking, face moving, unheard). Kept across reconnects
+  // within a call; a new call starts with both on.
+  const [micMuted, setMicMuted] = useState(false);
+  const [voiceMuted, setVoiceMuted] = useState(false);
+  const micMutedRef = useRef(false);
+  const voiceMutedRef = useRef(false);
+  const voiceSinkRef = useRef<WebAudioSink | null>(null);
+  // liveCaptions: off until the learner turns them on; the choice is remembered in this browser.
+  const [captionsOn, setCaptionsOn] = useState(readCaptionsChoice);
+  const [captions, setCaptions] = useState<CaptionLine[]>([]);
+  const captionIdRef = useRef(0);
+  // mode 'append': add to the speaker's open line; 'replace': the speaker's open line becomes text (live
+  // recognition); 'close': end the speaker's open line. Clean words only (no Markdown, citations or LaTeX).
+  const caption = useCallback((who: CaptionLine['who'], text: string, mode: 'append' | 'replace' | 'close') => {
+    const clean = mode === 'close' ? '' : stripMarkdownForSpeech(text).replace(/\s+/g, ' ').trim();
+    if (mode !== 'close' && !clean) return;
+    setCaptions((lines) => {
+      const last = lines[lines.length - 1];
+      const own = last && last.who === who && last.open ? last : null;
+      if (mode === 'close') return own ? [...lines.slice(0, -1), { ...own, open: false }] : lines;
+      // The other speaker's open line ends when this one speaks.
+      const closed = lines.map((l) => (l.open && l.who !== who ? { ...l, open: false } : l));
+      const next = own
+        ? [...closed.slice(0, -1), { ...own, text: mode === 'append' ? `${own.text} ${clean}` : clean }]
+        : [...closed, { id: ++captionIdRef.current, who, text: clean, open: true }];
+      return next.slice(-CAPTION_LINES);
+    });
+  }, []);
+  // liveExpressive: the last cue sent and the video tutor's own confirmations, as data attributes on the video's frame
+  // (read by the screenshot run; nothing is shown).
+  const videoFrameRef = useRef<HTMLDivElement | null>(null);
+  const markExpression = (key: 'cueSent' | 'cueApplied' | 'personaTurn' | 'personaDone', value: string) => {
+    const el = videoFrameRef.current;
+    if (el) el.dataset[key] = `${value}@${Date.now()}`;
+  };
   // Created on the student's click, so the browser lets it play sound later.
   const audioCtxRef = useRef<AudioContext | null>(null);
   const silenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -188,6 +257,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
     heartbeatRef.current = null;
     voiceRef.current?.stop();
     voiceRef.current = null;
+    voiceSinkRef.current = null;
     clipRecorderRef.current?.stop();
     clipRecorderRef.current = null;
     const client = anamClientRef.current;
@@ -226,6 +296,14 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
     lastHeardLanguageRef.current = null;
     switchingLanguageRef.current = false;
     setLanguageChoice(null);
+    setFeatures({});
+    setCaptions([]);
+    setCallUsage(null);
+    setCallStartedAt(null);
+    micMutedRef.current = false;
+    voiceMutedRef.current = false;
+    setMicMuted(false);
+    setVoiceMuted(false);
   }, []);
 
   const switchToTavus = useCallback(async (reason: string) => {
@@ -277,6 +355,9 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
     answeringRef.current = true;
     let talkStream: any = null;
     let pendingLanguageSwitch: string | null = null;
+    // liveCaptions: what the video tutor heard, then its answer as it is streamed to its voice.
+    caption('learner', last.content, 'replace');
+    caption('learner', '', 'close');
 
     try {
       const messages = messageHistory.map((msg: any) => ({
@@ -303,9 +384,23 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
         if (!trimmed) return;
         const data = JSON.parse(trimmed);
         if (data.visual === 'drawing') setArtifactHtml(DRAWING_PLACEHOLDER);
+        // liveExpressive: the cue goes into the talk stream only (the video tutor reads it; it is never spoken or shown).
+        if (isExpressiveCue(data.cue) && talkStream?.isActive()) {
+          const before = speech.flush();
+          if (before) {
+            talkStream.streamMessageChunk(before, false);
+            caption('tutor', before, 'append');
+          }
+          talkStream.streamMessageChunk(cueTag(data.cue), false);
+          markExpression('cueSent', data.cue);
+          return;
+        }
         if (data.content && talkStream?.isActive()) {
           const words = speech.push(data.content);
-          if (words) talkStream.streamMessageChunk(words, false);
+          if (words) {
+            talkStream.streamMessageChunk(words, false);
+            caption('tutor', words, 'append');
+          }
         } else if (data.language_switch) {
           // The current answer keeps speaking in the current voice; the
           // switch only takes effect once this turn is fully spoken.
@@ -327,13 +422,19 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
       if (buffer.trim()) handleLine(buffer.trim());
 
       const rest = speech.flush();
-      if (rest && talkStream?.isActive()) talkStream.streamMessageChunk(rest, false);
+      if (rest && talkStream?.isActive()) {
+        talkStream.streamMessageChunk(rest, false);
+        caption('tutor', rest, 'append');
+      }
+      caption('tutor', '', 'close');
       if (talkStream?.isActive()) talkStream.endMessage();
     } catch (e) {
       console.error('[AVATAR] ENARA answer streaming failed', e);
       try {
         if (talkStream?.isActive()) talkStream.endMessage();
         await client.talk('Sorry, I had trouble answering that. Please try again.');
+        caption('tutor', 'Sorry, I had trouble answering that. Please try again.', 'append');
+        caption('tutor', '', 'close');
       } catch {
         // If Anam itself is broken, the connection handler will trigger fallback.
       }
@@ -343,7 +444,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
         void switchAnamLanguageRef.current(pendingLanguageSwitch);
       }
     }
-  }, []);
+  }, [caption]);
 
   // ElevenLabs mode: one spoken turn. The reply streams in as text, is cut into
   // sentences, and each sentence is spoken as soon as it is complete. A new
@@ -367,6 +468,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
     if (kind === 'turn') nudgesRef.current = 0;
     const turn = ++voiceTurnRef.current;
     const current = () => turn === voiceTurnRef.current && !closingRef.current;
+    caption('tutor', '', 'close');
     setStatus(kind !== 'turn' ? 'Speaking…' : language === 'arabic' ? 'Thinking… (Arabic)' : 'Thinking… (English)');
 
     const messages =
@@ -398,6 +500,16 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
         if (!line.trim()) return;
         const data = JSON.parse(line);
         if (data.visual === 'drawing') setArtifactHtml(DRAWING_PLACEHOLDER);
+        // liveExpressive: ENARA speaks, so the cue goes to the face over the data channel, timed from the turn's start.
+        if (isExpressiveCue(data.cue)) {
+          try {
+            anamClientRef.current?.sendDirectorNoteCue(data.cue, { atSeconds: cueAtSeconds(reply.length) });
+            markExpression('cueSent', data.cue);
+          } catch {
+            // No face (voice only) or an older engine: the call goes on without the cue.
+          }
+          return;
+        }
         if (data.content) {
           reply += data.content;
           if (!inline) for (const sentence of splitter.push(data.content)) voice.say(sentence);
@@ -437,9 +549,10 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
       await voice.finishTurn();
       // Ended on a question: if the student stays quiet, help them along.
       // One nudge per student turn, after a longer pause: thinking time first.
-      if (current() && /[?؟]\s*$/.test(reply) && nudgesRef.current < 1) {
+      if (current() && /[?؟]\s*$/.test(reply) && nudgesRef.current < 1 && !micMutedRef.current) {
         silenceTimerRef.current = setTimeout(() => {
-          if (!current()) return;
+          // Microphone off: the learner can't answer, so no nudge.
+          if (!current() || micMutedRef.current) return;
           nudgesRef.current += 1;
           void answerSpokenTurnRef.current(null, undefined, 'nudge');
         }, 22_000);
@@ -455,7 +568,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
       endInline();
       if (current()) setStatus('Listening…');
     }
-  }, [clearSilenceTimer, switchToAvatarVoice]);
+  }, [caption, clearSilenceTimer, switchToAvatarVoice]);
 
   useEffect(() => {
     answerSpokenTurnRef.current = answerSpokenTurn;
@@ -467,6 +580,8 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
     const voice = new AvatarVoice(sessionIdRef.current, sink, {
       onUtterance: (text, language) => {
         lastHeardLanguageRef.current = language;
+        caption('learner', text, 'replace');
+        caption('learner', '', 'close');
         // avatarSpeaking: one English sentence as a short clip for pronunciation feedback (fire and forget; never blocks the answer).
         const rec = clipRecorderRef.current; const since = hearingSinceRef.current; hearingSinceRef.current = null;
         if (rec && language === 'english' && sessionIdRef.current) {
@@ -485,12 +600,16 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
         void voiceRef.current.finishTurn();
       },
       // The student is talking: no nudge.
-      onHearing: () => { clearSilenceTimer(); hearingSinceRef.current ??= Date.now(); },
+      onHearing: (text) => { clearSilenceTimer(); hearingSinceRef.current ??= Date.now(); caption('learner', text, 'replace'); },
+      // liveCaptions: each sentence as its audio starts.
+      onSpeaking: (text) => caption('tutor', text, 'append'),
       onInterrupt: interrupt,
       onVoiceUnavailable: () => switchToAvatarVoice(),
       onError: (message) => setError(message),
     });
     voiceRef.current = voice;
+    // liveMute: a reconnect keeps the learner's microphone choice.
+    if (micMutedRef.current) voice.setMicMuted(true);
     voice
       .startListening()
       .then(() => {
@@ -502,7 +621,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
         console.error('[AVATAR] Voice start failed', e);
         micFailed(classifyMicError(e, isInFrame()));
       });
-  }, [answerSpokenTurn, clearSilenceTimer, micFailed, switchToAvatarVoice]);
+  }, [answerSpokenTurn, caption, clearSilenceTimer, micFailed, switchToAvatarVoice]);
 
   // The video avatar refused the call: carry on as a voice-only tutor.
   const startVoiceOnly = useCallback(async () => {
@@ -515,6 +634,8 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
     }
     void ctx.resume().catch(() => {});
     const sink = new WebAudioSink(ctx);
+    sink.setMuted(voiceMutedRef.current);
+    voiceSinkRef.current = sink;
     setProvider('voice');
     setLoading(false);
     setStatus('Voice only');
@@ -542,6 +663,14 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
       ...(relay ? { api: { apiGateway: { enabled: true, baseUrl: `${relay}/v`, wsPath: '/v/ws' } } } : {}),
     });
     anamClientRef.current = client;
+    // liveMute: a new video connection (reconnect, language switch) keeps the microphone off.
+    if (!elevenlabs && micMutedRef.current) {
+      try {
+        client.muteInputAudio();
+      } catch {
+        // applied again once the session is ready
+      }
+    }
 
     client.addListener(AnamEvent.CONNECTION_ESTABLISHED, () => {
       setStatus('Connected');
@@ -550,6 +679,13 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
     client.addListener(AnamEvent.SESSION_READY, () => {
       setLoading(false);
       setStatus('Connected');
+      if (!elevenlabs && micMutedRef.current) {
+        try {
+          client.muteInputAudio();
+        } catch {
+          // best effort
+        }
+      }
       const beat = () => {
         const sessionId = sessionIdRef.current;
         if (!sessionId || anamClientRef.current !== client) return;
@@ -578,6 +714,17 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
     });
 
     if (!elevenlabs) client.addListener(AnamEvent.MESSAGE_HISTORY_UPDATED, streamEnaraAnswerToAnam);
+    // liveExpressive: when the video tutor confirms a cue, and when each spoken reply starts (screenshot run timing).
+    let lastPersonaId = '';
+    client.addListener(AnamEvent.DIRECTOR_NOTE_CUE_APPLIED, (e: { cueTag?: string }) => markExpression('cueApplied', String(e?.cueTag ?? '')));
+    client.addListener(AnamEvent.MESSAGE_STREAM_EVENT_RECEIVED, (e: { id?: string; role?: string; cueTag?: string; endOfSpeech?: boolean }) => {
+      if (e?.role === 'user' || !e?.id) return;
+      if (e.id !== lastPersonaId) {
+        lastPersonaId = e.id;
+        markExpression('personaTurn', e.cueTag ?? '');
+      }
+      if (e.endOfSpeech) markExpression('personaDone', e.id);
+    });
 
     client.addListener(AnamEvent.TALK_STREAM_INTERRUPTED, () => {
       answeringRef.current = false;
@@ -701,6 +848,8 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
       await endServerSession();
     }
 
+    // liveTimeUsed: today's usage before this call (read alongside the start; a call that hasn't got going isn't counted).
+    const usageRead = isStudent ? fetchMyLiveUsage() : Promise.resolve(null);
     try {
       const res = await avatarFetch('/session', {
         method: 'POST',
@@ -717,6 +866,11 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
 
       const data: AvatarSessionResponse = await res.json();
       sessionIdRef.current = data.session_id;
+      setFeatures(data.features ?? {});
+      if (data.features?.timeUsed) {
+        setCallStartedAt(Date.now());
+        void usageRead.then(setCallUsage);
+      }
       // 'server' (and the older 'elevenlabs'): ENARA speaks and listens itself.
       speechModeRef.current = data.speech === 'server' || data.speech === 'elevenlabs' ? 'elevenlabs' : 'anam';
       // A reconnect continues the same conversation.
@@ -759,7 +913,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
       setError('Could not start the AI tutor. Please try again.');
       setLoading(false);
     }
-  }, [courseId, endServerSession, lessonId, lessonTitle, startAnam, startPolling, startVoiceOnly, stopAnam, stopPolling, subject, switchToTavus]);
+  }, [courseId, endServerSession, isStudent, lessonId, lessonTitle, startAnam, startPolling, startVoiceOnly, stopAnam, stopPolling, subject, switchToTavus]);
 
   useEffect(() => {
     restartRef.current = async () => {
@@ -778,6 +932,62 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
     resetUi();
     onClose();
   }, [endServerSession, onClose, resetUi, stopAnam, stopPolling]);
+
+  // liveTimeUsed: the call clock ticks once a second while a call is on.
+  useEffect(() => {
+    if (!callStartedAt) return;
+    const t = setInterval(() => setClockNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, [callStartedAt]);
+
+  // liveMute: microphone off/on. With the video tutor listening, its input is
+  // muted; with ENARA listening, the transcription session closes (nothing is
+  // sent) until the microphone is on again.
+  const toggleMic = useCallback(() => {
+    const muted = !micMutedRef.current;
+    micMutedRef.current = muted;
+    setMicMuted(muted);
+    if (muted) clearSilenceTimer();
+    if (speechModeRef.current === 'elevenlabs') {
+      voiceRef.current?.setMicMuted(muted);
+      return;
+    }
+    const client = anamClientRef.current;
+    try {
+      if (muted) client?.muteInputAudio();
+      else client?.unmuteInputAudio();
+    } catch {
+      // not connected yet: applied when the session is ready
+    }
+  }, [clearSilenceTimer]);
+
+  // liveMute: tutor voice off/on. The tutor keeps talking (the face keeps
+  // moving); only what the learner hears is silenced: the video's sound, or
+  // the browser's own playback in a voice-only call.
+  const toggleVoice = useCallback(() => {
+    const muted = !voiceMutedRef.current;
+    voiceMutedRef.current = muted;
+    setVoiceMuted(muted);
+    voiceSinkRef.current?.setMuted(muted);
+  }, []);
+
+  // liveCaptions: on/off, remembered in this browser.
+  const toggleCaptions = useCallback(() => {
+    setCaptionsOn((on) => {
+      try {
+        localStorage.setItem(CAPTIONS_KEY, on ? 'off' : 'on');
+      } catch {
+        // storage blocked: the choice lasts for this page only
+      }
+      return !on;
+    });
+  }, []);
+
+  useEffect(() => {
+    if (provider !== 'anam') return;
+    const video = document.getElementById('enara-anam-video') as HTMLVideoElement | null;
+    if (video) video.muted = voiceMuted;
+  }, [provider, voiceMuted]);
 
   useEffect(() => {
     if (isOpen) {
@@ -864,6 +1074,15 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
 
   if (!isOpen) return null;
 
+  // liveTimeUsed: this call's clock, today's totals (read when the call started, plus this call) and the warning
+  // before the call's maximum length (none without a maximum).
+  const callUnderway = !loading && (provider === 'anam' || provider === 'voice');
+  const callSeconds = callStartedAt ? Math.max(0, (clockNow - callStartedAt) / 1000) : 0;
+  const todayMinutes = callUsage ? Math.floor((callUsage.secondsUsedToday + callSeconds) / 60) : null;
+  const callsLeft = callUsage ? Math.max(0, callUsage.callsLeftToday - (callUnderway ? 1 : 0)) : null;
+  const endsIn = callUsage?.maxCallSeconds ? callUsage.maxCallSeconds - callSeconds : null;
+  const showEnding = !!features.timeUsed && callUnderway && endsIn !== null && endsIn <= CALL_END_WARNING_SECONDS;
+
   return (
     <>
     {tutorPickerOpen && myTutor && (
@@ -890,7 +1109,8 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
             <p className="text-white font-bold text-sm">Enara AI Tutor</p>
             <p className="text-slate-400 text-xs">
               {lessonTitle}
-              {status ? ` · ${status}` : ''}
+              {/* liveMute: never "Listening…" while the learner's microphone is off. */}
+              {features.mute && micMuted && status === 'Listening…' ? ' · Microphone off · الميكروفون مُغلَق' : status ? ` · ${status}` : ''}
             </p>
           </div>
           <button
@@ -900,6 +1120,96 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
             <X size={18} />
           </button>
         </div>
+
+        {/* Call controls, each behind its own switch (video or voice-only call; the backup video has its own) */}
+        {(features.mute || features.captions || features.timeUsed) && (provider === 'anam' || provider === 'voice') && (
+          <div className="flex flex-wrap items-center gap-2 px-5 py-2 border-b border-white/10 shrink-0" role="group" aria-label="Call controls · أدوات المكالمة">
+            {features.mute && (<>
+            <button
+              type="button"
+              data-testid="live-mic-toggle"
+              data-state={micMuted ? 'off' : 'on'}
+              onClick={toggleMic}
+              aria-label={micMuted
+                ? 'Microphone off: the tutor cannot hear you. Turn it on · الميكروفون مُغلَق: لا يسمعك المعلّم. شغِّله'
+                : 'Microphone on: the tutor can hear you. Turn it off · الميكروفون يعمل: يسمعك المعلّم. أغلِقه'}
+              className={`flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-bold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-300 ${
+                micMuted ? 'bg-rose-600 text-white hover:bg-rose-500' : 'bg-white/10 text-white hover:bg-white/20'
+              }`}
+            >
+              {micMuted ? <MicOff size={16} aria-hidden="true" /> : <Mic size={16} aria-hidden="true" />}
+              <span>{micMuted ? 'Microphone off' : 'Microphone on'}</span>
+              <span lang="ar" dir="rtl">{micMuted ? 'الميكروفون مُغلَق' : 'الميكروفون يعمل'}</span>
+            </button>
+            <button
+              type="button"
+              data-testid="live-voice-toggle"
+              data-state={voiceMuted ? 'off' : 'on'}
+              onClick={toggleVoice}
+              aria-label={voiceMuted
+                ? 'Tutor voice off: you cannot hear the tutor. Turn it on · صوت المعلّم مكتوم: لا تسمع المعلّم. شغِّله'
+                : 'Tutor voice on: you can hear the tutor. Turn it off · صوت المعلّم يعمل: تسمع المعلّم. اكتمه'}
+              className={`flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-bold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-300 ${
+                voiceMuted ? 'bg-rose-600 text-white hover:bg-rose-500' : 'bg-white/10 text-white hover:bg-white/20'
+              }`}
+            >
+              {voiceMuted ? <VolumeX size={16} aria-hidden="true" /> : <Volume2 size={16} aria-hidden="true" />}
+              <span>{voiceMuted ? 'Tutor voice off' : 'Tutor voice on'}</span>
+              <span lang="ar" dir="rtl">{voiceMuted ? 'صوت المعلّم مكتوم' : 'صوت المعلّم يعمل'}</span>
+            </button>
+            </>)}
+            {features.captions && (
+              <button
+                type="button"
+                data-testid="live-captions-toggle"
+                data-state={captionsOn ? 'on' : 'off'}
+                onClick={toggleCaptions}
+                aria-label={captionsOn
+                  ? 'Captions on: the tutor’s words and yours are written on the screen. Turn them off · التسميات التوضيحية مُفعَّلة: تُكتب كلمات المعلّم وكلماتك على الشاشة. أوقِفها'
+                  : 'Captions off. Turn them on to see the tutor’s words and yours written on the screen · التسميات التوضيحية مُتوقِّفة. فعِّلها لترى كلمات المعلّم وكلماتك مكتوبةً على الشاشة'}
+                className={`flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-bold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-300 ${
+                  captionsOn ? 'bg-teal-600 text-white hover:bg-teal-500' : 'bg-white/10 text-white hover:bg-white/20'
+                }`}
+              >
+                {captionsOn ? <Captions size={16} aria-hidden="true" /> : <CaptionsOff size={16} aria-hidden="true" />}
+                <span>{captionsOn ? 'Captions on' : 'Captions off'}</span>
+                <span lang="ar" dir="rtl">{captionsOn ? 'التسميات التوضيحية مُفعَّلة' : 'التسميات التوضيحية مُتوقِّفة'}</span>
+              </button>
+            )}
+            {features.timeUsed && (
+              <div data-testid="live-call-usage" className="ml-auto text-[11px] sm:text-xs leading-tight text-slate-300 text-right">
+                <p className="m-0">
+                  This call <span data-testid="live-call-clock">{clock(callSeconds)}</span>
+                  {todayMinutes !== null && <> · Today <span data-testid="live-call-today">{todayMinutes}</span> min</>}
+                  {callsLeft !== null && <> · Calls left today <span data-testid="live-call-left">{callsLeft}</span></>}
+                </p>
+                <p className="m-0" lang="ar" dir="rtl">
+                  هذه المكالمة {clock(callSeconds)}
+                  {todayMinutes !== null && <> · اليوم {todayMinutes} دقيقة</>}
+                  {callsLeft !== null && <> · المكالمات المتبقية اليوم: {callsLeft}</>}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {showEnding && endsIn !== null && (
+          <div data-testid="live-call-ending" className="flex flex-wrap items-center gap-x-3 gap-y-1 px-5 py-2 bg-amber-400 text-slate-900 text-sm font-bold shrink-0">
+            <Clock size={16} aria-hidden="true" />
+            {endsIn > 0 ? (
+              <>
+                <span role="alert">
+                  About 2 minutes left in this call. · <span lang="ar" dir="rtl">تبقّت دقيقتان تقريبًا على نهاية هذه المكالمة.</span>
+                </span>
+                <span aria-hidden="true" data-testid="live-call-ending-clock">{clock(endsIn)}</span>
+              </>
+            ) : (
+              <span role="alert">
+                This call has reached its maximum length. Start a new call to continue. · <span lang="ar" dir="rtl">بلغت هذه المكالمة حدَّها الأقصى. ابدأ مكالمة جديدة للمتابعة.</span>
+              </span>
+            )}
+          </div>
+        )}
 
         {/* Body */}
         <div className="flex-1 relative bg-black flex flex-col lg:flex-row overflow-hidden">
@@ -929,6 +1239,17 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
               )}
               {/* No language choice: the tutor follows whichever language the
                   student speaks. The click also lets the browser play sound. */}
+              {/* liveTimeUsed: no calls left today: the button says so instead of a failed start. */}
+              {noCallsLeft(startUsage) ? (
+                <button
+                  type="button"
+                  disabled
+                  data-testid="live-start-no-calls"
+                  className="px-8 py-3 bg-slate-700 text-slate-200 text-base font-bold rounded-xl cursor-not-allowed"
+                >
+                  {NO_CALLS_LEFT.en} · <span lang="ar" dir="rtl">{NO_CALLS_LEFT.ar}</span>
+                </button>
+              ) : (
               <button
                 onClick={() => {
                   unlockAudio();
@@ -939,6 +1260,8 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
               >
                 Start call
               </button>
+              )}
+              <LiveUsageLine usage={startUsage} className="text-slate-300 text-center max-w-md px-4" />
               <p className="text-sm text-slate-400 m-0">
                 Speak English or Arabic. <span dir="rtl">تكلم عربي أو إنجليزي</span>
               </p>
@@ -986,6 +1309,8 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
           )}
 
           <div
+            ref={videoFrameRef}
+            data-testid="live-avatar-frame"
             className={`relative transition-all duration-500 shrink-0 ${
               artifactHtml ? 'h-[38%] lg:h-full w-full lg:w-[34%]' : 'h-full w-full'
             }`}
@@ -1015,6 +1340,39 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
               />
             )}
 
+
+            {/* liveCaptions: the last few lines, inside the tutor's pane (never over the visual aid), in the call's language. */}
+            {features.captions && captionsOn && (provider === 'anam' || provider === 'voice') && (() => {
+              const lead = [...captions].reverse().find((l) => l.who === 'tutor') ?? captions[captions.length - 1];
+              const arabic = !!lead && languageOfText(lead.text) === 'arabic';
+              return (
+                <div
+                  data-testid="live-captions"
+                  role="log"
+                  aria-live="polite"
+                  aria-label={arabic ? 'التسميات التوضيحية' : 'Captions'}
+                  dir={arabic ? 'rtl' : 'ltr'}
+                  lang={arabic ? 'ar' : 'en'}
+                  className="absolute inset-x-2 bottom-2 sm:inset-x-6 sm:bottom-4 z-10 max-h-[60%] overflow-hidden flex flex-col justify-end gap-1 rounded-xl bg-black/75 px-3 py-2 text-white text-sm sm:text-base leading-snug pointer-events-none"
+                >
+                  {captions.length === 0 ? (
+                    <p className="m-0 text-xs text-slate-300">Captions will appear here · <span lang="ar" dir="rtl">ستظهر التسميات التوضيحية هنا</span></p>
+                  ) : (
+                    captions.map((line) => (
+                      <p key={line.id} data-testid="live-caption-line" data-who={line.who} className="m-0">
+                        <span className={`font-bold ${line.who === 'tutor' ? 'text-teal-300' : 'text-amber-200'}`}>
+                          {line.who === 'tutor' ? (arabic ? 'المعلّم' : 'Tutor') : arabic ? 'أنت' : 'You'}
+                          {': '}
+                        </span>
+                        <span dir="auto" data-testid="live-caption-text">
+                          {line.text.length > CAPTION_CHARS ? `…${line.text.slice(-CAPTION_CHARS).replace(/^\S*\s/, '')}` : line.text}
+                        </span>
+                      </p>
+                    ))
+                  )}
+                </div>
+              );
+            })()}
 
             {provider === 'tavus' && tavusUrl && (
               <iframe

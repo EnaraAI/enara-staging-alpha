@@ -90,7 +90,7 @@ for (const p of extra) {
 
 // frontend/ against lms-test-live (skipped when the ref is not fetched, e.g. a shallow CI checkout).
 const LIVE = 'origin/lms-test-live';
-const git = (...a) => execFileSync('git', a, { cwd: SRC, stdio: ['ignore', 'pipe', 'ignore'] });
+const git = (...a) => execFileSync('git', a, { cwd: join(SRC, '..'), stdio: ['ignore', 'pipe', 'ignore'] });
 let live = 'not checked (no ' + LIVE + ')';
 try {
   git('rev-parse', '--verify', '-q', LIVE);
