@@ -176,7 +176,8 @@ async function openCallScreen(page, who, app) {
     // Courses and lessons can take a while to load on lms-test.
     await clickOne(page, 'English course', [page.getByRole('button', { name: /English/ }).filter({ hasNotText: /^EN/ }), page.getByText(/^English$/)], 90_000);
     await snap(page, `${who}-3-course`);
-    if (!(await clickOne(page, 'lesson', LESSON_PREF.map((re) => page.getByRole('button', { name: re })), 90_000))) await clickOne(page, 'first lesson', [page.locator('.ek-lessonmap button, [class*=lesson] button')]);
+    // The lesson map's lessons are not buttons: click the lesson's title (else "Continue: <next lesson>").
+    if (!(await clickOne(page, 'lesson', [...LESSON_PREF.map((re) => page.getByText(re)), page.getByRole('button', { name: /^Continue/ })], 90_000))) await clickOne(page, 'first lesson', [page.locator('.ek-lessonmap button, [class*=lesson] button')]);
     await snap(page, `${who}-4-lesson`);
     if (!(await clickOne(page, 'Ask Enara about this lesson', [page.getByRole('button', { name: /Ask Enara about this (lesson|video)/ })], 60_000))) await clickOne(page, 'Ask Enara', [page.getByRole('button', { name: /Ask Enara/ })]);
     await snap(page, `${who}-5-drawer`);
