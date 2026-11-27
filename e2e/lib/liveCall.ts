@@ -1,5 +1,5 @@
 import { expect, type Browser, type BrowserContext, type Page, type Route, type WebSocketRoute } from '@playwright/test';
-import { seedEmail } from './enara';
+import { enaraApi, login, seedEmail } from './enara';
 import { ENARA, secrets } from './env';
 
 // A live tutor call in the browser with no video or speech provider (this stack has none, and nothing here may cost
@@ -9,7 +9,8 @@ import { ENARA, secrets } from './env';
 // the "learner" said). The fake session token makes the video tutor refuse, so the call carries on voice-only, the
 // mode where ENARA listens and speaks itself. Nothing leaves the stack.
 
-export const LIVE_STUDENT = 'lt-s-a03'; // 14 years old, English 7A (School A)
+export const LIVE_STUDENT = 'lt-s-a03'; // 14 years old, group 7A (School A)
+const LIVE_CLASS = 'LT-C-ENG-7A';
 export const SESSION_ID = 'av-e2e-live';
 const json = (route: Route, body: unknown, status = 200) => route.fulfill({ status, contentType: 'application/json', body: JSON.stringify(body) });
 
@@ -83,6 +84,10 @@ export async function liveCallSession(browser: Browser, opts: { features?: Recor
     ws.onClose(() => { entry.closed = true; });
     ws.send(JSON.stringify({ message_type: 'session_started', session_id: `e2e-${call.stt.length}`, config: {} }));
   });
+
+  // The E2E stack reads a student's classes from class enrolments (multi-class on); the seed links students only
+  // through their group, so the learner is enrolled in English 7A here (as scenarios 5 and 15 do).
+  await enaraApi.post(`/api/multi-class/students/${LIVE_STUDENT.toUpperCase()}/enrollments`, await login('admin.a'), { scope: 'class', targetId: LIVE_CLASS }, [200, 201, 409]);
 
   // Sign in as the student on ENARA's own site.
   await page.goto(`${ENARA}/`);
