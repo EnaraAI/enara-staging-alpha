@@ -21,6 +21,8 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
       - run: npm ci --no-audit --no-fund
+      # The copied lms-test kids app (src/lms) must match frontend/ exactly; it is type checked with lms-test's own options.
+      - run: node scripts/sync-lms-kids.mjs --check && npx tsc --noEmit -p tsconfig.lms.json
       - run: npx tsc --noEmit -p . && VITE_API_BASE=https://lms-test.enara.app npx vite build
       - run: npm i --no-save playwright@1.56.1
       - name: Checks (lms-test, seed accounts)

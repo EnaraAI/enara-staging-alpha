@@ -1,10 +1,11 @@
-// Live calls reach the video service through Enara's relay (rt.enara.app), so the browser only talks to Enara
-// addresses for signalling. If the relay doesn't answer, the call connects to the service directly.
-// Port of frontend/services/relay.ts (same health check, timeouts and overrides).
+// Live calls reach the video and speech services through Enara's relay
+// (rt.enara.app), so the browser only talks to Enara addresses. If the relay
+// doesn't answer, calls connect to the services directly, as before.
 //
-// Testing overrides: ?relay=off or ?relay=<url> on the page, or localStorage 'enara.relay' set to 'off' or a URL.
+// Testing overrides: ?relay=off or ?relay=<url> on the page, or
+// localStorage 'enara.relay' set to 'off' or a URL.
 
-const DEFAULT_RELAY = (import.meta.env.VITE_RELAY_URL as string | undefined) ?? 'https://rt.enara.app';
+const DEFAULT_RELAY = (import.meta.env?.VITE_RELAY_URL as string | undefined) ?? 'https://rt.enara.app';
 // A first connection to the relay (DNS, TLS) can take over a second.
 const CHECK_TIMEOUT_MS = 3000;
 const REMEMBER_MS = 60_000;
@@ -24,7 +25,7 @@ function configuredBase(): string | null {
   return base ? base.replace(/\/$/, '') : null;
 }
 
-/** The relay's base URL when it is reachable, else null (connect directly). */
+// The relay's base URL when it is reachable, else null (connect directly).
 export function relayBase(): Promise<string | null> {
   const base = configuredBase();
   if (!base) return Promise.resolve(null);
@@ -33,7 +34,7 @@ export function relayBase(): Promise<string | null> {
   pending = (async () => {
     let ok = false;
     try {
-      const res = await fetch(`${base}/health`, { cache: 'no-store', credentials: 'omit', signal: AbortSignal.timeout(CHECK_TIMEOUT_MS) });
+      const res = await fetch(`${base}/health`, { cache: 'no-store', signal: AbortSignal.timeout(CHECK_TIMEOUT_MS) });
       ok = res.ok;
     } catch {
       ok = false;
@@ -45,8 +46,10 @@ export function relayBase(): Promise<string | null> {
   return pending;
 }
 
-/** A connection through the relay failed: use the service directly for a while. */
+// A connection through the relay failed: use the services directly for a while.
 export function markRelayDown(): void {
   const base = configuredBase();
   if (base) last = { base, ok: false, at: Date.now() };
 }
+
+export const relayWsBase = (base: string) => base.replace(/^http/, 'ws');

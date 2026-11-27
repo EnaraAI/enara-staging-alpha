@@ -538,7 +538,8 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
     // In ElevenLabs mode the microphone goes to ElevenLabs, not to Anam.
     const client = createClient(sessionToken, {
       ...(elevenlabs ? { disableInputAudio: true } : {}),
-      ...(relay ? { apiGateway: { enabled: true, baseUrl: `${relay}/v`, wsPath: '/v/ws' } } : {}),
+      // SDK 4.29.1 reads the gateway only under `api` (a top-level apiGateway is ignored, so calls went direct).
+      ...(relay ? { api: { apiGateway: { enabled: true, baseUrl: `${relay}/v`, wsPath: '/v/ws' } } } : {}),
     });
     anamClientRef.current = client;
 
