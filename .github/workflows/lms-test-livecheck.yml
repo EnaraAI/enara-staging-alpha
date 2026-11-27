@@ -32,6 +32,11 @@ jobs:
       - name: Nothing to run?
         id: plan
         run: echo "ids=$(node -e "console.log(require('./plan.json').run.ids.join(' '))")" >> "$GITHUB_OUTPUT"
+      - name: Live usage read (no call; plan.json run.usageOnly)
+        if: steps.plan.outputs.ids == ''
+        env:
+          LMSTEST_MAINTENANCE_TOKEN: ${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}
+        run: if node -e "process.exit(require('./plan.json').run.usageOnly ? 0 : 1)"; then node run.mjs usage; else echo "nothing to run"; fi
       - uses: actions/setup-python@v5
         if: steps.plan.outputs.ids != ''
         with:

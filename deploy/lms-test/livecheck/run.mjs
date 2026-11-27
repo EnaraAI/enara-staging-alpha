@@ -147,7 +147,13 @@ async function calls(audioDir) {
 const [cmd, arg] = process.argv.slice(2);
 try {
   if (cmd === 'calls') await calls(arg);
-  else throw new Error('usage: run.mjs calls <audioDir>');
+  else if (cmd === 'usage') {
+    // No call: the learner's live usage as lms-test serves it (liveTimeUsed on: 200 with the numbers; off: 404).
+    const u = await liveUsage(asLearner(await learnerToken()));
+    summaryLine(`LIVE_USAGE ${u.status} ${JSON.stringify(u.body)}`);
+    if (u.status !== 200) process.exitCode = 1;
+  }
+  else throw new Error('usage: run.mjs calls <audioDir> | usage');
 } catch (e) {
   console.log(`FAILED: ${String(e?.message ?? e).slice(0, 300)}`);
   process.exitCode = 1;
