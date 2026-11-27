@@ -1,0 +1,46 @@
+# liveRolePlay PR 4 (live tutor item 4): the learner simulation (8 learners, 4 subjects), switch off vs on (docs/tutor/ROLEPLAY_SIM.md). SIMULATION ONLY.
+# The real text tutor runs here on a throwaway database; the only model is lms-test's tutor model (DeepSeek), reached through lms-test's
+# maintenance route /api/maintenance/llm-compare with the pipeline's own token (secret LMSTEST_MAINTENANCE_TOKEN, never printed).
+# No Anthropic key exists in this job. test.enara.app is frozen: never called. Runs on a push to its own branch only.
+# Results and the history of runs: docs/tutor/ROLEPLAY_SIM.md.
+name: lms-test role-play simulation
+on:
+  push:
+    branches: ['claude/lms-live-roleplay-sim']
+    paths: ['backend/src/scripts/rolePlaySim.ts', '.github/workflows/lms-roleplay-sim.yml']
+permissions:
+  contents: read
+concurrency:
+  group: lms-roleplay-sim
+  cancel-in-progress: false
+jobs:
+  sim:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    services:
+      mongo:
+        image: mongo:7
+        ports: ['27017:27017']
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+        working-directory: backend
+      - name: Simulation (5 learners, liveRolePlay off then on)
+        working-directory: backend
+        env:
+          LMSTEST_MAINTENANCE_TOKEN: ${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}
+          MONGODB_URI: mongodb://localhost:27017/enara_roleplay_sim
+          ROLEPLAY_SIM_OUT: ${{ github.workspace }}/roleplay-sim
+        run: npx tsx src/scripts/rolePlaySim.ts --turns 14
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: roleplay-sim-${{ github.run_id }}
+          path: ${{ github.workspace }}/roleplay-sim
+          retention-days: 14

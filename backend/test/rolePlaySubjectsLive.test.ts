@@ -68,15 +68,21 @@ describe('role-play in other subjects (switch liveRolePlay on)', () => {
     // beat 2 expects 36: the learner says 30
     answer('دعني أحسب: ثلاثة في اثني عشر... ستة وثلاثون جنيهًا. هل تريد شيئًا آخر؟ البرتقال بعشرة جنيهات للكيلو.');
     r = await chat(sid, 'المبلغ 30 جنيهًا');
-    expect(ped(2)).toMatch(/they said 30, the right answer is 36/);
+    // first wrong try: the learner tries again first (one nudge, no answer)
+    expect(ped(2)).toMatch(/they said 30\. Let them try again first: do NOT give the right answer/);
     const ewo = await mongoose.connection.collection('errors_to_work_on').find({ studentId: 'rs-stu' }).toArray();
     expect(ewo).toHaveLength(1);
     expect(ewo[0]).toMatchObject({ errorCode: 'wrong_number', objectiveId: 'MA-total-price' });
-    expect(r.assistantMessage.meta.rolePlay).toMatchObject({ phase: 'beat', beat: 3, err: 'wrong_number', errs: ['MA-total-price'] });
+    expect(r.assistantMessage.meta.rolePlay).toMatchObject({ phase: 'beat', beat: 2, tries: 1, help: 'retry', err: 'wrong_number', errs: ['MA-total-price'] });
+    // second wrong try: corrected in character, and the scene goes on
+    answer('دعني أحسب معك: ثلاثة في اثني عشر يساوي ستة وثلاثين جنيهًا. هل تريد شيئًا آخر؟ البرتقال بعشرة جنيهات للكيلو.');
+    r = await chat(sid, 'ربما 24؟');
+    expect(String(mocks.params[3].pedagogy)).toMatch(/they said 24, the right answer is 36\. Now correct it/);
+    expect(r.assistantMessage.meta.rolePlay).toMatchObject({ phase: 'beat', beat: 3, tries: 0 });
     // the learner says goodbye: the debrief gives the maths method in Arabic (guaranteed by code)
     answer('أحسنت في المشهد! والآن سؤال جديد: اشتريت كيلوجرامين من الموز بسعر خمسة عشر جنيهًا للكيلو. كم المجموع؟');
     r = await chat(sid, 'شكرًا، مع السلامة');
-    expect(ped(3)).toMatch(/ROLE-PLAY DEBRIEF/);
+    expect(ped(4)).toMatch(/ROLE-PLAY DEBRIEF/);
     expect(r.assistantMessage.text).toContain('القاعدة: لحساب المجموع نضرب ثمن الواحد في عدد ما نشتريه.');
     expect(r.assistantMessage.text).toContain('صواب: ثلاثة كيلوجرامات');
     expect(r.assistantMessage.meta.rolePlay).toMatchObject({ phase: 'debrief' });

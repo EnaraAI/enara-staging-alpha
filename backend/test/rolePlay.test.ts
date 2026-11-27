@@ -267,3 +267,47 @@ describe('every subject (owner correction 27 Nov 2026)', () => {
     expect(d.text).toContain('خطأ: أدفع خمسين جنيهًا');
   });
 });
+
+describe('a wrong sum is never called right', () => {
+  it('Egyptian colloquial numbers are read; praise before a code-certain wrong number is removed', async () => {
+    const { numbersIn, guardSceneReply } = await import('../src/services/rolePlay');
+    expect(numbersIn('أربعتاشر جنيه')).toContain(14);
+    expect(numbersIn('تلاتين')).toContain(30);
+    expect(numbersIn('خمسة عشر جنيه')).toContain(15);
+    const t: RolePlayTurn = { scene: 'maths-market', phase: 'beat', beat: 3, tries: 0, subject: 'maths', lang: 'ar', error: { code: 'wrong_number', evidence: '15', expected: '36', certain: true } };
+    const g = guardSceneReply(t, 'صحيح، ستة وثلاثون جنيهًا. هل تريد شيئًا آخر؟ البرتقال بعشرة جنيهات للكيلو.');
+    expect(g.text).toBe('ستة وثلاثون جنيهًا. هل تريد شيئًا آخر؟ البرتقال بعشرة جنيهات للكيلو.');
+    expect(g.postCheck).toContain('roleplay_praise_on_wrong_removed');
+    // no wrong number: praise stays
+    expect(guardSceneReply({ ...t, error: undefined }, 'صحيح، ستة وثلاثون جنيهًا. هل تريد شيئًا آخر؟').fixed).toBe(false);
+  });
+});
+
+describe('a wrong computed answer: the learner tries again first (owner decision 27 Nov 2026)', () => {
+  const at = (beat: number, tries = 0) => [u(), a({ scene: 'maths-market', phase: 'beat', beat, tries, errs: [] })];
+  it('first wrong: same beat, one nudge, no answer; second wrong: corrected in character and the scene goes on; a right retry goes on', async () => {
+    on();
+    const t1 = await rolePlayStep({ history: at(2), message: 'It is 15 pounds', signals: none, blocked: false, lang: 'en', pick: () => undefined }) as RolePlayTurn;
+    expect(t1).toMatchObject({ phase: 'beat', beat: 2, tries: 1, help: 'retry', error: { code: 'wrong_number', evidence: '15', expected: '36' } });
+    const line = rolePlayLine({ ...t1, subject: 'maths', lang: 'en' });
+    expect(line).toMatch(/Let them try again first: do NOT give the right answer/);
+    expect(line).not.toMatch(/the right answer is 36/);
+    const t2 = await rolePlayStep({ history: at(2, 1), message: 'Maybe 30?', signals: none, blocked: false, lang: 'en', pick: () => undefined }) as RolePlayTurn;
+    expect(t2).toMatchObject({ phase: 'beat', beat: 3, tries: 0, error: { code: 'wrong_number', evidence: '30', expected: '36' } });
+    expect(t2.help).toBeUndefined();
+    expect(rolePlayLine({ ...t2, subject: 'maths', lang: 'en' })).toMatch(/the right answer is 36\. Now correct it/);
+    expect(await rolePlayStep({ history: at(2, 1), message: '36 pounds', signals: none, blocked: false, lang: 'en', pick: () => undefined })).toMatchObject({ phase: 'beat', beat: 3, tries: 0 });
+  });
+  it('a retry reply that states the answer is not used; children and Arabic lessons alike', async () => {
+    const { guardSceneReply } = await import('../src/services/rolePlay');
+    const t: RolePlayTurn = { scene: 'maths-market', phase: 'beat', beat: 2, tries: 1, help: 'retry', subject: 'maths', lang: 'en', error: { code: 'wrong_number', evidence: '15', expected: '36', certain: true } };
+    expect(hardSceneProblems(t, 'Hmm, 3 times 12 is 36. How much is that altogether?')).toContain('gives away the answer before their second try');
+    expect(guardSceneReply(t, 'Hmm, 3 times 12 is 36. How much is that altogether?').text).not.toMatch(/36/);
+    expect(hardSceneProblems(t, 'Three bags, 12 pounds each... How much is that altogether?')).toEqual([]);
+    on();
+    const kid = await rolePlayStep({ history: [u(), a({ scene: 'kids-maths-picnic', phase: 'beat', beat: 2, tries: 0, errs: [] })], message: 'six apples', signals: none, blocked: false, lang: 'en', pick: () => undefined });
+    expect(kid).toMatchObject({ beat: 2, help: 'retry' });
+    const ar = await rolePlayStep({ history: at(2), message: 'خمسة عشر جنيه', signals: none, blocked: false, lang: 'ar', pick: () => undefined });
+    expect(ar).toMatchObject({ beat: 2, help: 'retry' });
+  });
+});

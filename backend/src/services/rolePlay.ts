@@ -40,7 +40,8 @@ export interface RolePlayTag {
   err?: string;
   /** How the learner got in: asked, or accepted an offer. */
   via?: 'ask' | 'offer';
-  help?: 'hint' | 'model';
+  /** hint / model: help after a failed try; retry: a wrong computed answer, the learner tries again first (owner decision 27 Nov 2026). */
+  help?: 'hint' | 'model' | 'retry';
   /** debrief: the scene's last line, said in character first (the last beat flows into the debrief instead of a bare "goodbye"). */
   closing?: boolean;
 }
@@ -269,7 +270,9 @@ export function detectSceneError(text: string): { code: string; evidence: string
 
 // Numbers in the learner's answer: digits (Western and Arabic-Indic) and number words up to the thousands (English and Arabic).
 const EN_NUM: Record<string, number> = { zero: 0, one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12, thirteen: 13, fourteen: 14, fifteen: 15, sixteen: 16, seventeen: 17, eighteen: 18, nineteen: 19, twenty: 20, thirty: 30, forty: 40, fifty: 50, sixty: 60, seventy: 70, eighty: 80, ninety: 90 };
-const AR_NUM: [RegExp, number][] = [[/^(?:صفر)$/, 0], [/^(?:واحد|واحدة)$/, 1], [/^(?:اثنان|اثنين|اثنتان|اثنتين)$/, 2], [/^(?:ثلاث|ثلاثة)$/, 3], [/^(?:أربع|أربعة|اربع|اربعة)$/, 4], [/^(?:خمس|خمسة)$/, 5], [/^(?:ست|ستة)$/, 6], [/^(?:سبع|سبعة)$/, 7], [/^(?:ثماني|ثمانية|ثمان)$/, 8], [/^(?:تسع|تسعة)$/, 9], [/^(?:عشر|عشرة)$/, 10], [/^(?:عشرون|عشرين)$/, 20], [/^(?:ثلاثون|ثلاثين)$/, 30], [/^(?:أربعون|أربعين|اربعين)$/, 40], [/^(?:خمسون|خمسين)$/, 50], [/^(?:ستون|ستين)$/, 60], [/^(?:سبعون|سبعين)$/, 70], [/^(?:ثمانون|ثمانين)$/, 80], [/^(?:تسعون|تسعين)$/, 90], [/^(?:مئة|مائة)$/, 100], [/^(?:مئتان|مئتين|مائتان|مائتين)$/, 200]];
+// Egyptian colloquial forms learners say (and speech-to-text writes): اتناشر، تلاتين، أربعتاشر ...
+const AR_COLLOQUIAL: [RegExp, number][] = [[/^(?:حداشر|احداشر|إحداشر)$/, 11], [/^(?:اتناشر|إتناشر|اطناشر)$/, 12], [/^(?:تلتاشر|تلطاشر)$/, 13], [/^(?:اربعتاشر|أربعتاشر|اربعطاشر)$/, 14], [/^(?:خمستاشر|خمسطاشر)$/, 15], [/^(?:ستاشر|سطاشر)$/, 16], [/^(?:سبعتاشر|سبعطاشر)$/, 17], [/^(?:تمنتاشر|تمنطاشر)$/, 18], [/^(?:تسعتاشر|تسعطاشر)$/, 19], [/^(?:اتنين|إتنين)$/, 2], [/^(?:تلاتة|تلات|تلاته)$/, 3], [/^(?:تمانية|تمنية|تمن|تماني)$/, 8], [/^(?:تلاتين)$/, 30], [/^(?:تمانين)$/, 80], [/^(?:ميت|مية|ميه)$/, 100], [/^(?:ميتين)$/, 200]];
+const AR_NUM: [RegExp, number][] = [...AR_COLLOQUIAL,[/^(?:صفر)$/, 0], [/^(?:واحد|واحدة)$/, 1], [/^(?:اثنان|اثنين|اثنتان|اثنتين)$/, 2], [/^(?:ثلاث|ثلاثة)$/, 3], [/^(?:أربع|أربعة|اربع|اربعة)$/, 4], [/^(?:خمس|خمسة)$/, 5], [/^(?:ست|ستة)$/, 6], [/^(?:سبع|سبعة)$/, 7], [/^(?:ثماني|ثمانية|ثمان)$/, 8], [/^(?:تسع|تسعة)$/, 9], [/^(?:عشر|عشرة)$/, 10], [/^(?:أحد عشر|احد عشر)$/, 11], [/^(?:عشرون|عشرين)$/, 20], [/^(?:ثلاثون|ثلاثين)$/, 30], [/^(?:أربعون|أربعين|اربعين)$/, 40], [/^(?:خمسون|خمسين)$/, 50], [/^(?:ستون|ستين)$/, 60], [/^(?:سبعون|سبعين)$/, 70], [/^(?:ثمانون|ثمانين)$/, 80], [/^(?:تسعون|تسعين)$/, 90], [/^(?:مئة|مائة)$/, 100], [/^(?:مئتان|مئتين|مائتان|مائتين)$/, 200]];
 export function numbersIn(text: string): number[] {
   const t = text.replace(/[٠-٩]/g, (d) => String('٠١٢٣٤٥٦٧٨٩'.indexOf(d))).replace(/(\d),(\d{3})/g, '$1$2');
   const out = [...t.matchAll(/\d+(?:\.\d+)?/g)].map((m) => Number(m[0]));
@@ -365,6 +368,9 @@ export async function rolePlayStep(i: StepInput): Promise<RolePlayTurn | undefin
       // second failed try on this beat: the line is said for them and the scene moves on (a change of method, never a third same try)
       return n + 1 >= scene.beats.length ? { ...base, phase: 'debrief', help: 'model', beat: n, closing: true } : { ...base, phase: 'beat', beat: n + 1, tries: 0, help: 'model' };
     }
+    // A wrong computed answer (owner decision 27 Nov 2026): the learner tries again first. The character gives one in-scene nudge and asks
+    // again, without the answer; only after a second genuine wrong try does the character correct it, in character, and the scene goes on.
+    if (error?.code === 'wrong_number' && !(last.tries ?? 0)) return { ...base, phase: 'beat', beat: n, tries: 1, help: 'retry' };
     // The last beat (the character's goodbye) is said at the start of the debrief reply.
     return n + 1 >= scene.beats.length ? { ...base, phase: 'debrief', closing: true } : { ...base, phase: 'beat', beat: n + 1, tries: 0 };
   }
@@ -411,7 +417,8 @@ const labels = (lang: LessonLang) => (lang === 'ar' ? { rule: 'القاعدة', 
 function recastLine(t: RolePlayTurn, s: RolePlayScene): string {
   const who = tx(s.character, t.lang ?? 'en');
   const e = t.error;
-  if (e?.code === 'wrong_number') return `Their answer has a wrong number: they said ${q(e.evidence)}, the right answer is ${q(e.expected ?? '')}. In character, say the right amount naturally with the short working (a recast, for example "Let me check: 100 minus 56... that is 44 pounds."). Never say "wrong" or "mistake", and do not ask them to calculate it again.`;
+  if (e?.code === 'wrong_number' && t.help === 'retry') return `Their answer has a wrong number: they said ${q(e.evidence)}. Let them try again first: do NOT give the right answer or any number that is the answer. In character, give ONE short nudge or hint (remind them of the numbers or the step, for example "Three bags at 12 pounds each... how much is that?") and ask your question again. Do not call their answer right, correct or good, and never say "wrong" or "mistake".`;
+  if (e?.code === 'wrong_number') return `Their answer is wrong again: they said ${q(e.evidence)}, the right answer is ${q(e.expected ?? '')}. Now correct it. In character, say the right amount naturally with the short working (a recast, for example "Let me check: 100 minus 56... that is 44 pounds."). Do not call their answer right, correct or good (no "yes", "right", "صحيح", "أحسنت" before it), never say "wrong" or "mistake", and do not ask them to calculate it again.`;
   if (e?.code === 'idea_missing') return `Their answer may miss the key idea (a right answer mentions something like: ${q(e.expected ?? '')}). If what they said is wrong, say the right idea in character in a few words, kindly; if it is right in other words, accept it and go on. Never say "wrong".`;
   if (e) return `Their last message has a small error (${ERROR_LABEL[e.code] ?? e.code.replace(/_/g, ' ')}: "${q(e.evidence)}"). Before your line, say that part back correctly once, the way ${who} naturally would in the conversation (a recast: echo their words in the right form). No grammar explanation, never say "wrong" or "mistake", at most one correction.`;
   if (s.subject === 'english') return 'If their last message has an error in grammar, a word form or a missing small word (for example "I goed", "He go", "I have banana"), say that part back correctly once inside your line, the way the character naturally would (a recast: "Oh, you went to the beach!"). Never repeat a wrong form as if it were right, never call it right, and never explain it.';
@@ -437,7 +444,7 @@ export function rolePlayLine(t: RolePlayTurn): string {
     const recast = t.error?.code === 'wrong_number' ? ` Their last answer had a wrong number (${q(t.error.evidence)}; right: ${q(t.error.expected ?? '')}): say the right one in passing.` : t.error ? ` If their last message has the error "${q(t.error.evidence)}", say that part correctly once, in passing.` : '';
     const closing = t.closing ? ` First, still in character, react in a few words to what they said and close the scene with its last line: "${q(tx(s.beats[s.beats.length - 1].say, lang))}".` : '';
     const kind = s.subject === 'english' || s.subject === 'arabic' ? 'rule' : 'rule or method';
-    return `ROLE-PLAY DEBRIEF (set by the system): the scene "${tx(s.title, lang)}" is over.${closing} Then step out of the role and speak as the tutor again.${recast} If their last message asks you something, answer it in one short sentence first; if it has an error, say that part correctly in passing. (1) One short sentence that says the role-play is finished and praises their effort, naming ONE thing they did in the scene (if you quote them, copy their exact words from the conversation above; never "you are clever"). ${e ? `(2) Then say you will look at one point from it, and give exactly these lines: "${L.rule}: ${q(e.rule)}" and ${pair}. (3) Then ONE new practice item on this ${kind}, as a clear question or a one-sentence task set in the same place as the scene (a new one, not one from the scene), and stop.` : '(2) Then ONE new practice item on today\'s lesson point, and stop.'} No other rule, no recap ask, no second task. ${only} ${over}`;
+    return `ROLE-PLAY DEBRIEF (set by the system): the scene "${tx(s.title, lang)}" is over.${closing} Then step out of the role and speak as the tutor again.${recast} If their last message asks you something, answer it in one short sentence first; if it has an error, say that part correctly in passing. (1) One short sentence that says the role-play is finished and praises their effort, naming ONE thing they did in the scene (if you quote them, copy their exact words from the conversation above; never "you are clever"). ${e ? `(2) Then say you will look at one point from it (do not say they made a mistake on it unless that mistake is in the conversation above), and give exactly these lines: "${L.rule}: ${q(e.rule)}" and ${pair}. (3) Then ONE new practice item on this ${kind}, as a clear question or a one-sentence task set in the same place as the scene (a new one, not one from the scene), and stop.` : '(2) Then ONE new practice item on today\'s lesson point, and stop.'} No other rule, no recap ask, no second task. ${only} ${over}`;
   }
   if (t.phase === 'after') return `ROLE-PLAY OVER (set by the system): the role-play scene "${tx(s.title, lang)}" is finished. Speak as yourself, the tutor, not as ${tx(s.character, lang)}.`;
   if (t.phase !== 'beat' || !t.beat) return '';
@@ -453,7 +460,7 @@ export function rolePlayLine(t: RolePlayTurn): string {
   const len = child ? (lang === 'en' ? 'At most 3 very short sentences, with simple Starters words only.' : 'At most 3 very short, simple sentences.') : 'At most 2 short sentences (one more if you start the scene or help them).';
   const last = t.beat === s.beats.length ? ' This is the last line of the scene.' : '';
   const point = t.lessonPoint ? `Today's lesson point is ${q(t.lessonPoint)}: when their message has an error on it, always recast it.` : '';
-  const react = t.beat === 1 ? '' : 'First react in a few words, in character, to what they actually said. If they asked you something, answer it briefly in character; if they already answered part of your line\'s question, do not ask that part again.';
+  const react = t.beat === 1 ? '' : 'First react in a few words, in character, to what they actually said. If they asked you something, answer it briefly in character; if they already answered part of your line\'s question, or chose something else, do not ask that part again: say the line so that it follows from what they chose, and keep the scene moving towards the goal.';
   return `ROLE-PLAY (set by the system), beat ${t.beat} of ${s.beats.length}: ${who} Stay in character. ${start} ${react} ${recastLine(t, s)} ${point} ${help} Your line now (say it in character; you may fit it to what they said, but keep its meaning and add nothing new; if it answers a question they did not ask, say it as new information instead): "${q(tx(beat.say, lang))}"${last} ${len} The numbers in your line are fixed by the scene: keep them exactly, even if the learner said other amounts. Do not add new events, places, people or topics. Do not explain grammar or a method, do not give an exercise, a rule, a score or a recap, do not ask them to say or write anything again (the lesson comes back by itself after the scene), never claim they said something they did not say, and do not ask for personal details. Then stop and wait for their answer. ${only} ${over}`.replace(/\s{2,}/g, ' ');
 }
 
@@ -497,7 +504,8 @@ export function sceneReplyProblems(t: RolePlayTurn, reply: string): string[] {
   if (words.length > maxWords) out.push(`too long (${words.length} words, at most ${maxWords})`);
   if (t.child && sentencesOf(reply).length > 4) out.push('more than 3 short sentences for a child');
   const content = wordsOf(tx(beat.say, lang), lang).filter((w) => w.length >= 4 && !STOP_WORDS.has(w));
-  if (content.length && !content.some((w) => words.includes(w) || words.some((x) => x.startsWith(w.slice(0, 5)))) && !(t.help === 'hint')) out.push('does not voice the scene line');
+  if (content.length && !content.some((w) => words.includes(w) || words.some((x) => x.startsWith(w.slice(0, 5)))) && !(t.help === 'hint' || t.help === 'retry')) out.push('does not voice the scene line');
+  if (t.help === 'retry' && t.error?.expected && numbersIn(reply).includes(Number(t.error.expected))) out.push('gives away the answer before their second try');
   if (t.child && lang === 'en') {
     const list = childWords();
     const off = [...new Set(words.filter((w) => !/^\d+$/.test(w) && !inList(w, list) && !own.has(w)))];
@@ -506,7 +514,7 @@ export function sceneReplyProblems(t: RolePlayTurn, reply: string): string[] {
   return out;
 }
 /** Problems that make a reply unusable (the beat's fixed line is used if the regeneration still has one); the others only ask for the regeneration. */
-const HARD = /^(asks for personal details|Arabic in an English scene|English in an Arabic scene|a lesson task inside the scene|words a young learner may not know)/;
+const HARD = /^(gives away the answer before their second try|asks for personal details|Arabic in an English scene|English in an Arabic scene|a lesson task inside the scene|words a young learner may not know)/;
 export const hardSceneProblems = (t: RolePlayTurn, reply: string): string[] => sceneReplyProblems(t, reply).filter((p) => HARD.test(p));
 /** The note added to the one regeneration. */
 export const SCENE_REGEN_NOTE = (problems: string[]) => `Your last draft left the role-play scene (${problems.join('; ')}). Write the reply again: only the scene line in character, as the role-play instruction says.`;
@@ -569,9 +577,23 @@ export function ensureOffer(t: RolePlayTurn, reply: string): { text: string; add
 
 /** One place for the scene guards (language and other subjects alike): an unusable beat reply is trimmed or replaced by the fixed line; the
  *  debrief's rule and pair and the offer question are guaranteed. Returns the text, whether it changed, and post-check tags. */
-export function guardSceneReply(rp: RolePlayTurn | undefined, text: string): { text: string; fixed: boolean; postCheck: string[] } {
+const PRAISE_START = /(^|[.!?؟\n]\s*)(?:yes|right|correct|exactly|well done|good job|great|perfect|نعم|صحيح|صح|أحسنت|احسنت|ممتاز|برافو|تمام|بالضبط)[\s,،!.]*(?=\S)/gi;
+/** After a code-certain wrong number, praise at the start of a sentence is removed: a wrong sum is never called right. */
+export function dropPraiseOnWrong(rp: RolePlayTurn | undefined, text: string): { text: string; removed: boolean } {
+  if (rp?.error?.code !== 'wrong_number') return { text, removed: false };
+  const out = text.replace(PRAISE_START, (_m, lead: string) => lead);
+  return { text: out, removed: out !== text };
+}
+export function guardSceneReply(rp: RolePlayTurn | undefined, text0: string): { text: string; fixed: boolean; postCheck: string[] } {
   const postCheck: string[] = [];
-  if (!rp) return { text, fixed: false, postCheck };
+  if (!rp) return { text: text0, fixed: false, postCheck };
+  const dp = dropPraiseOnWrong(rp, text0);
+  if (dp.removed) postCheck.push('roleplay_praise_on_wrong_removed');
+  const text = dp.text;
+  if (dp.removed && (rp.phase !== 'beat' || !hardSceneProblems(rp, text).length)) {
+    const rest = rp.phase === 'debrief' ? ensureDebrief(rp, text) : { text, added: false };
+    return { text: rest.text, fixed: true, postCheck: rest.added ? [...postCheck, 'roleplay_debrief_added'] : postCheck };
+  }
   if (rp.phase === 'beat') {
     const hard = hardSceneProblems(rp, text);
     const soft = sceneReplyProblems(rp, text).filter((x) => !hard.includes(x));
