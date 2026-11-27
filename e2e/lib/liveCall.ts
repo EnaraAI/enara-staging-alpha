@@ -37,7 +37,9 @@ export async function liveCallSession(browser: Browser, opts: { features?: Recor
   const context = await browser.newContext({ ignoreHTTPSErrors: true, viewport: { width: 1366, height: 900 }, deviceScaleFactor: 1, permissions: ['microphone'] });
   const page = await context.newPage();
   page.on('pageerror', (e) => console.log('[pageerror live call]', String(e).slice(0, 500)));
-  await page.addLocatorHandler(page.getByRole('button', { name: 'Skip tour' }), async (b) => { await b.click(); });
+  // ENARA's first-visit product tour is not under test. It can open under the call's modal (where a click can't reach
+  // it), so it is skipped with a click event sent straight to its button.
+  await page.addLocatorHandler(page.getByRole('button', { name: 'Skip tour' }), async (b) => { await b.dispatchEvent('click'); });
   // Straight to the services (no relay), which are all faked below.
   await context.addInitScript(() => { try { localStorage.setItem('enara.relay', 'off'); } catch { /* storage blocked */ } });
 
@@ -106,6 +108,9 @@ export async function liveCallSession(browser: Browser, opts: { features?: Recor
     }
   });
   await page.reload();
+  // If the tour still starts (it opens 1.2 s after the page), skip it now, before anything else opens.
+  const tour = page.getByRole('button', { name: 'Skip tour' });
+  if (await tour.waitFor({ state: 'visible', timeout: 4000 }).then(() => true, () => false)) await tour.dispatchEvent('click');
   return call;
 }
 
