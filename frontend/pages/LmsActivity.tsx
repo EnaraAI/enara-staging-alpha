@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Bot, ClipboardCheck, Loader2, Mic, Video } from 'lucide-react';
 import { fetchLmsActivity, isLmsPreview, lmsNewTabTarget, type LmsActivityKind, type LmsActivityStatus } from '../services/apiService';
 import { MicProblemNotice, SafariFrameHint, useMicGate } from '../components/MicCheck';
-import { LiveAvatarModal } from '../components/enara/LiveAvatarModal';
+import { LiveAvatarModal } from '../components/enara/LiveAvatarModalLazy';
 import type { MicFeature } from '../services/micCheck';
 import { Diagnostic } from './Diagnostic';
 

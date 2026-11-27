@@ -46,7 +46,7 @@ import {
 } from 'lucide-react';
 import { Course, Lesson, Module, ChatMessage } from '../types';
 import { generateSpeech } from '../services/geminiService';
-import { LiveAvatarModal } from '../components/enara/LiveAvatarModal';
+import { LiveAvatarModal } from '../components/enara/LiveAvatarModalLazy';
 import { LiveUsageLine, NO_CALLS_LEFT, noCallsLeft, useLiveUsage } from '../components/enara/LiveUsage';
 import { UsageChip } from '../components/UsageChip';
 
