@@ -204,7 +204,7 @@ export function secondSentenceAt(text: string): number {
 export function planTurnCues(p: {
   call: ExpressiveCall | undefined; kind: TurnFacts['kind']; language?: LanguageTeachingContext; marker?: StrippedReply;
   reply: string; learnerText: string; drawing: boolean;
-}): CuePlan | null {
+}): (CuePlan & { verdict?: string; stuck?: boolean }) | null {
   if (!p.call?.on || !p.call.cara4) return null;
   let verdict: string | undefined;
   let next: string | undefined;
@@ -224,5 +224,6 @@ export function planTurnCues(p: {
   }
   const stuck = p.kind === 'turn' && (p.language ? stuckFromSignals(p.language.signals as Parameters<typeof stuckFromSignals>[0], verdict) : stuckFromWords(p.learnerText));
   const asks = /[?؟]\s*$/.test(p.reply.trim());
-  return cuesForTurn({ kind: p.kind, verdict, next, stuck, drawing: p.drawing, asks }, p.call.band ?? 'child');
+  const plan = cuesForTurn({ kind: p.kind, verdict, next, stuck, drawing: p.drawing, asks }, p.call.band ?? 'child');
+  return plan && { ...plan, ...(verdict ? { verdict } : {}), ...(stuck ? { stuck } : {}) };
 }

@@ -853,12 +853,16 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
   // cue tag the model wrote is removed from the text.
   const cueCall = session.expressive?.on && session.expressive.cara4 ? session.expressive : undefined;
   let cuePlan: CuePlan | null | undefined;
-  const writeCue = (cue: Cue) => res.write(JSON.stringify({ cue }) + '\n');
+  // Kept on the stored reply (tags only): the cues sent and the verdict they followed.
+  let cueRecord: { cues: string[]; verdict?: string; stuck?: boolean } | undefined;
+  const writeCue = (cue: Cue) => { res.write(JSON.stringify({ cue }) + '\n'); if (cueRecord) cueRecord.cues.push(cue); };
   const emit = (raw: string) => {
     let text = cueCall ? stripCueTags(raw) : raw;
     if (!text) return;
     if (cueCall && cuePlan === undefined) {
-      cuePlan = planTurnCues({ call: cueCall, kind, language: languagePrep?.context, marker: languageMarker, reply: text, learnerText: last?.content ?? '', drawing: visualStarted });
+      const planned = planTurnCues({ call: cueCall, kind, language: languagePrep?.context, marker: languageMarker, reply: text, learnerText: last?.content ?? '', drawing: visualStarted });
+      cuePlan = planned && { first: planned.first, ...(planned.then ? { then: planned.then } : {}) };
+      cueRecord = { cues: [], ...(planned?.verdict ? { verdict: planned.verdict } : {}), ...(planned?.stuck ? { stuck: true } : {}) };
       if (cuePlan) writeCue(cuePlan.first);
     }
     if (cuePlan?.then) {
@@ -974,7 +978,7 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
     const now = Date.now();
     const turn = [
       ...(last ? [{ id: generateMessageId(), role: 'user' as const, text: last.content, timestamp: new Date(now - 1) }] : []),
-      { id: aiMessageId, role: 'ai' as const, text: spoken.trim(), timestamp: new Date(now), ...(languageTurn ? { meta: { intent: 'tutor_voice', version: LANGUAGE_POLICY_VERSION, languageTurn } } : {}) },
+      { id: aiMessageId, role: 'ai' as const, text: spoken.trim(), timestamp: new Date(now), ...(languageTurn || cueRecord ? { meta: { intent: 'tutor_voice', ...(languageTurn ? { version: LANGUAGE_POLICY_VERSION, languageTurn } : {}), ...(cueRecord ? { expressive: cueRecord } : {}) } } : {}) },
     ];
     await appendTutorMessages(
       { id: session.id, studentId: session.studentId, institutionId: req.user!.institutionId, courseId: session.courseId, lessonId: session.lessonId },
