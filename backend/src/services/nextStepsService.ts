@@ -4,6 +4,7 @@ import { getConfig } from '../config/env';
 import { logger } from '../utils/logging';
 import { describeSnapshot, LearnerSnapshot } from './learnerSnapshot';
 import { llmClient, llmModel } from './llmProvider';
+import { NextStepsNote } from '../models/NextStepsNote';
 
 // "Your next steps" on the student's home page. The steps come from the
 // student's own data so every button leads somewhere real; Claude only writes
@@ -61,6 +62,13 @@ export async function nextStepsNote(s: LearnerSnapshot, steps: NextStep[]): Prom
   const cached = noteCache.get(key);
   if (cached) return cached;
   if (!config.anthropicApiKey || !steps.length) return fallbackNote(s, steps);
+  // lms-speed-5: a note another instance already wrote today (one indexed read instead of a model call).
+  const stored = await NextStepsNote.findById(key).select('note').lean().catch(() => null);
+  if (stored?.note) {
+    if (noteCache.size > 1000) noteCache.clear();
+    noteCache.set(key, stored.note);
+    return stored.note;
+  }
 
   client ??= new Anthropic({ apiKey: config.anthropicApiKey, timeout: 8_000, maxRetries: 0 });
   try {
@@ -79,6 +87,8 @@ export async function nextStepsNote(s: LearnerSnapshot, steps: NextStep[]): Prom
     const result = note && response.stop_reason !== 'refusal' ? note : fallbackNote(s, steps);
     if (noteCache.size > 1000) noteCache.clear();
     noteCache.set(key, result);
+    // Only a model-written note is shared; a fallback is tried again next time, as before.
+    if (result === note) await NextStepsNote.updateOne({ _id: key }, { $setOnInsert: { note: result, createdAt: new Date() } }, { upsert: true }).catch(() => undefined);
     return result;
   } catch (error) {
     logger.warn('next_steps_note_failed', { message: (error as Error).message });

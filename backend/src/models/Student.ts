@@ -158,5 +158,8 @@ const studentSchema = new Schema<IStudent>(
 );
 
 studentSchema.index({ institutionId: 1, email: 1 });
+// lms-speed-5: resolveUploads finds profile photos by path (sparse: most students have none).
+studentSchema.index({ photoUrl: 1 }, { sparse: true });
+studentSchema.index({ pendingPhotoUrl: 1 }, { sparse: true });
 
 export const Student = model<IStudent>('Student', studentSchema);

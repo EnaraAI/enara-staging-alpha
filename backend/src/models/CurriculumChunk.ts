@@ -133,6 +133,8 @@ const jobSchema = new Schema<ICurriculumFileJob>(
   { collection: 'curriculum_processing_jobs', versionKey: false, timestamps: true },
 );
 jobSchema.index({ curriculumId: 1, fileUrl: 1 }, { unique: true });
+// lms-speed-5: resolveUploads looks jobs up by fileUrl alone (every course, dashboard and lesson read).
+jobSchema.index({ fileUrl: 1 });
 jobSchema.index({ status: 1, updatedAt: 1 });
 jobSchema.index({ institutionId: 1, curriculumId: 1 });
 jobSchema.index({ scanStatus: 1, updatedAt: 1 });
