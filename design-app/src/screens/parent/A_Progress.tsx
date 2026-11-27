@@ -1,176 +1,236 @@
 import type { ReactNode } from 'react';
-import { Atom, BookA, Calculator, Home, Languages } from 'lucide-react';
-import { num, usePreview, useT } from '@/lib/preview';
-import { AppShell, SectionTitle } from '@/components/shell';
-import { Badge, Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
+import { Atom, BookA, BookOpen, Calculator, Home, Languages, Sparkles } from 'lucide-react';
+import { get } from '@/lib/api';
+import { num, usePreview, useT, type Lang } from '@/lib/preview';
+import { SectionTitle } from '@/components/shell';
+import { Badge, Card, CardContent, CardHeader, CardTitle, Skeleton } from '@/components/ui';
 import { cn } from '@/lib/utils';
-import { ChildSwitcher, useParentNav } from './A_shared';
-
-type Subject = {
-  id: string; name: string; level: string; tone: 'success' | 'info' | 'warning'; mastered: number; progress: number; total: number;
-  results: { what: string; when: string; score: string }[]; tip: string;
-};
+import { ChildSwitcher, ParentShell } from './A_shared';
+import { ChildGate } from './B_common';
+import {
+  bi, childName, ep, ErrorState, fmtDay, NotYet, optional, PageSkeleton, useChildren, useLoad,
+  type ActivityResp, type AssessmentItem, type LearnerChip, type ProgressResp, type SubjectCardResp, type SubjectsResp, type WeeklyStatus,
+} from './data';
 
 const T = {
   en: {
-    title: 'Progress', sub: 'Laila · Grade 6 · Term 1',
-    sum: [['Lessons this term', '48'], ['Average quiz score', '86%'], ['Learning time', '19 h']],
-    chart: 'Learning time per week', chartSub: 'Minutes on ENARA, last 8 weeks', weeks: ['6 Oct', '13 Oct', '20 Oct', '27 Oct', '3 Nov', '10 Nov', '17 Nov', '24 Nov'],
-    min: 'min', goal: 'Weekly goal: 150 min', thisWeek: 'This week', table: 'Minutes per week', week: 'Week', minutes: 'Minutes',
-    subjects: 'Subjects', mastered: 'Mastered', inProgress: 'In progress', notYet: 'Not started', outcomes: 'Learning outcomes', of: 'of',
-    recent: 'Recent results', home: 'Practise at home',
-    list: [
-      { id: 'math', name: 'Mathematics', level: 'Above expected', tone: 'success', mastered: 14, progress: 4, total: 20,
-        results: [{ what: 'Fractions quiz', when: '24 Nov', score: '18/20' }, { what: 'Ratio homework', when: '19 Nov', score: '9/10' }],
-        tip: 'Cook together and halve a recipe: it turns fractions into something she can see.' },
-      { id: 'eng', name: 'English', level: 'On track', tone: 'info', mastered: 11, progress: 5, total: 18,
-        results: [{ what: 'Reading check: “The Secret Garden”', when: '23 Nov', score: '8/10' }, { what: 'Persuasive paragraph', when: '17 Nov', score: 'B+' }],
-        tip: 'Ask her to tell you one opinion about a book and two reasons for it.' },
-      { id: 'sci', name: 'Science', level: 'On track', tone: 'info', mastered: 9, progress: 3, total: 15,
-        results: [{ what: 'Forces and motion test', when: '20 Nov', score: '41/50' }, { what: 'Lab report: friction', when: '12 Nov', score: '7/10' }],
-        tip: 'Roll a toy car down a ramp on carpet and on tiles, and talk about why it stops sooner.' },
-      { id: 'ar', name: 'Arabic', level: 'Needs practice', tone: 'warning', mastered: 8, progress: 6, total: 18,
-        results: [{ what: 'Grammar: nominal sentences', when: '25 Nov', score: '13/20' }, { what: 'Dictation', when: '18 Nov', score: '15/20' }],
-        tip: 'Read a short news item aloud together and find the subject and predicate in two sentences.' },
-    ] as Subject[],
+    title: 'Progress', sub: (n: string, s: string) => [n, s].filter(Boolean).join(' · '),
+    lessons: 'Lessons completed', avg: 'Average of recent results', time: 'Minutes this week',
+    chart: 'Learning time per day', chartSub: 'Minutes on ENARA, last 14 days', min: 'min', thisWeek: 'This week', goal: (g: string) => `Weekly goal: ${g} min`,
+    table: 'Minutes per day', day: 'Day', minutes: 'Minutes', noChart: 'No learning time recorded in the last 14 days.',
+    subjects: 'Subjects', mastered: 'Mastered', notYet: 'Not mastered yet', outcomes: 'Learning outcomes', of: 'of', lessonsOf: (a: string, b: string) => `${a} of ${b} lessons done`,
+    recent: 'Recent results', home: 'Practise at home', ai: 'Suggested by ENARA', waiting: 'Waiting for the teacher', noResults: 'No results yet.',
+    subjectsOff: 'A subject-by-subject view is not available yet.', noSubjects: 'No subject activity yet. Subjects appear here once your child starts learning on ENARA.',
   },
   ar: {
-    title: 'التقدّم', sub: 'ليلى · الصف 6 · الفصل الأول',
-    sum: [['الدروس هذا الفصل', '48'], ['متوسط الاختبارات', '86%'], ['وقت التعلّم', '19 ساعة']],
-    chart: 'وقت التعلّم أسبوعيًا', chartSub: 'الدقائق على إنارة خلال آخر 8 أسابيع', weeks: ['6 أكتوبر', '13 أكتوبر', '20 أكتوبر', '27 أكتوبر', '3 نوفمبر', '10 نوفمبر', '17 نوفمبر', '24 نوفمبر'],
-    min: 'دقيقة', goal: 'الهدف الأسبوعي: 150 دقيقة', thisWeek: 'هذا الأسبوع', table: 'الدقائق في كل أسبوع', week: 'الأسبوع', minutes: 'الدقائق',
-    subjects: 'المواد', mastered: 'أُتقنت', inProgress: 'قيد التعلّم', notYet: 'لم تبدأ بعد', outcomes: 'نواتج التعلّم', of: 'من',
-    recent: 'أحدث النتائج', home: 'تدرّبوا في البيت',
-    list: [
-      { id: 'math', name: 'الرياضيات', level: 'أعلى من المتوقّع', tone: 'success', mastered: 14, progress: 4, total: 20,
-        results: [{ what: 'اختبار الكسور', when: '24 نوفمبر', score: '18/20' }, { what: 'واجب النِّسب', when: '19 نوفمبر', score: '9/10' }],
-        tip: 'اطبخوا معها وقسّموا مقادير وصفة إلى النصف، فتصبح الكسور شيئًا تراه بعينيها.' },
-      { id: 'eng', name: 'اللغة الإنجليزية', level: 'في المسار الصحيح', tone: 'info', mastered: 11, progress: 5, total: 18,
-        results: [{ what: 'اختبار قراءة: «الحديقة السرية»', when: '23 نوفمبر', score: '8/10' }, { what: 'فقرة إقناعية', when: '17 نوفمبر', score: 'B+' }],
-        tip: 'اطلبوا منها أن تذكر رأيًا واحدًا في كتاب وسببين يدعمانه.' },
-      { id: 'sci', name: 'العلوم', level: 'في المسار الصحيح', tone: 'info', mastered: 9, progress: 3, total: 15,
-        results: [{ what: 'اختبار القوى والحركة', when: '20 نوفمبر', score: '41/50' }, { what: 'تقرير مختبر: الاحتكاك', when: '12 نوفمبر', score: '7/10' }],
-        tip: 'دحرجوا سيارة لعبة على منحدر فوق السجاد ثم فوق البلاط، وتحدّثوا عن سبب توقفها أسرع.' },
-      { id: 'ar', name: 'اللغة العربية', level: 'تحتاج إلى تدريب', tone: 'warning', mastered: 8, progress: 6, total: 18,
-        results: [{ what: 'النحو: الجملة الاسمية', when: '25 نوفمبر', score: '13/20' }, { what: 'إملاء', when: '18 نوفمبر', score: '15/20' }],
-        tip: 'اقرؤوا معًا خبرًا قصيرًا بصوت عالٍ، واستخرجوا المبتدأ والخبر من جملتين.' },
-    ] as Subject[],
+    title: 'التقدّم', sub: (n: string, s: string) => [n, s].filter(Boolean).join(' · '),
+    lessons: 'الدروس المكتملة', avg: 'متوسط النتائج الأخيرة', time: 'الدقائق هذا الأسبوع',
+    chart: 'وقت التعلّم يوميًا', chartSub: 'الدقائق على إنارة خلال آخر 14 يومًا', min: 'دقيقة', thisWeek: 'هذا الأسبوع', goal: (g: string) => `الهدف الأسبوعي: ${g} دقيقة`,
+    table: 'الدقائق في كل يوم', day: 'اليوم', minutes: 'الدقائق', noChart: 'لم يُسجَّل وقت تعلّم خلال آخر 14 يومًا.',
+    subjects: 'المواد', mastered: 'أُتقنت', notYet: 'لم تُتقن بعد', outcomes: 'نواتج التعلّم', of: 'من', lessonsOf: (a: string, b: string) => `أُنجز ${a} من ${b} درسًا`,
+    recent: 'أحدث النتائج', home: 'تدرّبوا في البيت', ai: 'اقتراح من إنارة', waiting: 'بانتظار المعلّم', noResults: 'لا توجد نتائج بعد.',
+    subjectsOff: 'عرض التقدّم لكل مادة غير متاح بعد.', noSubjects: 'لا يوجد نشاط في المواد بعد. تظهر المواد هنا عندما يبدأ ابنك أو ابنتك التعلّم على إنارة.',
   },
 };
+type TT = (typeof T)['en'];
 
-const icons: Record<string, ReactNode> = { math: <Calculator />, eng: <BookA />, sci: <Atom />, ar: <Languages /> };
-const minutes = [95, 120, 140, 110, 160, 135, 175, 145];
-const GOAL = 150, MAX = 200;
+function iconFor(s: SubjectCardResp): ReactNode {
+  const k = `${s.key} ${s.name?.en ?? ''}`.toLowerCase();
+  if (/math/.test(k)) return <Calculator />;
+  if (/arab/.test(k)) return <Languages />;
+  if (s.english || /engl/.test(k)) return <BookA />;
+  if (/scien|physic|chem|biol/.test(k)) return <Atom />;
+  return <BookOpen />;
+}
 
 export default function ParentProgress() {
   const t = useT(T);
-  const { lang } = usePreview();
-  const nav = useParentNav();
+  const kids = useChildren();
   return (
-    <AppShell nav={nav} active="progress" title={t.title} subtitle={t.sub}>
+    <ParentShell active="progress" title={t.title} subtitle={kids.child ? t.sub(childName(kids.child), kids.child.school ?? '') : undefined}>
       <div className="mx-auto flex max-w-6xl flex-col gap-6">
-        <ChildSwitcher selected="laila" />
-
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[15rem_1fr]">
-          <div className="grid grid-cols-3 gap-3 lg:grid-cols-1">
-            {t.sum.map(([l, v]) => (
-              <Card key={l} className="flex min-w-0 flex-col justify-center gap-1 p-3 md:p-4">
-                <span className="text-xs font-semibold text-muted-foreground">{l}</span>
-                <span className="text-xl font-bold tabular-nums md:text-2xl">{v}</span>
-              </Card>
-            ))}
-          </div>
-
-          {/* Weekly chart: one series, so no legend; the title names it. Bars from divs, goal line, two direct labels. */}
-          <Card>
-            <CardHeader className="flex-row flex-wrap items-start justify-between gap-x-4 gap-y-2">
-              <div><CardTitle className="text-lg">{t.chart}</CardTitle><p className="text-sm text-muted-foreground">{t.chartSub}</p></div>
-              <div className="text-end"><p className="text-xs font-semibold text-muted-foreground">{t.thisWeek}</p><p className="text-2xl font-bold tabular-nums leading-tight">{num(minutes[minutes.length - 1], lang)} <span className="text-sm font-semibold text-muted-foreground">{t.min}</span></p></div>
-            </CardHeader>
-            <CardContent>
-              <p className="mb-3 flex items-center gap-2 text-xs text-muted-foreground"><span className="w-5 border-t-2 border-dashed border-muted-foreground/60" />{t.goal}</p>
-              <div className="relative h-40" aria-hidden>
-                <div className="absolute inset-x-0 z-[1] border-t-2 border-dashed border-muted-foreground/50" style={{ bottom: `${(GOAL / MAX) * 100}%` }} />
-                <div className="absolute inset-x-0 bottom-0 border-t" />
-                <div className="relative flex h-full items-end gap-1 sm:gap-2">
-                  {minutes.map((m, i) => {
-                    const last = i === minutes.length - 1;
-                    return (
-                      <div key={i} title={`${t.weeks[i]}: ${num(m, lang)} ${t.min}`} className="group flex h-full flex-1 items-end justify-center">
-                        <div className={cn('w-full max-w-10 rounded-t-[4px] group-hover:opacity-80', last ? 'bg-primary' : 'bg-chart-1')} style={{ height: `${(m / MAX) * 100}%` }} />
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-              <div className="mt-2 flex gap-1 sm:gap-2" aria-hidden>
-                {t.weeks.map((w, i) => (
-                  <span key={w} className={cn('flex-1 truncate text-center text-[10px] text-muted-foreground sm:text-xs', i % 2 === 0 && 'max-sm:invisible', i === t.weeks.length - 1 && 'font-bold text-foreground')}>{w}</span>
-                ))}
-              </div>
-              <table className="sr-only">
-                <caption>{t.table}</caption>
-                <thead><tr><th>{t.week}</th><th>{t.minutes}</th></tr></thead>
-                <tbody>{minutes.map((m, i) => <tr key={i}><td>{t.weeks[i]}</td><td>{m}</td></tr>)}</tbody>
-              </table>
-            </CardContent>
-          </Card>
-        </div>
-
-        <section>
-          <SectionTitle>{t.subjects}</SectionTitle>
-          <div className="grid gap-4 md:grid-cols-2">
-            {t.list.map((s) => <SubjectCard key={s.id} s={s} t={t} />)}
-          </div>
-        </section>
+        <ChildGate kids={kids} skeleton={<PageSkeleton cards={2} aside={false} />}>
+          {(child) => (<><ChildSwitcher kids={kids} /><ProgressBody key={child.studentId} child={child} /></>)}
+        </ChildGate>
       </div>
-    </AppShell>
+    </ParentShell>
   );
 }
 
-function SubjectCard({ s, t }: { s: Subject; t: (typeof T)['en'] }) {
+const soft = <T,>(p: Promise<T | null>) => p.catch(() => null);
+
+function ProgressBody({ child }: { child: LearnerChip }) {
+  const t = useT(T);
   const { lang } = usePreview();
-  const notYet = s.total - s.mastered - s.progress;
-  const pct = (n: number) => `${(n / s.total) * 100}%`;
+  const id = child.studentId;
+  const q = useLoad(async (signal) => {
+    const [progress, subjects, activity, status] = await Promise.all([
+      get<ProgressResp>(ep.progress(id), signal),
+      soft(optional(get<SubjectsResp>(ep.subjects(id), signal))),
+      soft(get<ActivityResp>(ep.activity(id), signal)),
+      soft(get<{ status?: WeeklyStatus }>(ep.status(id), signal)),
+    ]);
+    return { progress, subjects, activity, status: status?.status ?? null };
+  }, [id]);
+
+  if (q.loading) return (
+    <div className="flex flex-col gap-6" aria-busy="true" data-testid="parent-loading">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[15rem_1fr]"><div className="grid grid-cols-3 gap-3 lg:grid-cols-1"><Skeleton className="h-20" /><Skeleton className="h-20" /><Skeleton className="h-20" /></div><Skeleton className="h-64 rounded-xl" /></div>
+      <div className="grid gap-4 md:grid-cols-2"><Skeleton className="h-72 rounded-xl" /><Skeleton className="h-72 rounded-xl" /></div>
+    </div>
+  );
+  if (q.error || !q.data) return <ErrorState error={q.error} onRetry={q.reload} />;
+
+  const { progress, subjects, activity, status } = q.data;
+  const results = (progress?.assessments?.items ?? []).filter((a) => a && a.id);
+  const scored = results.filter((a) => typeof a.score === 'number') as (AssessmentItem & { score: number })[];
+  const avg = scored.length ? Math.round(scored.reduce((s, a) => s + a.score, 0) / scored.length) : null;
+  const sum: [string, string][] = [
+    [t.lessons, typeof progress?.lessonsCompleted?.count === 'number' ? num(progress.lessonsCompleted.count, lang) : '—'],
+    [t.avg, avg !== null ? `${num(avg, lang)}%` : '—'],
+    [t.time, typeof status?.minutesDone === 'number' ? num(status.minutesDone, lang) : '—'],
+  ];
+  const list = subjects?.subjects ?? [];
+
+  return (
+    <>
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[15rem_1fr]">
+        <div className="grid grid-cols-3 gap-3 lg:grid-cols-1">
+          {sum.map(([l, v]) => (
+            <Card key={l} className="flex min-w-0 flex-col justify-center gap-1 p-3 md:p-4">
+              <span className="text-xs font-semibold text-muted-foreground">{l}</span>
+              <span className="text-xl font-bold tabular-nums md:text-2xl">{v}</span>
+            </Card>
+          ))}
+        </div>
+        <DailyChart activity={activity} status={status} t={t} lang={lang} />
+      </div>
+
+      <section>
+        <SectionTitle>{t.subjects}</SectionTitle>
+        {!subjects ? (
+          <div className="flex flex-col gap-4">
+            <NotYet className="text-sm">{t.subjectsOff}</NotYet>
+            <Card><CardHeader><CardTitle>{t.recent}</CardTitle></CardHeader><CardContent><Results items={results.slice(0, 6)} t={t} lang={lang} /></CardContent></Card>
+          </div>
+        ) : !list.length ? (
+          <Card className="p-5"><p className="text-sm text-muted-foreground">{t.noSubjects}</p></Card>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2">
+            {list.map((s) => <SubjectCard key={s.key} s={s} results={results.filter((a) => a.subject?.key === s.key).slice(0, 3)} t={t} lang={lang} />)}
+          </div>
+        )}
+      </section>
+    </>
+  );
+}
+
+/** One series (minutes per day), so no legend; the title names it. Bars from divs; future days are empty. */
+function DailyChart({ activity, status, t, lang }: { activity: ActivityResp | null; status: WeeklyStatus | null; t: TT; lang: Lang }) {
+  const days = (activity?.calendar?.days ?? []).filter((d) => d?.day);
+  const max = Math.max(1, ...days.map((d) => d.minutes ?? 0));
+  const any = days.some((d) => (d.minutes ?? 0) > 0);
+  return (
+    <Card>
+      <CardHeader className="flex-row flex-wrap items-start justify-between gap-x-4 gap-y-2">
+        <div><CardTitle className="text-lg">{t.chart}</CardTitle><p className="text-sm text-muted-foreground">{t.chartSub}</p></div>
+        {typeof status?.minutesDone === 'number' && <div className="text-end"><p className="text-xs font-semibold text-muted-foreground">{t.thisWeek}</p><p className="text-2xl font-bold tabular-nums leading-tight">{num(status.minutesDone, lang)} <span className="text-sm font-semibold text-muted-foreground">{t.min}</span></p></div>}
+      </CardHeader>
+      <CardContent>
+        {!days.length ? <NotYet className="text-sm" /> : (
+          <>
+            {typeof status?.goalMinutes === 'number' && <p className="mb-3 text-xs text-muted-foreground">{t.goal(num(status.goalMinutes, lang))}</p>}
+            <div className="relative h-40" aria-hidden>
+              <div className="absolute inset-x-0 bottom-0 border-t" />
+              <div className="relative flex h-full items-end gap-1 sm:gap-2">
+                {days.map((d) => {
+                  const m = d.minutes ?? 0;
+                  return (
+                    <div key={d.day} title={`${fmtDay(d.day, lang, { weekday: 'short', day: 'numeric', month: 'short' })}: ${num(m, lang)} ${t.min}`} className="group flex h-full flex-1 items-end justify-center">
+                      <div className={cn('w-full max-w-10 rounded-t-[4px] group-hover:opacity-80', m ? (d.isToday ? 'bg-primary' : 'bg-chart-1') : 'bg-muted')} style={{ height: m ? `${(m / max) * 100}%` : 4 }} />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            <div className="mt-2 flex gap-1 sm:gap-2" aria-hidden>
+              {days.map((d, i) => (
+                <span key={d.day} className={cn('flex-1 truncate text-center text-[10px] tabular-nums text-muted-foreground sm:text-xs', i % 2 === 1 && !d.isToday && 'max-sm:invisible', d.isToday && 'font-bold text-foreground')}>{fmtDay(d.day, lang, { day: 'numeric' })}</span>
+              ))}
+            </div>
+            {!any && <p className="mt-3 text-sm text-muted-foreground">{t.noChart}</p>}
+            <table className="sr-only">
+              <caption>{t.table}</caption>
+              <thead><tr><th>{t.day}</th><th>{t.minutes}</th></tr></thead>
+              <tbody>{days.map((d) => <tr key={d.day}><td>{fmtDay(d.day, lang, { weekday: 'long', day: 'numeric', month: 'long' })}</td><td>{d.minutes ?? 0}</td></tr>)}</tbody>
+            </table>
+          </>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function Results({ items, t, lang }: { items: AssessmentItem[]; t: TT; lang: Lang }) {
+  if (!items.length) return <p className="py-2 text-sm text-muted-foreground">{t.noResults}</p>;
+  return (
+    <ul className="divide-y">
+      {items.map((r) => (
+        <li key={r.id} className="flex items-center gap-3 py-2 text-sm">
+          <span className="min-w-0 flex-1"><span className="block truncate font-medium">{r.title}</span>{r.submittedAt && <span className="text-xs text-muted-foreground">{fmtDay(r.submittedAt.slice(0, 10), lang, { day: 'numeric', month: 'short' })}</span>}</span>
+          {typeof r.score === 'number' ? <span dir="ltr" className="font-bold tabular-nums">{num(Math.round(r.score), lang)}%</span> : r.waiting ? <Badge tone="neutral">{t.waiting}</Badge> : <span className="text-muted-foreground">—</span>}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function SubjectCard({ s, results, t, lang }: { s: SubjectCardResp; results: AssessmentItem[]; t: TT; lang: Lang }) {
+  const mastered = Math.max(0, s.outcomes?.mastered ?? 0);
+  const total = Math.max(0, s.outcomes?.total ?? 0);
+  const rest = Math.max(0, total - mastered);
+  const pct = total ? `${(Math.min(mastered, total) / total) * 100}%` : '0%';
+  const level = s.english && s.cefr?.label ? `${bi(s.cefr.label, lang)}${s.cefr.cefr ? ` · ${s.cefr.cefr}` : ''}` : bi(s.outcomes?.bandLabel, lang);
+  const latest = s.latestResult;
+  const shown: AssessmentItem[] = results.length ? results : latest?.title ? [{ id: `latest-${s.key}`, title: latest.title, score: latest.score ?? null, submittedAt: latest.submittedAt ?? undefined }] : [];
   return (
     <Card className="flex flex-col">
       <CardHeader className="flex-row items-center gap-3">
-        <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-secondary text-secondary-foreground [&_svg]:size-5">{icons[s.id]}</span>
-        <CardTitle className="min-w-0 flex-1 text-lg">{s.name}</CardTitle>
-        <Badge tone={s.tone}>{s.level}</Badge>
+        <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-secondary text-secondary-foreground [&_svg]:size-5">{iconFor(s)}</span>
+        <CardTitle className="min-w-0 flex-1 text-lg">{bi(s.name, lang) || s.key}</CardTitle>
+        {level && <Badge tone="info" className="max-w-40 truncate">{level}</Badge>}
       </CardHeader>
       <CardContent className="flex flex-1 flex-col gap-4">
-        <div>
-          <div className="mb-2 flex items-baseline justify-between gap-2 text-sm">
-            <span className="font-semibold">{t.outcomes}</span>
-            <span className="tabular-nums text-muted-foreground">{num(s.mastered, lang)} {t.of} {num(s.total, lang)} {t.mastered}</span>
+        {total > 0 ? (
+          <div>
+            <div className="mb-2 flex items-baseline justify-between gap-2 text-sm">
+              <span className="font-semibold">{t.outcomes}</span>
+              <span className="tabular-nums text-muted-foreground">{num(mastered, lang)} {t.of} {num(total, lang)} {t.mastered}</span>
+            </div>
+            <div className="flex h-3 gap-[2px] overflow-hidden rounded-full" role="img" aria-label={`${t.mastered} ${mastered}, ${t.notYet} ${rest}`}>
+              <div className="bg-success" style={{ width: pct }} />
+              <div className="flex-1 bg-muted" />
+            </div>
+            <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1.5"><span className="size-2.5 rounded-full bg-success" />{t.mastered} {num(mastered, lang)}</span>
+              <span className="flex items-center gap-1.5"><span className="size-2.5 rounded-full border bg-muted" />{t.notYet} {num(rest, lang)}</span>
+            </div>
           </div>
-          <div className="flex h-3 gap-[2px] overflow-hidden rounded-full" role="img" aria-label={`${t.mastered} ${s.mastered}, ${t.inProgress} ${s.progress}, ${t.notYet} ${notYet}`}>
-            <div className="bg-success" style={{ width: pct(s.mastered) }} />
-            <div className="bg-info" style={{ width: pct(s.progress) }} />
-            <div className="flex-1 bg-muted" />
-          </div>
-          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-            <span className="flex items-center gap-1.5"><span className="size-2.5 rounded-full bg-success" />{t.mastered} {num(s.mastered, lang)}</span>
-            <span className="flex items-center gap-1.5"><span className="size-2.5 rounded-full bg-info" />{t.inProgress} {num(s.progress, lang)}</span>
-            <span className="flex items-center gap-1.5"><span className="size-2.5 rounded-full border bg-muted" />{t.notYet} {num(notYet, lang)}</span>
-          </div>
-        </div>
+        ) : null}
+        {typeof s.lessons?.total === 'number' && s.lessons.total > 0 && <p className="text-sm text-muted-foreground">{t.lessonsOf(num(s.lessons.done ?? 0, lang), num(s.lessons.total, lang))}</p>}
         <div>
           <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t.recent}</p>
-          <ul className="divide-y">
-            {s.results.map((r) => (
-              <li key={r.what} className="flex items-center gap-3 py-2 text-sm">
-                <span className="min-w-0 flex-1"><span className="block truncate font-medium">{r.what}</span><span className="text-xs text-muted-foreground">{r.when}</span></span>
-                <span dir="ltr" className="font-bold tabular-nums">{r.score}</span>
-              </li>
-            ))}
-          </ul>
+          <Results items={shown} t={t} lang={lang} />
         </div>
-        <div className="mt-auto flex gap-3 rounded-lg bg-warning-soft/70 p-3 text-sm">
-          <Home className="mt-0.5 size-4 shrink-0 text-warning-foreground" />
-          <p><span className="font-bold">{t.home}: </span>{s.tip}</p>
-        </div>
+        {s.top?.do && (
+          <div className="mt-auto flex gap-3 rounded-lg bg-warning-soft/70 p-3 text-sm">
+            <Home className="mt-0.5 size-4 shrink-0 text-warning-foreground" />
+            <div className="min-w-0">
+              <p><span className="font-bold">{t.home}: </span>{bi(s.top.do, lang)}</p>
+              {s.top.ai && <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground"><Sparkles className="size-3.5" />{t.ai}</p>}
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

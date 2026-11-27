@@ -1,35 +1,65 @@
-// Shared bits for parent part B screens (fees, bus, attendance): the parent AppShell and the child switcher chip.
+// Shared bits for the parent school screens (fees, bus, attendance) and the gate every parent screen uses for "which child".
 import type { ReactNode } from 'react';
-import { ChevronDown, Home, MessageCircle, School, TrendingUp, UserRound } from 'lucide-react';
+import { Bus, CalendarCheck, Receipt } from 'lucide-react';
 import { useT } from '@/lib/preview';
-import { AppShell } from '@/components/shell';
 import { Avatar } from '@/components/ui';
+import { cn } from '@/lib/utils';
+import { ChildSwitcher, childMeta, childTone, useAgeLabel } from './A_shared';
+import { ErrorState, NoChildState, PageSkeleton, childName, useST, type Children, type LearnerChip } from './data';
+
+export { ParentShell } from './A_shared';
 
 const T = {
-  en: { home: 'Home', progress: 'Progress', school: 'School', chat: 'Chat', account: 'Account', child: 'Laila', childMeta: 'Grade 6 · NVIS', switchChild: 'Switch child' },
-  ar: { home: 'الرئيسية', progress: 'التقدّم', school: 'المدرسة', chat: 'المحادثة', account: 'الحساب', child: 'ليلى', childMeta: 'الصف السادس · مدرسة وادي النيل الدولية', switchChild: 'تبديل الابن أو الابنة' },
+  en: { attendance: 'Attendance', bus: 'Bus', fees: 'Fees', sections: 'School sections' },
+  ar: { attendance: 'الحضور', bus: 'الحافلة', fees: 'الرسوم', sections: 'أقسام المدرسة' },
 };
 
-export function ParentShell({ title, subtitle, children, active = 'school', back }: { title: string; subtitle?: string; children: ReactNode; active?: string; back?: boolean }) {
-  const t = useT(T);
-  const nav = [
-    { id: 'home', label: t.home, icon: <Home /> },
-    { id: 'progress', label: t.progress, icon: <TrendingUp /> },
-    { id: 'school', label: t.school, icon: <School /> },
-    { id: 'chat', label: t.chat, icon: <MessageCircle />, badge: '2' },
-    { id: 'account', label: t.account, icon: <UserRound /> },
-  ];
-  return <AppShell title={title} subtitle={subtitle} nav={nav} active={active} back={back}>{children}</AppShell>;
+/** The child this page is about. With several children it becomes the switcher. */
+export function ChildChip({ kids }: { kids: Children }) {
+  const age = useAgeLabel();
+  const c = kids.child;
+  if (!c) return null;
+  if (kids.list.length > 1) return <ChildSwitcher kids={kids} />;
+  const name = childName(c) || c.name || '';
+  const sub = [childMeta(c, age), typeof c.age === 'number' ? c.school : null].filter(Boolean).join(' · ');
+  return (
+    <span className="inline-flex max-w-full self-start items-center gap-2.5 rounded-full border bg-card py-1 ps-1 pe-4 text-sm shadow-sm" data-testid="child-chip">
+      <Avatar name={name || '?'} className="size-8 text-xs" tone={childTone(0)} />
+      <span className="min-w-0"><span className="block font-bold leading-tight">{name}</span>{sub && <span className="block truncate text-xs text-muted-foreground">{sub}</span>}</span>
+    </span>
+  );
 }
 
-/** The child this page is about, with a (static) switcher affordance. */
-export function ChildChip() {
+/** Attendance · Bus · Fees: the three school screens, one tap apart. */
+export function SchoolTabs({ active }: { active: 'attendance' | 'bus' | 'fees' }) {
   const t = useT(T);
+  const items = [
+    { id: 'attendance', label: t.attendance, href: '#/parent/attendance', icon: <CalendarCheck /> },
+    { id: 'bus', label: t.bus, href: '#/parent/bus', icon: <Bus /> },
+    { id: 'fees', label: t.fees, href: '#/parent/fees', icon: <Receipt /> },
+  ];
   return (
-    <a href="#" aria-label={t.switchChild} className="inline-flex max-w-full self-start items-center gap-2.5 rounded-full border bg-card py-1 ps-1 pe-3 text-sm shadow-sm hover:bg-muted">
-      <Avatar name={t.child} className="size-8 bg-accent text-xs text-accent-foreground" tone="bg-accent text-accent-foreground" />
-      <span className="min-w-0"><span className="block font-bold leading-tight">{t.child}</span><span className="block truncate text-xs text-muted-foreground">{t.childMeta}</span></span>
-      <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
-    </a>
+    <nav aria-label={t.sections} className="flex w-fit max-w-full gap-1 overflow-x-auto rounded-lg bg-muted p-1">
+      {items.map((x) => (
+        <a key={x.id} href={x.href} aria-current={x.id === active ? 'page' : undefined}
+          className={cn('inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-md px-3 text-sm font-semibold [&_svg]:size-4', x.id === active ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground')}>
+          {x.icon}{x.label}
+        </a>
+      ))}
+    </nav>
   );
+}
+
+/** Loading, error and "no child linked" for the learners list; renders the page once a child is chosen. */
+export function ChildGate({ kids, children, skeleton }: { kids: Children; children: (child: LearnerChip) => ReactNode; skeleton?: ReactNode }) {
+  const st = useST();
+  if (kids.loading) return <>{skeleton ?? <PageSkeleton />}</>;
+  if (kids.error) return <ErrorState error={kids.error} onRetry={kids.reload} />;
+  if (!kids.child) return (
+    <div className="flex flex-col gap-3">
+      <NoChildState />
+      {kids.hiddenBySchool > 0 && <p className="text-center text-sm text-muted-foreground">{st.hidden}</p>}
+    </div>
+  );
+  return <>{children(kids.child)}</>;
 }

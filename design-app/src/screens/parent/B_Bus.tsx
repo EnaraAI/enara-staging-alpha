@@ -1,168 +1,211 @@
-import { BusFront, CalendarDays, Check, Clock3, Home, Info, MapPin, MessageCircle, Phone, School, Sunrise, Sunset, TriangleAlert, UserRound } from 'lucide-react';
-import { useT, usePreview } from '@/lib/preview';
+import { BusFront, CalendarDays, Check, Clock3, Home, Info, MapPin, Phone, School, Sunrise, Sunset, TriangleAlert, UserRound, XCircle } from 'lucide-react';
+import { get } from '@/lib/api';
+import { useT, usePreview, type Lang } from '@/lib/preview';
 import { SectionTitle } from '@/components/shell';
-import { Alert, Avatar, Badge, Button, Card, CardContent, CardHeader, CardTitle, Separator, Tab, TabList, TabPanel, Tabs } from '@/components/ui';
+import { Alert, Avatar, Badge, Card, CardContent, CardHeader, CardTitle, Separator, Skeleton, Tab, TabList, TabPanel, Tabs, buttonVariants } from '@/components/ui';
 import { cn } from '@/lib/utils';
-import { ChildChip, ParentShell } from './B_common';
-
-type Stop = { time: string; name: { en: string; ar: string }; mine?: boolean; school?: boolean; done?: boolean };
-const MORNING: Stop[] = [
-  { time: '06:20', name: { en: 'Korba, Baghdad Street', ar: 'الكوربة، شارع بغداد' }, done: true },
-  { time: '06:31', name: { en: 'Merghany Street', ar: 'شارع الميرغني' }, done: true },
-  { time: '06:42', name: { en: 'Hegaz Square', ar: 'ميدان الحجاز' }, mine: true, done: true },
-  { time: '06:50', name: { en: 'Triumph Square', ar: 'ميدان الإسماعيلية' }, done: true },
-  { time: '07:04', name: { en: 'Abbas El Akkad Street', ar: 'شارع عباس العقاد' }, done: true },
-  { time: '07:25', name: { en: 'NVIS main gate', ar: 'البوابة الرئيسية للمدرسة' }, school: true, done: true },
-];
-const AFTERNOON: Stop[] = [
-  { time: '14:30', name: { en: 'NVIS main gate', ar: 'البوابة الرئيسية للمدرسة' }, school: true },
-  { time: '14:48', name: { en: 'Abbas El Akkad Street', ar: 'شارع عباس العقاد' } },
-  { time: '15:02', name: { en: 'Triumph Square', ar: 'ميدان الإسماعيلية' } },
-  { time: '15:10', name: { en: 'Hegaz Square', ar: 'ميدان الحجاز' }, mine: true },
-  { time: '15:20', name: { en: 'Merghany Street', ar: 'شارع الميرغني' } },
-  { time: '15:30', name: { en: 'Korba, Baghdad Street', ar: 'الكوربة، شارع بغداد' } },
-];
+import { ChildChip, ChildGate, ParentShell, SchoolTabs } from './B_common';
+import { addMinutes, sentence, CalmState, childName, ep, ErrorState, fmtDay, fmtStamp, isOff, OffState, useChildren, useLoad, type BusNotice, type BusResp, type BusTrip, type Children, type LearnerChip } from './data';
 
 const T = {
   en: {
-    title: 'Bus', sub: 'Bus 7 · Heliopolis route', today: 'Today’s trips', todayDate: 'Thursday 26 Nov 2026',
-    morning: 'Morning pickup', afternoon: 'Afternoon drop-off', at: 'at', stop: 'Hegaz Square', boarded: 'Laila boarded at 06:44', scheduled: 'Scheduled',
-    delayed: 'About 15 minutes late', expected: 'Expect around 15:25',
-    delayTitle: 'About 15 minutes late — traffic on the Corniche', delayBody: 'The afternoon bus left school on time but is held up on the Corniche. Posted by the school at 14:20.',
-    route: 'Route stops', yourStop: 'Your stop', school: 'School', morningTab: 'Morning', afternoonTab: 'Afternoon',
-    supervisor: 'Bus supervisor', supName: 'Ms Hanan Farouk', supRole: 'On board every trip', call: 'Call supervisor', message: 'Message',
-    driver: 'Driver', driverName: 'Mr Sayed Mahmoud', bus: 'Bus', busNo: 'Bus 7 · white, school logo', plate: 'Plate', plateNo: 'ق ل ط 4728',
-    notLive: 'Times are the school’s timetable, not live tracking.', notLiveBody: 'ENARA does not track the bus. Notices like delays come from the school.',
-    absent: 'Laila will not take the bus?', tell: 'Tell the school', timetable: 'Timetable', from: 'Valid from 1 Sep 2026',
+    title: 'Bus', sub: 'Stops and times from the school', today: 'Today’s trips',
+    morning: 'Morning pickup', afternoon: 'Afternoon drop-off', scheduled: 'Scheduled', cancelled: 'Cancelled', noTime: 'No time set', map: 'Open map',
+    delayed: (m: number | null | undefined) => (m ? `About ${m} minutes late` : 'Delayed'), expected: (x: string) => `Expect around ${x}`,
+    delayTitle: (dir: string, m: number | null | undefined) => `${dir}: ${m ? `about ${m} minutes late` : 'delayed'} today`, cancelTitle: (dir: string) => `${dir}: cancelled today`, posted: (at: string) => `Posted by the school at ${at}.`,
+    route: 'Route stops', yourStop: 'Your stop', school: 'School', morningTab: 'Morning', afternoonTab: 'Afternoon', updated: (d: string) => `Updated by the school on ${d}`,
+    supervisor: 'Bus supervisor', call: 'Call supervisor', noPhone: 'The school does not share the supervisor’s phone number.', noSupervisor: 'The school has not named a supervisor for this route.',
+    driver: 'Driver', bus: 'Bus', routeName: 'Route',
+    notLive: 'Times are the school’s timetable, not live tracking.', notLiveBody: 'Notices like delays come from the school.',
+    absent: (n: string) => `${n} will not take the bus?`, tell: 'Tell the school',
+    none: 'No bus for this child', noneBody: (n: string) => `The school has not assigned a bus route to ${n}.`, noStops: 'The school has not added the stops for this trip.',
   },
   ar: {
-    title: 'الحافلة', sub: 'الحافلة 7 · خط مصر الجديدة', today: 'رحلات اليوم', todayDate: 'الخميس 26 نوفمبر 2026',
-    morning: 'رحلة الصباح', afternoon: 'رحلة العودة', at: 'في', stop: 'ميدان الحجاز', boarded: 'صعدت ليلى الحافلة الساعة 06:44', scheduled: 'حسب الجدول',
-    delayed: 'تأخير نحو 15 دقيقة', expected: 'الوصول المتوقع نحو 15:25',
-    delayTitle: 'تأخير نحو 15 دقيقة بسبب الزحام على الكورنيش', delayBody: 'غادرت حافلة العودة المدرسة في موعدها، لكنها متوقفة في زحام الكورنيش. نشرت المدرسة هذا التنبيه الساعة 14:20.',
-    route: 'محطات الخط', yourStop: 'محطتك', school: 'المدرسة', morningTab: 'الصباح', afternoonTab: 'العودة',
-    supervisor: 'مشرفة الحافلة', supName: 'أ. حنان فاروق', supRole: 'موجودة في كل رحلة', call: 'الاتصال بالمشرفة', message: 'مراسلة',
-    driver: 'السائق', driverName: 'أ. سيد محمود', bus: 'الحافلة', busNo: 'الحافلة 7 · بيضاء وعليها شعار المدرسة', plate: 'اللوحة', plateNo: 'ق ل ط 4728',
-    notLive: 'المواعيد هي جدول المدرسة، وليست تتبعًا مباشرًا.', notLiveBody: 'لا تتتبع إنارة موقع الحافلة. تنبيهات التأخير تأتي من المدرسة.',
-    absent: 'لن تركب ليلى الحافلة؟', tell: 'أبلغ المدرسة', timetable: 'الجدول', from: 'ساري من 1 سبتمبر 2026',
+    title: 'الحافلة', sub: 'المحطات والمواعيد من المدرسة', today: 'رحلات اليوم',
+    morning: 'رحلة الصباح', afternoon: 'رحلة العودة', scheduled: 'حسب الجدول', cancelled: 'أُلغيت', noTime: 'لم يُحدَّد موعد', map: 'فتح الخريطة',
+    delayed: (m: number | null | undefined) => (m ? `تأخير نحو ${m} دقيقة` : 'متأخرة'), expected: (x: string) => `الوصول المتوقع نحو ${x}`,
+    delayTitle: (dir: string, m: number | null | undefined) => `${dir}: ${m ? `تأخير نحو ${m} دقيقة` : 'تأخير'} اليوم`, cancelTitle: (dir: string) => `${dir}: أُلغيت اليوم`, posted: (at: string) => `نشرت المدرسة هذا التنبيه الساعة ${at}.`,
+    route: 'محطات الخط', yourStop: 'محطتك', school: 'المدرسة', morningTab: 'الصباح', afternoonTab: 'العودة', updated: (d: string) => `حدّثته المدرسة في ${d}`,
+    supervisor: 'مشرف الحافلة', call: 'الاتصال بالمشرف', noPhone: 'لا تشارك المدرسة رقم هاتف المشرف.', noSupervisor: 'لم تحدّد المدرسة مشرفًا لهذا الخط.',
+    driver: 'السائق', bus: 'الحافلة', routeName: 'الخط',
+    notLive: 'المواعيد هي جدول المدرسة، وليست تتبعًا مباشرًا.', notLiveBody: 'تنبيهات التأخير تأتي من المدرسة.',
+    absent: (n: string) => `لن يركب ${n} الحافلة؟`, tell: 'أبلغ المدرسة',
+    none: 'لا توجد حافلة لهذا الابن أو الابنة', noneBody: (n: string) => `لم تخصّص المدرسة خط حافلة لـ${n}.`, noStops: 'لم تُضف المدرسة محطات هذه الرحلة بعد.',
   },
 };
+type TT = (typeof T)['en'];
 
-function Timeline({ stops }: { stops: Stop[] }) {
+export default function BusScreen() {
+  const t = useT(T);
+  const kids = useChildren();
+  return (
+    <ParentShell active="school" title={t.title} subtitle={t.sub}>
+      <div className="mx-auto flex max-w-6xl flex-col gap-5">
+        <ChildGate kids={kids}>
+          {(child) => <BusBody key={child.studentId} child={child} kids={kids} />}
+        </ChildGate>
+      </div>
+    </ParentShell>
+  );
+}
+
+function BusBody({ child, kids }: { child: LearnerChip; kids: Children }) {
   const t = useT(T);
   const { lang } = usePreview();
+  const q = useLoad((signal) => get<BusResp>(ep.bus(child.studentId), signal), [child.studentId]);
+  const trips = (q.data?.trips ?? []).filter((x): x is BusTrip => !!x && (x.direction === 'morning' || x.direction === 'afternoon'));
+  const name = childName(child);
+  return (
+    <>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <ChildChip kids={kids} />
+        {q.data?.today && <p className="flex items-center gap-1.5 text-xs text-muted-foreground"><CalendarDays className="size-4" />{fmtDay(q.data.today, lang, { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' })}</p>}
+      </div>
+      <SchoolTabs active="bus" />
+      {q.loading ? (
+        <div className="grid gap-5 lg:grid-cols-[1fr_340px]" aria-busy="true" data-testid="parent-loading">
+          <div className="flex flex-col gap-5"><div className="grid gap-3 sm:grid-cols-2"><Skeleton className="h-36 rounded-xl" /><Skeleton className="h-36 rounded-xl" /></div><Skeleton className="h-72 rounded-xl" /></div>
+          <Skeleton className="h-72 rounded-xl" />
+        </div>
+      ) : isOff(q.error) ? <OffState />
+        : q.error || !q.data ? <ErrorState error={q.error} onRetry={q.reload} />
+        : !trips.length ? <CalmState icon={<BusFront />} title={t.none} body={t.noneBody(name)} />
+        : <BusView data={q.data} trips={trips} name={name} t={t} lang={lang} />}
+    </>
+  );
+}
+
+function noticeOf(trip: BusTrip | undefined): BusNotice | undefined { return trip?.notices?.[0]; }
+
+function BusView({ data, trips, name, t, lang }: { data: BusResp; trips: BusTrip[]; name: string; t: TT; lang: Lang }) {
+  const notices = trips.flatMap((tr) => (tr.notices ?? []).map((n) => ({ n, dir: tr.direction === 'morning' ? t.morningTab : t.afternoonTab })));
+  const crew = trips.filter((tr, i) => trips.findIndex((x) => x.route === tr.route && x.supervisor === tr.supervisor && x.supervisorPhone === tr.supervisorPhone) === i);
+  const updated = data.source?.updatedAt ? fmtStamp(data.source.updatedAt, lang, { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+  const first = trips.find((x) => x.notices?.length)?.direction ?? trips[0]?.direction ?? 'morning';
+  return (
+    <div className="grid gap-5 lg:grid-cols-[1fr_340px]">
+      <div className="flex min-w-0 flex-col gap-5">
+        <section>
+          <SectionTitle>{t.today}</SectionTitle>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {(['morning', 'afternoon'] as const).map((dir) => {
+              const trip = trips.find((x) => x.direction === dir);
+              if (!trip) return null;
+              const n = noticeOf(trip);
+              const later = n?.kind === 'delay' ? addMinutes(trip.time, n.minutes) : null;
+              return (
+                <Card key={dir} className={cn('p-4', n?.kind === 'delay' && 'border-warning/50', n?.kind === 'cancel' && 'border-destructive/40')}>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="flex items-center gap-2 whitespace-nowrap text-sm font-semibold text-muted-foreground">{dir === 'morning' ? <Sunrise className="size-4 shrink-0" /> : <Sunset className="size-4 shrink-0" />}{t[dir]}</span>
+                    {n?.kind === 'cancel' ? <Badge tone="danger"><XCircle />{t.cancelled}</Badge> : n ? <Badge tone="warning"><Clock3 />{t.delayed(n.minutes)}</Badge> : <Badge tone="success"><Check />{t.scheduled}</Badge>}
+                  </div>
+                  {trip.time ? (
+                    <p className="mt-2 flex flex-wrap items-baseline gap-2" dir="ltr">
+                      <span className={cn('text-3xl font-extrabold tabular-nums', (later || n?.kind === 'cancel') && 'text-muted-foreground line-through decoration-2')}>{trip.time}</span>
+                      {later && <span className="text-3xl font-extrabold tabular-nums">~{later}</span>}
+                    </p>
+                  ) : <p className="mt-2 text-sm text-muted-foreground">{t.noTime}</p>}
+                  {trip.stop && <p className="mt-1 flex items-center gap-1.5 text-sm"><MapPin className="size-4 shrink-0 text-muted-foreground" />{trip.stop}</p>}
+                  {trip.mapLink && /^https?:\/\//i.test(trip.mapLink) && <a href={trip.mapLink} target="_blank" rel="noopener noreferrer" className="mt-1 inline-flex min-h-tap items-center text-sm font-semibold text-primary">{t.map}</a>}
+                  {later && <p className="mt-2 text-xs text-warning-foreground">{t.expected(later)}</p>}
+                </Card>
+              );
+            })}
+          </div>
+        </section>
+
+        {notices.map(({ n, dir }, i) => (
+          <Alert key={i} tone={n.kind === 'cancel' ? 'danger' : 'warning'} icon={<TriangleAlert />} title={n.kind === 'cancel' ? t.cancelTitle(dir) : t.delayTitle(dir, n.minutes)}>
+            {[sentence(n.message), n.at ? t.posted(fmtStamp(n.at, lang, { hour: '2-digit', minute: '2-digit' })) : ''].filter(Boolean).join(' ')}
+          </Alert>
+        ))}
+
+        <Card>
+          <CardHeader className="flex-row flex-wrap items-center justify-between gap-2">
+            <CardTitle>{t.route}</CardTitle>
+            {updated && <span className="text-xs text-muted-foreground">{t.updated(updated)}</span>}
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultSelectedKey={first}>
+              <TabList aria-label={t.route}>
+                {trips.map((tr) => (
+                  <Tab key={tr.direction} id={tr.direction}><span className="flex items-center gap-1.5">{tr.direction === 'morning' ? <Sunrise className="size-4" /> : <Sunset className="size-4" />}{tr.direction === 'morning' ? t.morningTab : t.afternoonTab}</span></Tab>
+                ))}
+              </TabList>
+              {trips.map((tr) => <TabPanel key={tr.direction} id={tr.direction} className="pt-2"><Timeline trip={tr} t={t} /></TabPanel>)}
+            </Tabs>
+          </CardContent>
+        </Card>
+      </div>
+
+      <aside className="flex flex-col gap-4">
+        {crew.map((tr, i) => (
+          <Card key={i}>
+            <CardHeader><p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t.supervisor}</p></CardHeader>
+            <CardContent className="flex flex-col gap-4">
+              {tr.supervisor ? (
+                <div className="flex items-center gap-3">
+                  <Avatar name={tr.supervisor} className="size-14 text-lg" />
+                  <p className="min-w-0 text-lg font-bold leading-tight">{tr.supervisor}</p>
+                </div>
+              ) : <p className="text-sm text-muted-foreground">{t.noSupervisor}</p>}
+              {tr.supervisorPhone
+                ? <a href={`tel:${tr.supervisorPhone.replace(/[^\d+]/g, '')}`} className={cn(buttonVariants({ variant: 'success', size: 'lg' }), 'h-14 w-full text-base')} data-testid="bus-call"><Phone />{t.call}</a>
+                : tr.supervisor ? <p className="text-xs text-muted-foreground">{t.noPhone}</p> : null}
+              {(tr.driver || tr.busNumber || tr.route) && (
+                <>
+                  <Separator />
+                  <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
+                    {tr.route && <><dt className="flex items-center gap-1.5 text-muted-foreground"><MapPin className="size-4" />{t.routeName}</dt><dd className="min-w-0 font-semibold">{tr.route}</dd></>}
+                    {tr.driver && <><dt className="flex items-center gap-1.5 text-muted-foreground"><UserRound className="size-4" />{t.driver}</dt><dd className="min-w-0 font-semibold">{tr.driver}</dd></>}
+                    {tr.busNumber && <><dt className="flex items-center gap-1.5 text-muted-foreground"><BusFront className="size-4" />{t.bus}</dt><dd className="min-w-0 font-semibold">{tr.busNumber}</dd></>}
+                  </dl>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        ))}
+        <Alert tone="info" icon={<Info />} title={t.notLive}>{t.notLiveBody}</Alert>
+        <Card className="flex flex-wrap items-center justify-between gap-2 p-4">
+          <p className="text-sm font-semibold">{t.absent(name)}</p>
+          <a href="#/parent/chat" className={buttonVariants({ variant: 'outline', size: 'sm' })}>{t.tell}</a>
+        </Card>
+      </aside>
+    </div>
+  );
+}
+
+function Timeline({ trip, t }: { trip: BusTrip; t: TT }) {
+  const stops = (trip.stops ?? []).filter((s) => s?.name);
+  if (!stops.length) return <p className="py-3 text-sm text-muted-foreground">{t.noStops}</p>;
   return (
     <ol className="flex flex-col">
       {stops.map((s, i) => {
         const first = i === 0, last = i === stops.length - 1;
-        const line = (hide: boolean, done?: boolean) => <span aria-hidden className={cn('w-0.5 flex-1', hide ? 'bg-transparent' : done ? 'bg-primary/60' : 'bg-primary/20')} />;
+        // The school end of the route: first stop in the afternoon, last in the morning (by the route's own order).
+        const school = trip.direction === 'afternoon' ? first : last;
+        const line = (hide: boolean) => <span aria-hidden className={cn('w-0.5 flex-1', hide ? 'bg-transparent' : 'bg-primary/30')} />;
         return (
           <li key={i} className="flex items-stretch gap-3">
             <div className="flex w-8 shrink-0 flex-col items-center">
-              {line(first, s.done)}
+              {line(first)}
               <span className={cn('grid shrink-0 place-items-center rounded-full border-2',
-                s.mine ? 'size-8 border-accent bg-accent text-accent-foreground shadow' : s.school ? 'size-7 border-primary bg-primary text-primary-foreground' : s.done ? 'size-3.5 border-primary bg-primary' : 'size-3.5 border-primary/50 bg-card')}>
-                {s.mine ? <Home className="size-4" /> : s.school ? <School className="size-3.5" /> : null}
+                s.mine ? 'size-8 border-accent bg-accent text-accent-foreground shadow' : 'size-3.5 border-primary/60 bg-card')}>
+                {s.mine ? <Home className="size-4" /> : null}
               </span>
-              {line(last, s.done && stops[i + 1]?.done)}
+              {line(last)}
             </div>
             <div className={cn('my-1 flex min-w-0 flex-1 items-center gap-3 rounded-lg px-3 py-2.5', s.mine && 'bg-accent/20 ring-1 ring-accent')}>
               <div className="min-w-0 flex-1">
-                <p className={cn('text-sm', s.mine ? 'font-extrabold' : 'font-semibold')}>{s.name[lang]}</p>
+                <p className={cn('text-sm', s.mine ? 'font-extrabold' : 'font-semibold')}>{s.name}</p>
                 {s.mine && <p className="text-xs font-semibold text-accent-foreground">{t.yourStop}</p>}
-                {s.school && <p className="text-xs text-muted-foreground">{t.school}</p>}
+                {!s.mine && school && /school|gate|مدرس|بوابة/i.test(s.name ?? '') && <p className="flex items-center gap-1 text-xs text-muted-foreground"><School className="size-3" />{t.school}</p>}
               </div>
-              <span className={cn('tabular-nums', s.mine ? 'text-lg font-extrabold' : 'text-sm text-muted-foreground')}>{s.time}</span>
+              <span dir="ltr" className={cn('tabular-nums', s.mine ? 'text-lg font-extrabold' : 'text-sm text-muted-foreground')}>{s.time ?? '—'}</span>
             </div>
           </li>
         );
       })}
     </ol>
-  );
-}
-
-export default function BusScreen() {
-  const t = useT(T);
-  return (
-    <ParentShell title={t.title} subtitle={t.sub}>
-      <div className="mx-auto flex max-w-6xl flex-col gap-5">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <ChildChip />
-          <p className="flex items-center gap-1.5 text-xs text-muted-foreground"><CalendarDays className="size-4" />{t.todayDate}</p>
-        </div>
-
-        <div className="grid gap-5 lg:grid-cols-[1fr_340px]">
-          <div className="flex min-w-0 flex-col gap-5">
-            <section>
-              <SectionTitle>{t.today}</SectionTitle>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <Card className="p-4">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="flex items-center gap-2 whitespace-nowrap text-sm font-semibold text-muted-foreground"><Sunrise className="size-4 shrink-0" />{t.morning}</span>
-                    <Badge tone="success"><Check />{t.scheduled}</Badge>
-                  </div>
-                  <p className="mt-2 text-3xl font-extrabold tabular-nums">06:42</p>
-                  <p className="mt-1 flex items-center gap-1.5 text-sm"><MapPin className="size-4 text-muted-foreground" />{t.stop}</p>
-                  <p className="mt-2 text-xs text-success">{t.boarded}</p>
-                </Card>
-                <Card className="border-warning/50 p-4">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="flex items-center gap-2 whitespace-nowrap text-sm font-semibold text-muted-foreground"><Sunset className="size-4 shrink-0" />{t.afternoon}</span>
-                    <Badge tone="warning"><Clock3 />{t.delayed}</Badge>
-                  </div>
-                  <p className="mt-2 flex items-baseline gap-2"><span className="text-3xl font-extrabold tabular-nums text-muted-foreground line-through decoration-2">15:10</span><span dir="ltr" className="text-3xl font-extrabold tabular-nums">~15:25</span></p>
-                  <p className="mt-1 flex items-center gap-1.5 text-sm"><MapPin className="size-4 text-muted-foreground" />{t.stop}</p>
-                  <p className="mt-2 text-xs text-warning-foreground">{t.expected}</p>
-                </Card>
-              </div>
-            </section>
-
-            <Alert tone="warning" icon={<TriangleAlert />} title={t.delayTitle}>{t.delayBody}</Alert>
-
-            <Card>
-              <CardHeader className="flex-row flex-wrap items-center justify-between gap-2">
-                <CardTitle>{t.route}</CardTitle>
-                <span className="text-xs text-muted-foreground">{t.timetable} · {t.from}</span>
-              </CardHeader>
-              <CardContent>
-                <Tabs defaultSelectedKey="afternoon">
-                  <TabList aria-label={t.route}>
-                    <Tab id="morning"><span className="flex items-center gap-1.5"><Sunrise className="size-4" />{t.morningTab}</span></Tab>
-                    <Tab id="afternoon"><span className="flex items-center gap-1.5"><Sunset className="size-4" />{t.afternoonTab}</span></Tab>
-                  </TabList>
-                  <TabPanel id="morning" className="pt-2"><Timeline stops={MORNING} /></TabPanel>
-                  <TabPanel id="afternoon" className="pt-2"><Timeline stops={AFTERNOON} /></TabPanel>
-                </Tabs>
-              </CardContent>
-            </Card>
-          </div>
-
-          <aside className="flex flex-col gap-4">
-            <Card>
-              <CardHeader><p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{t.supervisor}</p></CardHeader>
-              <CardContent className="flex flex-col gap-4">
-                <div className="flex items-center gap-3">
-                  <Avatar name={t.supName.replace(/^(Ms|أ\.)\s/, '')} className="size-14 text-lg" />
-                  <div className="min-w-0"><p className="text-lg font-bold leading-tight">{t.supName}</p><p className="text-sm text-muted-foreground">{t.supRole}</p></div>
-                </div>
-                <Button size="lg" variant="success" className="h-14 w-full text-base"><Phone />{t.call}</Button>
-                <Button variant="outline" className="w-full"><MessageCircle />{t.message}</Button>
-                <Separator />
-                <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
-                  <dt className="flex items-center gap-1.5 text-muted-foreground"><UserRound className="size-4" />{t.driver}</dt><dd className="font-semibold">{t.driverName}</dd>
-                  <dt className="flex items-center gap-1.5 text-muted-foreground"><BusFront className="size-4" />{t.bus}</dt><dd className="font-semibold">{t.busNo}</dd>
-                  <dt className="ps-5.5 text-muted-foreground">{t.plate}</dt><dd className="font-semibold"><span dir="rtl" lang="ar">{t.plateNo}</span></dd>
-                </dl>
-              </CardContent>
-            </Card>
-            <Alert tone="info" icon={<Info />} title={t.notLive}>{t.notLiveBody}</Alert>
-            <Card className="flex flex-wrap items-center justify-between gap-2 p-4">
-              <p className="text-sm font-semibold">{t.absent}</p>
-              <Button variant="outline" size="sm">{t.tell}</Button>
-            </Card>
-          </aside>
-        </div>
-      </div>
-    </ParentShell>
   );
 }
