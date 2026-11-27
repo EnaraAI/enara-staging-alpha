@@ -89,14 +89,14 @@ export async function buildCourseTree(studentId: string, courseId: string) {
     ? await Curriculum.findOne({
         id: instance.curriculumId,
         ...(instance.institutionId ? { institutionId: instance.institutionId } : {}),
-      })
+      }).lean() // lms-speed-5: plain objects (no document hydration of the whole curriculum)
     : null;
 
   const progress = await LessonProgress.find({
     studentId,
     ...(instance.institutionId ? { institutionId: instance.institutionId } : {}),
     courseId: instance.courseId,
-  });
+  }).select('lessonId status').lean();
   const completedIds = new Set(
     progress.filter((p) => p.status === 'completed').map((p) => p.lessonId)
   );
