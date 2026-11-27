@@ -9,6 +9,7 @@ import * as api from '../services/apiService';
 import { toast } from '../services/toastService';
 import { SpeakingExam } from '../components/SpeakingExam';
 import { LiveAvatarModal } from '../components/enara/LiveAvatarModal';
+import { LiveUsageLine, useLiveUsage } from '../components/enara/LiveUsage';
 import { MicProblemNotice, useMicGate } from '../components/MicCheck';
 import { classifySpeechRecognitionError, isInFrame } from '../services/micCheck';
 import * as D from './kidsData';
@@ -696,6 +697,8 @@ function TutorDrawer({ ctx, tutor, onClose }: { ctx: Ctx; tutor: Tutor; onClose:
   const micRef = useRef(mic);
   micRef.current = mic;
   useEffect(() => { api.getTutorSpeaking().then(setSpeaking, () => undefined); }, []);
+  // liveTimeUsed: live calls left and minutes used today, under the tutor (null when the switch is off).
+  const { usage: liveUsage, reload: reloadLiveUsage } = useLiveUsage(speaking.liveCall);
 
   useEffect(() => {
     api.listTutorSessions().then(s => setSessions(D.chatSessions(s)), () => undefined);
@@ -758,8 +761,9 @@ function TutorDrawer({ ctx, tutor, onClose }: { ctx: Ctx; tutor: Tutor; onClose:
           onLive={speaking.liveCall ? () => setLiveOpen(true) : undefined}
           onOpenSession={(sid: string) => { setSessionId(sid); api.getTutorSession(sid).then((s: any) => setMessages(D.chatMessages(s.messages)), () => undefined); }} />
         {mic.problem && <MicProblemNotice problem={mic.problem} feature="tutor_voice" />}
+        {speaking.liveCall && <LiveUsageLine usage={liveUsage} lang={D.isArabic(ctx.lang) ? 'ar' : 'en'} className="px-4 py-2 text-center" />}
       </div>
-      {speaking.liveCall && <LiveAvatarModal isOpen={liveOpen} onClose={() => setLiveOpen(false)} isStudent courseId={tutor.courseId} lessonId={tutor.lessonId} lessonTitle={ctx.T('Talk with Enara', 'تحدّث مع إنارة')} subject="English" />}
+      {speaking.liveCall && <LiveAvatarModal isOpen={liveOpen} onClose={() => { setLiveOpen(false); reloadLiveUsage(); }} isStudent courseId={tutor.courseId} lessonId={tutor.lessonId} lessonTitle={ctx.T('Talk with Enara', 'تحدّث مع إنارة')} subject="English" />}
     </div>
   );
 }
