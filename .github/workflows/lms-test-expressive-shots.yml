@@ -42,7 +42,7 @@ jobs:
             curl -sfL -o "$PIPER_VOICES/$b.onnx" "https://huggingface.co/rhasspy/piper-voices/resolve/main/$m.onnx"
             curl -sfL -o "$PIPER_VOICES/$b.onnx.json" "https://huggingface.co/rhasspy/piper-voices/resolve/main/$m.onnx.json"
           done
-      - name: Browser (Google Chrome: the avatar video may need H.264)
+      - name: 'Browser (Google Chrome, the avatar video may need H.264)'
         run: |
           npm init -y >/dev/null
           npm i --no-save --no-audit --no-fund playwright@1.49.1
