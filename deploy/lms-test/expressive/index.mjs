@@ -24,7 +24,7 @@ for (const r of results) {
   for (const t of r.turns ?? []) {
     const heard = spoken[`${r.who}--${t.moment}--${r.expressive}`] ?? '';
     const flag = CUE_WORDS.test(heard) ? ' **(starts with a cue word)**' : '';
-    const files = [`${r.who}--${t.moment}--${r.expressive}.png`, ...(/^stuck/.test(t.moment) ? [`${r.who}--${t.moment}-then--${r.expressive}.png`] : []), ...(t.moment === 'drawing' ? [`${r.who}--drawing-panel--${r.expressive}.png`] : [])];
+    const files = [`${r.who}--${t.moment}--${r.expressive}.png`, ...(/stuck/.test(t.moment) ? [`${r.who}--${t.moment}-then--${r.expressive}.png`] : []), ...(/drawing$/.test(t.moment) ? [`${r.who}--${t.moment}-panel--${r.expressive}.png`] : [])];
     const applied = [t.cueApplied?.split('@')[0], t.secondCueApplied ? 'supportive' : null].filter(Boolean).join(', ');
     lines.push(`| ${t.moment} | ${files.map((f) => `\`${f}\``).join('<br>')} | ${t.said} | ${t.cues?.join(', ') || '-'} | ${applied || '-'} | ${(heard || (t.reply ?? '')).replace(/\|/g, '/').slice(0, 160)}${flag} |`);
   }

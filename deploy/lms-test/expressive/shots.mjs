@@ -86,6 +86,23 @@ export function answers(question) {
   return { right: 'She gets up at seven and she goes to school.', wrong: 'She get up at seven and she go to school.' };
 }
 
+// Maths (owner: the live tutor teaches every subject): a sum or a one-step equation in the tutor's question.
+const WORD_OPS = { plus: '+', add: '+', minus: '-', 'take away': '-', times: '*', 'multiplied by': '*', x: '*', '×': '*', '*': '*', 'divided by': '/', '÷': '/', '/': '/', '+': '+', '-': '-', '−': '-' };
+export function mathsAnswers(question) {
+  const q = String(question || '').toLowerCase().replace(/,/g, '');
+  const num = '(\\d+(?:\\.\\d+)?)';
+  const op = '(plus|add|minus|take away|times|multiplied by|divided by|x|×|\\*|÷|/|\\+|-|−)';
+  const say = (n) => `It is ${Number.isInteger(n) ? n : Math.round(n * 100) / 100}.`;
+  // One-step equation: "x + 3 = 7", "3x = 12", "x - 4 = 10"
+  let m = new RegExp(`\\b([a-z])\\s*${op}\\s*${num}\\s*=\\s*${num}`).exec(q);
+  if (m) { const a = Number(m[3]); const b = Number(m[4]); const o = WORD_OPS[m[2]]; const x = o === '+' ? b - a : o === '-' ? b + a : o === '*' ? b / a : b * a; return { right: `${m[1]} equals ${x}.`, wrong: `${m[1]} equals ${x + 2}.` }; }
+  m = new RegExp(`${num}\\s*([a-z])\\s*=\\s*${num}`).exec(q);
+  if (m) { const x = Number(m[3]) / Number(m[1]); return { right: `${m[2]} equals ${x}.`, wrong: `${m[2]} equals ${x + 2}.` }; }
+  m = new RegExp(`${num}\\s*${op}\\s*${num}`).exec(q);
+  if (m) { const a = Number(m[1]); const b = Number(m[3]); const o = WORD_OPS[m[2]]; const r = o === '+' ? a + b : o === '-' ? a - b : o === '*' ? a * b : a / b; return { right: say(r), wrong: say(r + (Number.isInteger(r) ? 1 : 0.5)) }; }
+  return { right: 'It is 56.', wrong: 'It is 54.' };
+}
+
 // ---------- the in-page fake microphone, remote-audio recorder and frame grabber (added before the app loads)
 const INIT = () => {
   const ctx = new AudioContext({ sampleRate: 48000 });
@@ -168,8 +185,10 @@ async function skipTour(page) {
   const tour = page.getByRole('button', { name: /Skip tour|تخطّ/ });
   if (await tour.first().waitFor({ state: 'visible', timeout: 3000 }).then(() => true, () => false)) await tour.first().dispatchEvent('click');
 }
-const LESSON_PREF = [/routine/i, /family/i, /greeting/i];
-async function openCallScreen(page, who, app) {
+const LESSONS = { english: [/routine/i, /family/i, /greeting/i], maths: [/equation/i, /fraction/i, /decimal/i] };
+const COURSE = { english: { kids: /English\s*[–-]\s*Grade/, standard: /English\s*[–-]/ }, maths: { kids: /Math\w*\s*[–-]\s*Grade/, standard: /Math\w*\s*[–-]/ } };
+async function openCallScreen(page, who, app, subject = 'english') {
+  const LESSON_PREF = LESSONS[subject];
   await page.goto(`${SITE}/`, { waitUntil: 'networkidle', timeout: 90_000 }).catch(() => undefined);
   await skipTour(page);
   await snap(page, `${who}-1-home`);
@@ -177,8 +196,8 @@ async function openCallScreen(page, who, app) {
     await clickOne(page, 'learning tab', [page.getByRole('button', { name: /^(Learning|My learning|Lessons|Learn)$/i }), page.getByRole('link', { name: /Learning|Lessons/i }), page.getByRole('tab', { name: /Learning|Lessons/i })]);
     await snap(page, `${who}-2-learning`);
     // Courses and lessons can take a while to load on lms-test.
-    // The English course card's "Keep going" (not the EN/English language button).
-    await clickOne(page, 'English course', [page.locator('article, li, section, div').filter({ hasText: /English\s*[–-]\s*Grade/ }).getByRole('button', { name: /Keep going|Start/ })], 90_000);
+    // The course card's "Keep going" (not the EN/English language button).
+    await clickOne(page, `${subject} course`, [page.locator('article, li, section, div').filter({ hasText: COURSE[subject].kids }).getByRole('button', { name: /Keep going|Start/ })], 90_000);
     await snap(page, `${who}-3-course`);
     // The lesson map's lessons are not buttons: click the lesson's title (else "Continue: <next lesson>").
     // The lesson's round button sits next to its title (the title itself is not clickable); else "Continue: <next lesson>".
@@ -187,11 +206,17 @@ async function openCallScreen(page, who, app) {
     await snap(page, `${who}-4-lesson`);
     if (!(await clickOne(page, 'Ask Enara about this lesson', [page.getByRole('button', { name: /Ask Enara about this (lesson|video)/ })], 60_000))) await clickOne(page, 'Ask Enara', [page.getByRole('button', { name: /Ask Enara/ })]);
     await snap(page, `${who}-5-drawer`);
-    await clickOne(page, 'Talk live', [page.getByRole('button', { name: /Talk live/ })], 30_000);
+    // The drawer asks the server whether live calls are on when it opens; on a slow answer, close it and open it again.
+    if (!(await clickOne(page, 'Talk live', [page.getByRole('button', { name: /Talk live/ })], 30_000))) {
+      await page.keyboard.press('Escape').catch(() => undefined);
+      await page.locator('.ek-drawer__scrim').click({ timeout: 3000 }).catch(() => undefined);
+      await clickOne(page, 'Ask Enara about this lesson (again)', [page.getByRole('button', { name: /Ask Enara about this (lesson|video)/ })], 20_000);
+      await clickOne(page, 'Talk live', [page.getByRole('button', { name: /Talk live/ })], 40_000);
+    }
   } else {
     await clickOne(page, 'My learning', [page.getByRole('button', { name: 'My learning', exact: true }), page.getByRole('link', { name: 'My learning' })]);
     await snap(page, `${who}-2-learning`);
-    await clickOne(page, 'English course', [page.getByRole('button', { name: /English/ })], 90_000);
+    await clickOne(page, `${subject} course`, [page.getByRole('button', { name: COURSE[subject].standard })], 90_000);
     await snap(page, `${who}-3-course`);
     await clickOne(page, 'lesson', LESSON_PREF.map((re) => page.getByRole('button', { name: re })), 60_000);
     await snap(page, `${who}-4-lesson`);
@@ -207,14 +232,23 @@ async function openCallScreen(page, who, app) {
 }
 
 // ---------- one real call
-const MOMENTS = [
-  { id: 'new-question', say: () => 'Hello. Can you give me one short question about this lesson, please?' },
-  { id: 'wrong', say: (q) => answers(q).wrong },
-  { id: 'stuck1', say: () => "I don't know." },
-  { id: 'stuck2', say: () => "I don't know. I am confused." },
-  { id: 'right', say: (q) => answers(q).right },
-  { id: 'drawing', say: () => 'Can you draw a picture for me, please?' },
-];
+const MOMENTS = {
+  english: [
+    { id: 'new-question', say: () => 'Hello. Can you give me one short question about this lesson, please?' },
+    { id: 'wrong', say: (q) => answers(q).wrong },
+    { id: 'stuck1', say: () => "I don't know." },
+    { id: 'stuck2', say: () => "I don't know. I am confused." },
+    { id: 'right', say: (q) => answers(q).right },
+    { id: 'drawing', say: () => 'Can you draw a picture for me, please?' },
+  ],
+  maths: [
+    { id: 'maths-new-question', say: () => 'Hello. Can you give me one short sum to solve, please?' },
+    { id: 'maths-wrong', say: (q) => mathsAnswers(q).wrong },
+    { id: 'maths-stuck', say: () => "I don't know. I am confused." },
+    { id: 'maths-right', say: (q) => mathsAnswers(q).right },
+    { id: 'maths-drawing', say: () => 'Can you draw a picture to show me, please?' },
+  ],
+};
 
 async function oneCall(browser, spec) {
   const { who, expressive } = spec;
@@ -251,7 +285,8 @@ async function oneCall(browser, spec) {
     }
   });
   try {
-    if (!(await openCallScreen(page, tag, learner.app))) { result.errors.push('no Start call button'); return result; }
+    // lms-test can be slow: one more try from the start before giving up (no call has started yet).
+    if (!(await openCallScreen(page, tag, learner.app, learner.subject)) && !(await openCallScreen(page, `${tag}-retry`, learner.app, learner.subject))) { result.errors.push('no Start call button'); return result; }
     if (plan.mode !== 'calls') return result;
     await page.getByRole('button', { name: 'Start call' }).click();
     // Connected: the face is moving.
@@ -262,7 +297,7 @@ async function oneCall(browser, spec) {
     await saveFrame(page, `${who}--idle--${expressive}`);
     const frame = page.getByTestId('live-avatar-frame');
     let lastQuestion = '';
-    for (const m of MOMENTS) {
+    for (const m of MOMENTS[learner.subject ?? 'english']) {
       const text = m.say(lastQuestion);
       const turn = { moment: m.id, said: text };
       const before = { replies: replies.length, persona: await frame.getAttribute('data-persona-turn').catch(() => null), done: await frame.getAttribute('data-persona-done').catch(() => null) };
@@ -276,11 +311,11 @@ async function oneCall(browser, spec) {
       turn.cueSent = await frame.getAttribute('data-cue-sent').catch(() => null);
       turn.cueApplied = await frame.getAttribute('data-cue-applied').catch(() => null);
       turn.personaCue = await frame.getAttribute('data-persona-turn').catch(() => null);
-      if (m.id === 'drawing') { await sleep(1500); await page.screenshot({ path: join(OUT, 'shots', `${who}--drawing-panel--${expressive}.png`) }); }
+      if (/drawing$/.test(m.id)) { await sleep(1500); await page.screenshot({ path: join(OUT, 'shots', `${who}--${m.id}-panel--${expressive}.png`) }); }
       // A second cue in the same reply (stuck: concerned, then supportive): one more frame ~1 s after Anam applies it.
       // Stuck: a second cue in the same reply (concerned, then supportive): one more frame ~1 s after Anam applies it
       // (switch off: the same moment, about 3 s into the reply).
-      if (/^stuck/.test(m.id)) {
+      if (/stuck/.test(m.id)) {
         const second = expressive === 'on' && await page.waitForFunction((prev) => { const el = document.querySelector('[data-testid="live-avatar-frame"]'); return el && el.dataset.cueApplied && el.dataset.cueApplied !== prev && /^supportive@/.test(el.dataset.cueApplied); }, turn.cueApplied, { timeout: 8000 }).then(() => true, () => false);
         await sleep(second ? 1000 : 2000);
         await saveFrame(page, `${who}--${m.id}-then--${expressive}`);
@@ -313,6 +348,18 @@ async function saveFrame(page, name) {
   else await page.locator('#enara-anam-video').screenshot({ path: join(OUT, 'shots', `${name}.png`) }).catch(() => undefined);
 }
 
+async function voiceProbe() {
+  // Which Arabic voice a child's call gets and whether it can be slowed: start a call (a token only, never connected) and end it.
+  for (const lang of plan.voiceProbe ?? []) {
+    const a = await login(plan.learners.child.email);
+    if (!a.token) continue;
+    const r = await site('/api/avatar/session', { method: 'POST', headers: { Authorization: `Bearer ${a.token}`, 'Content-Type': 'application/json', 'x-enara-expressive-test': 'on', 'x-enara-ci-token': CI_TOKEN }, body: JSON.stringify({ preferred_language: lang }) });
+    const j = await r.json().catch(() => ({}));
+    summary(`VOICE_PROBE ${lang} ${r.status} ${JSON.stringify(j.expressive_test ?? null)}`);
+    if (j.session_id) await site(`/api/avatar/session/${encodeURIComponent(j.session_id)}`, { method: 'DELETE', headers: { Authorization: `Bearer ${a.token}` } }).catch(() => undefined);
+  }
+}
+
 // ---------- dry checks: sign-ins, the Arabic/English voices in use, the call screen (no call)
 async function dry(browser) {
   const admin = await login(plan.admin);
@@ -325,15 +372,6 @@ async function dry(browser) {
   for (const email of plan.dryCheck ?? []) {
     const a = await login(email);
     summary(`LEARNER ${email.split('@')[0]} login=${a.token ? 'ok' : a.status} role=${a.user?.role ?? '-'} uiMode=${a.user?.uiMode ?? '-'} ageBand=${a.user?.learnerAgeBand ?? '-'}`);
-  }
-  // Which Arabic voice a child's call gets and whether it can be slowed: start a call (a token only, never connected) and end it.
-  for (const lang of plan.voiceProbe ?? []) {
-    const a = await login(plan.learners.child.email);
-    if (!a.token) continue;
-    const r = await site('/api/avatar/session', { method: 'POST', headers: { Authorization: `Bearer ${a.token}`, 'Content-Type': 'application/json', 'x-enara-expressive-test': 'on', 'x-enara-ci-token': CI_TOKEN }, body: JSON.stringify({ preferred_language: lang }) });
-    const j = await r.json().catch(() => ({}));
-    summary(`VOICE_PROBE ${lang} ${r.status} ${JSON.stringify(j.expressive_test ?? null)}`);
-    if (j.session_id) await site(`/api/avatar/session/${encodeURIComponent(j.session_id)}`, { method: 'DELETE', headers: { Authorization: `Bearer ${a.token}` } }).catch(() => undefined);
   }
   const out = [];
   for (const who of Object.keys(plan.learners)) out.push(await oneCall(browser, { who, expressive: 'on' }));
@@ -351,9 +389,11 @@ async function main() {
   });
   let results;
   try {
+    await voiceProbe();
     if (plan.mode === 'calls') {
-      if ((plan.callsUsed ?? 0) > plan.maxCalls) throw new Error(`call budget: ${plan.callsUsed} used of ${plan.maxCalls}`);
-      if ((plan.callsUsed ?? 0) + plan.run.length > plan.maxCalls) throw new Error('this run would pass the call budget');
+      // callsUsed already counts this run's calls.
+      if ((plan.callsUsed ?? 0) > plan.maxCalls) throw new Error(`call budget: ${plan.callsUsed} of ${plan.maxCalls}`);
+      if ((plan.callsUsed ?? 0) < plan.run.length) throw new Error('callsUsed must count this run');
       results = [];
       for (const spec of plan.run) {
         log(`CALL ${spec.who} ${spec.expressive}`);
