@@ -1,163 +1,152 @@
-import { Bot, CircleCheck, ClipboardCheck, Flame, Mail, RefreshCw, Siren, Snowflake, Sparkles, TriangleAlert, Video, Clock } from 'lucide-react';
+import type { ReactNode } from 'react';
+import { Bot, CircleCheck, CircleSlash, Clock, Database, HardDrive, KeyRound, Mail, Mic, RefreshCw, ShieldCheck, Siren, Sparkles, TriangleAlert, Video, XCircle } from 'lucide-react';
 import { num, usePreview, useT, type Lang } from '@/lib/preview';
 import { SectionTitle } from '@/components/shell';
 import { Alert, Badge, Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui';
 import { cn } from '@/lib/utils';
 import { PlatformShell } from './PlatformShell';
+import { featureLabel, fetchAiUsage, fetchReady, ms, timeShort, useLoad } from './data';
+import { ErrorBlock, LoadingBlock, NotAvailable } from './states';
 
-type St = 'ok' | 'degraded' | 'cold';
-interface Svc { id: string; icon: React.ReactNode; status: St; p50: number; p95: number; err: number; version: string; check: number; warm?: boolean; unit?: 'ms' | 's' }
-
-const SVCS: Svc[] = [
-  { id: 'tutor', icon: <Bot />, status: 'ok', p50: 820, p95: 2100, err: 0.2, version: 'deepseek-chat · prompt v14', check: 1 },
-  { id: 'grading', icon: <ClipboardCheck />, status: 'degraded', p50: 2900, p95: 11400, err: 2.8, version: 'grader-2026.11 · rubric v6', check: 1 },
-  { id: 'mishkatAr', icon: <Sparkles />, status: 'ok', p50: 140, p95: 310, err: 0.0, version: 'mishkat-ar 1.4.2', check: 2, warm: true },
-  { id: 'mishkatEn', icon: <Sparkles />, status: 'cold', p50: 160, p95: 38200, err: 0.1, version: 'mishkat-en 1.3.0', check: 2, warm: false },
-  { id: 'avatar', icon: <Video />, status: 'ok', p50: 640, p95: 1250, err: 0.4, version: 'Anam · persona v3', check: 1 },
-  { id: 'email', icon: <Mail />, status: 'ok', p50: 310, p95: 720, err: 0.3, version: 'Resend API · 2 domains', check: 5 },
-];
+type Tone = 'success' | 'info' | 'outline' | 'danger' | 'warning';
+interface Svc { id: string; icon: ReactNode; check?: string; extra?: { label: string; value: string }[]; na?: boolean }
 
 const T = {
   en: {
-    title: 'Models & Mishkat', sub: 'Live status of every AI and messaging service · checked every minute', refresh: 'Refresh',
-    banner: 'The grading model is slow', bannerD: 'Teachers see marks 10–15 s later than usual. Answers are queued, none are lost. Incident INC-214 is open.',
-    name: { tutor: 'Tutor model', grading: 'Grading model', mishkatAr: 'Mishkat Arabic', mishkatEn: 'Mishkat English', avatar: 'Avatar', email: 'Email' } as Record<string, string>,
-    provider: { tutor: 'DeepSeek', grading: 'Hosted LLM', mishkatAr: 'ENARA GPU · scoring', mishkatEn: 'ENARA GPU · scoring', avatar: 'Anam', email: 'Resend' } as Record<string, string>,
-    st: { ok: 'Operational', degraded: 'Degraded', cold: 'Cold start' } as Record<St, string>,
-    warm: 'Warm', coldL: 'Cold', warmUp: 'Warm up now', coldNote: 'GPU scaled down at 02:00. First request takes about 38 s.',
-    p50: 'p50', p95: 'p95', err: 'Errors', check: (m: number) => `Checked ${m} min ago`, version: 'Version',
-    qwk: 'Mishkat agreement with teachers', qwkD: 'Quadratic weighted kappa (QWK) on answers marked by both Mishkat and a teacher, last 30 days. Target 0.80.',
-    target: 'Target', samples: (n: string) => `${n} double-marked answers`,
-    q: [
-      { name: 'Arabic · writing', v: 0.86, n: 1240 },
-      { name: 'Arabic · short answers', v: 0.89, n: 2015 },
-      { name: 'English · writing', v: 0.82, n: 980 },
-      { name: 'English · short answers', v: 0.84, n: 1530 },
-      { name: 'Science · explanations (Arabic)', v: 0.77, n: 412 },
-    ],
-    below: 'Below target: teachers review every mark in this area',
-    incidents: 'Recent incidents',
-    inc: [
-      { id: 'INC-214', title: 'Grading model responding slowly', svc: 'Grading model', when: 'Today, 10:20 · ongoing', sev: 'degraded', open: true },
-      { id: 'INC-213', title: 'Mishkat English cold start after GPU scale-down', svc: 'Mishkat English', when: 'Today, 07:05 · 6 min', sev: 'minor', open: false },
-      { id: 'INC-211', title: 'Bounce spike from one school email domain', svc: 'Email (Resend)', when: '22 Nov · 2 h 10 min', sev: 'minor', open: false },
-      { id: 'INC-209', title: 'Tutor API timeouts from DeepSeek', svc: 'Tutor model', when: '18 Nov · 34 min', sev: 'major', open: false },
-    ],
-    open: 'Open', resolved: 'Resolved', sev: { degraded: 'Degraded', minor: 'Minor', major: 'Major' } as Record<string, string>,
+    title: 'Models & Mishkat', sub: (time: string) => `Configuration and reachability from the public readiness check${time ? ` · checked at ${time}` : ''}`, refresh: 'Refresh',
+    readyOk: 'All required services are ready', notReady: 'Not ready: a required service is down', notReadyD: (list: string) => `Failing: ${list}. Users may see errors until it is fixed.`,
+    name: { mongo: 'Main database', postgres: 'Ingestion database', r2: 'File storage', anthropic: 'Tutor and grading model', fallback: 'Fallback model key', elevenlabs: 'Speech', anam: 'Avatar', spendCap: 'Test spend cap', mishkatAr: 'Mishkat Arabic', mishkatEn: 'Mishkat English', email: 'Email' } as Record<string, string>,
+    provider: { mongo: 'MongoDB', postgres: 'Postgres', r2: 'Cloudflare R2', anthropic: 'Anthropic', fallback: 'Anthropic', elevenlabs: 'ElevenLabs', anam: 'Anam', spendCap: 'Staging AI spend limit', mishkatAr: 'ENARA GPU · scoring', mishkatEn: 'ENARA GPU · scoring', email: 'Resend' } as Record<string, string>,
+    st: { ok: 'Reachable', accepted: 'Key accepted', configured: 'Configured', set: 'Set', not_configured: 'Not configured', not_set: 'Not set', unavailable: 'Unavailable', rejected: 'Key rejected', error: 'Check failed' } as Record<string, string>,
+    required: 'Required', keyCheck: 'Key', fallbackModel: 'Fallback model',
+    naNote: 'Latency, warm state and version need the planned platform status endpoint.',
+    configNote: 'Configured means a key is set; it does not prove the provider answers.',
+    activity: 'Model activity, last 24 hours', activityD: 'All schools · from recorded AI calls. Averages, not percentiles.',
+    cFeature: 'Feature', cModel: 'Model', cCalls: 'Calls', cErr: 'Errors', cLat: 'Avg time', cFirst: 'First token',
+    activityEmpty: 'No AI calls in the last 24 hours.', activityFailed: 'Model activity could not be loaded.',
+    qwk: 'Mishkat agreement with teachers', qwkNa: 'Agreement (QWK) between Mishkat and teachers is not reported by the lms-test API yet.',
+    incidents: 'Recent incidents', incidentsNa: 'There is no incident record on lms-test yet.',
+    failed: 'The readiness check could not be loaded.',
   },
   ar: {
-    title: 'النماذج ومشكاة', sub: 'الحالة المباشرة لكل خدمات الذكاء الاصطناعي والمراسلة · يُفحص كل دقيقة', refresh: 'تحديث',
-    banner: 'نموذج التصحيح بطيء', bannerD: 'تظهر الدرجات للمعلمين متأخرة 10 إلى 15 ثانية عن المعتاد. الإجابات في قائمة الانتظار ولم يُفقد منها شيء. البلاغ INC-214 مفتوح.',
-    name: { tutor: 'نموذج المعلّم', grading: 'نموذج التصحيح', mishkatAr: 'مشكاة العربية', mishkatEn: 'مشكاة الإنجليزية', avatar: 'الصورة الرمزية', email: 'البريد الإلكتروني' } as Record<string, string>,
-    provider: { tutor: 'DeepSeek', grading: 'نموذج لغوي مستضاف', mishkatAr: 'وحدة GPU لإنارة · تقييم', mishkatEn: 'وحدة GPU لإنارة · تقييم', avatar: 'Anam', email: 'Resend' } as Record<string, string>,
-    st: { ok: 'يعمل', degraded: 'أداء منخفض', cold: 'بدء بارد' } as Record<St, string>,
-    warm: 'جاهز', coldL: 'بارد', warmUp: 'تسخين الآن', coldNote: 'أُوقفت وحدة GPU في الساعة 02:00. يستغرق أول طلب نحو 38 ثانية.',
-    p50: 'p50', p95: 'p95', err: 'الأخطاء', check: (m: number) => (m === 1 ? 'فُحص منذ دقيقة' : m === 2 ? 'فُحص منذ دقيقتين' : `فُحص منذ ${m} دقائق`), version: 'الإصدار',
-    qwk: 'اتفاق مشكاة مع المعلمين', qwkD: 'معامل كابا الموزون تربيعيًا (QWK) على الإجابات التي صحّحها كلٌّ من مشكاة والمعلم، آخر 30 يومًا. الهدف 0.80.',
-    target: 'الهدف', samples: (n: string) => `${n} إجابة مصحّحة مرتين`,
-    q: [
-      { name: 'العربية · الكتابة', v: 0.86, n: 1240 },
-      { name: 'العربية · الإجابات القصيرة', v: 0.89, n: 2015 },
-      { name: 'الإنجليزية · الكتابة', v: 0.82, n: 980 },
-      { name: 'الإنجليزية · الإجابات القصيرة', v: 0.84, n: 1530 },
-      { name: 'العلوم · التفسير (بالعربية)', v: 0.77, n: 412 },
-    ],
-    below: 'دون الهدف: يراجع المعلمون كل درجة في هذا المجال',
-    incidents: 'أحدث الأعطال',
-    inc: [
-      { id: 'INC-214', title: 'بطء استجابة نموذج التصحيح', svc: 'نموذج التصحيح', when: 'اليوم، 10:20 · مستمر', sev: 'degraded', open: true },
-      { id: 'INC-213', title: 'بدء بارد لمشكاة الإنجليزية بعد إيقاف وحدة GPU', svc: 'مشكاة الإنجليزية', when: 'اليوم، 07:05 · 6 دقائق', sev: 'minor', open: false },
-      { id: 'INC-211', title: 'ارتفاع الرسائل المرتدة من نطاق بريد إحدى المدارس', svc: 'البريد الإلكتروني (Resend)', when: '22 نوفمبر · ساعتان و10 دقائق', sev: 'minor', open: false },
-      { id: 'INC-209', title: 'انتهاء مهلة طلبات نموذج المعلّم لدى DeepSeek', svc: 'نموذج المعلّم', when: '18 نوفمبر · 34 دقيقة', sev: 'major', open: false },
-    ],
-    open: 'مفتوح', resolved: 'تم الحل', sev: { degraded: 'أداء منخفض', minor: 'بسيط', major: 'كبير' } as Record<string, string>,
+    title: 'النماذج ومشكاة', sub: (time: string) => `الإعداد وإمكانية الوصول من فحص الجاهزية العام${time ? ` · فُحص في ${time}` : ''}`, refresh: 'تحديث',
+    readyOk: 'كل الخدمات المطلوبة جاهزة', notReady: 'غير جاهز: خدمة مطلوبة متوقفة', notReadyD: (list: string) => `المتعطّل: ${list}. قد يرى المستخدمون أخطاء حتى يُصلَح.`,
+    name: { mongo: 'قاعدة البيانات الرئيسية', postgres: 'قاعدة بيانات الاستيعاب', r2: 'تخزين الملفات', anthropic: 'نموذج المعلّم والتصحيح', fallback: 'مفتاح النموذج الاحتياطي', elevenlabs: 'الكلام', anam: 'الصورة الرمزية', spendCap: 'حدّ إنفاق الاختبار', mishkatAr: 'مشكاة العربية', mishkatEn: 'مشكاة الإنجليزية', email: 'البريد الإلكتروني' } as Record<string, string>,
+    provider: { mongo: 'MongoDB', postgres: 'Postgres', r2: 'Cloudflare R2', anthropic: 'Anthropic', fallback: 'Anthropic', elevenlabs: 'ElevenLabs', anam: 'Anam', spendCap: 'حدّ إنفاق الذكاء الاصطناعي في بيئة الاختبار', mishkatAr: 'وحدة GPU لإنارة · تقييم', mishkatEn: 'وحدة GPU لإنارة · تقييم', email: 'Resend' } as Record<string, string>,
+    st: { ok: 'يمكن الوصول', accepted: 'المفتاح مقبول', configured: 'مُعَدّ', set: 'مضبوط', not_configured: 'غير مُعَدّ', not_set: 'غير مضبوط', unavailable: 'غير متاح', rejected: 'المفتاح مرفوض', error: 'تعذّر الفحص' } as Record<string, string>,
+    required: 'مطلوب', keyCheck: 'المفتاح', fallbackModel: 'النموذج الاحتياطي',
+    naNote: 'زمن الاستجابة وحالة الجاهزية والإصدار تحتاج إلى واجهة حالة المنصة المخطط لها.',
+    configNote: '«مُعَدّ» يعني أن المفتاح موجود، ولا يثبت أن المزوّد يستجيب.',
+    activity: 'نشاط النماذج، آخر 24 ساعة', activityD: 'جميع المدارس · من طلبات الذكاء الاصطناعي المسجّلة. متوسطات لا نِسَب مئوية.',
+    cFeature: 'الميزة', cModel: 'النموذج', cCalls: 'الطلبات', cErr: 'الأخطاء', cLat: 'متوسط الزمن', cFirst: 'أول جزء من الرد',
+    activityEmpty: 'لا طلبات ذكاء اصطناعي في آخر 24 ساعة.', activityFailed: 'تعذّر تحميل نشاط النماذج.',
+    qwk: 'اتفاق مشكاة مع المعلمين', qwkNa: 'لا تعرض واجهة lms-test بعد معامل الاتفاق (QWK) بين مشكاة والمعلمين.',
+    incidents: 'أحدث الأعطال', incidentsNa: 'لا يوجد سجل أعطال على lms-test بعد.',
+    failed: 'تعذّر تحميل فحص الجاهزية.',
   },
 };
 
-const ms = (v: number, lang: Lang) =>
-  lang === 'ar'
-    ? `${num(v / 1000, lang, { maximumFractionDigits: v >= 1000 ? 1 : 2 })} ث`
-    : v >= 1000 ? `${num(v / 1000, lang, { maximumFractionDigits: 1 })} s` : `${num(v, lang)} ms`;
-const ST_TONE: Record<St, 'success' | 'warning' | 'info'> = { ok: 'success', degraded: 'warning', cold: 'info' };
-const ST_ICON: Record<St, React.ReactNode> = { ok: <CircleCheck />, degraded: <TriangleAlert />, cold: <Snowflake /> };
+function statusOf(v: string | undefined): { tone: Tone; icon: ReactNode } {
+  switch (v) {
+    case 'ok': case 'accepted': return { tone: 'success', icon: <CircleCheck /> };
+    case 'configured': case 'set': return { tone: 'info', icon: <CircleCheck /> };
+    case 'unavailable': case 'rejected': return { tone: 'danger', icon: <XCircle /> };
+    case 'error': return { tone: 'warning', icon: <TriangleAlert /> };
+    default: return { tone: 'outline', icon: <CircleSlash /> };
+  }
+}
+// /ready names its required checks after the dependency (r2Configured, aiTestSpendCap).
+const REQUIRED_KEY: Record<string, string> = { mongo: 'mongo', postgres: 'postgres', r2: 'r2Configured', spendCap: 'aiTestSpendCap' };
 
 export default function PlatformModels() {
   const t = useT(T);
   const { lang } = usePreview();
-  return (
-    <PlatformShell active="models" title={t.title} subtitle={t.sub} actions={<Button variant="outline" size="sm" aria-label={t.refresh}><RefreshCw /><span className="hidden sm:inline">{t.refresh}</span></Button>}>
-      <div className="mx-auto flex max-w-6xl flex-col gap-5">
-        <Alert tone="warning" icon={<TriangleAlert />} title={t.banner}>{t.bannerD}</Alert>
+  const ready = useLoad((signal) => fetchReady(signal));
+  const activity = useLoad((signal) => fetchAiUsage(1, undefined, signal));
+  const reload = () => { ready.reload(); activity.reload(); };
+  const actions = <Button variant="outline" size="sm" aria-label={t.refresh} isDisabled={ready.loading} onPress={reload}><RefreshCw /><span className="hidden sm:inline">{t.refresh}</span></Button>;
 
+  let top: ReactNode;
+  if (ready.loading && !ready.data) top = <LoadingBlock rows={3} className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3" />;
+  else if (ready.error && !ready.data) top = <ErrorBlock error={ready.error} onRetry={ready.reload} title={t.failed} />;
+  else if (ready.data) {
+    const c = ready.data.checks;
+    const required = new Set(ready.data.required);
+    const svcs: Svc[] = [
+      // With the model fallback switch on, /ready also tests the key (accepted / rejected / error); otherwise only "configured".
+      { id: 'anthropic', icon: <Bot />, check: c.anthropicKey ?? c.anthropic, extra: c.anthropicKey && c.anthropic ? [{ label: t.keyCheck, value: t.st[c.anthropic] ?? c.anthropic }] : undefined },
+      ...(c.anthropicFallbackKey ? [{ id: 'fallback', icon: <KeyRound />, check: c.anthropicFallbackKey, extra: c.anthropicFallbackModel ? [{ label: t.fallbackModel, value: t.st[c.anthropicFallbackModel] ?? c.anthropicFallbackModel }] : undefined }] : []),
+      { id: 'mishkatAr', icon: <Sparkles />, na: true },
+      { id: 'mishkatEn', icon: <Sparkles />, na: true },
+      { id: 'anam', icon: <Video />, check: c.anam },
+      { id: 'elevenlabs', icon: <Mic />, check: c.elevenlabs },
+      { id: 'email', icon: <Mail />, na: true },
+      { id: 'mongo', icon: <Database />, check: c.mongo },
+      { id: 'postgres', icon: <Database />, check: c.postgres },
+      { id: 'r2', icon: <HardDrive />, check: c.r2 },
+      { id: 'spendCap', icon: <ShieldCheck />, check: c.aiTestSpendCap },
+    ].filter((s) => s.na || s.check !== undefined);
+    const failing = ready.data.required.filter((k) => {
+      const v = k === 'r2Configured' ? c.r2 : k === 'aiTestSpendCap' ? c.aiTestSpendCap : c[k];
+      return !(v === 'ok' || v === 'configured' || v === 'set');
+    });
+    top = (
+      <>
+        {ready.data.status === 'ready'
+          ? <Alert tone="success" icon={<CircleCheck />} title={t.readyOk} />
+          : <Alert tone="danger" icon={<TriangleAlert />} title={t.notReady}>{t.notReadyD(failing.length ? failing.join(', ') : '—')}</Alert>}
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-          {SVCS.map((s) => (
-            <Card key={s.id} className={cn('flex flex-col gap-3 p-4', s.status === 'degraded' && 'border-warning/60')}>
-              <div className="flex items-start gap-3">
-                <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-secondary text-primary [&_svg]:size-[18px]">{s.icon}</span>
-                <div className="min-w-0 flex-1"><p className="text-sm font-bold">{t.name[s.id]}</p><p className="truncate text-xs text-muted-foreground">{t.provider[s.id]}</p></div>
-                <Badge tone={ST_TONE[s.status]}>{ST_ICON[s.status]}{t.st[s.status]}</Badge>
-              </div>
-              {s.warm !== undefined && (
-                <div className={cn('flex items-center gap-2 rounded-md px-2.5 py-1.5 text-xs', s.warm ? 'bg-success-soft' : 'bg-info-soft')}>
-                  {s.warm ? <Flame className="size-3.5 text-success" /> : <Snowflake className="size-3.5 text-info" />}
-                  <span className="font-semibold">{s.warm ? t.warm : t.coldL}</span>
-                  {!s.warm && <span className="min-w-0 flex-1 text-muted-foreground">{t.coldNote}</span>}
+          {svcs.map((s) => {
+            const st = statusOf(s.check);
+            const isRequired = REQUIRED_KEY[s.id] && required.has(REQUIRED_KEY[s.id]);
+            return (
+              <Card key={s.id} className={cn('flex flex-col gap-3 p-4', st.tone === 'danger' && 'border-destructive/50', st.tone === 'warning' && 'border-warning/60')}>
+                <div className="flex items-start gap-3">
+                  <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-secondary text-primary [&_svg]:size-[18px]">{s.icon}</span>
+                  <div className="min-w-0 flex-1"><p className="text-sm font-bold">{t.name[s.id]}</p><p className="truncate text-xs text-muted-foreground">{t.provider[s.id]}</p></div>
+                  {s.na ? <Badge tone="outline"><Clock />{lang === 'ar' ? 'غير متاح بعد' : 'Not available yet'}</Badge>
+                    : <Badge tone={st.tone}>{st.icon}{t.st[s.check ?? ''] ?? s.check}</Badge>}
                 </div>
-              )}
-              <dl className="grid grid-cols-3 gap-2 rounded-lg bg-muted/60 p-2.5">
-                <Metric label={t.p50} value={ms(s.p50, lang)} />
-                <Metric label={t.p95} value={ms(s.p95, lang)} bad={s.p95 > 5000} />
-                <Metric label={t.err} value={`${num(s.err, lang, { minimumFractionDigits: 1 })}%`} bad={s.err >= 1} />
-              </dl>
-              <div className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
-                <span className="inline-flex items-center gap-1"><Clock className="size-3" />{t.check(s.check)}</span>
-                <span className="min-w-0 truncate font-mono"><bdi>{s.version}</bdi></span>
-              </div>
-              {s.warm === false && <Button variant="outline" size="sm"><Flame />{t.warmUp}</Button>}
-            </Card>
-          ))}
+                {s.extra?.map((e) => (
+                  <dl key={e.label} className="flex items-center justify-between gap-2 rounded-lg bg-muted/60 px-2.5 py-1.5 text-xs"><dt className="font-semibold text-muted-foreground">{e.label}</dt><dd className="font-semibold">{e.value}</dd></dl>
+                ))}
+                <div className="mt-auto flex flex-col gap-2">
+                  {s.na ? <p className="text-[11px] text-muted-foreground">{t.naNote}</p> : (s.check === 'configured') ? <p className="text-[11px] text-muted-foreground">{t.configNote}</p> : null}
+                  {isRequired && <span className="text-[11px] font-semibold text-muted-foreground">{t.required}</span>}
+                </div>
+              </Card>
+            );
+          })}
         </div>
+      </>
+    );
+  }
+
+  return (
+    <PlatformShell active="models" title={t.title} subtitle={t.sub(timeShort(ready.at, lang))} actions={actions}>
+      <div className="mx-auto flex max-w-6xl flex-col gap-5">
+        {top}
+
+        <Card>
+          <CardHeader><CardTitle>{t.activity}</CardTitle><CardDescription>{t.activityD}</CardDescription></CardHeader>
+          <CardContent>
+            {activity.loading && !activity.data ? <LoadingBlock rows={2} />
+              : activity.error && !activity.data ? <ErrorBlock error={activity.error} onRetry={activity.reload} title={t.activityFailed} />
+              : !activity.data?.rows.length ? <p className="text-sm text-muted-foreground">{t.activityEmpty}</p>
+              : <ActivityList rows={activity.data.rows} t={t} lang={lang} />}
+          </CardContent>
+        </Card>
 
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
           <Card>
-            <CardHeader><CardTitle>{t.qwk}</CardTitle><CardDescription>{t.qwkD}</CardDescription></CardHeader>
-            <CardContent className="flex flex-col gap-4">
-              {t.q.map((q) => {
-                const below = q.v < 0.8;
-                return (
-                  <div key={q.name} className="flex flex-col gap-1.5">
-                    <div className="flex items-baseline justify-between gap-3">
-                      <p className="min-w-0 truncate text-sm font-medium">{q.name}</p>
-                      <p className={cn('shrink-0 text-sm font-bold tabular-nums', below && 'text-destructive')}>{num(q.v, lang, { minimumFractionDigits: 2 })}</p>
-                    </div>
-                    <div className="relative h-2 rounded-full bg-muted">
-                      <div className={cn('absolute inset-y-0 start-0 rounded-full', below ? 'bg-warning' : 'bg-success')} style={{ width: `${q.v * 100}%` }} />
-                      <span className="absolute -top-1 -bottom-1 w-0.5 rounded-full bg-foreground/70" style={{ insetInlineStart: 'calc(80% - 1px)' }} />
-                    </div>
-                    <p className="text-[11px] text-muted-foreground">{t.samples(num(q.n, lang))}{below && <span className="font-semibold text-warning-foreground"> · {t.below}</span>}</p>
-                  </div>
-                );
-              })}
-              <p className="flex items-center gap-1.5 border-t pt-3 text-[11px] text-muted-foreground"><span className="h-3 w-0.5 rounded-full bg-foreground/70" />{t.target} {num(0.8, lang, { minimumFractionDigits: 2 })}</p>
-            </CardContent>
+            <CardHeader><CardTitle>{t.qwk}</CardTitle></CardHeader>
+            <CardContent className="flex flex-col gap-2"><p className="text-sm text-muted-foreground">{t.qwkNa}</p><NotAvailable /></CardContent>
           </Card>
-
           <section>
             <SectionTitle>{t.incidents}</SectionTitle>
-            <Card className="divide-y">
-              {t.inc.map((i) => (
-                <div key={i.id} className="flex items-start gap-3 px-4 py-3">
-                  <span className={cn('mt-0.5 grid size-8 shrink-0 place-items-center rounded-md [&_svg]:size-4', i.open ? 'bg-warning-soft text-warning-foreground' : 'bg-muted text-muted-foreground')}>{i.open ? <Siren /> : <CircleCheck />}</span>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold">{i.title}</p>
-                    <p className="text-xs text-muted-foreground"><span className="font-mono">{i.id}</span> · {i.svc} · {i.when}</p>
-                  </div>
-                  <div className="flex shrink-0 flex-col items-end gap-1">
-                    <Badge tone={i.open ? 'warning' : 'success'}>{i.open ? t.open : t.resolved}</Badge>
-                    <span className={cn('text-[11px] font-semibold', i.sev === 'major' ? 'text-destructive' : 'text-muted-foreground')}>{t.sev[i.sev]}</span>
-                  </div>
-                </div>
-              ))}
+            <Card className="flex items-start gap-3 p-4">
+              <span className="grid size-8 shrink-0 place-items-center rounded-md bg-muted text-muted-foreground [&_svg]:size-4"><Siren /></span>
+              <div className="flex min-w-0 flex-1 flex-col gap-2"><p className="text-sm text-muted-foreground">{t.incidentsNa}</p><NotAvailable /></div>
             </Card>
           </section>
         </div>
@@ -166,10 +155,57 @@ export default function PlatformModels() {
   );
 }
 
+function ActivityList({ rows, t, lang }: { rows: Awaited<ReturnType<typeof fetchAiUsage>>['rows']; t: (typeof T)['en']; lang: Lang }) {
+  const sorted = [...rows].sort((a, b) => b.calls - a.calls).slice(0, 12);
+  const errPct = (r: (typeof rows)[number]) => (r.calls ? (r.errors / r.calls) * 100 : 0);
+  return (
+    <>
+      {/* Desktop: a table */}
+      <div className="hidden overflow-x-auto md:block">
+        <table className="w-full border-separate border-spacing-0 text-sm">
+          <thead className="text-muted-foreground">
+            <tr>
+              {[t.cFeature, t.cModel, t.cCalls, t.cErr, t.cLat, t.cFirst].map((h, i) => (
+                <th key={h} scope="col" className={cn('border-b px-3 py-2 text-xs font-semibold uppercase tracking-wide', i >= 2 ? 'text-end' : 'text-start')}>{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {sorted.map((r) => (
+              <tr key={`${r.feature}|${r.model}`}>
+                <th scope="row" className="border-b px-3 py-2.5 text-start font-semibold">{featureLabel(r.feature, lang)}</th>
+                <td className="border-b px-3 py-2.5 font-mono text-xs"><bdi>{r.model || '—'}</bdi></td>
+                <td className="border-b px-3 py-2.5 text-end tabular-nums">{num(r.calls, lang)}</td>
+                <td className={cn('border-b px-3 py-2.5 text-end tabular-nums', errPct(r) >= 1 && 'font-semibold text-destructive')}>{num(errPct(r), lang, { maximumFractionDigits: 1 })}%</td>
+                <td className={cn('border-b px-3 py-2.5 text-end tabular-nums', r.avgLatencyMs > 5000 && 'font-semibold text-destructive')}>{r.avgLatencyMs ? ms(r.avgLatencyMs, lang) : '—'}</td>
+                <td className="border-b px-3 py-2.5 text-end tabular-nums">{r.avgFirstTokenMs != null ? ms(r.avgFirstTokenMs, lang) : '—'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {/* Phone: cards */}
+      <ul className="flex flex-col gap-2 md:hidden">
+        {sorted.map((r) => (
+          <li key={`${r.feature}|${r.model}`} className="rounded-lg border p-3">
+            <p className="text-sm font-semibold">{featureLabel(r.feature, lang)}</p>
+            <p className="truncate font-mono text-[11px] text-muted-foreground"><bdi>{r.model || '—'}</bdi></p>
+            <dl className="mt-2 grid grid-cols-3 gap-2 rounded-lg bg-muted/60 p-2.5">
+              <Metric label={t.cCalls} value={num(r.calls, lang)} />
+              <Metric label={t.cErr} value={`${num(errPct(r), lang, { maximumFractionDigits: 1 })}%`} bad={errPct(r) >= 1} />
+              <Metric label={t.cLat} value={r.avgLatencyMs ? ms(r.avgLatencyMs, lang) : '—'} bad={r.avgLatencyMs > 5000} />
+            </dl>
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+}
+
 function Metric({ label, value, bad }: { label: string; value: string; bad?: boolean }) {
   return (
     <div className="flex min-w-0 flex-col">
-      <dt className="text-[11px] font-semibold text-muted-foreground">{label}</dt>
+      <dt className="truncate text-[11px] font-semibold text-muted-foreground">{label}</dt>
       <dd className={cn('truncate text-sm font-bold tabular-nums', bad && 'text-destructive')}>{value}</dd>
     </div>
   );
