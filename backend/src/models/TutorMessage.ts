@@ -55,6 +55,8 @@ export interface ITutorMessageDoc extends Document {
     // injectionCheck: where text that tries to change the tutor's instructions was found.
     injection?: 'learner' | 'passage';
     practiceTurn?: { assessment: { verdict: string }; answeringCheck: boolean; objectiveId?: string; lessonId?: string; next?: string };
+    // liveExpressive: the live avatar's cues for this reply and the verdict they followed (tags only).
+    expressive?: { cues: string[]; verdict?: string; stuck?: boolean };
   };
 }
 
@@ -104,6 +106,7 @@ const tutorMessageDocSchema = new Schema<ITutorMessageDoc>(
         type: { assessment: { type: { verdict: String, _id: false } }, answeringCheck: Boolean, objectiveId: String, lessonId: String, next: String, _id: false },
         default: undefined,
       },
+      expressive: { type: { cues: { type: [String], default: undefined }, verdict: String, stuck: Boolean, _id: false }, default: undefined },
       languageTurn: {
         type: {
           version: String,
