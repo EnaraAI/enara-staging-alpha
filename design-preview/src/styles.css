@@ -1,0 +1,267 @@
+/* ENARA design tokens: one set of semantic tokens, three themes (kids, learner, admin), light and dark.
+   Components only use the semantic names (bg-primary, text-muted-foreground, rounded-lg ...), never raw colours,
+   so a theme is just a different set of values. Tailwind is built locally (no CDN). */
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@plugin 'tailwindcss-react-aria-components';
+
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/nunito';
+@import '@fontsource-variable/noto-sans-arabic';
+@import '@fontsource-variable/baloo-bhaijaan-2';
+@import '@fontsource/ibm-plex-sans-arabic/400.css';
+@import '@fontsource/ibm-plex-sans-arabic/500.css';
+@import '@fontsource/ibm-plex-sans-arabic/600.css';
+@import '@fontsource/ibm-plex-sans-arabic/700.css';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---------- Learners & Parents (default theme) ---------- */
+:root,
+[data-theme='learner'] {
+  --font-latin: 'Nunito Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-arabic: 'IBM Plex Sans Arabic', 'Noto Sans Arabic Variable', ui-sans-serif, sans-serif;
+  --root-size: 16px;
+  --radius: 0.875rem;
+  --tap: 44px; /* minimum tap target */
+
+  --background: oklch(0.984 0.006 250);
+  --foreground: oklch(0.23 0.045 262);
+  --card: oklch(1 0 0);
+  --card-foreground: var(--foreground);
+  --popover: oklch(1 0 0);
+  --popover-foreground: var(--foreground);
+  --primary: oklch(0.31 0.085 263);          /* ENARA navy */
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.955 0.016 255);
+  --secondary-foreground: oklch(0.3 0.06 262);
+  --accent: oklch(0.82 0.15 78);             /* ENARA amber */
+  --accent-foreground: oklch(0.27 0.06 60);
+  --muted: oklch(0.963 0.01 255);
+  --muted-foreground: oklch(0.5 0.03 260);
+  --success: oklch(0.6 0.14 152);
+  --success-foreground: oklch(0.985 0 0);
+  --success-soft: oklch(0.95 0.045 152);
+  --warning: oklch(0.76 0.15 72);
+  --warning-foreground: oklch(0.3 0.07 60);
+  --warning-soft: oklch(0.96 0.05 85);
+  --destructive: oklch(0.58 0.2 27);
+  --destructive-foreground: oklch(0.985 0 0);
+  --destructive-soft: oklch(0.95 0.035 25);
+  --info: oklch(0.58 0.14 245);
+  --info-soft: oklch(0.95 0.03 245);
+  --border: oklch(0.91 0.012 255);
+  --input: oklch(0.88 0.014 255);
+  --ring: oklch(0.6 0.15 255);
+  --chart-1: oklch(0.58 0.14 245);
+  --chart-2: oklch(0.6 0.14 152);
+  --chart-3: oklch(0.76 0.15 72);
+  --chart-4: oklch(0.6 0.17 300);
+  --chart-5: oklch(0.6 0.17 20);
+}
+.dark[data-theme='learner'],
+[data-theme='learner'] .dark,
+.dark:not([data-theme]) {
+  --background: oklch(0.19 0.03 262);
+  --foreground: oklch(0.95 0.01 255);
+  --card: oklch(0.235 0.035 262);
+  --popover: oklch(0.235 0.035 262);
+  --primary: oklch(0.78 0.1 255);
+  --primary-foreground: oklch(0.2 0.05 262);
+  --secondary: oklch(0.29 0.04 262);
+  --secondary-foreground: oklch(0.92 0.02 255);
+  --accent: oklch(0.82 0.15 78);
+  --muted: oklch(0.27 0.035 262);
+  --muted-foreground: oklch(0.72 0.03 255);
+  --success-soft: oklch(0.32 0.06 152);
+  --warning-soft: oklch(0.34 0.06 75);
+  --destructive-soft: oklch(0.33 0.07 25);
+  --info-soft: oklch(0.32 0.06 245);
+  --border: oklch(0.32 0.035 262);
+  --input: oklch(0.36 0.035 262);
+}
+
+/* ---------- Kids (under 9): big, round, warm ---------- */
+[data-theme='kids'] {
+  --font-latin: 'Baloo Bhaijaan 2 Variable', 'Nunito Variable', ui-rounded, sans-serif;
+  --font-arabic: 'Baloo Bhaijaan 2 Variable', 'IBM Plex Sans Arabic', sans-serif;
+  --root-size: 19px;            /* body text 19 px */
+  --radius: 1.5rem;
+  --tap: 75px;                  /* every tap target at least 75 x 75 px */
+
+  --background: oklch(0.975 0.025 95);
+  --foreground: oklch(0.28 0.06 285);
+  --card: oklch(1 0 0);
+  --card-foreground: var(--foreground);
+  --popover: oklch(1 0 0);
+  --popover-foreground: var(--foreground);
+  --primary: oklch(0.56 0.2 292);           /* grape */
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.93 0.06 170);        /* mint */
+  --secondary-foreground: oklch(0.32 0.08 175);
+  --accent: oklch(0.87 0.16 92);            /* sunshine */
+  --accent-foreground: oklch(0.33 0.08 70);
+  --muted: oklch(0.955 0.02 95);
+  --muted-foreground: oklch(0.48 0.05 285);
+  --success: oklch(0.66 0.17 150);
+  --success-foreground: oklch(0.99 0 0);
+  --success-soft: oklch(0.94 0.07 150);
+  --warning: oklch(0.8 0.16 75);
+  --warning-foreground: oklch(0.32 0.08 60);
+  --warning-soft: oklch(0.96 0.06 85);
+  --destructive: oklch(0.65 0.2 25);
+  --destructive-foreground: oklch(0.99 0 0);
+  --destructive-soft: oklch(0.95 0.04 25);
+  --info: oklch(0.64 0.15 235);
+  --info-soft: oklch(0.94 0.04 235);
+  --border: oklch(0.9 0.03 95);
+  --input: oklch(0.86 0.04 95);
+  --ring: oklch(0.56 0.2 292);
+  --chart-1: oklch(0.56 0.2 292);
+  --chart-2: oklch(0.66 0.17 150);
+  --chart-3: oklch(0.8 0.16 75);
+  --chart-4: oklch(0.64 0.15 235);
+  --chart-5: oklch(0.65 0.2 25);
+}
+.dark[data-theme='kids'] {
+  --background: oklch(0.22 0.05 285);
+  --foreground: oklch(0.96 0.02 95);
+  --card: oklch(0.27 0.06 285);
+  --popover: oklch(0.27 0.06 285);
+  --primary: oklch(0.75 0.15 292);
+  --primary-foreground: oklch(0.2 0.06 285);
+  --secondary: oklch(0.35 0.07 175);
+  --secondary-foreground: oklch(0.93 0.05 170);
+  --muted: oklch(0.3 0.05 285);
+  --muted-foreground: oklch(0.78 0.04 285);
+  --success-soft: oklch(0.34 0.07 150);
+  --warning-soft: oklch(0.36 0.07 75);
+  --destructive-soft: oklch(0.35 0.08 25);
+  --info-soft: oklch(0.34 0.07 235);
+  --border: oklch(0.36 0.06 285);
+  --input: oklch(0.4 0.06 285);
+}
+
+/* ---------- School admin (and teacher, platform admin): calm, dense ---------- */
+[data-theme='admin'] {
+  --font-latin: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-arabic: 'Noto Sans Arabic Variable', 'IBM Plex Sans Arabic', sans-serif;
+  --root-size: 15px;
+  --radius: 0.5rem;
+  --tap: 36px;
+
+  --background: oklch(0.982 0.003 255);
+  --foreground: oklch(0.22 0.025 262);
+  --card: oklch(1 0 0);
+  --card-foreground: var(--foreground);
+  --popover: oklch(1 0 0);
+  --popover-foreground: var(--foreground);
+  --primary: oklch(0.33 0.08 263);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.96 0.006 255);
+  --secondary-foreground: oklch(0.28 0.03 262);
+  --accent: oklch(0.82 0.15 78);
+  --accent-foreground: oklch(0.27 0.06 60);
+  --muted: oklch(0.965 0.005 255);
+  --muted-foreground: oklch(0.52 0.02 260);
+  --success: oklch(0.58 0.13 152);
+  --success-foreground: oklch(0.985 0 0);
+  --success-soft: oklch(0.955 0.035 152);
+  --warning: oklch(0.74 0.14 72);
+  --warning-foreground: oklch(0.3 0.07 60);
+  --warning-soft: oklch(0.965 0.045 85);
+  --destructive: oklch(0.56 0.19 27);
+  --destructive-foreground: oklch(0.985 0 0);
+  --destructive-soft: oklch(0.955 0.03 25);
+  --info: oklch(0.56 0.13 245);
+  --info-soft: oklch(0.955 0.025 245);
+  --border: oklch(0.91 0.006 255);
+  --input: oklch(0.88 0.008 255);
+  --ring: oklch(0.58 0.14 255);
+  --chart-1: oklch(0.56 0.13 245);
+  --chart-2: oklch(0.58 0.13 152);
+  --chart-3: oklch(0.74 0.14 72);
+  --chart-4: oklch(0.58 0.16 300);
+  --chart-5: oklch(0.58 0.17 20);
+}
+.dark[data-theme='admin'] {
+  --background: oklch(0.18 0.015 262);
+  --foreground: oklch(0.94 0.006 255);
+  --card: oklch(0.22 0.018 262);
+  --popover: oklch(0.22 0.018 262);
+  --primary: oklch(0.78 0.09 255);
+  --primary-foreground: oklch(0.2 0.04 262);
+  --secondary: oklch(0.27 0.02 262);
+  --secondary-foreground: oklch(0.92 0.01 255);
+  --muted: oklch(0.25 0.018 262);
+  --muted-foreground: oklch(0.7 0.015 255);
+  --success-soft: oklch(0.3 0.05 152);
+  --warning-soft: oklch(0.32 0.05 75);
+  --destructive-soft: oklch(0.31 0.06 25);
+  --info-soft: oklch(0.3 0.05 245);
+  --border: oklch(0.3 0.02 262);
+  --input: oklch(0.34 0.02 262);
+}
+
+@theme inline {
+  --font-sans: var(--font-latin);
+  --font-arabic: var(--font-arabic);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-soft: var(--warning-soft);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive-soft: var(--destructive-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) * 0.5);
+  --radius-md: calc(var(--radius) * 0.75);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --spacing-tap: var(--tap);
+}
+
+@layer base {
+  html { font-size: var(--root-size); }
+  html[lang='ar'] { --font-latin: var(--font-arabic); }
+  * { border-color: var(--border); }
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-latin);
+    -webkit-font-smoothing: antialiased;
+  }
+  html[lang='ar'] body { line-height: 1.7; }
+  :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+}
+
+/* Kids: every tap gives feedback (a squish and a pop). */
+@keyframes kid-pop { 0% { transform: scale(1); } 40% { transform: scale(0.92); } 100% { transform: scale(1); } }
+.kid-pressable[data-pressed] { animation: kid-pop 180ms ease-out; }
+@media (prefers-reduced-motion: reduce) { .kid-pressable[data-pressed] { animation: none; } }
