@@ -78,9 +78,11 @@ describe('vercel.json', () => {
 
   it('builds the SPA same-origin, deploys only staging-alpha, and keeps the function near the database', () => {
     expect(cfg.buildCommand).toMatch(/VITE_API_URL=\/api/);
+    // lms-speed-2: the SPA is a production React build even when the project's NODE_ENV says otherwise.
+    expect(cfg.buildCommand).toMatch(/NODE_ENV=production VITE_API_URL=\/api npx vite build/);
     expect(cfg.outputDirectory).toBe('frontend/dist');
     expect(cfg.git.deploymentEnabled).toEqual({ main: false, 'staging-alpha': true });
-    expect(cfg.regions).toEqual(['iad1']);
+    expect(cfg.regions).toEqual(['cdg1']); // lms-test: Paris, next to the Atlas cluster (eu-west-3)
     expect(Object.keys(cfg.functions)).toEqual(['api/index.js']);
   });
 

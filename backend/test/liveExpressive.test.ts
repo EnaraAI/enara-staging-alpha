@@ -261,7 +261,10 @@ describe('liveExpressive: cues by code', () => {
 
   it('says "look at the picture" in the call\'s language and puts the panel on the side the face is turned to', () => {
     expect(L.lookLine('Here it is.', 'english')).toBe('Look at the picture.');
-    expect(L.lookLine('هذه هي الصورة.', 'arabic')).toBe('انظر إلى الصورة.');
+    expect(L.lookLine('هذه هي الصورة.', 'arabic')).toBe('لننظرْ إلى الصورة.'); // the same for a girl or a boy
+    expect(L.lookLine('لننظر إلى الصورة معًا.', 'arabic')).toBeNull();
+    expect(L.withLookLine('Welcome back! Here is one.', 'Look at the picture.')).toEqual({ text: 'Welcome back! Look at the picture. Here is one.', at: 14 });
+    expect(L.withLookLine('Here it is.', 'Look at the picture.')).toEqual({ text: 'Look at the picture. Here it is.', at: -1 });
     expect(L.lookLine('Look at the drawing: three apples.', 'english')).toBeNull();
     expect(L.lookLine('انظر إلى الرسم.', 'arabic')).toBeNull();
     expect(L.panelSide('27e12daa-50fc-4384-93c2-ebca73f1f78d')).toBe('left');
@@ -278,7 +281,7 @@ describe('liveExpressive: cues by code', () => {
       const res = await request(app).post('/api/avatar/query-stream').set('Authorization', auth).send({ session_id: start.body.session_id, messages: [{ role: 'user', content: 'ارسم لي صورة من فضلك' }] });
       const lines = res.text.trim().split('\n').map((l) => JSON.parse(l));
       expect(lines.some((l) => l.visual === 'drawing')).toBe(true);
-      expect(lines.filter((l) => l.content).map((l) => l.content).join('')).toBe('انظر إلى الصورة. هذا رسم للدورة اليومية.');
+      expect(lines.filter((l) => l.content).map((l) => l.content).join('')).toBe('لننظرْ إلى الصورة. هذا رسم للدورة اليومية.');
       expect(lines.filter((l) => l.cue).map((l) => l.cue)).toEqual(['curious']);
     });
   });
@@ -296,7 +299,7 @@ describe('liveExpressive: cues by code', () => {
       let r = await turn('What is 7 times 8?', '[[assess verdict=NOT_EVALUATED relevance=NO_ACTIVE_ITEM next=NEW_ITEM]]\nGood question. Try this one first: what is 7 times 7?');
       expect(r.params.pedagogy).toContain('HIDDEN GRADING LINE');
       expect(r.cues).toEqual(['curious']);
-      expect(r.text).toBe('Look at the picture. Good question. Try this one first: what is 7 times 7?'); // the call's first real question draws a visual
+      expect(r.text).toBe('Good question. Look at the picture. Try this one first: what is 7 times 7?'); // the first real question draws a visual; the look line follows the first sentence
       r = await turn('It is 47', '[[assess verdict=INCORRECT relevance=ACTIVE_ITEM next=SAME_ITEM]]\nNot quite. Count 7 more from 42.');
       expect(r.cues).toEqual(['supportive']);
       expect(r.text).not.toMatch(/\[\[assess/);
@@ -319,6 +322,7 @@ describe('liveExpressive: cues by code', () => {
       expect(lines.filter((l) => l.cue).map((l) => l.cue)).toEqual(['concerned', 'supportive']);
       // The grading line never changes the reply's language (the simulation saw Arabic lessons drift into English).
       expect(String((mocks.stream.mock.calls.at(-1)![0] as { pedagogy?: string }).pedagogy)).toContain('an Arabic lesson stays in Arabic');
+      expect(String((mocks.stream.mock.calls.at(-1)![0] as { pedagogy?: string }).pedagogy)).toContain('اكتب ردك كله باللغة العربية فقط');
     });
     // Switch off: the model is not asked for the line (today's prompt).
     await withSwitch('', async () => {
