@@ -2,6 +2,11 @@
 
 Each PNG is the avatar's own video frame about 1 s after the cue (switch off: the same moment of the reply). Names: `<who>--<moment>--<on|off>.png`. "on"/"off" is liveExpressive for that call (a CI-only per-call test override). Learners speak with synthetic voices (Piper). Newest run first.
 
+## Drawing workaround (PR 3), from the E2E run (no paid call)
+Anam's Free plan minutes for this period are used up, so these two come from E2E 48 (the same call window, a voice-only call with a fake tutor):
+- `e2e--drawing-panel-left--on.png`: switch on, a face turned to the viewer's left (Anne): the drawing opens on the left, pulses with "Look here · انظر هنا", and the captions show the tutor saying "Look at the picture." No cue tag anywhere.
+- `e2e--drawing-panel-right--off.png`: switch off: the drawing opens on the right as before, no pulse.
+
 ## Run 46042501033 (2026-11-27T17:54 UTC)
 
 ### adult (hassan.shaker), switch on
