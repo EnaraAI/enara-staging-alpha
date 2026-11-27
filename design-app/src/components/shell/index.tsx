@@ -109,16 +109,32 @@ export function AdminShell({ title, subtitle, nav, active, children, actions, sc
 }
 
 /** Kids: top bar with big Home and Listen buttons; no navigation at the bottom edge; generous padding at the bottom. */
-export function KidsShell({ children, title, listenLabel, homeLabel, stars }: { children: React.ReactNode; title?: string; listenLabel: string; homeLabel: string; stars?: number }) {
+export function KidsShell({ children, title, listenLabel, homeLabel, stars, onListen }: { children: React.ReactNode; title?: string; listenLabel: string; homeLabel: string; stars?: number; onListen?: () => void }) {
+  const lang = usePreview().lang;
+  // Listen reads the page aloud (the browser's own voice; nothing is sent anywhere). A second press stops it.
+  const listen = () => {
+    if (onListen) { onListen(); return; }
+    try {
+      const synth = window.speechSynthesis;
+      if (!synth) return;
+      if (synth.speaking) { synth.cancel(); return; }
+      const main = document.querySelector('[data-kids-main]') as HTMLElement | null;
+      const text = [title, main?.innerText].filter(Boolean).join('. ').replace(/\s+/g, ' ').slice(0, 400);
+      if (!text) return;
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = /[\u0600-\u06FF]/.test(text) ? 'ar-SA' : 'en-GB'; u.rate = 0.95;
+      synth.speak(u);
+    } catch { /* speech not available */ }
+  };
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <header className="flex items-center gap-3 px-4 pt-4 md:px-10 md:pt-6">
         <KidButton tone="white" aria-label={homeLabel} className="px-0" onPress={() => { window.location.hash = '#/kids'; }}><Home /></KidButton>
         <div className="min-w-0 flex-1 text-center">{title && <h1 className="truncate text-2xl font-extrabold">{title}</h1>}</div>
-        {stars !== undefined && <span className="flex h-[75px] items-center gap-2 rounded-2xl bg-card px-4 text-2xl font-extrabold border-2" aria-label={usePreview().lang === 'ar' ? `${stars} نجمة` : `${stars} stars`}><Star className="size-8" />{stars}</span>}
-        <KidButton tone="sun" aria-label={listenLabel} className="px-0"><Volume2 /></KidButton>
+        {stars !== undefined && <span className="flex h-[75px] items-center gap-2 rounded-2xl bg-card px-4 text-2xl font-extrabold border-2" aria-label={lang === 'ar' ? `${stars} نجمة` : `${stars} stars`}><Star className="size-8" />{stars}</span>}
+        <KidButton tone="sun" aria-label={listenLabel} className="px-0" onPress={listen} data-testid="kids-listen"><Volume2 /></KidButton>
       </header>
-      <main className="flex flex-1 flex-col px-4 pt-6 pb-16 md:px-10 md:pb-20">{children}</main>
+      <main data-kids-main className="flex flex-1 flex-col px-4 pt-6 pb-16 md:px-10 md:pb-20">{children}</main>
     </div>
   );
 }
