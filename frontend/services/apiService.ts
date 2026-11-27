@@ -912,6 +912,11 @@ export const fetchMyAnalyticsOverview = () => request('GET', '/api/me/analytics/
 // TUTOR (student)
 /** kidsSpeaking (environment switch): may the kids app show the chat microphone and the live call. */
 export const getTutorSpeaking = () => request<{ microphone: boolean; liveCall: boolean }>('GET', '/api/me/tutor/speaking');
+// liveTimeUsed: live tutor calls used and left today, minutes used today and the longest a call may run (null: no limit).
+export interface LiveUsage { callsUsedToday: number; callsLeftToday: number; dailyLimit: number; secondsUsedToday: number; minutesUsedToday: number; maxCallSeconds: number | null }
+// null when the switch is off (404) or the account isn't a learner: the screens then look as before.
+export const fetchMyLiveUsage = (): Promise<LiveUsage | null> =>
+  request<LiveUsage>('GET', '/api/me/tutor/live-usage').catch(() => null);
 export const listTutorSessions = () => request<any[]>('GET', '/api/me/tutor/sessions');
 export const getTutorSession = (id: string) => request('GET', `/api/me/tutor/sessions/${encodeURIComponent(id)}`);
 export const createTutorSession = (courseId?: string, lessonId?: string, title?: string) =>

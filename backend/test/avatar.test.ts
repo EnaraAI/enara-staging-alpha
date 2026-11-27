@@ -775,6 +775,79 @@ describe('live avatar', () => {
     expect((await request(app).post('/api/avatar/session').send({})).status).toBe(401);
   });
 
+  it('live usage (liveTimeUsed): 404 when off; counts only calls that got going, minutes, calls left, the start cap', async () => {
+    const saved = process.env.ENARA_ENGINE_V2;
+    const auth = await token('usage-student', 'student');
+    const { AvatarSession } = await import('../src/models/AvatarSession');
+    const { User } = await import('../src/models/User');
+    const userId = String((await User.findOne({ email: 'usage-student@enara.ai' }).lean())!._id);
+    try {
+      for (const value of [undefined, 'all', 'liveMute,liveCaptions']) {
+        if (value === undefined) delete process.env.ENARA_ENGINE_V2;
+        else process.env.ENARA_ENGINE_V2 = value;
+        expect((await request(app).get('/api/me/tutor/live-usage').set('Authorization', auth)).status).toBe(404);
+        const start = await request(app).post('/api/avatar/session').set('Authorization', await token('usage-off')).send({});
+        expect(start.body.features?.timeUsed).toBeUndefined();
+      }
+      process.env.ENARA_ENGINE_V2 = 'liveTimeUsed';
+      expect((await request(app).get('/api/me/tutor/live-usage')).status).toBe(401);
+      expect((await request(app).get('/api/me/tutor/live-usage').set('Authorization', await token('usage-staff'))).status).toBe(403);
+      const empty = await request(app).get('/api/me/tutor/live-usage').set('Authorization', auth);
+      expect(empty.status).toBe(200);
+      expect(empty.body).toEqual({ callsUsedToday: 0, callsLeftToday: 30, dailyLimit: 30, secondsUsedToday: 0, minutesUsedToday: 0, maxCallSeconds: null });
+
+      const ago = (min: number) => new Date(Date.now() - min * 60_000);
+      await AvatarSession.collection.insertMany([
+        // Got going (the video connected): 5 minutes, ended.
+        { id: 'av-u-1', userId, createdAt: ago(60), endedAt: ago(55), lastHeartbeatAt: ago(56) },
+        // Got going (the tutor opened it), still open: counted to the last request seen (3 minutes).
+        { id: 'av-u-2', userId, createdAt: ago(10), lastActivityAt: ago(7), openingUsed: true },
+        // Failed starts: never got going, so they use nothing (but count toward the wider start cap).
+        { id: 'av-u-3', userId, createdAt: ago(30), endedAt: ago(29) },
+        { id: 'av-u-4', userId, createdAt: ago(20), lastActivityAt: ago(19), openingUsed: false },
+        // Yesterday (outside the same 24-hour window as the limit).
+        { id: 'av-u-5', userId, createdAt: ago(25 * 60), endedAt: ago(25 * 60 - 10), lastHeartbeatAt: ago(25 * 60 - 5) },
+        // Someone else's call.
+        { id: 'av-u-6', userId: 'someone-else', createdAt: ago(5), endedAt: ago(1), lastHeartbeatAt: ago(2) },
+      ]);
+      const used = await request(app).get('/api/me/tutor/live-usage').set('Authorization', auth);
+      expect(used.body).toMatchObject({ callsUsedToday: 2, callsLeftToday: 28, minutesUsedToday: 8, maxCallSeconds: null });
+      expect(used.body.secondsUsedToday).toBeGreaterThanOrEqual(479);
+      expect(used.body.secondsUsedToday).toBeLessThanOrEqual(481);
+
+      // The start cap (three times the limit) also ends the day: 86 more failed starts make 90.
+      await AvatarSession.collection.insertMany(Array.from({ length: 86 }, (_, i) => ({ id: `av-u-f${i}`, userId, createdAt: ago(1) })));
+      const capped = await request(app).get('/api/me/tutor/live-usage').set('Authorization', auth);
+      expect(capped.body).toMatchObject({ callsUsedToday: 2, callsLeftToday: 0 });
+      // ...and the start is refused by the same rule.
+      expect((await request(app).post('/api/avatar/session').set('Authorization', auth).send({})).status).toBe(429);
+
+      // With a maximum call length set, it is reported and caps each call's time.
+      process.env.ANAM_MAX_SESSION_SECONDS = '240';
+      (await import('../src/config/env')).resetConfigForTests();
+      const max = await request(app).get('/api/me/tutor/live-usage').set('Authorization', auth);
+      expect(max.body).toMatchObject({ maxCallSeconds: 240, secondsUsedToday: 240 + 180, minutesUsedToday: 7 });
+    } finally {
+      delete process.env.ANAM_MAX_SESSION_SECONDS;
+      (await import('../src/config/env')).resetConfigForTests();
+      if (saved === undefined) delete process.env.ENARA_ENGINE_V2;
+      else process.env.ENARA_ENGINE_V2 = saved;
+    }
+  });
+
+  it('tells the browser the time-used switch is on', async () => {
+    const saved = process.env.ENARA_ENGINE_V2;
+    try {
+      process.env.ENARA_ENGINE_V2 = 'liveTimeUsed';
+      const on = await request(app).post('/api/avatar/session').set('Authorization', await token('time-on')).send({});
+      expect(on.status).toBe(200);
+      expect(on.body.features).toEqual({ timeUsed: true });
+    } finally {
+      if (saved === undefined) delete process.env.ENARA_ENGINE_V2;
+      else process.env.ENARA_ENGINE_V2 = saved;
+    }
+  });
+
   it('tells the browser about captions only when liveCaptions is on (named only, not in "all")', async () => {
     const saved = process.env.ENARA_ENGINE_V2;
     try {

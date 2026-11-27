@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { EnaraMark } from '../brand/EnaraLogo';
-import { X, Loader2, AlertCircle, RefreshCw, Mic, MicOff, Volume2, VolumeX, Captions, CaptionsOff } from 'lucide-react';
+import { X, Loader2, AlertCircle, RefreshCw, Mic, MicOff, Volume2, VolumeX, Captions, CaptionsOff, Clock } from 'lucide-react';
 import { createClient, AnamEvent } from '@anam-ai/js-sdk';
 import { Assessment } from '../../types';
 import {
@@ -22,6 +22,8 @@ import { cueAtSeconds, cueTag, isExpressiveCue } from '../../services/expressive
 import { WebAudioSink } from '../../services/webAudioSink';
 import { classifyMicError, isInFrame, micMessage } from '../../services/micCheck';
 import { MicProblemNotice, useMicGate, type MicProblem } from '../MicCheck';
+import { LiveUsageLine, NO_CALLS_LEFT, clock, noCallsLeft, useLiveUsage } from './LiveUsage';
+import { fetchMyLiveUsage, type LiveUsage } from '../../services/apiService';
 
 interface LiveAvatarModalProps {
   isOpen: boolean;
@@ -58,7 +60,10 @@ type AvatarSessionResponse = {
 };
 
 // The server's live call switches (ENARA_ENGINE_V2 liveMute, ...): off means the call looks as before.
-type LiveCallFeatures = { mute?: boolean; captions?: boolean };
+type LiveCallFeatures = { mute?: boolean; captions?: boolean; timeUsed?: boolean };
+
+// liveTimeUsed: the warning shows this long before the call's maximum length.
+const CALL_END_WARNING_SECONDS = 120;
 
 // liveCaptions: one caption line (the tutor's spoken words, or what was heard from the learner). An open
 // line still grows: the tutor's current turn, or the learner's words while they are talking.
@@ -163,6 +168,13 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
   const [tutorSaving, setTutorSaving] = useState<string | null>(null);
   const anamReadyRef = useRef(false);
   const [features, setFeatures] = useState<LiveCallFeatures>({});
+  // liveTimeUsed: before the call, the learner's calls today (null when the switch is off); during it, the
+  // usage read when this call started, when it started, and a once-a-second tick for the clock.
+  // (read again each time the modal opens)
+  const { usage: startUsage } = useLiveUsage(isOpen && isStudent);
+  const [callUsage, setCallUsage] = useState<LiveUsage | null>(null);
+  const [callStartedAt, setCallStartedAt] = useState<number | null>(null);
+  const [clockNow, setClockNow] = useState(() => Date.now());
   // liveMute: the learner's microphone (the tutor hears nothing) and the tutor's
   // voice (the tutor keeps talking, face moving, unheard). Kept across reconnects
   // within a call; a new call starts with both on.
@@ -302,6 +314,8 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
     setLanguageChoice(null);
     setFeatures({});
     setCaptions([]);
+    setCallUsage(null);
+    setCallStartedAt(null);
     micMutedRef.current = false;
     voiceMutedRef.current = false;
     setMicMuted(false);
@@ -850,6 +864,8 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
       await endServerSession();
     }
 
+    // liveTimeUsed: today's usage before this call (read alongside the start; a call that hasn't got going isn't counted).
+    const usageRead = isStudent ? fetchMyLiveUsage() : Promise.resolve(null);
     try {
       const res = await avatarFetch('/session', {
         method: 'POST',
@@ -868,6 +884,10 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
       sessionIdRef.current = data.session_id;
       setFeatures(data.features ?? {});
       setExpressiveUi(data.expressive ? { panel: data.expressive.panel === 'left' ? 'left' : 'right' } : null);
+      if (data.features?.timeUsed) {
+        setCallStartedAt(Date.now());
+        void usageRead.then(setCallUsage);
+      }
       // 'server' (and the older 'elevenlabs'): ENARA speaks and listens itself.
       speechModeRef.current = data.speech === 'server' || data.speech === 'elevenlabs' ? 'elevenlabs' : 'anam';
       // A reconnect continues the same conversation.
@@ -910,7 +930,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
       setError('Could not start the AI tutor. Please try again.');
       setLoading(false);
     }
-  }, [courseId, endServerSession, lessonId, lessonTitle, startAnam, startPolling, startVoiceOnly, stopAnam, stopPolling, subject, switchToTavus]);
+  }, [courseId, endServerSession, isStudent, lessonId, lessonTitle, startAnam, startPolling, startVoiceOnly, stopAnam, stopPolling, subject, switchToTavus]);
 
   useEffect(() => {
     restartRef.current = async () => {
@@ -929,6 +949,13 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
     resetUi();
     onClose();
   }, [endServerSession, onClose, resetUi, stopAnam, stopPolling]);
+
+  // liveTimeUsed: the call clock ticks once a second while a call is on.
+  useEffect(() => {
+    if (!callStartedAt) return;
+    const t = setInterval(() => setClockNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, [callStartedAt]);
 
   // liveMute: microphone off/on. With the video tutor listening, its input is
   // muted; with ENARA listening, the transcription session closes (nothing is
@@ -1064,6 +1091,15 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
 
   if (!isOpen) return null;
 
+  // liveTimeUsed: this call's clock, today's totals (read when the call started, plus this call) and the warning
+  // before the call's maximum length (none without a maximum).
+  const callUnderway = !loading && (provider === 'anam' || provider === 'voice');
+  const callSeconds = callStartedAt ? Math.max(0, (clockNow - callStartedAt) / 1000) : 0;
+  const todayMinutes = callUsage ? Math.floor((callUsage.secondsUsedToday + callSeconds) / 60) : null;
+  const callsLeft = callUsage ? Math.max(0, callUsage.callsLeftToday - (callUnderway ? 1 : 0)) : null;
+  const endsIn = callUsage?.maxCallSeconds ? callUsage.maxCallSeconds - callSeconds : null;
+  const showEnding = !!features.timeUsed && callUnderway && endsIn !== null && endsIn <= CALL_END_WARNING_SECONDS;
+
   return (
     <>
     {tutorPickerOpen && myTutor && (
@@ -1103,7 +1139,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
         </div>
 
         {/* Call controls, each behind its own switch (video or voice-only call; the backup video has its own) */}
-        {(features.mute || features.captions) && (provider === 'anam' || provider === 'voice') && (
+        {(features.mute || features.captions || features.timeUsed) && (provider === 'anam' || provider === 'voice') && (
           <div className="flex flex-wrap items-center gap-2 px-5 py-2 border-b border-white/10 shrink-0" role="group" aria-label="Call controls · أدوات المكالمة">
             {features.mute && (<>
             <button
@@ -1157,6 +1193,38 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
                 <span lang="ar" dir="rtl">{captionsOn ? 'التسميات التوضيحية مُفعَّلة' : 'التسميات التوضيحية مُتوقِّفة'}</span>
               </button>
             )}
+            {features.timeUsed && (
+              <div data-testid="live-call-usage" className="ml-auto text-[11px] sm:text-xs leading-tight text-slate-300 text-right">
+                <p className="m-0">
+                  This call <span data-testid="live-call-clock">{clock(callSeconds)}</span>
+                  {todayMinutes !== null && <> · Today <span data-testid="live-call-today">{todayMinutes}</span> min</>}
+                  {callsLeft !== null && <> · Calls left today <span data-testid="live-call-left">{callsLeft}</span></>}
+                </p>
+                <p className="m-0" lang="ar" dir="rtl">
+                  هذه المكالمة {clock(callSeconds)}
+                  {todayMinutes !== null && <> · اليوم {todayMinutes} دقيقة</>}
+                  {callsLeft !== null && <> · المكالمات المتبقية اليوم: {callsLeft}</>}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {showEnding && endsIn !== null && (
+          <div data-testid="live-call-ending" className="flex flex-wrap items-center gap-x-3 gap-y-1 px-5 py-2 bg-amber-400 text-slate-900 text-sm font-bold shrink-0">
+            <Clock size={16} aria-hidden="true" />
+            {endsIn > 0 ? (
+              <>
+                <span role="alert">
+                  About 2 minutes left in this call. · <span lang="ar" dir="rtl">تبقّت دقيقتان تقريبًا على نهاية هذه المكالمة.</span>
+                </span>
+                <span aria-hidden="true" data-testid="live-call-ending-clock">{clock(endsIn)}</span>
+              </>
+            ) : (
+              <span role="alert">
+                This call has reached its maximum length. Start a new call to continue. · <span lang="ar" dir="rtl">بلغت هذه المكالمة حدَّها الأقصى. ابدأ مكالمة جديدة للمتابعة.</span>
+              </span>
+            )}
           </div>
         )}
 
@@ -1188,6 +1256,17 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
               )}
               {/* No language choice: the tutor follows whichever language the
                   student speaks. The click also lets the browser play sound. */}
+              {/* liveTimeUsed: no calls left today: the button says so instead of a failed start. */}
+              {noCallsLeft(startUsage) ? (
+                <button
+                  type="button"
+                  disabled
+                  data-testid="live-start-no-calls"
+                  className="px-8 py-3 bg-slate-700 text-slate-200 text-base font-bold rounded-xl cursor-not-allowed"
+                >
+                  {NO_CALLS_LEFT.en} · <span lang="ar" dir="rtl">{NO_CALLS_LEFT.ar}</span>
+                </button>
+              ) : (
               <button
                 onClick={() => {
                   unlockAudio();
@@ -1198,6 +1277,8 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
               >
                 Start call
               </button>
+              )}
+              <LiveUsageLine usage={startUsage} className="text-slate-300 text-center max-w-md px-4" />
               <p className="text-sm text-slate-400 m-0">
                 Speak English or Arabic. <span dir="rtl">تكلم عربي أو إنجليزي</span>
               </p>

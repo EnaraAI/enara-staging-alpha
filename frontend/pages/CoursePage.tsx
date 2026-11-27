@@ -47,6 +47,7 @@ import {
 import { Course, Lesson, Module, ChatMessage } from '../types';
 import { generateSpeech } from '../services/geminiService';
 import { LiveAvatarModal } from '../components/enara/LiveAvatarModal';
+import { LiveUsageLine, NO_CALLS_LEFT, noCallsLeft, useLiveUsage } from '../components/enara/LiveUsage';
 import { UsageChip } from '../components/UsageChip';
 
 interface CoursePageProps {
@@ -104,6 +105,8 @@ export const CoursePage: React.FC<CoursePageProps> = ({ initialCourseId }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isTutorMinimized, setIsTutorMinimized] = useState(true);
   const [isLiveAvatarOpen, setIsLiveAvatarOpen] = useState(false);
+  // liveTimeUsed: live calls left and minutes used today, next to the live tutor button (null when the switch is off).
+  const { usage: liveUsage, reload: reloadLiveUsage } = useLiveUsage(true);
   // A tutor diagram shown full size (the chat panel is narrow).
   const [largeVisual, setLargeVisual] = useState<string | null>(null);
   const [tutorView, setTutorView] = useState<'chat' | 'history'>('chat');
@@ -624,6 +627,16 @@ export const CoursePage: React.FC<CoursePageProps> = ({ initialCourseId }) => {
           <h4 className="text-sm font-bold text-slate-900">AI tutor</h4>
         </div>
         <div className="flex items-center gap-1">
+          {noCallsLeft(liveUsage) ? (
+            <button
+              type="button"
+              disabled
+              data-testid="live-tutor-no-calls"
+              className="px-2 py-1.5 rounded-md border border-[#e5e7eb] text-slate-500 text-xs font-bold cursor-not-allowed"
+            >
+              {NO_CALLS_LEFT.en} · <span lang="ar" dir="rtl">{NO_CALLS_LEFT.ar}</span>
+            </button>
+          ) : (
           <button
             type="button"
             onClick={() => setIsLiveAvatarOpen(true)}
@@ -632,6 +645,7 @@ export const CoursePage: React.FC<CoursePageProps> = ({ initialCourseId }) => {
             <span className="w-1.5 h-1.5 rounded-full bg-teal-600 animate-pulse" aria-hidden="true" />
             Live AI Tutor
           </button>
+          )}
           <button
             type="button"
             onClick={() => setTutorView(tutorView === 'chat' ? 'history' : 'chat')}
@@ -651,6 +665,9 @@ export const CoursePage: React.FC<CoursePageProps> = ({ initialCourseId }) => {
           </button>
         </div>
       </div>
+      {liveUsage && (
+        <LiveUsageLine usage={liveUsage} className={`px-4 py-1.5 border-b border-[#e5e7eb] shrink-0 ${noCallsLeft(liveUsage) ? 'text-rose-700' : 'text-slate-600'}`} />
+      )}
 
       <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3">
         {tutorView === 'chat' ? (
@@ -1128,7 +1145,7 @@ export const CoursePage: React.FC<CoursePageProps> = ({ initialCourseId }) => {
       {/* Live AI Avatar Streaming Modal */}
       <LiveAvatarModal
         isOpen={isLiveAvatarOpen}
-        onClose={() => setIsLiveAvatarOpen(false)}
+        onClose={() => { setIsLiveAvatarOpen(false); reloadLiveUsage(); }}
         lessonTitle={selectedLesson?.title || selectedCourse?.title || "Active Course Session"}
         subject={selectedCourse?.subject || "Academic"}
         courseId={selectedCourse?.id}

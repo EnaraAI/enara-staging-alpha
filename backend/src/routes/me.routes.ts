@@ -1,4 +1,5 @@
 import { warmOnOpen } from '../services/llmWarmup';
+import { getLiveUsage } from '../controllers/avatar.controller';
 import { Router } from 'express';
 import multer from 'multer';
 import { beginSpeaking, speakingTurn } from '../controllers/speakingExam.controller';
@@ -123,6 +124,8 @@ router.get('/results/:id', getMyResult);
 
 router.get('/tutor/reviews/due', listDueReviews);
 router.get('/tutor/speaking', warmOnOpen, getTutorSpeaking);
+// liveTimeUsed: live calls used and left today (404 when the switch is off).
+router.get('/tutor/live-usage', getLiveUsage);
 // Warm-up ping (llmWarmup.ts): answers at once; the tiny model request runs after the response. The learner never waits for it.
 router.post('/tutor/warm', warmOnOpen, (_req, res) => { res.status(202).json({ ok: true }); });
 router.get('/tutor/sessions', warmOnOpen, listTutorSessions);
