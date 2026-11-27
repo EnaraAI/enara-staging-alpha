@@ -3,6 +3,7 @@ import { ALL_SCENES, CHILD_SCENES, SCENES, checkScene, checkSceneBank, sceneById
 import { loadKidsPack, starterTokens } from '../src/services/kidsPack';
 import { RULE_BANK_BY_ID } from '../src/services/ruleBank';
 import { INTERESTS } from '../src/models/LearnerMemory';
+import { SUBJECT_RULE_BANK, SUBJECT_RULE_BY_ID, checkSubjectEntry } from '../src/services/subjectRuleBank';
 
 // liveRolePlay PR 1 (live tutor upgrade item 4): the scene bank and its checker. Data only: nothing here changes the tutor.
 const pack = loadKidsPack()!;
@@ -23,7 +24,7 @@ describe('role-play scene bank', () => {
     for (const s of ALL_SCENES) {
       expect(s.beats.length).toBeGreaterThanOrEqual(MIN_BEATS);
       expect(s.beats.length).toBeLessThanOrEqual(MAX_BEATS);
-      for (const t of s.targets) expect(RULE_BANK_BY_ID.has(t)).toBe(true);
+      for (const t of s.targets) expect(RULE_BANK_BY_ID.has(t) || SUBJECT_RULE_BY_ID.get(t)?.subject === s.subject).toBe(true);
       for (const i of s.interests) expect(INTERESTS as readonly string[]).toContain(i);
     }
     expect(sceneById('doctor-visit')?.character.en).toMatch(/doctor/i);
@@ -39,6 +40,19 @@ describe('role-play scene bank', () => {
       expect(JSON.stringify(s)).not.toMatch(/doctor|clinic|medicine/i);
     }
     for (const s of SCENES) expect(s.ages).not.toContain('child');
+  });
+
+  it('every subject the live tutor teaches has scenes: maths, science, Arabic and social studies besides English, for children and for teens/adults, in each lesson language', () => {
+    for (const subject of ['maths', 'science', 'social'] as const) for (const lang of ['en', 'ar'] as const) {
+      expect(SCENES.some((s) => s.subject === subject && s.langs.includes(lang)), `${subject} ${lang}`).toBe(true);
+      expect(CHILD_SCENES.some((s) => s.subject === subject && s.langs.includes(lang)), `child ${subject} ${lang}`).toBe(true);
+    }
+    expect(SCENES.some((s) => s.subject === 'arabic' && s.langs[0] === 'ar')).toBe(true);
+    expect(CHILD_SCENES.some((s) => s.subject === 'arabic')).toBe(true);
+    // maths beats carry the number a right answer gives (code-certain, so a wrong sum is recast and logged)
+    expect(SCENES.find((s) => s.id === 'maths-market')!.beats.filter((b) => b.check?.number !== undefined).map((b) => b.check!.number)).toEqual([36, 56, 44]);
+    for (const e of SUBJECT_RULE_BANK) expect(checkSubjectEntry(e), e.id).toEqual([]);
+    for (const s of CHILD_SCENES) expect(JSON.stringify(s)).not.toMatch(/pounds|price|money|fever|sick|hurt/i);
   });
 
   it('the checker catches a bad scene', () => {

@@ -64,7 +64,7 @@ describe('role-play in the live call (switch liveRolePlay on)', () => {
     reply('Here is the menu. Would you like something to drink?');
     r = await say(sid, 'Yes, please.');
     expect(mocks.params.length).toBe(3);
-    expect(String(mocks.params[2].pedagogy)).toMatch(/Your last draft left the role-play scene \(teaching talk/);
+    expect(String(mocks.params[2].pedagogy)).toMatch(/Your last draft left the role-play scene \(a lesson task inside the scene/);
     expect(r.text).toBe('Here is the menu. Would you like something to drink?');
     // 3. beat 3: an error in their message: the recast line, and the error goes to errors to work on with its code
     reply('Some water, of course. Are you ready to order?');
@@ -89,7 +89,8 @@ describe('role-play in the live call (switch liveRolePlay on)', () => {
     // 5. back to the lesson: no scene, the card goes away
     reply('[[assess verdict=NOT_EVALUATED relevance=NO_ACTIVE_ITEM next=NEW_ITEM item=i1]]\nCorrect the verb: "She go to bed at ten."');
     r = await say(sid, 'My brother is a teacher.');
-    expect(ctx(5)).not.toMatch(/ROLE-PLAY/);
+    expect(ctx(5)).not.toMatch(/ROLE-PLAY \(set by the system\), beat|ROLE-PLAY DEBRIEF/);
+    expect(ctx(5)).toMatch(/ROLE-PLAY OVER \(set by the system\).*Speak as yourself, the tutor, not as Karim, a waiter/);
     expect(r.scene).toBeNull();
     expect((await storedAi(sid)).at(-1)!.meta.languageTurn.rolePlay).toEqual({ scene: 'restaurant-order', phase: 'after' });
   });

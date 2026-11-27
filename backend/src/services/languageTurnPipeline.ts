@@ -14,18 +14,21 @@ import { exampleGuardHits, removeGuardHits, ruleLinePostCheck, GUARD_REGEN_REASO
 import { ruleBankEntry } from './ruleBank';
 import { removeFalseWrongs } from './pairCheck';
 import { under9 } from './languageTeachingContext';
-import { rolePlayActive, sceneReplyProblems, sceneFallback, ensureDebrief, ensureOffer, rolePlayTagOf, sceneCard, SCENE_REGEN_NOTE, type SceneCard } from './rolePlay';
+import { rolePlayActive, sceneReplyProblems, hardSceneProblems, guardSceneReply, rolePlayTagOf, sceneCard, SCENE_REGEN_NOTE, type SceneCard, type RolePlayTurn } from './rolePlay';
 import { recordRolePlayError } from './errorsToWorkOn';
 
 /** liveRolePlay: the note for ONE regeneration when a scene reply leaves the scene (both channels call this before the guards); undefined = keep it. */
-export function rolePlayRegenNote(language: LanguageTeachingContext | null | undefined, answer: string): string | undefined {
+export function rolePlayRegenNote(language: Pick<LanguageTeachingContext, 'rolePlay'> | null | undefined, answer: string): string | undefined {
   const t = language?.rolePlay;
   if (!t || t.phase !== 'beat') return undefined;
   const p = sceneReplyProblems(t, answer);
   return p.length ? SCENE_REGEN_NOTE(p) : undefined;
 }
+/** liveRolePlay: a regenerated scene reply is kept unless it still has a problem that makes it unusable (then the guards use the beat's line). */
+export const rolePlayDraftUsable = (language: Pick<LanguageTeachingContext, 'rolePlay'> | null | undefined, answer: string): boolean => !language?.rolePlay || language.rolePlay.phase !== 'beat' || !hardSceneProblems(language.rolePlay, answer).length;
 /** liveRolePlay: the scene card for the client (the live call's side panel); null outside a scene. */
-export const rolePlayCardOf = (language: LanguageTeachingContext | null | undefined): SceneCard | null => sceneCard(language?.rolePlay);
+export const rolePlayCardOf = (language: Pick<LanguageTeachingContext, 'rolePlay'> | null | undefined): SceneCard | null => sceneCard(language?.rolePlay);
+export type { RolePlayTurn };
 
 /** TRACK 2 (exampleGuard, plan §2): the guard check on its own (no change to the text), for the one regeneration in the chat path and for the harness. */
 export function exampleGuardCheck(language: LanguageTeachingContext, answer: string, learnerText: string): GuardHit[] {
@@ -103,17 +106,11 @@ export function applyReplyGuards(language: LanguageTeachingContext, answer: stri
   let text = answer; let removed = 0; let closingAsk: ClosingAskStatus | undefined; let guardHits = 0; let postCheck: string[] | undefined;
   // liveRolePlay: a beat reply that still leaves the scene (after the one regeneration) becomes the beat's fixed line; the debrief's rule line and
   // right/wrong pair, and the offer question, are guaranteed by code.
-  const rp = language.rolePlay; let rolePlayFixed = false;
-  if (rp && rp.phase === 'beat') {
-    const p = sceneReplyProblems(rp, text);
-    if (p.length) { const fb = sceneFallback(rp); if (fb) { text = fb; rolePlayFixed = true; postCheck = [...(postCheck ?? []), 'roleplay_fallback']; } }
-  } else if (rp && rp.phase === 'debrief') {
-    const d = ensureDebrief(rp, text);
-    if (d.added) { text = d.text; rolePlayFixed = true; postCheck = [...(postCheck ?? []), 'roleplay_debrief_added']; }
-  } else if (rp && rp.phase === 'offer') {
-    const o = ensureOffer(rp, text);
-    if (o.added) { text = o.text; rolePlayFixed = true; postCheck = [...(postCheck ?? []), 'roleplay_offer_added']; }
-  }
+  const rp = language.rolePlay;
+  const sg = guardSceneReply(rp, text);
+  const rolePlayFixed = sg.fixed;
+  if (sg.fixed) text = sg.text;
+  if (sg.postCheck.length) postCheck = [...(postCheck ?? []), ...sg.postCheck];
   const inScene = rolePlayActive(rp);
   // TRACK 2 (exampleGuard): a modelled sentence that completes an item the learner will solve is removed (the fallback after the one regeneration).
   const hits = exampleGuardCheck(language, text, learnerText);
@@ -210,7 +207,7 @@ export async function completeLanguageTurn(opts: {
   // liveError (ESL5): the error type seen now, and the one the previous reply targeted when this answer got it right (codes only).
   const live = engineV2('liveError') ? { ...(language.signals.liveError ? { liveError: language.signals.liveError.code } : {}), ...(language.signals.liveTarget && isSuccess(lt.assessment.verdict) ? { liveCorrect: language.signals.liveTarget } : {}) } : {};
   // liveRolePlay: an error corrected in the scene is logged with its code to errors to work on (codes and ids only).
-  if (language.rolePlay?.error) await recordRolePlayError({ institutionId: opts.institutionId, studentId: opts.studentId, code: language.rolePlay.error.code, outcomeId: language.rolePlay.error.outcome, sceneId: language.rolePlay.scene, messageId: opts.messageId });
+  if (language.rolePlay?.error?.certain) await recordRolePlayError({ institutionId: opts.institutionId, studentId: opts.studentId, code: language.rolePlay.error.code, outcomeId: language.rolePlay.error.outcome, sceneId: language.rolePlay.scene, messageId: opts.messageId });
   await recordProfileTurn(opts.institutionId, opts.studentId, { errorCode: language.signals.diagnosis?.code, independentSuccessOn: independentSuccessItem(language, lt), ...(belief ? { belief } : {}), lessonId: language.lesson.lessonId, lessonTitle: language.lesson.title, style: styleFromMoves(language.prevMoves), ...live, ...known, ...(engineV2('reviewOpen') && lt.rulesIntroduced?.length ? { rulesIntroduced: lt.rulesIntroduced.map((c) => knownKey(language.lesson.lessonId, c)) } : {}) });
   return lt as unknown as LanguageTurnEvidence;
 }

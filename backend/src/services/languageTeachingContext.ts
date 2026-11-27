@@ -14,8 +14,8 @@ import { priorAnsweredItems } from './learnerMemory';
 import { loadProfileLines, loadEsl5Record, errorTypeLabel, type Esl5Record } from './learnerLanguageProfile';
 import { graderV2On } from './graderV2';
 import { KIDS_PICS_LINE } from './kidsPictures';
-import { sceneById } from './roleplayScenes';
-import { rolePlayStep, rolePlayLine, rolePlayActive, pickScene, debriefEntry, scenesIn, type RolePlayTurn, type RolePlayTag } from './rolePlay';
+import { rolePlayLine, rolePlayActive, type RolePlayTurn, type RolePlayTag } from './rolePlay';
+import { buildRolePlayTurn } from './rolePlayTurn';
 import { engineV2, arbitrationForced } from './engineV2';
 import { RULE_BANK, ruleBankEntry, type RuleBankEntry } from './ruleBank';
 import {
@@ -2385,42 +2385,10 @@ export const QUICK_CHECK_LINE = 'QUICK CHECK (set by the system): this opening r
 
 /** liveRolePlay: moves that teach or set a lesson exercise, removed in a scene reply (the scene line replaces them). */
 export const ROLE_PLAY_DROPPED = new Set<MoveId>(['present_lesson_item', 'independent_practice', 'general_practice', 'comprehension_check', 'distinct_example', 'restate_task', 'corrective_feedback_retry', 'scaffold_hint', 'reteach_simpler', 'answer_with_reasoning', 'short_explanation', 'comprehensible_model', 'activate_prior_knowledge']);
-/** liveRolePlay: this turn's step. The scene is picked by code (age band, level, interests, scenes not had recently); interests and recent scenes are read only when a scene is picked. */
-async function rolePlayForTurn(i: { params: { studentId?: string; message: string; history: Turn[]; objectiveCode?: string }; learner: LanguageLearnerContext; child: boolean; signals: TurnSignals; blocked: boolean; busy: boolean }): Promise<RolePlayTurn | undefined> {
-  if (!engineV2('liveRolePlay')) return undefined;
-  try {
-    const step = await rolePlayStep({
-      history: i.params.history, message: i.params.message, signals: i.signals, blocked: i.blocked, busy: i.busy,
-      pick: async () => {
-        const mem = i.params.studentId ? await loadRolePlayMemory(i.params.studentId) : { interests: [], recent: [] };
-        return pickScene({ child: i.child, ageBand: i.learner.ageBand.status === 'known' ? i.learner.ageBand.value : 'unknown', level: i.learner.proficiency.value, interests: mem.interests, recent: [...mem.recent, ...scenesIn(i.params.history)], ask: i.params.message, objectiveCode: i.params.objectiveCode, seed: `${i.params.studentId ?? ''}|${new Date().toISOString().slice(0, 10)}` });
-      },
-    });
-    if (!step) return undefined;
-    const out: RolePlayTurn = { ...step, ...(i.child ? { child: true } : {}), ...(under9(i.learner.ageYears) ? { under9: true } : {}) };
-    if (out.phase === 'debrief') {
-      const scene = sceneById(out.scene);
-      const e = scene ? debriefEntry(scene, out.errs) : undefined;
-      if (e) out.entryId = e.id;
-    }
-    return out;
-  } catch (error) {
-    logger.warn('roleplay_step_failed', { error: serializeError(error) });
-    return undefined;
-  }
-}
-/** liveRolePlay: the learner's interests (learner profile) and the scenes of their recent sessions (session summaries). Codes and ids only. */
-export async function loadRolePlayMemory(studentId: string): Promise<{ interests: string[]; recent: string[] }> {
-  try {
-    const { LearnerProfile, SessionSummary } = await import('../models/LearnerMemory');
-    const [p, sums] = await Promise.all([
-      engineV2('learnerProfile') ? LearnerProfile.findOne({ studentId }).select('interests').lean() : null,
-      engineV2('sessionMemory') ? SessionSummary.find({ studentId }).sort({ endedAt: -1 }).limit(5).select('roleplayScenes').lean() : [],
-    ]);
-    return { interests: (p as { interests?: string[] } | null)?.interests ?? [], recent: (sums as { roleplayScenes?: string[] }[]).flatMap((x) => x.roleplayScenes ?? []) };
-  } catch {
-    return { interests: [], recent: [] };
-  }
+/** liveRolePlay: this turn's step (rolePlayTurn.ts, shared with the other subjects). English or Arabic practice, by the course's target language. */
+async function rolePlayForTurn(i: { params: { studentId?: string; message: string; history: Turn[]; objectiveCode?: string }; learner: LanguageLearnerContext; child: boolean; lessonText?: string; signals: TurnSignals; blocked: boolean; busy: boolean }): Promise<RolePlayTurn | undefined> {
+  const arabic = /arabic/i.test(i.learner.targetLanguage.value ?? '');
+  return buildRolePlayTurn({ studentId: i.params.studentId, message: i.params.message, history: i.params.history, objectiveCode: i.params.objectiveCode, lessonText: i.lessonText, child: i.child, ageBand: i.learner.ageBand.status === 'known' ? i.learner.ageBand.value : 'unknown', level: i.learner.proficiency.value, under9: under9(i.learner.ageYears), subject: arabic ? 'arabic' : 'english', lang: arabic ? 'ar' : 'en', signals: i.signals, blocked: i.blocked, busy: i.busy });
 }
 
 export async function buildLanguageTeachingContext(params: {
@@ -2497,7 +2465,7 @@ export async function buildLanguageTeachingContext(params: {
     const quickCheck = Boolean(params.quickCheck) && engineV2('planner2') && !reviewStep;
     // liveRolePlay: a role-play scene (asked for, or offered by the OFFER RULE) replaces the lesson exercise, the real chat and the closing ask for its replies.
     const child = learner.ageBand.status === 'known' && learner.ageBand.value === 'child';
-    const rolePlay = await rolePlayForTurn({ params, learner, child, signals: adjusted.signals, blocked: Boolean(reviewStep || quickCheck || params.hintsOnly || params.ladStep || params.taskStep || /arabic/i.test(learner.targetLanguage.value ?? '') || !learner.targetLanguage.value), busy: Boolean(chatStep) });
+    const rolePlay = await rolePlayForTurn({ params, learner, child, lessonText: [lesson.title, ...(lesson.spec?.grammar ?? []), ...(lesson.spec?.objectives ?? []), ...(lesson.spec?.successCriteria ?? [])].filter(Boolean).join('; '), signals: adjusted.signals, blocked: Boolean(reviewStep || quickCheck || params.hintsOnly || params.ladStep || params.taskStep || !learner.targetLanguage.value), busy: Boolean(chatStep) });
     const inScene = rolePlayActive(rolePlay);
     if (inScene) {
       chatStep = undefined;
@@ -2523,7 +2491,9 @@ export async function buildLanguageTeachingContext(params: {
     const { explicit, ruleFirst } = quickCheck || reviewStep || inScene ? { explicit: undefined, ruleFirst: undefined } : ruleFirstDecision({ band: learner.proficiency.band, masteryStatus: params.masteryStatus, history: params.history, signals, spec: lesson.spec, moves, record, lessonId: lesson.lessonId, entry: ruleBankEntry(teach2?.entryId) });
     const base = { version: LANGUAGE_CONTEXT_VERSION, learner, lesson, signals, moves, length, ...(history.length ? { history } : {}), ...(research ? { research } : {}), ...(ruleFirst ? { ruleFirst } : {}), ...(chatStep ? { realChat: chatStep } : {}), ...(rolePlay ? { rolePlay } : {}), ...(explicit !== undefined ? { explicitFirst: explicit } : {}), ...(prevTurn?.moves?.length ? { prevMoves: prevTurn.moves } : {}), ...(params.planPrimary ? { planPrimary: params.planPrimary } : {}), ...(record ? { record } : {}), ...(teach2 ? { teach2 } : {}) } as const;
     const parts0 = engineV2('cache') ? renderLanguageContextParts(base) : undefined;
-    const tail = inScene ? rolePlayLine(rolePlay!) : reviewStep ? REVIEW_FIRST_LINE(reviewStep, params.reviewsDue ?? 1) : chatStep ? REAL_CHAT_LINE(chatStep, learner.ageBand.status === 'known' && learner.ageBand.value === 'child') : quickCheck ? QUICK_CHECK_LINE : ladStep ? LAD_STEP_LINE : taskStep ? TASK_STEP_LINE : '';
+    const tail0 = inScene ? rolePlayLine(rolePlay!) : reviewStep ? REVIEW_FIRST_LINE(reviewStep, params.reviewsDue ?? 1) : chatStep ? REAL_CHAT_LINE(chatStep, learner.ageBand.status === 'known' && learner.ageBand.value === 'child') : quickCheck ? QUICK_CHECK_LINE : ladStep ? LAD_STEP_LINE : taskStep ? TASK_STEP_LINE : '';
+    // liveRolePlay: after a scene the tutor speaks as itself again (one short line).
+    const tail = rolePlay?.phase === 'after' && !tail0 ? rolePlayLine(rolePlay) : tail0;
     const parts = parts0 && tail ? { ...parts0, dynamic: `${parts0.dynamic}\n\n${tail}` } : parts0;
     const prompt = renderLanguageContextPrompt(base);
     return { ...base, ...(quickCheck ? { quickCheck: true } : {}), ...(ladStep ? { ladStep: true } : {}), ...(taskStep ? { taskStep: true } : {}), ...(parts ? { parts } : {}), prompt: tail ? `${prompt}\n\n${tail}` : prompt };

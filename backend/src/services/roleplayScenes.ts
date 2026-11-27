@@ -3,9 +3,14 @@
 // separate fixed safe list built from Pre A1 Starters words. This module holds the types, the bank and its checker; the engine
 // that picks a scene and runs it is added separately (behind ENARA_ENGINE_V2 `liveRolePlay`, named-only, off by default).
 import { RULE_BANK_BY_ID } from './ruleBank';
+import { SUBJECT_RULE_BY_ID, SUBJECTS, type SceneSubject } from './subjectRuleBank';
 import { INTERESTS } from '../models/LearnerMemory';
 import { inList } from './kidsPack';
-import { SCENES, CHILD_SCENES } from './roleplaySceneData';
+import { SCENES as ENGLISH_SCENES, CHILD_SCENES as ENGLISH_CHILD_SCENES } from './roleplaySceneData';
+import { SUBJECT_SCENES, SUBJECT_CHILD_SCENES } from './roleplaySubjectScenes';
+/** Teens and adults (every subject), and the fixed safe list for children (every subject). */
+export const SCENES: RolePlayScene[] = [...ENGLISH_SCENES, ...SUBJECT_SCENES];
+export const CHILD_SCENES: RolePlayScene[] = [...ENGLISH_CHILD_SCENES, ...SUBJECT_CHILD_SCENES];
 
 export const ROLEPLAY_BANK_VERSION = 'rp-v1';
 export type SceneCefr = 'preA1' | 'A1' | 'A2' | 'B1';
@@ -13,6 +18,10 @@ export type SceneAgeBand = 'child' | 'teen' | 'adult';
 export type SceneInterest = (typeof INTERESTS)[number];
 /** Every text is given in English and in formal Arabic (fusha). */
 export interface Bi { en: string; ar: string }
+export type LessonLang = 'en' | 'ar';
+export { type SceneSubject };
+/** A code check of the learner's answer to this beat (maths: the number; science and social studies: key words, for the recast hint only). */
+export interface BeatCheck { number?: number; words?: { en: string[]; ar: string[] } }
 export interface SceneBeat {
   /** The character's line at this beat (fixed; the model voices it in character). */
   say: Bi;
@@ -20,11 +29,21 @@ export interface SceneBeat {
   learner: Bi;
   /** One thing the learner could say (given only as help after a failed try). */
   example: Bi;
+  /** Optional: what a right answer to this beat contains. A wrong number is a code-certain error (recast in character, logged); missing key
+   *  words only make the recast hint (never logged). */
+  check?: BeatCheck;
+  /** The outcome this beat's check belongs to (default: the scene's first target). */
+  outcome?: string;
 }
 export interface RolePlayScene {
   id: string;
   /** 'child': the fixed safe list for under-13s; 'adult': teens and adults. */
   kind: 'adult' | 'child';
+  /** The subject the scene practises (scene choice uses the course or lesson subject first). */
+  subject: SceneSubject;
+  /** The lesson languages the scene can be voiced in (English practice: en; Arabic language: ar; other subjects: both). */
+  langs: LessonLang[];
+  /** For English practice, the CEFR band; for other subjects, the language demand of the lines (not a gate). */
   cefr: SceneCefr;
   ages: SceneAgeBand[];
   interests: SceneInterest[];
@@ -33,7 +52,8 @@ export interface RolePlayScene {
   character: Bi;
   /** The learner's goal in the scene (shown on the scene card). */
   goal: Bi;
-  /** The target outcomes: rule-bank ids (ruleBank.ts). The debrief's rule line and right/wrong pair come from these entries. */
+  /** The target outcomes: rule-bank ids (ruleBank.ts) for English, subject-bank ids (subjectRuleBank.ts) for the other subjects. The debrief's
+   *  rule line and right/wrong pair come from these entries. */
   targets: string[];
   /** Key words of the scene (English). For child scenes every word is a Starters word. */
   words: string[];
@@ -60,7 +80,6 @@ const words = (t: string) => t.split(/[\s/,.!?;:"()]+/).map((w) => w.trim()).fil
 export const ALL_SCENES: RolePlayScene[] = [...SCENES, ...CHILD_SCENES];
 export const SCENE_BY_ID = new Map(ALL_SCENES.map((s) => [s.id, s]));
 export const sceneById = (id?: string | null): RolePlayScene | undefined => (id ? SCENE_BY_ID.get(id) : undefined);
-export { SCENES, CHILD_SCENES };
 
 /** Every English text of a scene that the learner sees or hears (card, beats, examples). */
 export function sceneEnglish(s: RolePlayScene): string[] {
@@ -80,7 +99,19 @@ export function checkScene(s: RolePlayScene, childWords?: ChildWordList): string
   if (!s.interests.length) out.push('no interest tag');
   for (const t of s.interests) if (!(INTERESTS as readonly string[]).includes(t)) out.push(`interest "${t}" is not in INTERESTS`);
   if (!s.targets.length) out.push('no target outcome');
-  for (const t of s.targets) if (!RULE_BANK_BY_ID.has(t)) out.push(`target "${t}" is not a rule-bank id`);
+  if (!SUBJECTS.includes(s.subject)) out.push(`unknown subject ${s.subject}`);
+  if (!s.langs?.length || s.langs.some((l) => l !== 'en' && l !== 'ar')) out.push('lesson languages missing or unknown');
+  if (s.subject === 'english' && (s.langs.length !== 1 || s.langs[0] !== 'en')) out.push('an English-practice scene is voiced in English only');
+  if (s.subject === 'arabic' && (s.langs.length !== 1 || s.langs[0] !== 'ar')) out.push('an Arabic-language scene is voiced in Arabic only');
+  for (const t of s.targets) {
+    if (s.subject === 'english' ? !RULE_BANK_BY_ID.has(t) : SUBJECT_RULE_BY_ID.get(t)?.subject !== s.subject) out.push(`target "${t}" is not a ${s.subject === 'english' ? 'rule-bank' : `${s.subject} subject-bank`} id`);
+  }
+  for (const [i, b] of s.beats.entries()) {
+    if (b.outcome && !s.targets.includes(b.outcome)) out.push(`beat ${i + 1}: outcome "${b.outcome}" is not a target of the scene`);
+    if (b.check?.number !== undefined && !Number.isFinite(b.check.number)) out.push(`beat ${i + 1}: the number check is not a number`);
+    if (b.check?.number !== undefined && !String(b.example.en).includes(String(b.check.number))) out.push(`beat ${i + 1}: the example answer does not give the checked number`);
+    if (b.check?.words && (!b.check.words.en.length || !b.check.words.ar.length)) out.push(`beat ${i + 1}: key words missing in English or Arabic`);
+  }
   if (s.beats.length < MIN_BEATS || s.beats.length > MAX_BEATS) out.push(`${s.beats.length} beats (${MIN_BEATS}-${MAX_BEATS})`);
   if (!s.words.length) out.push('no allowed words');
   for (const [where, bi] of allBi(s)) {
@@ -106,10 +137,11 @@ export function checkScene(s: RolePlayScene, childWords?: ChildWordList): string
       for (const x of sentences) if (words(x).length > 10) out.push(`child sentence over 10 words: "${x}"`);
     }
     if (!childWords) out.push('no Starters word list to check a child scene against');
-    else {
-      const allowed = new Set([...childWords]);
-      for (const w of s.words) for (const p of w.split(/\s+/)) if (!inList(p, childWords)) out.push(`allowed word "${p}" is not a Starters word`);
-      for (const t of sceneEnglish(s)) for (const w of words(t)) if (!inList(w, allowed)) out.push(`"${w}" is not a Starters word ("${t}")`);
+    else if (s.langs.includes('en')) {
+      // English practice: Starters words only. Other subjects voiced in English: Starters words plus the scene's own listed subject words.
+      const allowed = new Set([...childWords, ...(s.subject === 'english' ? [] : s.words.flatMap((w) => w.toLowerCase().split(/\s+/)))]);
+      if (s.subject === 'english') for (const w of s.words) for (const p of w.split(/\s+/)) if (!inList(p, childWords)) out.push(`allowed word "${p}" is not a Starters word`);
+      for (const t of sceneEnglish(s)) for (const w of words(t)) if (!/^\d+$/.test(w) && !inList(w, allowed)) out.push(`"${w}" is not a Starters word ("${t}")`);
     }
   } else if (s.ages.includes('child')) out.push('a teen/adult scene may not be given to children');
   return out;
@@ -125,6 +157,10 @@ export function checkSceneBank(scenes: RolePlayScene[], childWords?: ChildWordLi
     for (const p of checkScene(s, childWords)) out.push(`${s.id}: ${p}`);
   }
   if (!scenes.some((s) => s.kind === 'child')) out.push('no child scene');
-  for (const band of ['A1', 'A2', 'B1'] as SceneCefr[]) if (!scenes.some((s) => s.kind === 'adult' && s.cefr === band)) out.push(`no teen/adult scene at ${band}`);
+  for (const band of ['A1', 'A2', 'B1'] as SceneCefr[]) if (!scenes.some((s) => s.kind === 'adult' && s.subject === 'english' && s.cefr === band)) out.push(`no teen/adult English scene at ${band}`);
+  // Every subject, for children and for teens/adults, in each lesson language it is taught in.
+  for (const subject of SUBJECTS) for (const kind of ['adult', 'child'] as const) for (const lang of (subject === 'english' ? ['en'] : subject === 'arabic' ? ['ar'] : ['en', 'ar']) as LessonLang[]) {
+    if (!scenes.some((s) => s.subject === subject && s.kind === kind && s.langs.includes(lang))) out.push(`no ${kind} ${subject} scene in ${lang}`);
+  }
   return out;
 }
