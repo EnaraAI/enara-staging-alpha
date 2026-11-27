@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import { getConfig } from '../config/env';
 import { MIGRATIONS } from '../migrations';
 import { pendingMigrations, runMigrations } from '../migrations/runner';
+import { ensureAllIndexes } from '../config/indexSync';
 import { logger } from '../utils/logging';
 import { applyBackfill, planBackfill, undoBackfill } from '../services/enrollmentBackfill';
 import { shadowReport } from '../services/enrollmentShadowReport';
@@ -92,7 +93,9 @@ router.post('/migrate', async (_req, res, next) => {
   try {
     const applied = await runMigrations(MIGRATIONS);
     logger.info('maintenance_migrate', { applied: applied.length });
-    res.json({ applied, pending: (await pendingMigrations(MIGRATIONS)).map((m) => m.id) });
+    // lms-speed-4b: every model's indexes, once per deploy (the lms-test entry has Mongoose autoIndex off).
+    const indexes = await ensureAllIndexes();
+    res.json({ applied, pending: (await pendingMigrations(MIGRATIONS)).map((m) => m.id), indexes });
   } catch (e) {
     next(e);
   }
