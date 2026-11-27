@@ -169,6 +169,16 @@ async function createAnamSessionToken(language: Language, avatarId?: string, opt
   return { token: data.sessionToken, expressive: { applied, speed: applied && Boolean(expr?.speed), voice: expr?.voice ?? null } };
 }
 
+// The longest a call may run (the P22 hard stop in findOwnSession), or undefined when no limit is set.
+// Read without failing the heartbeat when the full config is not loadable
+// (unit callers); a running server always has it. Demo sessions: short calls.
+function liveCallMaxSeconds(institutionId?: string): number | undefined {
+  let maxSeconds: number | undefined;
+  try { maxSeconds = getConfig().unpricedLimits.anamMaxSessionSeconds; } catch { maxSeconds = undefined; }
+  if (isDemoSessionInstitution(institutionId)) maxSeconds = Math.min(maxSeconds ?? DEMO_LIMITS.avatarCallSeconds, DEMO_LIMITS.avatarCallSeconds);
+  return maxSeconds || undefined;
+}
+
 // One database round trip on the common path: the lookup also records the
 // request for usage metering (lastActivityAt). `extra` lets a caller fold its
 // own guarded update into the same write (the speech character count); when
@@ -185,12 +195,7 @@ async function findOwnSession(
   // Hard stop (P22): past the approved maximum length the call is ended on
   // the server and metered; the browser must start a new, newly reserved one.
   // (New calls cannot start without the limit: see requireAnam.)
-  // Read without failing the heartbeat when the full config is not loadable
-  // (unit callers); a running server always has it.
-  let maxSeconds: number | undefined;
-  try { maxSeconds = getConfig().unpricedLimits.anamMaxSessionSeconds; } catch { maxSeconds = undefined; }
-  // Demo sessions: short calls.
-  if (isDemoSessionInstitution(req.user!.institutionId)) maxSeconds = Math.min(maxSeconds ?? DEMO_LIMITS.avatarCallSeconds, DEMO_LIMITS.avatarCallSeconds);
+  const maxSeconds = liveCallMaxSeconds(req.user!.institutionId);
   const own = { id: req.params.id, userId: req.user!.id, endedAt: null };
   const live = maxSeconds ? { createdAt: { $gte: new Date(Date.now() - maxSeconds * 1000) } } : {};
   const session = await AvatarSession.findOneAndUpdate(
@@ -393,12 +398,49 @@ export const startAvatarSession = asyncHandler(async (req: AuthRequest, res: Res
 });
 
 // Live call controls (ENARA_ENGINE_V2 named switches, off by default): only the ones that are on are listed.
-export function liveCallFeatures(): { features?: { mute?: true; captions?: true } } {
-  const features: { mute?: true; captions?: true } = {};
+export function liveCallFeatures(): { features?: { mute?: true; captions?: true; timeUsed?: true } } {
+  const features: { mute?: true; captions?: true; timeUsed?: true } = {};
   if (engineV2('liveMute')) features.mute = true;
   if (engineV2('liveCaptions')) features.captions = true;
+  if (engineV2('liveTimeUsed')) features.timeUsed = true;
   return Object.keys(features).length ? { features } : {};
 }
+
+// liveTimeUsed: the learner's live calls today, by the same rules as the daily limit in startAvatarSession
+// (the same 24-hour window; only calls that got going count as used; failed starts count only toward the
+// wider start cap), minutes used today, and the longest a call may run (null: no limit). One indexed read
+// (userId; at most the day's starts, which the start cap bounds); no provider is called. 404 when the switch is off.
+export const getLiveUsage = asyncHandler(async (req: AuthRequest, res: Response) => {
+  if (!engineV2('liveTimeUsed')) throw new AppError('Not found', 404, 'NOT_FOUND');
+  const now = Date.now();
+  const since = new Date(now - 24 * 60 * 60 * 1000);
+  const limit = req.user!.role === 'student' ? DAILY_SESSIONS.student : DAILY_SESSIONS.staff;
+  const maxSeconds = liveCallMaxSeconds(req.user!.institutionId);
+  const calls = await AvatarSession.find({ userId: req.user!.id, createdAt: { $gte: since } })
+    .select('createdAt endedAt usageEndAt lastActivityAt lastHeartbeatAt openingUsed')
+    .lean();
+  const going = calls.filter((c) => c.lastHeartbeatAt != null || c.openingUsed === true);
+  let left = Math.max(0, Math.min(limit - going.length, limit * DAILY_START_FACTOR - calls.length));
+  if (isDemoSessionInstitution(req.user!.institutionId)) {
+    const demoCalls = await AvatarSession.countDocuments({ institutionId: req.user!.institutionId, $or: [{ lastHeartbeatAt: { $ne: null } }, { openingUsed: true }] });
+    left = Math.min(left, Math.max(0, DEMO_LIMITS.avatarCallsPerSession - demoCalls));
+  }
+  // A call's time: start to its end, or for one still open to the last request seen (heartbeats arrive once a minute).
+  const seconds = going.reduce((sum, c) => {
+    const end = (c.endedAt ?? c.usageEndAt ?? c.lastActivityAt ?? c.createdAt).getTime();
+    const s = Math.max(0, (Math.min(end, now) - c.createdAt.getTime()) / 1000);
+    return sum + (maxSeconds ? Math.min(s, maxSeconds) : s);
+  }, 0);
+  res.setHeader('Cache-Control', 'no-store');
+  res.json({
+    callsUsedToday: going.length,
+    callsLeftToday: left,
+    dailyLimit: limit,
+    secondsUsedToday: Math.round(seconds),
+    minutesUsedToday: Math.round(seconds / 60),
+    maxCallSeconds: maxSeconds ?? null,
+  });
+});
 
 // Enara admins only (route): the video tutor's voice catalogue, filtered by a
 // search (name, description or tags) and/or accent country (country=EG for

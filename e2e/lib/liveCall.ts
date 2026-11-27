@@ -37,7 +37,7 @@ export interface LiveCall {
 export const tutorReply = (q: LiveQuery) =>
   q.kind === 'opening' ? 'Hello! I am your tutor today. What is your name?' : q.kind === 'nudge' ? 'Take your time. What is your name?' : 'Nice to meet you. Let us practise greetings.';
 
-export async function liveCallSession(browser: Browser, opts: { features?: Record<string, boolean> } = {}): Promise<LiveCall> {
+export async function liveCallSession(browser: Browser, opts: { features?: Record<string, boolean>; student?: string } = {}): Promise<LiveCall> {
   const context = await browser.newContext({ ignoreHTTPSErrors: true, viewport: { width: 1366, height: 900 }, deviceScaleFactor: 1, permissions: ['microphone'] });
   const page = await context.newPage();
   page.on('pageerror', (e) => console.log('[pageerror live call]', String(e).slice(0, 500)));
@@ -98,7 +98,7 @@ export async function liveCallSession(browser: Browser, opts: { features?: Recor
   // Sign in as the student on ENARA's own site.
   await page.goto(`${ENARA}/`);
   await page.getByRole('tab', { name: 'Student', exact: true }).click();
-  await page.locator('#si-email').fill(seedEmail(LIVE_STUDENT));
+  await page.locator('#si-email').fill(seedEmail(opts.student ?? LIVE_STUDENT));
   await page.locator('#si-pass').fill(secrets.enaraPassword);
   await page.getByRole('button', { name: 'Continue' }).click();
   await expect.poll(() => page.evaluate(() => !!(sessionStorage.getItem('enara_token') || localStorage.getItem('enara_token'))), { timeout: 30_000 }).toBe(true);
@@ -123,7 +123,7 @@ export async function openCoursePage(call: LiveCall): Promise<void> {
   const { page } = call;
   await page.getByRole('button', { name: 'My learning', exact: true }).click();
   await page.getByRole('button', { name: /English/ }).first().click();
-  await expect(page.getByRole('button', { name: /Live AI Tutor/ })).toBeVisible({ timeout: 60_000 });
+  await expect(page.getByRole('heading', { name: 'AI tutor', exact: true })).toBeVisible({ timeout: 60_000 });
 }
 
 /** From the course page: open the live tutor and start a call (fake microphone; the call goes voice-only). */
