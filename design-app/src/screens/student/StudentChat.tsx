@@ -52,7 +52,7 @@ const T = {
 
 interface Msg { id: string; role: 'user' | 'ai'; text: string; at?: string; streaming?: boolean; stopped?: boolean; error?: string; retryText?: string; hint?: boolean; visualHtml?: string; drawing?: boolean }
 /** A typed request for a drawing (English or Arabic), sent to the diagram generator instead of the chat. */
-const DRAW_ASK = /^\s*(please\s+|can you\s+|could you\s+)*(draw|sketch|illustrate)\b|\b(draw|sketch)\s+(me|a|an|the|it|this)\b|(show me|make)\s+(a|an)\s+(picture|diagram|drawing|chart)\b|ارسم|ارسمي|ترسم|رسمًا|رسما|رسم توضيحي|رسمة|مخطط توضيحي|صورة توضيحية/i;
+const DRAW_ASK = /^\s*(please\s+|can you\s+|could you\s+)*(draw|sketch|illustrate)\b|\b(can|could|would|will)\s+you\s+(please\s+)?(draw|sketch)\b|\b(draw|sketch)\s+(me|it|this|that)\b|(show me|make)\s+(a|an)\s+(picture|diagram|drawing|chart)\b|ارسم|ارسمي|ترسم|رسمًا|رسما|رسم توضيحي|رسمة|مخطط توضيحي|صورة توضيحية/i;
 interface SessionDoc { id?: string; courseId?: string; lessonId?: string; lessonTitle?: string; title?: string; messages?: { id?: string; role?: string; text?: string; timestamp?: string }[] }
 
 const toMsg = (m: NonNullable<SessionDoc['messages']>[number], i: number): Msg => ({ id: str(m?.id) || `m${i}`, role: m?.role === 'user' ? 'user' : 'ai', text: str(m?.text), at: str(m?.timestamp) });
