@@ -20,7 +20,7 @@ test.describe.serial('48 · Live tutor: expressive avatar (liveExpressive)', () 
     // The call start, as the server sends it with the switch on (the face takes cues, panel on its left) or off.
     await context.route(/\/api\/avatar\/session$/, (route) => {
       if (route.request().method() !== 'POST') return route.fallback();
-      return json(route, { session_id: SESSION_ID, provider: 'video', session_token: 'e2e-not-a-session-token', speech: 'server', fallback_reason: null, pronunciation: false, ...(expressive ? { expressive } : {}) });
+      return json(route, { session_id: SESSION_ID, provider: 'video', session_token: 'e2e-not-a-session-token', speech: 'server', fallback_reason: null, pronunciation: false, features: { captions: true }, ...(expressive ? { expressive } : {}) });
     });
     // The tutor: a warm opening; asked for a drawing, a curious cue, the drawing and the look line.
     await context.route(/\/api\/avatar\/query-stream$/, (route) => {
@@ -32,9 +32,13 @@ test.describe.serial('48 · Live tutor: expressive avatar (liveExpressive)', () 
     });
     await openCoursePage(call);
 
-    // Switch on.
+    // Switch on, with captions on (liveCaptions): a cue never reaches a caption.
     await startCall(call);
     await expect(page.getByText(/talking without a face/)).toBeVisible({ timeout: 30_000 }); // voice-only call
+    const toggle = page.getByTestId('live-captions-toggle');
+    if ((await toggle.getAttribute('data-state')) !== 'on') await toggle.click();
+    const captions = page.getByTestId('live-captions');
+    await expect(captions.locator('[data-who="tutor"]').last()).toContainText('Shall we practise?', { timeout: 30_000 });
     await call.learnerSays('Can you draw three apples?');
     const panel = page.getByTestId('visual-aid-panel');
     await expect(panel).toBeVisible({ timeout: 30_000 });
@@ -50,6 +54,9 @@ test.describe.serial('48 · Live tutor: expressive avatar (liveExpressive)', () 
     // The cue reached the call (the frame records it) but no cue tag is shown anywhere.
     await expect(page.getByTestId('live-avatar-frame')).toHaveAttribute('data-cue-sent', /^curious@/);
     expect(await page.locator('body').innerText()).not.toMatch(CUE_TEXT);
+    await expect(captions).toContainText('Here are three red apples', { timeout: 30_000 });
+    await expect(captions).toContainText('Look at the picture');
+    expect(await captions.innerText()).not.toMatch(CUE_TEXT);
     // The pulse is only a moment.
     await expect(look).toBeHidden({ timeout: 10_000 });
     expect(await page.locator('body').innerText()).not.toMatch(CUE_TEXT);
