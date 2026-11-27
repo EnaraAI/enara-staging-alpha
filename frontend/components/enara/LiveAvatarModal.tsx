@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { RolePlaySceneCard, type SceneCardData } from './RolePlaySceneCard';
 import { EnaraMark } from '../brand/EnaraLogo';
 import { X, Loader2, AlertCircle, RefreshCw, Mic, MicOff, Volume2, VolumeX, Captions, CaptionsOff } from 'lucide-react';
 import { createClient, AnamEvent } from '@anam-ai/js-sdk';
@@ -100,6 +101,8 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [artifactHtml, setArtifactHtml] = useState<string | null>(null);
+  // liveRolePlay: the scene card ({ scene } from /query-stream; null outside a scene).
+  const [scene, setScene] = useState<SceneCardData | null>(null);
   const [status, setStatus] = useState('');
   // Anam's STT/voice language is fixed for the whole session and there's no
   // auto-detect from a cold start, so we ask up front instead of requiring
@@ -275,6 +278,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
     setProvider(null);
     setTavusUrl(null);
     setArtifactHtml(null);
+    setScene(null);
     setError(null);
     setStatus('');
     fallbackStartedRef.current = false;
@@ -370,6 +374,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
         if (!trimmed) return;
         const data = JSON.parse(trimmed);
         if (data.visual === 'drawing') setArtifactHtml(DRAWING_PLACEHOLDER);
+        if ('scene' in data) setScene(data.scene ?? null);
         // liveExpressive: the cue goes into the talk stream only (the video tutor reads it; it is never spoken or shown).
         if (isExpressiveCue(data.cue) && talkStream?.isActive()) {
           const before = speech.flush();
@@ -486,6 +491,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
         if (!line.trim()) return;
         const data = JSON.parse(line);
         if (data.visual === 'drawing') setArtifactHtml(DRAWING_PLACEHOLDER);
+        if ('scene' in data) setScene(data.scene ?? null);
         // liveExpressive: ENARA speaks, so the cue goes to the face over the data channel, timed from the turn's start.
         if (isExpressiveCue(data.cue)) {
           try {
@@ -821,7 +827,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
     switchingLanguageRef.current = false;
     setLoading(true);
     setError(null);
-    if (!reconnect) setArtifactHtml(null);
+    if (!reconnect) { setArtifactHtml(null); setScene(null); }
     setTavusUrl(null);
     setProvider(null);
     setStatus(reconnect ? 'Reconnecting…' : 'Starting session…');
@@ -1234,6 +1240,8 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
               artifactHtml ? 'h-[38%] lg:h-full w-full lg:w-[34%]' : 'h-full w-full'
             }`}
           >
+            {/* liveRolePlay: the scene card, in a corner of the tutor's video (never over the Visual Aid; collapsed on a phone). */}
+            <RolePlaySceneCard card={scene} defaultLang={languageChoice === 'arabic' ? 'ar' : 'en'} />
             {provider === 'voice' && (
               <div className="w-full h-full flex flex-col items-center justify-center gap-4 bg-slate-900 text-center px-6">
                 {myTutor?.current?.imageUrl ? (
