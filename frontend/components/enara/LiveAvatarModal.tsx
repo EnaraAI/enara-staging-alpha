@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { EnaraMark } from '../brand/EnaraLogo';
-import { X, Loader2, AlertCircle, RefreshCw, Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
+import { X, Loader2, AlertCircle, RefreshCw, Mic, MicOff, Volume2, VolumeX, Captions, CaptionsOff } from 'lucide-react';
 import { createClient, AnamEvent } from '@anam-ai/js-sdk';
 import { Assessment } from '../../types';
 import {
@@ -13,11 +13,11 @@ import {
 } from '../../services/apiService';
 import { toast } from '../../services/toastService';
 import { FaceGallery } from './FaceGallery';
-import { AvatarVoice, SentenceSplitter, type VoiceLanguage } from '../../services/avatarVoice';
+import { AvatarVoice, SentenceSplitter, languageOfText, type VoiceLanguage } from '../../services/avatarVoice';
 import { UtteranceRecorder, base64 } from '../../services/utteranceRecorder';
 import { markRelayDown, relayBase } from '../../services/relay';
 import { notCaughtLine } from '../../services/voiceText';
-import { SpeechChunkCleaner } from '../../services/speechText';
+import { SpeechChunkCleaner, stripMarkdownForSpeech } from '../../services/speechText';
 import { WebAudioSink } from '../../services/webAudioSink';
 import { classifyMicError, isInFrame, micMessage } from '../../services/micCheck';
 import { MicProblemNotice, useMicGate, type MicProblem } from '../MicCheck';
@@ -55,7 +55,21 @@ type AvatarSessionResponse = {
 };
 
 // The server's live call switches (ENARA_ENGINE_V2 liveMute, ...): off means the call looks as before.
-type LiveCallFeatures = { mute?: boolean };
+type LiveCallFeatures = { mute?: boolean; captions?: boolean };
+
+// liveCaptions: one caption line (the tutor's spoken words, or what was heard from the learner). An open
+// line still grows: the tutor's current turn, or the learner's words while they are talking.
+type CaptionLine = { id: number; who: 'tutor' | 'learner'; text: string; open: boolean };
+const CAPTION_LINES = 4;
+const CAPTION_CHARS = 220;
+const CAPTIONS_KEY = 'enara.liveCaptions';
+const readCaptionsChoice = (): boolean => {
+  try {
+    return localStorage.getItem(CAPTIONS_KEY) === 'on';
+  } catch {
+    return false;
+  }
+};
 
 const MIC_PERMISSION_DENIED_REASON = 'CONNECTION_CLOSED_CODE_MICROPHONE_PERMISSION_DENIED';
 
@@ -154,6 +168,27 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
   const micMutedRef = useRef(false);
   const voiceMutedRef = useRef(false);
   const voiceSinkRef = useRef<WebAudioSink | null>(null);
+  // liveCaptions: off until the learner turns them on; the choice is remembered in this browser.
+  const [captionsOn, setCaptionsOn] = useState(readCaptionsChoice);
+  const [captions, setCaptions] = useState<CaptionLine[]>([]);
+  const captionIdRef = useRef(0);
+  // mode 'append': add to the speaker's open line; 'replace': the speaker's open line becomes text (live
+  // recognition); 'close': end the speaker's open line. Clean words only (no Markdown, citations or LaTeX).
+  const caption = useCallback((who: CaptionLine['who'], text: string, mode: 'append' | 'replace' | 'close') => {
+    const clean = mode === 'close' ? '' : stripMarkdownForSpeech(text).replace(/\s+/g, ' ').trim();
+    if (mode !== 'close' && !clean) return;
+    setCaptions((lines) => {
+      const last = lines[lines.length - 1];
+      const own = last && last.who === who && last.open ? last : null;
+      if (mode === 'close') return own ? [...lines.slice(0, -1), { ...own, open: false }] : lines;
+      // The other speaker's open line ends when this one speaks.
+      const closed = lines.map((l) => (l.open && l.who !== who ? { ...l, open: false } : l));
+      const next = own
+        ? [...closed.slice(0, -1), { ...own, text: mode === 'append' ? `${own.text} ${clean}` : clean }]
+        : [...closed, { id: ++captionIdRef.current, who, text: clean, open: true }];
+      return next.slice(-CAPTION_LINES);
+    });
+  }, []);
   // Created on the student's click, so the browser lets it play sound later.
   const audioCtxRef = useRef<AudioContext | null>(null);
   const silenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -242,6 +277,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
     switchingLanguageRef.current = false;
     setLanguageChoice(null);
     setFeatures({});
+    setCaptions([]);
     micMutedRef.current = false;
     voiceMutedRef.current = false;
     setMicMuted(false);
@@ -297,6 +333,9 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
     answeringRef.current = true;
     let talkStream: any = null;
     let pendingLanguageSwitch: string | null = null;
+    // liveCaptions: what the video tutor heard, then its answer as it is streamed to its voice.
+    caption('learner', last.content, 'replace');
+    caption('learner', '', 'close');
 
     try {
       const messages = messageHistory.map((msg: any) => ({
@@ -325,7 +364,10 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
         if (data.visual === 'drawing') setArtifactHtml(DRAWING_PLACEHOLDER);
         if (data.content && talkStream?.isActive()) {
           const words = speech.push(data.content);
-          if (words) talkStream.streamMessageChunk(words, false);
+          if (words) {
+            talkStream.streamMessageChunk(words, false);
+            caption('tutor', words, 'append');
+          }
         } else if (data.language_switch) {
           // The current answer keeps speaking in the current voice; the
           // switch only takes effect once this turn is fully spoken.
@@ -347,13 +389,19 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
       if (buffer.trim()) handleLine(buffer.trim());
 
       const rest = speech.flush();
-      if (rest && talkStream?.isActive()) talkStream.streamMessageChunk(rest, false);
+      if (rest && talkStream?.isActive()) {
+        talkStream.streamMessageChunk(rest, false);
+        caption('tutor', rest, 'append');
+      }
+      caption('tutor', '', 'close');
       if (talkStream?.isActive()) talkStream.endMessage();
     } catch (e) {
       console.error('[AVATAR] ENARA answer streaming failed', e);
       try {
         if (talkStream?.isActive()) talkStream.endMessage();
         await client.talk('Sorry, I had trouble answering that. Please try again.');
+        caption('tutor', 'Sorry, I had trouble answering that. Please try again.', 'append');
+        caption('tutor', '', 'close');
       } catch {
         // If Anam itself is broken, the connection handler will trigger fallback.
       }
@@ -363,7 +411,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
         void switchAnamLanguageRef.current(pendingLanguageSwitch);
       }
     }
-  }, []);
+  }, [caption]);
 
   // ElevenLabs mode: one spoken turn. The reply streams in as text, is cut into
   // sentences, and each sentence is spoken as soon as it is complete. A new
@@ -387,6 +435,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
     if (kind === 'turn') nudgesRef.current = 0;
     const turn = ++voiceTurnRef.current;
     const current = () => turn === voiceTurnRef.current && !closingRef.current;
+    caption('tutor', '', 'close');
     setStatus(kind !== 'turn' ? 'Speaking…' : language === 'arabic' ? 'Thinking… (Arabic)' : 'Thinking… (English)');
 
     const messages =
@@ -476,7 +525,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
       endInline();
       if (current()) setStatus('Listening…');
     }
-  }, [clearSilenceTimer, switchToAvatarVoice]);
+  }, [caption, clearSilenceTimer, switchToAvatarVoice]);
 
   useEffect(() => {
     answerSpokenTurnRef.current = answerSpokenTurn;
@@ -488,6 +537,8 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
     const voice = new AvatarVoice(sessionIdRef.current, sink, {
       onUtterance: (text, language) => {
         lastHeardLanguageRef.current = language;
+        caption('learner', text, 'replace');
+        caption('learner', '', 'close');
         // avatarSpeaking: one English sentence as a short clip for pronunciation feedback (fire and forget; never blocks the answer).
         const rec = clipRecorderRef.current; const since = hearingSinceRef.current; hearingSinceRef.current = null;
         if (rec && language === 'english' && sessionIdRef.current) {
@@ -506,7 +557,9 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
         void voiceRef.current.finishTurn();
       },
       // The student is talking: no nudge.
-      onHearing: () => { clearSilenceTimer(); hearingSinceRef.current ??= Date.now(); },
+      onHearing: (text) => { clearSilenceTimer(); hearingSinceRef.current ??= Date.now(); caption('learner', text, 'replace'); },
+      // liveCaptions: each sentence as its audio starts.
+      onSpeaking: (text) => caption('tutor', text, 'append'),
       onInterrupt: interrupt,
       onVoiceUnavailable: () => switchToAvatarVoice(),
       onError: (message) => setError(message),
@@ -525,7 +578,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
         console.error('[AVATAR] Voice start failed', e);
         micFailed(classifyMicError(e, isInFrame()));
       });
-  }, [answerSpokenTurn, clearSilenceTimer, micFailed, switchToAvatarVoice]);
+  }, [answerSpokenTurn, caption, clearSilenceTimer, micFailed, switchToAvatarVoice]);
 
   // The video avatar refused the call: carry on as a voice-only tutor.
   const startVoiceOnly = useCallback(async () => {
@@ -851,6 +904,18 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
     voiceSinkRef.current?.setMuted(muted);
   }, []);
 
+  // liveCaptions: on/off, remembered in this browser.
+  const toggleCaptions = useCallback(() => {
+    setCaptionsOn((on) => {
+      try {
+        localStorage.setItem(CAPTIONS_KEY, on ? 'off' : 'on');
+      } catch {
+        // storage blocked: the choice lasts for this page only
+      }
+      return !on;
+    });
+  }, []);
+
   useEffect(() => {
     if (provider !== 'anam') return;
     const video = document.getElementById('enara-anam-video') as HTMLVideoElement | null;
@@ -980,9 +1045,10 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
           </button>
         </div>
 
-        {/* liveMute: call controls (video or voice-only call; the backup video has its own) */}
-        {features.mute && (provider === 'anam' || provider === 'voice') && (
+        {/* Call controls, each behind its own switch (video or voice-only call; the backup video has its own) */}
+        {(features.mute || features.captions) && (provider === 'anam' || provider === 'voice') && (
           <div className="flex flex-wrap items-center gap-2 px-5 py-2 border-b border-white/10 shrink-0" role="group" aria-label="Call controls · أدوات المكالمة">
+            {features.mute && (<>
             <button
               type="button"
               data-testid="live-mic-toggle"
@@ -1015,6 +1081,25 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
               <span>{voiceMuted ? 'Tutor voice off' : 'Tutor voice on'}</span>
               <span lang="ar" dir="rtl">{voiceMuted ? 'صوت المعلّم مكتوم' : 'صوت المعلّم يعمل'}</span>
             </button>
+            </>)}
+            {features.captions && (
+              <button
+                type="button"
+                data-testid="live-captions-toggle"
+                data-state={captionsOn ? 'on' : 'off'}
+                onClick={toggleCaptions}
+                aria-label={captionsOn
+                  ? 'Captions on: the tutor’s words and yours are written on the screen. Turn them off · التسميات التوضيحية مُفعَّلة: تُكتب كلمات المعلّم وكلماتك على الشاشة. أوقِفها'
+                  : 'Captions off. Turn them on to see the tutor’s words and yours written on the screen · التسميات التوضيحية مُتوقِّفة. فعِّلها لترى كلمات المعلّم وكلماتك مكتوبةً على الشاشة'}
+                className={`flex items-center gap-2 h-9 px-3 rounded-lg text-xs font-bold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-300 ${
+                  captionsOn ? 'bg-teal-600 text-white hover:bg-teal-500' : 'bg-white/10 text-white hover:bg-white/20'
+                }`}
+              >
+                {captionsOn ? <Captions size={16} aria-hidden="true" /> : <CaptionsOff size={16} aria-hidden="true" />}
+                <span>{captionsOn ? 'Captions on' : 'Captions off'}</span>
+                <span lang="ar" dir="rtl">{captionsOn ? 'التسميات التوضيحية مُفعَّلة' : 'التسميات التوضيحية مُتوقِّفة'}</span>
+              </button>
+            )}
           </div>
         )}
 
@@ -1132,6 +1217,39 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
               />
             )}
 
+
+            {/* liveCaptions: the last few lines, inside the tutor's pane (never over the visual aid), in the call's language. */}
+            {features.captions && captionsOn && (provider === 'anam' || provider === 'voice') && (() => {
+              const lead = [...captions].reverse().find((l) => l.who === 'tutor') ?? captions[captions.length - 1];
+              const arabic = !!lead && languageOfText(lead.text) === 'arabic';
+              return (
+                <div
+                  data-testid="live-captions"
+                  role="log"
+                  aria-live="polite"
+                  aria-label={arabic ? 'التسميات التوضيحية' : 'Captions'}
+                  dir={arabic ? 'rtl' : 'ltr'}
+                  lang={arabic ? 'ar' : 'en'}
+                  className="absolute inset-x-2 bottom-2 sm:inset-x-6 sm:bottom-4 z-10 max-h-[60%] overflow-hidden flex flex-col justify-end gap-1 rounded-xl bg-black/75 px-3 py-2 text-white text-sm sm:text-base leading-snug pointer-events-none"
+                >
+                  {captions.length === 0 ? (
+                    <p className="m-0 text-xs text-slate-300">Captions will appear here · <span lang="ar" dir="rtl">ستظهر التسميات التوضيحية هنا</span></p>
+                  ) : (
+                    captions.map((line) => (
+                      <p key={line.id} data-testid="live-caption-line" data-who={line.who} className="m-0">
+                        <span className={`font-bold ${line.who === 'tutor' ? 'text-teal-300' : 'text-amber-200'}`}>
+                          {line.who === 'tutor' ? (arabic ? 'المعلّم' : 'Tutor') : arabic ? 'أنت' : 'You'}
+                          {': '}
+                        </span>
+                        <span dir="auto" data-testid="live-caption-text">
+                          {line.text.length > CAPTION_CHARS ? `…${line.text.slice(-CAPTION_CHARS).replace(/^\S*\s/, '')}` : line.text}
+                        </span>
+                      </p>
+                    ))
+                  )}
+                </div>
+              );
+            })()}
 
             {provider === 'tavus' && tavusUrl && (
               <iframe

@@ -29,7 +29,8 @@ an attempt is left; ready once the assessment is over; teacher list, learner lis
 blocked, teacher dismiss; ENARA_ENGINE_V2 as on lms-test, AI paused), …, 19 tutor reply formatting (the learner's
 tutor chat with a MOCK Markdown reply given by Playwright routes, no AI call: no raw `**` or `#`, maths readable,
 citation chip, model HTML shown as text), …, 46 live tutor call controls (a seeded student's voice-only call with every
-provider faked by Playwright, `lib/liveCall.ts`, nothing paid: microphone off/on, tutor voice off/on).
+provider faked by Playwright, `lib/liveCall.ts`, nothing paid: microphone off/on, tutor voice off/on), 47 live
+captions (off by default and remembered; tutor and learner lines as clean text; Arabic right to left; beside the visual aid; phone).
 
 ## CI
 
