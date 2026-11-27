@@ -230,7 +230,9 @@ async function main() {
     info: { stuckWordsCuedConcerned: `${stuckCued}/${stuckTurns.length}`, cueVsIndependentRightWrong: `${indepAgree}/${indep.length}`, subjects: [...new Set(ok.map((s) => `${s.profile}:${s.subject}/${s.lang}`))] },
   };
   // Added after run 3: an Arabic-medium lesson answered in English (the teacher pre-screen let it through).
-  const englishIn = (arm) => ok.filter((s) => s.arm === arm && s.lang === 'arabic').flatMap((s) => s.turns).filter((t) => t.text && !/[\u0600-\u06FF]/.test(t.text.slice(0, 60)) && (t.text.slice(0, 60).match(/[A-Za-z]/g) ?? []).length >= 12).length;
+  // Mostly Latin letters in the reply's opening (after run 5: "Great job! Yes, مشرقةٌ is the خبر" counts too).
+  const mostlyEnglish = (t) => { const a = t.slice(0, 80); const la = (a.match(/[A-Za-z]/g) ?? []).length; const ar = (a.match(/[\u0600-\u06FF]/g) ?? []).length; return la >= 12 && la > ar; };
+  const englishIn = (arm) => ok.filter((s) => s.arm === arm && s.lang === 'arabic').flatMap((s) => s.turns).filter((t) => t.text && mostlyEnglish(t.text)).length;
   result.arabicRepliesInEnglish = { off: englishIn('off'), on: englishIn('on'), noWorse: englishIn('on') <= englishIn('off') };
   result.pass = unread <= Math.ceil(onTurns.length / 10) && result.arabicRepliesInEnglish.noWorse && result.cueMatch.pct >= 95 && blocked === 0 && childCalm && shown === 0 && result.teacherAccept.pct >= 90 && result.stuck.noWorse && result.failedSessions.length === 0;
   writeFileSync(join(OUT, 'sim.json'), JSON.stringify({ result, sessions, judged }, null, 1));
