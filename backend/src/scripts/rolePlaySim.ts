@@ -37,8 +37,9 @@ async function llm(system: string, messages: { role: 'user' | 'assistant'; conte
     const r = await fetch(`${SITE}/api/maintenance/llm-compare`, { method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body, signal: AbortSignal.timeout(65_000) }).catch(() => null);
     const j = r?.ok ? (await r.json().catch(() => null)) as { ok?: boolean; text?: string; usage?: { input_tokens?: number; output_tokens?: number } } | null : null;
     if (j?.ok && typeof j.text === 'string') { inTok += j.usage?.input_tokens ?? 0; outTok += j.usage?.output_tokens ?? 0; return j.text; }
-    if (attempt >= 3) throw new Error(`llm-compare failed (HTTP ${r?.status ?? 0})`);
-    await new Promise((res) => setTimeout(res, 3000 * attempt));
+    // lms-test's rate limit (429) or a cold start: wait longer each time (at most 6 tries).
+    if (attempt >= 6) throw new Error(`llm-compare failed (HTTP ${r?.status ?? 0})`);
+    await new Promise((res) => setTimeout(res, (r?.status === 429 ? 15_000 : 3000) * attempt));
   }
 }
 function fakeReply(system: string, messages: { role: string; content: string }[]): string {
@@ -248,7 +249,10 @@ async function main() {
   for (const cond of ['off', 'on'] as const) {
     process.env.ENARA_ENGINE_V2 = [...BASE_V2, ...(cond === 'on' ? ['liveRolePlay'] : [])].join(',');
     // The five learners run side by side (each its own school records and session).
-    await Promise.all(learners.map((l) => runOne(l, cond).catch((e) => { console.log(`FAILED ${l.label} ${cond}: ${String(e).slice(0, 300)}`); results.push({ learner: l.label, cond, error: String(e).slice(0, 300) }); })));
+    // At most four learners at a time (lms-test's maintenance route has a rate limit).
+    for (let k = 0; k < learners.length; k += 4) {
+      await Promise.all(learners.slice(k, k + 4).map((l) => runOne(l, cond).catch((e) => { console.log(`FAILED ${l.label} ${cond}: ${String(e).slice(0, 300)}`); results.push({ learner: l.label, cond, error: String(e).slice(0, 300) }); })));
+    }
   }
   const sum = (cond: string) => { const r = results.filter((x) => x.cond === cond && !x.error); const n = r.reduce((a, x) => a + x.replies, 0); const acc = r.reduce((a, x) => a + x.accepted, 0); return { sessions: r.length, replies: n, accepted: acc, acceptedPct: n ? Math.round((1000 * acc) / n) / 10 : 0, stuckLearners: r.filter((x) => x.stuck).length, sceneReplies: r.reduce((a, x) => a + x.sceneReplies, 0) }; };
   const summary = { off: sum('off'), on: sum('on'), calls, tokens: { input: inTok, output: outTok }, switches: BASE_V2.join(','), turnsPerSession: TURNS, fake: FAKE };
