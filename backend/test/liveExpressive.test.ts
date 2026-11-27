@@ -332,4 +332,30 @@ describe('liveExpressive: cues by code', () => {
       expect(String((mocks.stream.mock.calls.at(-1)![0] as { pedagogy?: string }).pedagogy ?? '')).not.toContain('HIDDEN GRADING LINE');
     });
   });
+
+  it('an Arabic-medium call whose reply opens in English is made again without the hidden line (Arabic, neutral cue)', async () => {
+    expect(L.openedInEnglish('Correct! The word is the subject')).toBe(true);
+    expect(L.openedInEnglish('أحسنت! «الشمسُ» مبتدأ')).toBe(false);
+    expect(L.openedInEnglish('Correct! "الشمسُ" is the subject')).toBe(false);
+    await withSwitch('liveExpressive', async () => {
+      const auth = await token('kid-arabic-drift', 'stu-kid');
+      const start = await request(app).post('/api/avatar/session').set('Authorization', auth).send({ subject: 'اللغة العربية', preferred_language: 'arabic' });
+      mocks.stream
+        .mockImplementationOnce(async function* () { yield '[[assess verdict=CORRECT relevance=ACTIVE_ITEM next=NEW_ITEM]]\nCorrect! '; yield 'The word sun is the subject here.'; })
+        .mockImplementationOnce(async function* () { yield 'أحسنتَ! الشمسُ هي المبتدأ.'; });
+      const res = await request(app).post('/api/avatar/query-stream').set('Authorization', auth).send({ session_id: start.body.session_id, messages: [{ role: 'user', content: 'الشمسُ' }] });
+      const lines = res.text.trim().split('\n').map((l) => JSON.parse(l));
+      expect(lines.filter((l) => l.content).map((l) => l.content).join('')).toBe('أحسنتَ! الشمسُ هي المبتدأ.');
+      expect(lines.filter((l) => l.cue).map((l) => l.cue)).toEqual(['warm']); // no verdict on the retry: neutral
+      const calls = mocks.stream.mock.calls.slice(-2).map((c) => String((c[0] as { pedagogy?: string }).pedagogy ?? ''));
+      expect(calls[0]).toContain('HIDDEN GRADING LINE');
+      expect(calls[1]).not.toContain('HIDDEN GRADING LINE');
+      // An Arabic reply goes through at once, with its verdict.
+      mocks.stream.mockImplementationOnce(async function* () { yield '[[assess verdict=CORRECT relevance=ACTIVE_ITEM next=NONE]]\nأحسنتَ! '; yield 'الإجابة صحيحة تمامًا.'; });
+      const ok = await request(app).post('/api/avatar/query-stream').set('Authorization', auth).send({ session_id: start.body.session_id, messages: [{ role: 'user', content: 'القمرُ' }] });
+      const okLines = ok.text.trim().split('\n').map((l) => JSON.parse(l));
+      expect(okLines.filter((l) => l.content).map((l) => l.content).join('')).toBe('أحسنتَ! الإجابة صحيحة تمامًا.');
+      expect(okLines.filter((l) => l.cue).map((l) => l.cue)).toEqual(['warm']); // a child's right answer: warm
+    });
+  });
 });
