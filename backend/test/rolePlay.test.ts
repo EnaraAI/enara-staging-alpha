@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { rolePlayStep, pickScene, eligibleScenes, mayOffer, classifyBeatReply, detectSceneError, debriefEntry, rolePlayLine, sceneReplyProblems, hardSceneProblems, lessonTargets, sceneFallback, ensureDebrief, ensureOffer, sceneCard, asksForRolePlay, saysYes, ROLEPLAY_OFFER_FROM, type RolePlayTurn } from '../src/services/rolePlay';
+import { rolePlayStep, rolePlayTagOf, pickScene, eligibleScenes, mayOffer, classifyBeatReply, detectSceneError, debriefEntry, rolePlayLine, sceneReplyProblems, hardSceneProblems, lessonTargets, sceneFallback, ensureDebrief, ensureOffer, sceneCard, asksForRolePlay, saysYes, ROLEPLAY_OFFER_FROM, type RolePlayTurn } from '../src/services/rolePlay';
 import { applyReplyGuards } from '../src/services/languageTurnPipeline';
 import { sceneById, CHILD_SCENES, SCENES } from '../src/services/roleplayScenes';
 import { engineV2 } from '../src/services/engineV2';
@@ -124,7 +124,8 @@ describe('today\'s lesson point (its own words)', () => {
     expect(lessonTargets('Jobs and the verb be; be: am/is/are; Uses a/an before a job')).toEqual(expect.arrayContaining(['EN-F-A1-GR-copula-be', 'EN-F-A1-GR-article-a-an']));
     expect(lessonTargets('Last holiday (past simple)')).toEqual(expect.arrayContaining(['EN-F-A2-GR-past-simple-regular', 'EN-F-A2-GR-past-simple-irregular']));
     expect(pickScene({ child: false, ageBand: 'adult', level: 'B1', lessonText: 'Last holiday (past simple)', seed: 's' }).targets.some((t) => /past-simple/.test(t))).toBe(true);
-    expect(debriefEntry(sceneById('airport-checkin')!, [], undefined, 'Last holiday (past simple)')?.id).toMatch(/past-simple/);
+    // the debrief comes from the learner's logged errors only (no lesson fallback)
+    expect(debriefEntry(sceneById('airport-checkin')!, [], undefined, 'Last holiday (past simple)')).toBeUndefined();
     expect(rolePlayLine({ scene: 'restaurant-order', phase: 'beat', beat: 3, tries: 0, lessonPoint: 'Daily routines (he/she -s)' })).toMatch(/Today's lesson point is Daily routines \(he\/she -s\): when their message has an error on it, always recast it/);
   });
 });
@@ -179,7 +180,7 @@ describe('the model only voices the current beat; post-check keeps it in the sce
 describe('debrief and offer are guaranteed by code', () => {
   it('debrief: the rule line and right/wrong pair of the error seen most, else the scene target', () => {
     expect(debriefEntry(restaurant, ['copula_omitted', 'article_omitted', 'copula_omitted'])?.id).toBe('EN-F-A1-GR-copula-be');
-    expect(debriefEntry(restaurant, [])?.id).toBe(restaurant.targets[0]);
+    expect(debriefEntry(restaurant, [])).toBeUndefined();
     const t: RolePlayTurn = { scene: 'restaurant-order', phase: 'debrief', entryId: 'EN-F-A1-GR-copula-be' };
     const line = rolePlayLine(t);
     expect(line).toContain('The giraffe is very tall.'); expect(line).toContain('The giraffe very tall.'); expect(line).toMatch(/ONE new practice item/);
@@ -309,5 +310,38 @@ describe('a wrong computed answer: the learner tries again first (owner decision
     expect(kid).toMatchObject({ beat: 2, help: 'retry' });
     const ar = await rolePlayStep({ history: at(2), message: 'خمسة عشر جنيه', signals: none, blocked: false, lang: 'ar', pick: () => undefined });
     expect(ar).toMatchObject({ beat: 2, help: 'retry' });
+  });
+});
+
+
+describe('English round (coordinator, 27 Nov 2026)', () => {
+  it('past simple errors are found by code and recast in the scene', async () => {
+    const { detectPastError, detectSceneError } = await import('../src/services/rolePlay');
+    expect(detectPastError('I goed to the beach with my family')).toMatchObject({ code: 'past_overregular', evidence: 'goed', outcome: 'EN-F-A2-GR-past-simple-irregular' });
+    expect(detectPastError('I notice it one hour ago, when I come back.')).toMatchObject({ code: 'past_base_form', evidence: 'i notice', outcome: 'EN-F-A2-GR-past-simple-regular' });
+    expect(detectPastError('We travel a long way yesterday.')).toMatchObject({ code: 'past_base_form' });
+    expect(detectPastError('We buy a hat last week.')?.outcome).toBe('EN-F-A2-GR-past-simple-irregular');
+    expect(detectPastError('I go to work every day.')).toBeNull();
+    expect(detectPastError('I visited the museum yesterday.')).toBeNull();
+    expect(detectSceneError('We visit the pyramids last summer.')).toMatchObject({ code: 'past_base_form' });
+  });
+  it('a question in their message is answered first, then back to the beat', async () => {
+    on();
+    const hotel = sceneById('hotel-reception')!;
+    const t = await rolePlayStep({ history: [u(), a({ scene: 'hotel-reception', phase: 'beat', beat: 4, tries: 0, errs: [] })], message: 'Thank you. Where can I park my car?', signals: none, blocked: false, lang: 'en', pick: () => hotel }) as RolePlayTurn;
+    expect(t.learnerAsked).toBe('Where can I park my car?');
+    expect(rolePlayLine(t)).toMatch(/They asked you: "Where can I park my car\?"\. Answer THAT first/);
+    expect(rolePlayLine(t)).toMatch(/Never answer a question they did not ask/);
+    expect(rolePlayTagOf(t)).not.toHaveProperty('learnerAsked');
+  });
+  it('the debrief uses only logged errors: none = praise and one stretch item, no rule', async () => {
+    const line = rolePlayLine({ scene: 'restaurant-order', phase: 'debrief' });
+    expect(line).toMatch(/give ONE stretch item/);
+    expect(line).not.toMatch(/Rule:/);
+    expect(ensureDebrief({ scene: 'restaurant-order', phase: 'debrief' }, 'Well done!').added).toBe(false);
+    on();
+    // an uncertain hint (science key words) is never kept for the debrief
+    const k = await rolePlayStep({ history: [u(), a({ scene: 'science-kitchen', phase: 'beat', beat: 2, tries: 0, errs: [] })], message: 'It went away', signals: none, blocked: false, lang: 'en', pick: () => undefined });
+    expect(k?.errs).toEqual([]);
   });
 });
