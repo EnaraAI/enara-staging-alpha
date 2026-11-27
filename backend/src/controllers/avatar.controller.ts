@@ -980,23 +980,24 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
         const filter = new AssessmentMarkerFilter();
         let seen = '';
         let checked = !arabicSubjectCall;
+        // Made again with today's prompt (no hidden line, so no verdict: a neutral cue).
+        async function* again(): AsyncGenerator<string> {
+          logger.info('live_expressive_language_retry', { session: session.id });
+          languageMarker = undefined;
+          const f2 = new AssessmentMarkerFilter();
+          for await (const d2 of streamDirectTutorModel({ ...modelParams, pedagogy: modelParams.pedagogy?.replace(`\n\n${subjectCue}`, '').replace(subjectCue!, '') || undefined })) { if (closed) break; const v2 = f2.push(d2); if (v2) yield v2; }
+          const tail2 = f2.end();
+          if (tail2) yield tail2;
+        }
         for await (const d of modelStream) {
           if (closed) break;
           const v = filter.push(d);
           if (!v) continue;
           seen += v;
           if (!checked) {
-            if (seen.replace(/\s/g, '').length < 24) continue; // hold the first words until the language is clear
+            if (seen.replace(/\s/g, '').length < 40) continue; // hold the first words until the language is clear
             checked = true;
-            if (openedInEnglish(seen)) {
-              logger.info('live_expressive_language_retry', { session: session.id });
-              languageMarker = undefined;
-              const again = new AssessmentMarkerFilter();
-              for await (const d2 of streamDirectTutorModel({ ...modelParams, pedagogy: modelParams.pedagogy?.replace(`\n\n${subjectCue}`, '').replace(subjectCue!, '') || undefined })) { if (closed) break; const v2 = again.push(d2); if (v2) yield v2; }
-              const tail2 = again.end();
-              if (tail2) yield tail2;
-              return;
-            }
+            if (openedInEnglish(seen)) { yield* again(); return; }
             languageMarker ??= filterSummary(filter, seen);
             yield seen;
             continue;
@@ -1004,7 +1005,13 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
           languageMarker ??= filterSummary(filter, seen);
           yield v;
         }
-        if (!checked && seen) { languageMarker ??= filterSummary(filter, seen); yield seen; } // a short reply
+        if (!checked && seen) { // a short reply: the same check at its end
+          seen += filter.end();
+          if (openedInEnglish(seen)) { yield* again(); return; }
+          languageMarker ??= filterSummary(filter, seen);
+          yield seen;
+          return;
+        }
         const tail = filter.end();
         languageMarker ??= filterSummary(filter, seen + tail);
         if (tail) yield tail;

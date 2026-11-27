@@ -336,7 +336,8 @@ describe('liveExpressive: cues by code', () => {
   it('an Arabic-medium call whose reply opens in English is made again without the hidden line (Arabic, neutral cue)', async () => {
     expect(L.openedInEnglish('Correct! The word is the subject')).toBe(true);
     expect(L.openedInEnglish('أحسنت! «الشمسُ» مبتدأ')).toBe(false);
-    expect(L.openedInEnglish('Correct! "الشمسُ" is the subject')).toBe(false);
+    expect(L.openedInEnglish('Great job! Yes, مشرقةٌ is the خبر, and الشمسُ is')).toBe(true); // mostly English (simulation run 5)
+    expect(L.openedInEnglish('أحسنت! كلمة sun تعني الشمس، وهي المبتدأ هنا')).toBe(false); // Arabic quoting one English word
     await withSwitch('liveExpressive', async () => {
       const auth = await token('kid-arabic-drift', 'stu-kid');
       const start = await request(app).post('/api/avatar/session').set('Authorization', auth).send({ subject: 'اللغة العربية', preferred_language: 'arabic' });
