@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { RolePlaySceneCard, type SceneCardData } from './RolePlaySceneCard';
 import { EnaraMark } from '../brand/EnaraLogo';
 import { X, Loader2, AlertCircle, RefreshCw, Mic, MicOff, Volume2, VolumeX, Captions, CaptionsOff, Clock } from 'lucide-react';
 import { createClient, AnamEvent } from '@anam-ai/js-sdk';
@@ -55,6 +56,8 @@ type AvatarSessionResponse = {
   pronunciation?: boolean;
   // Live call controls whose switch is on (absent: none).
   features?: LiveCallFeatures;
+  // liveExpressive: this call's face takes cues; a drawing's panel pulses when it opens, on the side the face is turned to.
+  expressive?: { panel?: 'left' | 'right' };
 };
 
 // The server's live call switches (ENARA_ENGINE_V2 liveMute, ...): off means the call looks as before.
@@ -105,6 +108,8 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [artifactHtml, setArtifactHtml] = useState<string | null>(null);
+  // liveRolePlay: the scene card ({ scene } from /query-stream; null outside a scene).
+  const [scene, setScene] = useState<SceneCardData | null>(null);
   const [status, setStatus] = useState('');
   // Anam's STT/voice language is fixed for the whole session and there's no
   // auto-detect from a cold start, so we ask up front instead of requiring
@@ -209,6 +214,19 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
     const el = videoFrameRef.current;
     if (el) el.dataset[key] = `${value}@${Date.now()}`;
   };
+  // liveExpressive: Anam cannot turn the face to the drawing, so the panel sits on the side the face is turned to and
+  // pulses ("Look here") for a moment when it opens; the tutor also says "Look at the picture".
+  const [expressiveUi, setExpressiveUi] = useState<{ panel: 'left' | 'right' } | null>(null);
+  const [lookPulse, setLookPulse] = useState(false);
+  const panelOpenRef = useRef(false);
+  useEffect(() => {
+    const opened = Boolean(artifactHtml) && !panelOpenRef.current;
+    panelOpenRef.current = Boolean(artifactHtml);
+    if (!opened || !expressiveUi) return;
+    setLookPulse(true);
+    const t = setTimeout(() => setLookPulse(false), 2600);
+    return () => clearTimeout(t);
+  }, [artifactHtml, expressiveUi]);
   // Created on the student's click, so the browser lets it play sound later.
   const audioCtxRef = useRef<AudioContext | null>(null);
   const silenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -283,10 +301,12 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
 
   const resetUi = useCallback(() => {
     micRef.current.clear();
+    setExpressiveUi(null);
     voiceSwitchedRef.current = false;
     setProvider(null);
     setTavusUrl(null);
     setArtifactHtml(null);
+    setScene(null);
     setError(null);
     setStatus('');
     fallbackStartedRef.current = false;
@@ -384,6 +404,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
         if (!trimmed) return;
         const data = JSON.parse(trimmed);
         if (data.visual === 'drawing') setArtifactHtml(DRAWING_PLACEHOLDER);
+        if ('scene' in data) setScene(data.scene ?? null);
         // liveExpressive: the cue goes into the talk stream only (the video tutor reads it; it is never spoken or shown).
         if (isExpressiveCue(data.cue) && talkStream?.isActive()) {
           const before = speech.flush();
@@ -500,6 +521,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
         if (!line.trim()) return;
         const data = JSON.parse(line);
         if (data.visual === 'drawing') setArtifactHtml(DRAWING_PLACEHOLDER);
+        if ('scene' in data) setScene(data.scene ?? null);
         // liveExpressive: ENARA speaks, so the cue goes to the face over the data channel, timed from the turn's start.
         if (isExpressiveCue(data.cue)) {
           try {
@@ -835,7 +857,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
     switchingLanguageRef.current = false;
     setLoading(true);
     setError(null);
-    if (!reconnect) setArtifactHtml(null);
+    if (!reconnect) { setArtifactHtml(null); setScene(null); }
     setTavusUrl(null);
     setProvider(null);
     setStatus(reconnect ? 'Reconnecting…' : 'Starting session…');
@@ -867,6 +889,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
       const data: AvatarSessionResponse = await res.json();
       sessionIdRef.current = data.session_id;
       setFeatures(data.features ?? {});
+      setExpressiveUi(data.expressive ? { panel: data.expressive.panel === 'left' ? 'left' : 'right' } : null);
       if (data.features?.timeUsed) {
         setCallStartedAt(Date.now());
         void usageRead.then(setCallUsage);
@@ -1212,7 +1235,7 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
         )}
 
         {/* Body */}
-        <div className="flex-1 relative bg-black flex flex-col lg:flex-row overflow-hidden">
+        <div className={`flex-1 relative bg-black flex flex-col ${expressiveUi?.panel === 'left' ? 'lg:flex-row-reverse' : 'lg:flex-row'} overflow-hidden`}>
 
           {!languageChoice && !loading && !error && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-5 text-white z-20 bg-black">
@@ -1315,6 +1338,8 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
               artifactHtml ? 'h-[38%] lg:h-full w-full lg:w-[34%]' : 'h-full w-full'
             }`}
           >
+            {/* liveRolePlay: the scene card, in a corner of the tutor's video (never over the Visual Aid; collapsed on a phone). */}
+            <RolePlaySceneCard card={scene} defaultLang={languageChoice === 'arabic' ? 'ar' : 'en'} />
             {provider === 'voice' && (
               <div className="w-full h-full flex flex-col items-center justify-center gap-4 bg-slate-900 text-center px-6">
                 {myTutor?.current?.imageUrl ? (
@@ -1386,9 +1411,20 @@ export const LiveAvatarModal: React.FC<LiveAvatarModalProps> = ({
 
           {/* Visual artifact panel */}
           {artifactHtml && (
-            <div className="flex-1 min-h-0 min-w-0 bg-white transition-all duration-500 flex flex-col">
+            <div
+              data-testid="visual-aid-panel"
+              data-panel-side={expressiveUi?.panel ?? 'right'}
+              className={`flex-1 min-h-0 min-w-0 bg-white transition-all duration-500 flex flex-col ${lookPulse ? 'ring-4 ring-inset ring-teal-400 animate-pulse' : ''}`}
+            >
               <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 shrink-0">
-                <p className="text-slate-700 font-semibold text-sm">Visual Aid</p>
+                <p className="text-slate-700 font-semibold text-sm">
+                  Visual Aid
+                  {lookPulse && (
+                    <span data-testid="visual-aid-look" className="ml-2 px-2 py-0.5 rounded-full bg-teal-100 text-teal-800 text-xs font-bold">
+                      Look here · <span dir="rtl">انظر هنا</span>
+                    </span>
+                  )}
+                </p>
                 <button
                   onClick={() => setArtifactHtml(null)}
                   aria-label="Close visual aid"

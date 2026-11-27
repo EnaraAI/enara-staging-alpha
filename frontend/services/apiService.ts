@@ -1,6 +1,7 @@
 import type { ApiKeyValidationResponse } from '../types';
 import { OriginView, withOrigin } from './roleRouting';
 import { retryDelayMs } from './retryPolicy';
+import { createInflight } from './inflight';
 import { createSseParser } from './sse';
 
 // Single client for the Enara backend (backend/ in this repo).
@@ -112,12 +113,9 @@ function toUrl(path: string): string {
   return `${API_BASE}${path.replace(/^\/api(?=\/|$)/, '')}`;
 }
 
-async function request<T = any>(method: string, path: string, body?: unknown, isForm = false, retried = false): Promise<T> {
-  const token = getToken();
-  const headers: Record<string, string> = {};
-  if (token) headers.Authorization = `Bearer ${token}`;
-  if (body !== undefined && !isForm) headers['Content-Type'] = 'application/json';
-
+// One network exchange: the fetch, its retries (429/503 per retryDelayMs) and the body text.
+type RawResponse = { ok: boolean; status: number; text: string; requestId: string | null };
+async function send(method: string, path: string, headers: Record<string, string>, body: unknown, isForm: boolean): Promise<RawResponse> {
   let res: Response;
   for (let attempt = 0; ; attempt++) {
     res = await fetch(toUrl(path), {
@@ -129,8 +127,26 @@ async function request<T = any>(method: string, path: string, body?: unknown, is
     if (wait === null) break;
     await new Promise((resolve) => setTimeout(resolve, wait));
   }
+  return { ok: res.ok, status: res.status, text: await res.text(), requestId: res.headers.get('X-Request-Id') };
+}
 
-  const text = await res.text();
+// Speed (lms-speed-2): identical GETs already in flight share one network call (services/inflight.ts).
+// Only the transport is shared: every caller parses its own copy of the body, so no caller sees
+// another's changes, and errors are handled per caller as before.
+const shareGet = createInflight<RawResponse>();
+function sendShared(method: string, path: string, headers: Record<string, string>, body: unknown, isForm: boolean): Promise<RawResponse> {
+  if (method !== 'GET' || body !== undefined) return send(method, path, headers, body, isForm);
+  return shareGet(`${headers.Authorization ?? ''} ${path}`, () => send(method, path, headers, body, isForm));
+}
+
+async function request<T = any>(method: string, path: string, body?: unknown, isForm = false, retried = false): Promise<T> {
+  const token = getToken();
+  const headers: Record<string, string> = {};
+  if (token) headers.Authorization = `Bearer ${token}`;
+  if (body !== undefined && !isForm) headers['Content-Type'] = 'application/json';
+
+  const res = await sendShared(method, path, headers, body, isForm);
+  const text = res.text;
   let data: any = null;
   if (text) {
     try {
@@ -154,7 +170,7 @@ async function request<T = any>(method: string, path: string, body?: unknown, is
   }
   // The server's request id (P5 usage chips); not enumerable, so it never
   // leaks into rendered or re-sent data.
-  const requestId = res.headers.get('X-Request-Id');
+  const requestId = res.requestId;
   if (requestId && data && typeof data === 'object') Object.defineProperty(data, '__requestId', { value: requestId, enumerable: false });
   return data as T;
 }

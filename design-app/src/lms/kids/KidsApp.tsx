@@ -8,7 +8,7 @@ import type { Lang } from './enaraKids';
 import * as api from '../services/apiService';
 import { toast } from '../services/toastService';
 import { SpeakingExam } from '../components/SpeakingExam';
-import { LiveAvatarModal } from '../components/enara/LiveAvatarModal';
+import { LiveAvatarModal } from '../components/enara/LiveAvatarModalLazy';
 import { LiveUsageLine, useLiveUsage } from '../components/enara/LiveUsage';
 import { MicProblemNotice, useMicGate } from '../components/MicCheck';
 import { classifySpeechRecognitionError, isInFrame } from '../services/micCheck';
