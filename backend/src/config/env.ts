@@ -361,6 +361,14 @@ function parseNodeEnv(source: NodeJS.ProcessEnv): NodeEnv {
   return value as NodeEnv;
 }
 
+/** The new design front end (design.enara.app, owner 27 Nov 2026) calls this API from its own origin. Exactly that one origin
+ *  is added when LMS_DESIGN_APP_ORIGIN=true (set on lms-test only, through deploy/lms-test.flags.json); nothing else changes. */
+export const DESIGN_APP_ORIGIN = "https://design.enara.app";
+export function withDesignAppOrigin(origins: string[], source: NodeJS.ProcessEnv): string[] {
+  const on = String(source.LMS_DESIGN_APP_ORIGIN ?? "").trim().toLowerCase() === "true";
+  return on && !origins.includes(DESIGN_APP_ORIGIN) ? [...origins, DESIGN_APP_ORIGIN] : origins;
+}
+
 function parseOrigins(source: NodeJS.ProcessEnv, nodeEnv: NodeEnv): string[] {
   const explicit = readString(source, "CORS_ALLOWED_ORIGINS");
   const legacy = readString(source, "FRONTEND_URL");
@@ -553,7 +561,7 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): AppConfig {
     );
   }
 
-  const corsAllowedOrigins = parseOrigins(source, nodeEnv);
+  const corsAllowedOrigins = withDesignAppOrigin(parseOrigins(source, nodeEnv), source);
 
   const demoModeEnabled = readBoolean(source, "DEMO_MODE_ENABLED", false);
   if (isProduction && demoModeEnabled) {
