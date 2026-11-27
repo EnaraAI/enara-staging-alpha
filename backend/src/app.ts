@@ -46,6 +46,7 @@ import teachingRoutes from './routes/teaching.routes';
 import itemBankRoutes from './routes/itemBank.routes';
 import lessonPlansRoutes from './routes/lessonPlans.routes';
 import aiControlsRoutes from './routes/aiControls.routes';
+import platformStatusRoutes from './routes/platformStatus.routes';
 import workspaceRoutes from './routes/workspace.routes';
 import documentsRoutes from './routes/documents.routes';
 import educatorChatRoutes from './routes/educatorChat.routes';
@@ -360,6 +361,7 @@ export function createApp() {
   app.use('/api/integrations', integrationsRoutes);
   app.use('/api/security', securityRoutes);
   app.use('/api/ai-controls', aiControlsRoutes);
+  app.use('/api/platform', platformStatusRoutes); // design app status screen (LMS_DESIGN_PLATFORM_STATUS; 404 while off)
   app.use('/api/workspace', workspaceRoutes);
   app.use('/api/documents', documentsRoutes);
   app.use('/api/educator-chat', educatorChatRoutes);
