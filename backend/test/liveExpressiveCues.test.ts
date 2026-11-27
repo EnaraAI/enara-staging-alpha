@@ -75,6 +75,10 @@ describe('liveExpressive: the cue follows the verdict', () => {
     expect(r.cues).toEqual(['happy', 'curious']);
     // The stored transcript is the reply without any cue.
     for (const doc of await storedAi(sid)) expect(doc.text).not.toMatch(/\[(happy|warm|supportive|curious|concerned)\]/);
+    // Each stored reply keeps the cues it got and the verdict they followed (tags only).
+    expect((await storedAi(sid)).map((d) => d.meta?.expressive)).toEqual([
+      { cues: ['curious'], verdict: 'NOT_EVALUATED' }, { cues: ['supportive'], verdict: 'INCORRECT' },
+      { cues: ['concerned', 'supportive'], verdict: 'NOT_EVALUATED', stuck: true }, { cues: ['happy', 'curious'], verdict: 'CORRECT' }]);
   });
 
   it('removes cue tags the model writes itself (blocked ones included) from the words, the speech and the transcript', async () => {

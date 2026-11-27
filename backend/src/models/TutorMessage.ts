@@ -55,6 +55,8 @@ export interface ITutorMessageDoc extends Document {
     // injectionCheck: where text that tries to change the tutor's instructions was found.
     injection?: 'learner' | 'passage';
     practiceTurn?: { assessment: { verdict: string }; answeringCheck: boolean; objectiveId?: string; lessonId?: string; next?: string };
+    // liveExpressive: the live avatar's cues for this reply and the verdict they followed (tags only).
+    expressive?: { cues: string[]; verdict?: string; stuck?: boolean };
   };
 }
 
@@ -104,6 +106,7 @@ const tutorMessageDocSchema = new Schema<ITutorMessageDoc>(
         type: { assessment: { type: { verdict: String, _id: false } }, answeringCheck: Boolean, objectiveId: String, lessonId: String, next: String, _id: false },
         default: undefined,
       },
+      expressive: { type: { cues: { type: [String], default: undefined }, verdict: String, stuck: Boolean, _id: false }, default: undefined },
       languageTurn: {
         type: {
           version: String,
@@ -172,6 +175,10 @@ const tutorMessageDocSchema = new Schema<ITutorMessageDoc>(
           fadeCheckAnswered: { type: [Number], default: undefined },
           fadeFailed: { type: [Number], default: undefined },
           ownSentence: String, // ownSentence (ESL5): 'asked' | 'feedback' tag only
+          // realChat (tag only): conversation reply 1 or 2. It was missing here, so the tag was dropped on save and the chat never counted as done.
+          realChat: Number,
+          // liveRolePlay (ids and codes only): scene, phase, beat, failed tries on the beat, error codes seen in the scene, how it started, help given.
+          rolePlay: { type: { scene: String, phase: String, beat: Number, tries: Number, errs: { type: [String], default: undefined }, err: String, via: String, help: String, _id: false }, default: undefined },
           _id: false,
         },
         default: undefined,

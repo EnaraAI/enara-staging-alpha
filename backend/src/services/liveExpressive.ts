@@ -163,7 +163,7 @@ export interface TurnFacts {
   stuck?: boolean;
   /** A drawing opens with this reply. */
   drawing?: boolean;
-  /** No language engine (another subject): the reply ends on a question. */
+  /** The reply ends on a question (no verdict: curious rather than warm). */
   asks?: boolean;
 }
 export interface CuePlan { first: Cue; then?: Cue }
@@ -177,8 +177,13 @@ export function cuesForTurn(t: TurnFacts, band: ExpressiveBand): CuePlan | null 
   if (t.verdict && SUCCESS.has(t.verdict)) return { first: band === 'child' ? 'warm' : 'happy', ...(t.next === 'NEW_ITEM' ? { then: 'curious' as const } : {}) };
   if (t.verdict && FAILURE.has(t.verdict)) return { first: 'supportive' };
   if (t.next === 'NEW_ITEM' || t.drawing || t.asks) return { first: 'curious' };
-  return null;
+  // No verdict: a neutral cue, never one that could read as a judgement.
+  return { first: 'warm' };
 }
+
+// Every other subject (maths, science, Arabic, social studies...): the learner's own words say they are stuck.
+const STUCK_WORDS = /\b(i\s*(really\s*)?(don'?t|do not|dont) (know|understand|get it)|no idea|not sure|i'?m (confused|lost|stuck)|i give up|give me a hint|can you help|why is (that|it) wrong)\b|مش عارف|مش فاهم|لا أعرف|لا اعرف|لا أفهم|لا افهم|ما فهمت|ساعدني|محتار/i;
+export const stuckFromWords = (learnerText: string): boolean => STUCK_WORDS.test(learnerText);
 
 /** Stuck, from the language engine's signals for this learner message (current turn only). */
 export function stuckFromSignals(s: { learnerResponse?: string; whyAfterAttempt?: boolean; learning?: { attemptsOnItem?: number } } | undefined, verdict?: string): boolean {
@@ -193,12 +198,13 @@ export function secondSentenceAt(text: string): number {
   return m ? m.index + m[0].length : -1;
 }
 
-/** The turn's cues for an expressive call, from the language engine's own verdict on this reply (the same pure step that later
- *  records the turn: finalizeLanguageTurn), the learner's signals and whether a drawing opens. Null: no cue. */
+/** The turn's cues for an expressive call, from the verdict on this reply: in an English lesson the language engine's own
+ *  (finalizeLanguageTurn, the same pure step that later records the turn); in every other subject the reply's trusted hidden
+ *  grading line (gradeAllSubjects' SUBJECT_GRADE_LINE, a right/wrong only when it answers the question set). Null: no cue. */
 export function planTurnCues(p: {
   call: ExpressiveCall | undefined; kind: TurnFacts['kind']; language?: LanguageTeachingContext; marker?: StrippedReply;
   reply: string; learnerText: string; drawing: boolean;
-}): CuePlan | null {
+}): (CuePlan & { verdict?: string; stuck?: boolean }) | null {
   if (!p.call?.on || !p.call.cara4) return null;
   let verdict: string | undefined;
   let next: string | undefined;
@@ -211,9 +217,15 @@ export function planTurnCues(p: {
       verdict = undefined;
     }
   }
-  const stuck = p.kind === 'turn' && stuckFromSignals(p.language?.signals as Parameters<typeof stuckFromSignals>[0], verdict);
-  const asks = !p.language && /[?؟]\s*$/.test(p.reply.trim());
-  return cuesForTurn({ kind: p.kind, verdict, next, stuck, drawing: p.drawing, asks }, p.call.band ?? 'child');
+  if (!p.language && p.kind === 'turn') {
+    const a = p.marker?.assessment as { verdict?: string; relevance?: string; next?: string } | null | undefined;
+    if (a?.verdict && (a.relevance === 'ACTIVE_ITEM' || !(SUCCESS.has(a.verdict) || FAILURE.has(a.verdict)))) verdict = a.verdict;
+    next = a?.next;
+  }
+  const stuck = p.kind === 'turn' && (p.language ? stuckFromSignals(p.language.signals as Parameters<typeof stuckFromSignals>[0], verdict) : stuckFromWords(p.learnerText));
+  const asks = /[?؟]\s*$/.test(p.reply.trim());
+  const plan = cuesForTurn({ kind: p.kind, verdict, next, stuck, drawing: p.drawing, asks }, p.call.band ?? 'child');
+  return plan && { ...plan, ...(verdict ? { verdict } : {}), ...(stuck ? { stuck } : {}) };
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -230,7 +230,8 @@ describe('liveExpressive: cues by code', () => {
     expect(L.cuesForTurn({ ...turn, verdict: 'NOT_EVALUATED', next: 'NEW_ITEM' }, 'adult')).toEqual({ first: 'curious' });
     expect(L.cuesForTurn({ ...turn, stuck: true, verdict: 'INCORRECT' }, 'adult')).toEqual({ first: 'concerned', then: 'supportive' });
     expect(L.cuesForTurn({ ...turn, drawing: true }, 'adult')).toEqual({ first: 'curious' });
-    expect(L.cuesForTurn({ ...turn, verdict: 'NOT_EVALUATED', next: 'NONE' }, 'adult')).toBeNull();
+    expect(L.cuesForTurn({ ...turn, verdict: 'NOT_EVALUATED', next: 'NONE' }, 'adult')).toEqual({ first: 'warm' }); // no verdict: neutral
+    expect(L.cuesForTurn({ ...turn, asks: true }, 'child')).toEqual({ first: 'curious' });
     expect(L.cuesForTurn({ kind: 'opening' }, 'adult')).toEqual({ first: 'warm' });
     expect(L.cuesForTurn({ kind: 'nudge' }, 'child')).toEqual({ first: 'supportive' });
     const every = ['CORRECT', 'INCORRECT', 'PARTIALLY_CORRECT', 'NOT_EVALUATED', 'AMBIGUOUS', undefined].flatMap((verdict) => ['adult', 'teen', 'child'].flatMap((band) =>
@@ -279,6 +280,50 @@ describe('liveExpressive: cues by code', () => {
       expect(lines.some((l) => l.visual === 'drawing')).toBe(true);
       expect(lines.filter((l) => l.content).map((l) => l.content).join('')).toBe('انظر إلى الصورة. هذا رسم للدورة اليومية.');
       expect(lines.filter((l) => l.cue).map((l) => l.cue)).toEqual(['curious']);
+    });
+  });
+
+  it('every subject (here maths, in English and in Arabic): the cue follows the hidden grading line; no verdict gives a neutral cue', async () => {
+    await withSwitch('liveExpressive', async () => {
+      const auth = await token('grown-maths', 'stu-grown');
+      const start = await request(app).post('/api/avatar/session').set('Authorization', auth).send({ subject: 'Mathematics', lesson_title: 'Times tables', preferred_language: 'english' });
+      const turn = async (said: string, reply: string) => {
+        mocks.stream.mockImplementationOnce(async function* () { yield reply.slice(0, 9); yield reply.slice(9); });
+        const res = await request(app).post('/api/avatar/query-stream').set('Authorization', auth).send({ session_id: start.body.session_id, messages: [{ role: 'user', content: said }] });
+        const lines = res.text.trim().split('\n').map((l) => JSON.parse(l));
+        return { cues: lines.filter((l) => l.cue).map((l) => l.cue), text: lines.filter((l) => l.content).map((l) => l.content).join(''), params: mocks.stream.mock.calls.at(-1)![0] as { pedagogy?: string } };
+      };
+      let r = await turn('What is 7 times 8?', '[[assess verdict=NOT_EVALUATED relevance=NO_ACTIVE_ITEM next=NEW_ITEM]]\nGood question. Try this one first: what is 7 times 7?');
+      expect(r.params.pedagogy).toContain('HIDDEN GRADING LINE');
+      expect(r.cues).toEqual(['curious']);
+      expect(r.text).toBe('Look at the picture. Good question. Try this one first: what is 7 times 7?'); // the call's first real question draws a visual
+      r = await turn('It is 47', '[[assess verdict=INCORRECT relevance=ACTIVE_ITEM next=SAME_ITEM]]\nNot quite. Count 7 more from 42.');
+      expect(r.cues).toEqual(['supportive']);
+      expect(r.text).not.toMatch(/\[\[assess/);
+      r = await turn("I don't know", '[[assess verdict=NOT_EVALUATED relevance=ACTIVE_ITEM next=SAME_ITEM]]\nThat is all right. 7 times 6 is 42, and 42 plus 7 is the answer.');
+      expect(r.cues).toEqual(['concerned', 'supportive']);
+      r = await turn('49', '[[assess verdict=CORRECT relevance=ACTIVE_ITEM next=NEW_ITEM]]\nYes, 49! Now, what is 8 times 8?');
+      expect(r.cues).toEqual(['happy', 'curious']);
+      // A right verdict on a message that answered nothing is not trusted: neutral cue.
+      r = await turn('Hello', '[[assess verdict=CORRECT relevance=NO_ACTIVE_ITEM next=NONE]]\nHello again.');
+      expect(r.cues).toEqual(['warm']);
+      // No hidden line at all: neutral.
+      r = await turn('Thanks', 'You are welcome.');
+      expect(r.cues).toEqual(['warm']);
+
+      // Arabic call, a stuck learner in Arabic words.
+      const ar = await request(app).post('/api/avatar/session').set('Authorization', auth).send({ subject: 'العلوم', preferred_language: 'arabic' });
+      mocks.stream.mockImplementationOnce(async function* () { yield '[[assess verdict=NOT_EVALUATED relevance=ACTIVE_ITEM next=SAME_ITEM]]\nلا بأس. النبات يحتاج إلى الماء والضوء. ما الذي يحتاجه أيضًا؟'; });
+      const res = await request(app).post('/api/avatar/query-stream').set('Authorization', auth).send({ session_id: ar.body.session_id, messages: [{ role: 'user', content: 'لا أعرف' }] });
+      const lines = res.text.trim().split('\n').map((l) => JSON.parse(l));
+      expect(lines.filter((l) => l.cue).map((l) => l.cue)).toEqual(['concerned', 'supportive']);
+    });
+    // Switch off: the model is not asked for the line (today's prompt).
+    await withSwitch('', async () => {
+      const auth = await token('grown-maths-off', 'stu-grown');
+      const start = await request(app).post('/api/avatar/session').set('Authorization', auth).send({ subject: 'Mathematics' });
+      await request(app).post('/api/avatar/query-stream').set('Authorization', auth).send({ session_id: start.body.session_id, messages: [{ role: 'user', content: 'What is 7 times 8?' }] });
+      expect(String((mocks.stream.mock.calls.at(-1)![0] as { pedagogy?: string }).pedagogy ?? '')).not.toContain('HIDDEN GRADING LINE');
     });
   });
 });
