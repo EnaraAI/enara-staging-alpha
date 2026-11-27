@@ -58,10 +58,10 @@ describe('role-play in other subjects (switch liveRolePlay on)', () => {
     const sid = (await request(app).post('/api/me/tutor/sessions').set('Authorization', auth).send({ courseId: 'rs-crs-m', lessonId: 'rs-math-l1' })).body.id as string;
     answer('مرحبًا! لنبدأ مشهدًا قصيرًا: في سوق الخضار. أنا العم صابر. صباح الخير! طماطم طازجة اليوم: اثنا عشر جنيهًا للكيلو. كم كيلو تريد؟');
     let r = await chat(sid, 'هل يمكن أن نمثّل مشهدًا في السوق؟');
-    expect(ped(0)).toMatch(/ROLE-PLAY \(set by the system\), beat 1 of 7/);
+    expect(ped(0)).toMatch(/ROLE-PLAY \(set by the system\), beat 1 of 6/);
     expect(ped(0)).toContain('Subject: maths');
     expect(ped(0)).toContain('Formal Arabic (fusha) only');
-    expect(ped(0)).toContain('صباح الخير! طماطم طازجة اليوم');
+    expect(ped(0)).toContain('صباح الخير! لدينا اليوم طماطم وبرتقال طازج');
     expect(r.assistantMessage.meta.rolePlay).toMatchObject({ scene: 'maths-market', phase: 'beat', beat: 1 });
     answer('ثلاثة كيلوجرامات بسعر اثني عشر جنيهًا للكيلو. كم المبلغ كله؟');
     r = await chat(sid, 'ثلاثة كيلو من فضلك');
