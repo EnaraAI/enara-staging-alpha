@@ -6,9 +6,12 @@
 //   POST /api/me/tutor/sessions/:id/messages/stream {text, context}
 //        server-sent events, one `data: <json>` per event: user · token {delta} · replace {text} · done {assistantMessage} · error {code, message}
 //        Stop aborts the request; the server stops generating when the connection closes.
+//   POST /api/me/tutor/visualize {lessonTitle, lessonText, courseId, prompt?}   a diagram (sanitised HTML/SVG), as in lms-test's
+//        "Visualize" button. Shown in a sandboxed iframe (no scripts). Also used when the learner types a drawing request
+//        ("draw …", "ارسم …"), with their words as the prompt.
 // Hints: the tutor recognises a hint request in the learner's words ("hint" / "تلميح") and gives the next step of its hint ladder.
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { BookOpenText, CheckCircle2, Circle, Lightbulb, MessageCirclePlus, RotateCcw, SendHorizontal, Square, Video } from 'lucide-react';
+import { BookOpenText, CheckCircle2, Circle, ImageIcon, Lightbulb, Maximize2, MessageCirclePlus, RotateCcw, SendHorizontal, Square, Video, X } from 'lucide-react';
 import { go } from '@/App';
 import { ApiError, get, post, stream } from '@/lib/api';
 import { num, usePreview, useT } from '@/lib/preview';
@@ -29,6 +32,8 @@ const T = {
     lessons: 'Lessons in this course', noLessons: 'This course has no lessons yet.', progress: 'Your progress',
     lessonsDone: (d: string, n: string) => `${d} of ${n} lessons done`, hintsUsed: 'Hints asked in this chat',
     tryAgain: 'Put my message back', done: 'done',
+    draw: 'Draw it', drawAsk: 'Can you draw the main idea of this lesson for me?', drawing: 'Drawing…', drawn: 'Here is a drawing of the idea. Ask me about any part of it!',
+    drawFailed: 'I couldn’t make the drawing right now. Please try again in a moment.', drawTitle: 'Lesson drawing', large: 'View large', close: 'Close',
   },
   ar: {
     title: 'معلّمك', general: 'مساعدة عامة', wholeCourse: 'المقرر كله', voice: 'تحدّث بدلًا من الكتابة', newChat: 'محادثة جديدة',
@@ -40,10 +45,14 @@ const T = {
     lessons: 'دروس هذا المقرر', noLessons: 'لا توجد دروس في هذا المقرر بعد.', progress: 'تقدّمك',
     lessonsDone: (d: string, n: string) => `اكتمل ${d} من ${n} دروس`, hintsUsed: 'التلميحات المطلوبة في هذه المحادثة',
     tryAgain: 'إعادة رسالتي إلى مربع الكتابة', done: 'مكتمل',
+    draw: 'ارسمها لي', drawAsk: 'هل يمكنك أن ترسم لي الفكرة الرئيسية لهذا الدرس؟', drawing: 'جارٍ الرسم…', drawn: 'هذا رسم يوضّح الفكرة. اسألني عن أي جزء منه!',
+    drawFailed: 'تعذّر إعداد الرسم الآن. حاول مرة أخرى بعد قليل.', drawTitle: 'رسم الدرس', large: 'عرض بحجم أكبر', close: 'إغلاق',
   },
 };
 
-interface Msg { id: string; role: 'user' | 'ai'; text: string; at?: string; streaming?: boolean; stopped?: boolean; error?: string; retryText?: string; hint?: boolean }
+interface Msg { id: string; role: 'user' | 'ai'; text: string; at?: string; streaming?: boolean; stopped?: boolean; error?: string; retryText?: string; hint?: boolean; visualHtml?: string; drawing?: boolean }
+/** A typed request for a drawing (English or Arabic), sent to the diagram generator instead of the chat. */
+const DRAW_ASK = /^\s*(please\s+|can you\s+|could you\s+)*(draw|sketch|illustrate)\b|\b(draw|sketch)\s+(me|a|an|the|it|this)\b|(show me|make)\s+(a|an)\s+(picture|diagram|drawing|chart)\b|ارسم|ارسمي|ترسم|رسمًا|رسما|رسم توضيحي|رسمة|مخطط توضيحي|صورة توضيحية/i;
 interface SessionDoc { id?: string; courseId?: string; lessonId?: string; lessonTitle?: string; title?: string; messages?: { id?: string; role?: string; text?: string; timestamp?: string }[] }
 
 const toMsg = (m: NonNullable<SessionDoc['messages']>[number], i: number): Msg => ({ id: str(m?.id) || `m${i}`, role: m?.role === 'user' ? 'user' : 'ai', text: str(m?.text), at: str(m?.timestamp) });
@@ -132,6 +141,7 @@ export default function StudentChat() {
   async function send(raw: string, hint = false) {
     const body = raw.trim();
     if (!body || busy) return;
+    if (!hint && DRAW_ASK.test(body)) { setText(''); return draw(body); }
     const ctl = new AbortController();
     abortRef.current = ctl;
     setBusy(true);
@@ -175,7 +185,28 @@ export default function StudentChat() {
       setBusy(false);
     }
   }
+  /** A diagram for the lesson (or for the learner's own words), drawn by the server like lms-test's Visualize button. */
+  async function draw(prompt?: string) {
+    if (busy) return;
+    setBusy(true);
+    const replyId = localId();
+    setMessages((ms) => [...ms, { id: localId(), role: 'user', text: prompt || t.drawAsk, at: new Date().toISOString() }, { id: replyId, role: 'ai', text: '', drawing: true }]);
+    try {
+      const r = await post<{ html?: string }>('/api/me/tutor/visualize', {
+        lessonTitle: lessonTitle || courseTitle || undefined,
+        lessonText: lesson?.description || undefined,
+        courseId: data?.courseId || undefined,
+        prompt: prompt || undefined,
+      });
+      if (!r?.html) throw new ApiError('no visual', 503, 'VISUAL_UNAVAILABLE');
+      patch(replyId, { text: t.drawn, visualHtml: r.html, drawing: false, at: new Date().toISOString() });
+    } catch (e) {
+      const status = (e as ApiError)?.status;
+      patch(replyId, { drawing: false, error: status && status < 500 ? errMsg(e, lang) : t.drawFailed, retryText: prompt });
+    } finally { setBusy(false); }
+  }
   const stop = () => abortRef.current?.abort();
+  const [large, setLarge] = useState<string | null>(null);
   const newChat = () => { if (busy) return; setMessages([]); setSessionId(null); };
   const contextHref = (lessonId?: string) => `/student/chat${data?.courseId ? `?course=${encodeURIComponent(data.courseId)}${lessonId ? `&lesson=${encodeURIComponent(lessonId)}` : ''}` : ''}`;
 
@@ -185,6 +216,8 @@ export default function StudentChat() {
         <form className="flex items-end gap-2 rounded-2xl border bg-card p-2 shadow-lg shadow-primary/5" onSubmit={(e) => { e.preventDefault(); void send(text); }}>
           <Button variant="outline" size="sm" isDisabled={busy || !hasTutorReply} onPress={() => void send(t.hintAsk, true)} aria-label={t.hint}
             className="mb-1 shrink-0 rounded-full border-accent bg-accent/15 text-accent-foreground data-[hovered]:bg-accent/25"><Lightbulb /><span className="hidden sm:inline">{t.hint}</span></Button>
+          <Button variant="outline" size="sm" isDisabled={busy || ctx.loading || (!lessonTitle && !courseTitle)} onPress={() => void draw()} aria-label={t.draw} data-testid="chat-draw"
+            className="mb-1 shrink-0 rounded-full"><ImageIcon /><span className="hidden sm:inline">{t.draw}</span></Button>
           <textarea rows={1} value={text} placeholder={t.placeholder} aria-label={t.placeholder} dir="auto"
             onChange={(e) => setText(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); void send(text); } }}
@@ -245,7 +278,7 @@ export default function StudentChat() {
                 ) : <LearnerMsg key={m.id}><RichText text={m.text} className="text-start" /></LearnerMsg>
               ) : (
                 <TutorMsg key={m.id}>
-                  {m.text ? <RichText text={m.text} /> : m.streaming ? null : !m.error && !m.stopped ? <span className="text-muted-foreground">…</span> : null}
+                  {m.text ? <RichText text={m.text} /> : m.streaming || m.drawing ? null : !m.error && !m.stopped ? <span className="text-muted-foreground">…</span> : null}
                   {m.streaming && m.text && <span aria-hidden className="-mt-2 inline-block h-[1.1em] w-[3px] animate-pulse rounded-sm bg-primary" />}
                   {m.streaming && (
                     <div className={cn('flex items-center justify-between gap-3', m.text && 'mt-1 border-t pt-2.5')}>
@@ -254,6 +287,13 @@ export default function StudentChat() {
                         {t.writing}
                       </span>
                       <Button variant="outline" size="sm" className="rounded-full" onPress={stop}><Square className="fill-current" />{t.stop}</Button>
+                    </div>
+                  )}
+                  {m.drawing && <span className="flex items-center gap-2 text-xs font-semibold text-muted-foreground"><ImageIcon className="size-4 animate-pulse" />{t.drawing}</span>}
+                  {m.visualHtml && (
+                    <div className="overflow-hidden rounded-xl border bg-white">
+                      <iframe srcDoc={m.visualHtml} sandbox="" title={t.drawTitle} className="h-[380px] w-full border-0" />
+                      <div className="flex justify-end border-t bg-card p-1.5"><Button variant="ghost" size="sm" onPress={() => setLarge(m.visualHtml!)}><Maximize2 />{t.large}</Button></div>
                     </div>
                   )}
                   {m.stopped && <p className="text-xs font-semibold text-muted-foreground">{t.stopped}</p>}
@@ -300,6 +340,14 @@ export default function StudentChat() {
               {lesson?.status === 'completed' && <Badge tone="success" className="w-fit"><CheckCircle2 />{t.lesson}: {t.done}</Badge>}
             </Card>
           </aside>
+        </div>
+      )}
+      {large && (
+        <div role="dialog" aria-modal="true" aria-label={t.drawTitle} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-3 md:p-8" onClick={() => setLarge(null)} onKeyDown={(e) => { if (e.key === 'Escape') setLarge(null); }}>
+          <div className="flex h-full max-h-[90vh] w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-card shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between border-b px-4 py-2"><p className="text-sm font-bold">{t.drawTitle}</p><Button variant="ghost" size="icon" aria-label={t.close} onPress={() => setLarge(null)} autoFocus><X /></Button></div>
+            <iframe srcDoc={large} sandbox="" title={t.drawTitle} className="w-full flex-1 border-0 bg-white" />
+          </div>
         </div>
       )}
     </AppShell>
