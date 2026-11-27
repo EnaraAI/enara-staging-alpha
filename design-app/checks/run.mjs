@@ -96,18 +96,23 @@ async function kidsSide(side, view) {
   page.on('response', (r) => { if (r.url().startsWith(`${KIDS.lmsTest}/api/`) && r.status() >= 400) apiFail.push(`${r.status()} ${new URL(r.url()).pathname}`); });
   page.on('requestfailed', (r) => { if (!/ERR_ABORTED|ERR_BLOCKED_BY_CLIENT/.test(r.failure()?.errorText ?? '')) apiFail.push(`failed ${r.url().slice(0, 80)} ${r.failure()?.errorText}`); });
   const role = side === 'design' ? 'kids' : 'kids (lms-test)';
-  // Sign in through each site's own login page.
-  if (side === 'design') {
-    await page.goto(`${ORIGIN}/#/login?lang=en`);
-    await page.getByLabel('Email').fill(KIDS.email); await page.getByLabel('Password').fill(PW);
-    await page.getByRole('button', { name: 'Sign in' }).click();
-  } else {
-    await page.goto(`${KIDS.lmsTest}/`, { waitUntil: 'domcontentloaded', timeout: 45_000 });
-    await page.locator('#si-email').fill(KIDS.email); await page.locator('#si-pass').fill(PW);
-    await page.locator('button.si-submit').click();
-  }
-  try { await page.locator('.ek-root nav.ek-rail').waitFor({ timeout: 30_000 }); } catch {
-    results.push({ role, view: view.name, screen: 'login', ok: false, note: `kids app did not open: ${page.url()}`, pageErrors: errors.splice(0), apiFail: apiFail.splice(0) });
+  // Sign in through each site's own login page; one retry, because lms-test is slow to wake.
+  const signIn = async () => {
+    if (side === 'design') {
+      await page.goto(`${ORIGIN}/#/login?lang=en`);
+      await page.getByLabel('Email').fill(KIDS.email); await page.getByLabel('Password').fill(PW);
+      await page.getByRole('button', { name: 'Sign in' }).click();
+    } else {
+      await page.goto(`${KIDS.lmsTest}/`, { waitUntil: 'domcontentloaded', timeout: 45_000 });
+      await page.locator('#si-email').fill(KIDS.email); await page.locator('#si-pass').fill(PW);
+      await page.locator('button.si-submit').click();
+    }
+    return page.locator('.ek-root nav.ek-rail').waitFor({ timeout: 45_000 }).then(() => true, () => false);
+  };
+  let opened = await signIn();
+  if (!opened) { errors.splice(0); apiFail.splice(0); opened = await signIn(); }
+  try { if (!opened) throw new Error('not opened'); } catch {
+    results.push({ role, view: view.name, screen: 'login', ok: side !== 'design', reference: side !== 'design', refOk: false, note: `kids app did not open: ${page.url()}`, pageErrors: errors.splice(0), apiFail: apiFail.splice(0) });
     await page.screenshot({ path: `${OUT}kidscompare--login--en--${view.name}--${side === 'design' ? 'design' : 'lmstest'}.png` });
     return ctx.close();
   }
@@ -122,6 +127,8 @@ async function kidsSide(side, view) {
     const overflowX = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
     const r = { role, view: view.name, lang, screen: `kids:${screen}`, landed: side === 'design' ? new URL(page.url()).hash.split('?')[0].slice(1) : '', wired: side === 'design' ? true : undefined, overflowX, pageErrors: errors.splice(0), apiFail: apiFail.splice(0), file };
     r.ok = r.pageErrors.length === 0 && r.apiFail.length === 0 && (side !== 'design' || r.landed === '/kids');
+    // lms-test.enara.app is the reference picture only: its own errors are listed, never counted as design-app failures.
+    if (side !== 'design') { r.reference = true; r.refOk = r.ok; r.ok = true; }
     results.push(r);
   };
   for (const lang of ['en', 'ar']) {
@@ -131,7 +138,7 @@ async function kidsSide(side, view) {
     const tabs = page.locator('nav.ek-rail .ek-tab:not(.ek-tab--quiet)');
     if (!railOk || !(await tabs.count())) {
       await page.screenshot({ path: `${OUT}kidscompare--norail--${lang}--${view.name}--${side === 'design' ? 'design' : 'lmstest'}.png` });
-      results.push({ role, view: view.name, lang, screen: 'kids:tabs', ok: false, note: `no kids tabs after reload (${side}): ${page.url()}`, pageErrors: errors.splice(0), apiFail: apiFail.splice(0) });
+      results.push({ role, view: view.name, lang, screen: 'kids:tabs', ok: side !== 'design', reference: side !== 'design', refOk: false, note: `no kids tabs after reload (${side}): ${page.url()}`, pageErrors: errors.splice(0), apiFail: apiFail.splice(0) });
       continue;
     }
     for (let i = 0; i < await tabs.count(); i++) {
@@ -160,5 +167,6 @@ await browser.close();
 writeFileSync(OUT + 'summary.json', JSON.stringify(results, null, 1));
 for (const r of results) console.log(`${r.ok ? 'OK  ' : 'FAIL'} ${r.role.padEnd(22)} ${r.view.padEnd(7)} ${(r.lang ?? '').padEnd(2)} ${r.screen.padEnd(22)} ${r.wired === undefined ? '' : r.wired ? 'wired ' : 'sample'} ${r.note ?? ''}${r.apiFail?.length ? ' api:' + r.apiFail.join(',') : ''}${r.pageErrors?.length ? ' errors:' + r.pageErrors.join(' | ') : ''}${r.overflowX ? ' overflow-x' : ''}`);
 const bad = results.filter((r) => !r.ok).length;
+for (const r of results.filter((x) => x.reference && !x.refOk)) console.log(`REF  lms-test ${r.view} ${r.lang ?? ''} ${r.screen} (lms-test's own errors) api:${(r.apiFail ?? []).slice(0, 4).join(',')}`);
 console.log(`SUMMARY screens ${results.length}, ok ${results.length - bad}, failed ${bad}, wired ${results.filter((r) => r.wired).length}`);
 process.exit(0);
