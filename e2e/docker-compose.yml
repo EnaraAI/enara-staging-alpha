@@ -194,6 +194,8 @@ services:
       SCHOOL_APP_CHAT_ENABLED: "true"
       # The Moodle connector for the school app (announcements; attendance when the plugin exists). Scenario 40.
       SCHOOL_APP_MOODLE_ENABLED: "true"
+      # Design front end: read-only platform status for ENARA admins, as on lms-test (deploy/lms-test.flags.json). Scenario 45.
+      LMS_DESIGN_PLATFORM_STATUS: "true"
       # The suite signs in from one address many times (UI sign-ins and restarted workers); production keeps 20 per 15 minutes.
       LOGIN_RATE_LIMIT_MAX: "200"
       # Same for parent codes: the school app scenarios link many parents from this one address; production keeps 30 per 15 minutes.

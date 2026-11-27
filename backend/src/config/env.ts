@@ -368,6 +368,11 @@ export function withDesignAppOrigin(origins: string[], source: NodeJS.ProcessEnv
   const on = String(source.LMS_DESIGN_APP_ORIGIN ?? "").trim().toLowerCase() === "true";
   return on && !origins.includes(DESIGN_APP_ORIGIN) ? [...origins, DESIGN_APP_ORIGIN] : origins;
 }
+/** The design app's "Models & Mishkat" screen: GET /api/platform/status (ENARA admins only, read-only) answers only when
+ *  LMS_DESIGN_PLATFORM_STATUS=true (set on lms-test only, through deploy/lms-test.flags.json); off = 404. */
+export function designPlatformStatusOn(source: NodeJS.ProcessEnv): boolean {
+  return String(source.LMS_DESIGN_PLATFORM_STATUS ?? "").trim().toLowerCase() === "true";
+}
 
 function parseOrigins(source: NodeJS.ProcessEnv, nodeEnv: NodeEnv): string[] {
   const explicit = readString(source, "CORS_ALLOWED_ORIGINS");
