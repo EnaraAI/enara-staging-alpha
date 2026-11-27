@@ -101,4 +101,19 @@ describe('liveExpressive: the cue follows the verdict', () => {
       expect(r.cues).toEqual([]);
     } finally { process.env.ENARA_ENGINE_V2 = 'liveExpressive'; }
   });
+
+  it('a drawing that opens: the tutor says "Look at the picture." first (once), and the call tells the browser which side the panel goes', async () => {
+    const start = await request(app).post('/api/avatar/session').set('Authorization', auth).send({ course_id: 'lk-crs', lesson_id: 'lk-lsn', preferred_language: 'english' });
+    expect(start.body.expressive).toEqual({ panel: 'right' });
+    const sid = start.body.session_id as string;
+    reply('[[assess verdict=NOT_EVALUATED relevance=NO_ACTIVE_ITEM next=NONE]]\nHere is a picture of a daily routine.');
+    let r = await say(sid, 'Can you draw a picture for me, please?');
+    expect(r.lines.some((l) => l.visual === 'drawing')).toBe(true);
+    expect(r.text).toBe('Look at the picture. Here is a picture of a daily routine.');
+    expect(r.cues).toEqual(['curious']);
+    // Not twice when the reply already says it.
+    reply('[[assess verdict=NOT_EVALUATED relevance=NO_ACTIVE_ITEM next=NONE]]\nLook at the picture on the screen now.');
+    r = await say(sid, 'Draw it again please');
+    expect(r.text).toBe('Look at the picture on the screen now.');
+  });
 });

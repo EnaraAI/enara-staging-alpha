@@ -259,6 +259,30 @@ describe('liveExpressive: cues by code', () => {
     expect(L.secondSentenceAt('Only one sentence.')).toBe(-1);
   });
 
+  it('says "look at the picture" in the call\'s language and puts the panel on the side the face is turned to', () => {
+    expect(L.lookLine('Here it is.', 'english')).toBe('Look at the picture.');
+    expect(L.lookLine('هذه هي الصورة.', 'arabic')).toBe('انظر إلى الصورة.');
+    expect(L.lookLine('Look at the drawing: three apples.', 'english')).toBeNull();
+    expect(L.lookLine('انظر إلى الرسم.', 'arabic')).toBeNull();
+    expect(L.panelSide('27e12daa-50fc-4384-93c2-ebca73f1f78d')).toBe('left');
+    expect(L.panelSide('avatar-1')).toBe('right');
+    expect(L.panelSide(undefined)).toBe('right');
+  });
+
+  it('an Arabic call (not a language lesson) opening a drawing: the line is in formal Arabic', async () => {
+    await withSwitch('liveExpressive', async () => {
+      const auth = await token('grown-ar', 'stu-grown');
+      const start = await request(app).post('/api/avatar/session').set('Authorization', auth).send({ preferred_language: 'arabic' });
+      expect(start.body.expressive).toEqual({ panel: 'right' });
+      mocks.stream.mockImplementationOnce(async function* () { yield 'هذا رسم للدورة اليومية.'; });
+      const res = await request(app).post('/api/avatar/query-stream').set('Authorization', auth).send({ session_id: start.body.session_id, messages: [{ role: 'user', content: 'ارسم لي صورة من فضلك' }] });
+      const lines = res.text.trim().split('\n').map((l) => JSON.parse(l));
+      expect(lines.some((l) => l.visual === 'drawing')).toBe(true);
+      expect(lines.filter((l) => l.content).map((l) => l.content).join('')).toBe('انظر إلى الصورة. هذا رسم للدورة اليومية.');
+      expect(lines.filter((l) => l.cue).map((l) => l.cue)).toEqual(['curious']);
+    });
+  });
+
   it('every subject (here maths, in English and in Arabic): the cue follows the hidden grading line; no verdict gives a neutral cue', async () => {
     await withSwitch('liveExpressive', async () => {
       const auth = await token('grown-maths', 'stu-grown');
@@ -272,7 +296,7 @@ describe('liveExpressive: cues by code', () => {
       let r = await turn('What is 7 times 8?', '[[assess verdict=NOT_EVALUATED relevance=NO_ACTIVE_ITEM next=NEW_ITEM]]\nGood question. Try this one first: what is 7 times 7?');
       expect(r.params.pedagogy).toContain('HIDDEN GRADING LINE');
       expect(r.cues).toEqual(['curious']);
-      expect(r.text).toBe('Good question. Try this one first: what is 7 times 7?');
+      expect(r.text).toBe('Look at the picture. Good question. Try this one first: what is 7 times 7?'); // the call's first real question draws a visual
       r = await turn('It is 47', '[[assess verdict=INCORRECT relevance=ACTIVE_ITEM next=SAME_ITEM]]\nNot quite. Count 7 more from 42.');
       expect(r.cues).toEqual(['supportive']);
       expect(r.text).not.toMatch(/\[\[assess/);
