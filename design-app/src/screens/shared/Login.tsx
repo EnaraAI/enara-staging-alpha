@@ -45,7 +45,7 @@ export default function Login() {
   return (
     <div className="grid min-h-screen md:grid-cols-2">
       <div className="hidden flex-col justify-between bg-primary p-12 text-primary-foreground md:flex">
-        <Logo className="text-primary-foreground [&_rect:first-child]:fill-[var(--primary-foreground)] [&_rect:first-child]:opacity-15" />
+        <Logo className="h-12 self-start text-primary-foreground" />
         <div className="max-w-md">
           <p className="text-3xl font-extrabold leading-snug">{t.side}</p>
           <p className="mt-3 text-primary-foreground/75">{t.sideSub}</p>

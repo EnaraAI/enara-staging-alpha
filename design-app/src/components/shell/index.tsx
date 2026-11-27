@@ -5,22 +5,17 @@ import { Bell, ChevronLeft, Home, Languages, LogOut, Menu, Moon, Search, Setting
 import { useSession } from '@/lib/session';
 import { setLang } from '@/App';
 import { cn } from '@/lib/utils';
+import { EnaraLogo, EnaraMark } from '@/components/brand/EnaraLogo';
 import { usePreview } from '@/lib/preview';
 import { Avatar, Badge, Dir } from '@/components/ui';
 import { KidButton } from '@/components/ui/kids';
 
+/** ENARA's official logo (frontend/components/brand/EnaraLogo.tsx): the full lockup "Enara | إنارة", or the symbol alone
+ *  when compact. Drawn in the current text colour (navy on light, white on the navy panels and in dark mode). */
 export function Logo({ className, compact }: { className?: string; compact?: boolean }) {
-  const { lang } = usePreview();
-  return (
-    <span className={cn('inline-flex items-center gap-2 font-extrabold tracking-tight', className)}>
-      <svg viewBox="0 0 32 32" className="size-7 shrink-0" aria-hidden>
-        <rect width="32" height="32" rx="9" fill="var(--primary)" />
-        <path d="M16 6c4.4 0 8 3.4 8 7.7 0 2.7-1.4 4.6-3.1 6-.9.8-1.4 1.6-1.4 2.6V23h-7v-.7c0-1-.5-1.8-1.4-2.6C9.4 18.3 8 16.4 8 13.7 8 9.4 11.6 6 16 6Z" fill="var(--accent)" />
-        <rect x="12.5" y="24.5" width="7" height="2.2" rx="1.1" fill="var(--primary-foreground)" />
-      </svg>
-      {!compact && <span className="text-lg">{lang === 'ar' ? 'إنارة' : 'ENARA'}</span>}
-    </span>
-  );
+  return compact
+    ? <EnaraMark className={cn('h-7 w-auto shrink-0 text-primary', className)} title="ENARA" />
+    : <EnaraLogo className={cn('h-8 w-auto shrink-0 text-primary', className)} />;
 }
 
 export interface NavItem { id: string; label: string; icon: React.ReactNode; badge?: string; href?: string }
