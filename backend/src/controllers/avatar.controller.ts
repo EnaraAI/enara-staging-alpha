@@ -1,5 +1,5 @@
 import { engineV2 } from '../services/engineV2';
-import { expressivePersona, planTurnCues, secondSentenceAt, startExpressiveCall, stripCueTags, type Cue, type CuePlan, type ExpressiveCall, type VoiceProfile } from '../services/liveExpressive';
+import { expressivePersona, SUBJECT_CUE_LINE, planTurnCues, secondSentenceAt, startExpressiveCall, stripCueTags, type Cue, type CuePlan, type ExpressiveCall, type VoiceProfile } from '../services/liveExpressive';
 import { guardedEmitter } from '../services/guardedStream';
 import { guardSpokenMarker, spokenLines } from '../services/spokenInput';
 import { DEMO_LIMITS, isDemoSessionInstitution } from '../config/demo';
@@ -9,7 +9,6 @@ import { SentenceSplitter } from '../services/sentenceSplitter';
 import { stripMarkdownForSpeech } from '../services/speechText';
 import { avatarSpeakingOn, avatarSpeakingUsesAnamVoice, isWavClip, LATENCY_KEEP, MAX_CLIP_BYTES, pronunciationReady, PRONUNCIATION_NOTE_LINE, SPEAKING_PRACTICE_LINE } from '../services/avatarSpeaking';
 import { assessPronunciation } from '../services/pronunciation';
-import { SUBJECT_GRADE_LINE } from '../services/subjectPractice';
 import { ageFromBirthDate } from '../services/languageTeachingContext';
 import { Student } from '../models/Student';
 import { TutorSession } from '../models/TutorSession';
@@ -942,7 +941,7 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
       mode: 'voice',
       learner: learner ? describeSnapshot(learner) : undefined,
       // liveExpressive, every other subject: the reply opens with the hidden grading line, so its cue follows the verdict.
-      pedagogy: arbitratePedagogy([plan?.prompt, policyRule(tutorPolicy.policy), cueCall && !languagePrep ? SUBJECT_GRADE_LINE : undefined, sceneActive || subjectRolePlay?.phase === 'after' ? rolePlayLine(subjectRolePlay!) : undefined].filter(Boolean).join('\n\n') || undefined, Boolean(languagePrep)),
+      pedagogy: arbitratePedagogy([plan?.prompt, policyRule(tutorPolicy.policy), cueCall && !languagePrep ? SUBJECT_CUE_LINE : undefined, sceneActive || subjectRolePlay?.phase === 'after' ? rolePlayLine(subjectRolePlay!) : undefined].filter(Boolean).join('\n\n') || undefined, Boolean(languagePrep)),
       planActive: Boolean(plan),
       ...(languagePrep?.parts ? { languageContextStable: languagePrep.parts.stable, languageContextDynamic: `${languagePrep.parts.dynamic}${speakingLines}${heardLines}` } : { languageContext: languagePrep?.prompt ? `${languagePrep.prompt}${speakingLines}${heardLines}` : languagePrep?.prompt }),
     };

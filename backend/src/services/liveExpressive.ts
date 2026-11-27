@@ -13,6 +13,7 @@ import { engineV2 } from './engineV2';
 import { finalizeLanguageTurn, loadTrustedAgeBand, type LanguageTeachingContext } from './languageTeachingContext';
 import type { StrippedReply } from './languageLearningState';
 import { faceVersions } from './tutorFaceService';
+import { SUBJECT_GRADE_LINE } from './subjectPractice';
 
 export const EXPRESS_MODEL = 'cara-4.1-express';
 export const CHILD_SPEED = 0.85;
@@ -180,6 +181,11 @@ export function cuesForTurn(t: TurnFacts, band: ExpressiveBand): CuePlan | null 
   // No verdict: a neutral cue, never one that could read as a judgement.
   return { first: 'warm' };
 }
+
+// Every other subject: the hidden grading line the chat uses (gradeAllSubjects), plus one line so the rest of the reply is unchanged.
+// The simulation (docs/tutor/EXPRESSIVE_SIM.md) saw Arabic-medium replies drift into English after the English-language
+// grading instruction; the reply's language is the call's, whatever the hidden line says.
+export const SUBJECT_CUE_LINE = `${SUBJECT_GRADE_LINE}\nAfter the hidden line, reply exactly as you would without it: in the language the request asks for (an Arabic lesson stays in Arabic), with the same length and tone.`;
 
 // Every other subject (maths, science, Arabic, social studies...): the learner's own words say they are stuck.
 const STUCK_WORDS = /\b(i\s*(really\s*)?(don'?t|do not|dont) (know|understand|get it)|no idea|not sure|i'?m (confused|lost|stuck)|i give up|give me a hint|can you help|why is (that|it) wrong)\b|مش عارف|مش فاهم|لا أعرف|لا اعرف|لا أفهم|لا افهم|ما فهمت|ساعدني|محتار/i;

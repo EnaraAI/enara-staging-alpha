@@ -1,0 +1,45 @@
+{
+ "$comment": "Expressive-avatar screenshots on lms-test only (owner, 27 Nov 2026). 'mode' dry = sign in and open the live call screen, no call; calls = run 'run' below. Hard cap: 6 real calls in total (callsUsed counts them; raise it with every run).",
+ "mode": "dry",
+ "callsUsed": 4,
+ "maxCalls": 6,
+ "run": [],
+ "learners": {
+  "adult": {
+   "email": "hassan.shaker@school.enara.app",
+   "fallback": [
+    "nadine.soliman@school.enara.app"
+   ],
+   "app": "standard",
+   "voice": "adult",
+   "subject": "english"
+  },
+  "child": {
+   "email": "khaled.nasser@school.enara.app",
+   "fallback": [
+    "ayman.helmy@school.enara.app"
+   ],
+   "app": "kids",
+   "voice": "child",
+   "subject": "english"
+  },
+  "teen": {
+   "email": "farida.fahmy@school.enara.app",
+   "fallback": [
+    "noha.kim@school.enara.app"
+   ],
+   "app": "standard",
+   "voice": "adult",
+   "subject": "maths"
+  }
+ },
+ "dryCheck": [],
+ "admin": "mariam.shawky@school.enara.app",
+ "$runs": [
+  "run 1 (17:18 UTC): adult off, child off - did not reach the call (lms-test slow), no call made: 0 calls",
+  "run 2: adult on/off, child on/off, English (calls 1-4)",
+  "run 2 (17:34-17:51 UTC): 4 calls made (adult on/off, child on/off); Anam Free plan: 3-minute sessions, 30 minutes a period, now used up",
+  "sim 1: the text-path simulation (no video): 6 learners x off/on"
+ ],
+ "voiceProbe": []
+}
