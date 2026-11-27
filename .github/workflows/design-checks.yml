@@ -7,7 +7,7 @@ on:
     branches: ['claude/design-app', 'claude/design-app-*']
     paths: ['design-app/**', '.github/workflows/design-checks.yml']
 permissions:
-  contents: read
+  contents: write  # only to publish screenshots to the orphan branch design-check-results
 concurrency: { group: 'design-checks-${{ github.ref }}', cancel-in-progress: true }
 jobs:
   checks:
@@ -28,6 +28,12 @@ jobs:
           SEED_USER_PASSWORD: ${{ secrets.SEED_USER_PASSWORD }}
           ONLY_ROLES: ${{ vars.DESIGN_CHECK_ROLES }}
         run: node checks/run.mjs
+      - name: Publish screenshots and summary (orphan branch design-check-results, overwritten each run)
+        if: always()
+        working-directory: design-app/checks/out
+        run: |
+          git init -q && git checkout -q -b r && git config user.name github-actions && git config user.email github-actions@users.noreply.github.com
+          git add -A && git commit -qm "design checks ${GITHUB_SHA::8} (${GITHUB_REF_NAME})" && git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" "r:design-check-results-${GITHUB_REF_NAME//\//-}"
       - uses: actions/upload-artifact@v4
         if: always()
         with: { name: design-checks, path: design-app/checks/out, retention-days: 7 }

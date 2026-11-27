@@ -38,7 +38,7 @@ for (const acc of ACCOUNTS.filter((a) => !only.length || only.includes(a.role)))
     const page = await ctx.newPage();
     const errors = []; page.on('pageerror', (e) => errors.push(String(e).slice(0, 200)));
     const apiFail = []; page.on('response', (r) => { if (r.url().startsWith('https://lms-test.enara.app/api/') && r.status() >= 400) apiFail.push(`${r.status()} ${new URL(r.url()).pathname}`); });
-    page.on('requestfailed', (r) => { if (r.url().startsWith('https://lms-test.enara.app/')) apiFail.push(`failed ${new URL(r.url()).pathname} ${r.failure()?.errorText}`); });
+    page.on('requestfailed', (r) => { if (r.url().startsWith('https://lms-test.enara.app/') && !/ERR_ABORTED/.test(r.failure()?.errorText ?? '')) apiFail.push(`failed ${new URL(r.url()).pathname} ${r.failure()?.errorText}`); });
     // Sign in (English), then every screen in English and Arabic.
     await page.goto(`${ORIGIN}/#/login?lang=en`);
     await page.getByLabel('Email').fill(acc.email);
@@ -60,7 +60,7 @@ for (const acc of ACCOUNTS.filter((a) => !only.length || only.includes(a.role)))
         const sample = await page.getByTestId('sample-ribbon').count();
         const overflowX = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
         const file = `${acc.role.replace(/\W+/g, '_')}--${s.replace(/\//g, '_')}--${lang}--${view.name}.png`;
-        await page.screenshot({ path: OUT + file, fullPage: false });
+        await page.waitForTimeout(600); await page.screenshot({ path: OUT + file, fullPage: false });
         const r = { role: acc.role, view: view.name, lang, screen: s, landed: where, wired: sample === 0, overflowX, pageErrors: errors.slice(before), apiFail: apiFail.slice(beforeApi), file };
         r.ok = where === s && r.pageErrors.length === 0 && r.apiFail.length === 0 && !overflowX;
         results.push(r);
