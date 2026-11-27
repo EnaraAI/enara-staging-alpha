@@ -6,10 +6,20 @@ import { Alert, Badge, Button, Card, CardContent, CardDescription, CardHeader, C
 import { cn } from '@/lib/utils';
 import { PlatformShell } from './PlatformShell';
 import { featureLabel, fetchAiUsage, fetchReady, ms, timeShort, useLoad } from './data';
+import { get } from '@/lib/api';
+
+/** GET /api/platform/status (enara-admin, switch LMS_DESIGN_PLATFORM_STATUS on lms-test). A part that failed is "unavailable". */
+type Maybe<T> = T | 'unavailable';
+interface PlatformStatus {
+  mishkat: { ar: { configured: boolean; splitOn: boolean }; en: { configured: boolean; splitOn: boolean }; lastScoredAt: Maybe<string | null>; scoredLast24h: Maybe<number> };
+  email: { configured: boolean; resendKeyPresent: boolean; emailsEnabled: boolean; lmsEmailsEnabled: boolean; dailyCeiling: number | null; cairoDay: string; today: Maybe<{ sent: number; held: number; failed: number }> };
+  models: { tutorProvider: string; tutor?: string; anthropicTutor?: string; deepseekTutor?: string; fallback: string | null; fallbackOn: boolean };
+  checkedAt: string;
+}
 import { ErrorBlock, LoadingBlock, NotAvailable } from './states';
 
 type Tone = 'success' | 'info' | 'outline' | 'danger' | 'warning';
-interface Svc { id: string; icon: ReactNode; check?: string; extra?: { label: string; value: string }[]; na?: boolean }
+interface Svc { id: string; icon: ReactNode; check?: string; extra?: { label: string; value: string }[]; na?: boolean; note?: string }
 
 const T = {
   en: {
@@ -19,6 +29,8 @@ const T = {
     provider: { mongo: 'MongoDB', postgres: 'Postgres', r2: 'Cloudflare R2', anthropic: 'Anthropic', fallback: 'Anthropic', elevenlabs: 'ElevenLabs', anam: 'Anam', spendCap: 'Staging AI spend limit', mishkatAr: 'ENARA GPU · scoring', mishkatEn: 'ENARA GPU · scoring', email: 'Resend' } as Record<string, string>,
     st: { ok: 'Reachable', accepted: 'Key accepted', configured: 'Configured', set: 'Set', not_configured: 'Not configured', not_set: 'Not set', unavailable: 'Unavailable', rejected: 'Key rejected', error: 'Check failed' } as Record<string, string>,
     required: 'Required', keyCheck: 'Key', fallbackModel: 'Fallback model',
+    tutorModel: 'Tutor model', split: 'Split by language', on: 'On', off: 'Off', last: 'Last scored', none: 'None yet', day24: 'Scored, last 24 h', schoolOnly: 'School assessments only. One service serves both languages, so counts are not split by language.',
+    sent: 'Sent today', held: 'Held today', failedE: 'Failed today', ceiling: 'Daily limit', lmsEmails: 'LMS emails', statusFailed: 'Platform status could not be loaded.',
     naNote: 'Latency, warm state and version need the planned platform status endpoint.',
     configNote: 'Configured means a key is set; it does not prove the provider answers.',
     activity: 'Model activity, last 24 hours', activityD: 'All schools · from recorded AI calls. Averages, not percentiles.',
@@ -35,6 +47,8 @@ const T = {
     provider: { mongo: 'MongoDB', postgres: 'Postgres', r2: 'Cloudflare R2', anthropic: 'Anthropic', fallback: 'Anthropic', elevenlabs: 'ElevenLabs', anam: 'Anam', spendCap: 'حدّ إنفاق الذكاء الاصطناعي في بيئة الاختبار', mishkatAr: 'وحدة GPU لإنارة · تقييم', mishkatEn: 'وحدة GPU لإنارة · تقييم', email: 'Resend' } as Record<string, string>,
     st: { ok: 'يمكن الوصول', accepted: 'المفتاح مقبول', configured: 'مُعَدّ', set: 'مضبوط', not_configured: 'غير مُعَدّ', not_set: 'غير مضبوط', unavailable: 'غير متاح', rejected: 'المفتاح مرفوض', error: 'تعذّر الفحص' } as Record<string, string>,
     required: 'مطلوب', keyCheck: 'المفتاح', fallbackModel: 'النموذج الاحتياطي',
+    tutorModel: 'نموذج المعلّم', split: 'الفصل حسب اللغة', on: 'مُفعَّل', off: 'متوقف', last: 'آخر تقييم', none: 'لا يوجد بعد', day24: 'التقييمات، آخر 24 ساعة', schoolOnly: 'تقييمات المدارس فقط. خدمة واحدة تخدم اللغتين، لذا لا تُفصَل الأعداد حسب اللغة.',
+    sent: 'المُرسَل اليوم', held: 'المحجوز اليوم', failedE: 'المتعثّر اليوم', ceiling: 'الحد اليومي', lmsEmails: 'رسائل نظام التعلّم', statusFailed: 'تعذّر تحميل حالة المنصة.',
     naNote: 'زمن الاستجابة وحالة الجاهزية والإصدار تحتاج إلى واجهة حالة المنصة المخطط لها.',
     configNote: '«مُعَدّ» يعني أن المفتاح موجود، ولا يثبت أن المزوّد يستجيب.',
     activity: 'نشاط النماذج، آخر 24 ساعة', activityD: 'جميع المدارس · من طلبات الذكاء الاصطناعي المسجّلة. متوسطات لا نِسَب مئوية.',
@@ -63,7 +77,8 @@ export default function PlatformModels() {
   const { lang } = usePreview();
   const ready = useLoad((signal) => fetchReady(signal));
   const activity = useLoad((signal) => fetchAiUsage(1, undefined, signal));
-  const reload = () => { ready.reload(); activity.reload(); };
+  const status = useLoad((signal) => get<PlatformStatus>('/api/platform/status', signal));
+  const reload = () => { ready.reload(); activity.reload(); status.reload(); };
   const actions = <Button variant="outline" size="sm" aria-label={t.refresh} isDisabled={ready.loading} onPress={reload}><RefreshCw /><span className="hidden sm:inline">{t.refresh}</span></Button>;
 
   let top: ReactNode;
@@ -71,16 +86,34 @@ export default function PlatformModels() {
   else if (ready.error && !ready.data) top = <ErrorBlock error={ready.error} onRetry={ready.reload} title={t.failed} />;
   else if (ready.data) {
     const c = ready.data.checks;
+    const ps = status.data ?? null;
     const required = new Set(ready.data.required);
     const svcs: Svc[] = [
       // With the model fallback switch on, /ready also tests the key (accepted / rejected / error); otherwise only "configured".
-      { id: 'anthropic', icon: <Bot />, check: c.anthropicKey ?? c.anthropic, extra: c.anthropicKey && c.anthropic ? [{ label: t.keyCheck, value: t.st[c.anthropic] ?? c.anthropic }] : undefined },
+      { id: 'anthropic', icon: <Bot />, check: c.anthropicKey ?? c.anthropic, extra: [
+        ...(ps?.models.tutor ? [{ label: t.tutorModel, value: `${ps.models.tutor}${ps.models.tutorProvider !== 'anthropic' ? ` (${ps.models.tutorProvider})` : ''}` }] : []),
+        ...(ps?.models.fallback ? [{ label: t.fallbackModel, value: `${ps.models.fallback} · ${ps.models.fallbackOn ? t.on : t.off}` }] : []),
+        ...(c.anthropicKey && c.anthropic ? [{ label: t.keyCheck, value: t.st[c.anthropic] ?? c.anthropic }] : []),
+      ] },
       ...(c.anthropicFallbackKey ? [{ id: 'fallback', icon: <KeyRound />, check: c.anthropicFallbackKey, extra: c.anthropicFallbackModel ? [{ label: t.fallbackModel, value: t.st[c.anthropicFallbackModel] ?? c.anthropicFallbackModel }] : undefined }] : []),
-      { id: 'mishkatAr', icon: <Sparkles />, na: true },
-      { id: 'mishkatEn', icon: <Sparkles />, na: true },
+      ...(['ar', 'en'] as const).map((l): Svc => {
+        if (!ps) return { id: l === 'ar' ? 'mishkatAr' : 'mishkatEn', icon: <Sparkles />, na: true };
+        const m = ps.mishkat;
+        const extra = [{ label: t.split, value: m[l].splitOn ? t.on : t.off }];
+        if (l === 'ar') extra.push(
+          { label: t.last, value: m.lastScoredAt === 'unavailable' ? t.st.unavailable : m.lastScoredAt ? `${new Date(m.lastScoredAt).toLocaleDateString(lang === 'ar' ? 'ar-EG-u-nu-latn' : 'en-GB', { day: 'numeric', month: 'short', timeZone: 'Africa/Cairo' })} ${timeShort(new Date(m.lastScoredAt), lang)}` : t.none },
+          { label: t.day24, value: m.scoredLast24h === 'unavailable' ? t.st.unavailable : num(m.scoredLast24h, lang) },
+        );
+        return { id: l === 'ar' ? 'mishkatAr' : 'mishkatEn', icon: <Sparkles />, check: m[l].configured ? 'configured' : 'not_configured', extra, note: l === 'ar' ? t.schoolOnly : undefined };
+      }),
       { id: 'anam', icon: <Video />, check: c.anam },
       { id: 'elevenlabs', icon: <Mic />, check: c.elevenlabs },
-      { id: 'email', icon: <Mail />, na: true },
+      ps ? { id: 'email', icon: <Mail />, check: ps.email.configured ? 'configured' : 'not_configured', extra: [
+        ...(ps.email.today === 'unavailable' ? [{ label: t.sent, value: t.st.unavailable }] : [
+          { label: t.sent, value: num(ps.email.today.sent, lang) }, { label: t.held, value: num(ps.email.today.held, lang) }, { label: t.failedE, value: num(ps.email.today.failed, lang) }]),
+        ...(ps.email.dailyCeiling != null ? [{ label: t.ceiling, value: num(ps.email.dailyCeiling, lang) }] : []),
+        { label: t.lmsEmails, value: ps.email.lmsEmailsEnabled ? t.on : t.off },
+      ] } : { id: 'email', icon: <Mail />, na: true },
       { id: 'mongo', icon: <Database />, check: c.mongo },
       { id: 'postgres', icon: <Database />, check: c.postgres },
       { id: 'r2', icon: <HardDrive />, check: c.r2 },
@@ -111,7 +144,7 @@ export default function PlatformModels() {
                   <dl key={e.label} className="flex items-center justify-between gap-2 rounded-lg bg-muted/60 px-2.5 py-1.5 text-xs"><dt className="font-semibold text-muted-foreground">{e.label}</dt><dd className="font-semibold">{e.value}</dd></dl>
                 ))}
                 <div className="mt-auto flex flex-col gap-2">
-                  {s.na ? <p className="text-[11px] text-muted-foreground">{t.naNote}</p> : (s.check === 'configured') ? <p className="text-[11px] text-muted-foreground">{t.configNote}</p> : null}
+                  {s.na ? <p className="text-[11px] text-muted-foreground">{status.error ? t.statusFailed : t.naNote}</p> : s.note ? <p className="text-[11px] text-muted-foreground">{s.note}</p> : (s.check === 'configured') ? <p className="text-[11px] text-muted-foreground">{t.configNote}</p> : null}
                   {isRequired && <span className="text-[11px] font-semibold text-muted-foreground">{t.required}</span>}
                 </div>
               </Card>
