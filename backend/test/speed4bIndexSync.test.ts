@@ -1,5 +1,8 @@
 // lms-speed-4b: with autoIndex off (lms-test entry), the deploy's migration step builds every model's indexes once,
 // including models that other code loads only on demand.
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -22,10 +25,25 @@ describe('lms-speed-4b ensureAllIndexes', () => {
     expect(files.some((x) => x.includes('/scripts/'))).toBe(false);
   });
 
+  it('also finds model files in the compiled build (CommonJS), not only in TypeScript source', () => {
+    // lms-test runs the tsc output, where model('X', …) becomes (0, mongoose_1.model)('X', …): on 27 Nov the first
+    // deploy found only 2 files there.
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'speed4c-'));
+    fs.mkdirSync(path.join(dir, 'models')); fs.mkdirSync(path.join(dir, 'scripts'));
+    fs.writeFileSync(path.join(dir, 'models', 'A.js'), "exports.A = (0, mongoose_1.model)('Alpha', schema);");
+    fs.writeFileSync(path.join(dir, 'models', 'B.js'), "exports.B = mongoose_1.default.model('Beta', schema);");
+    fs.writeFileSync(path.join(dir, 'models', 'C.js'), "const x = model('lowercaseIsNotAModel');");
+    fs.writeFileSync(path.join(dir, 'scripts', 'D.js'), "(0, mongoose_1.model)('Script', s);");
+    const found = modelFiles(dir).map((f) => path.basename(f)).sort();
+    fs.rmSync(dir, { recursive: true, force: true });
+    expect(found).toEqual(['A.js', 'B.js']);
+  });
+
   it('builds the indexes autoIndex would have built, for every model, with no failure', async () => {
     const res = await ensureAllIndexes();
     expect(res.failed).toEqual([]);
     expect(res.missing, 'every declared index exists').toEqual([]);
+    expect(res.unloaded, 'every model the build defines is loaded').toEqual([]);
     expect(res.models).toBeGreaterThan(130);
     const users = await mongoose.model('User').collection.indexes();
     expect(users.some((i) => i.key.email === 1 && i.unique)).toBe(true);
