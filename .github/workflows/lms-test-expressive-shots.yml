@@ -1,0 +1,87 @@
+# Expressive avatar (live tutor item 5): screenshots of the live tutor's face for the owner, on lms-test.enara.app ONLY
+# (deploy/lms-test/expressive). Runs on a push to the run branch below that changes the harness or its plan.json.
+# plan.json mode "dry": sign-ins and the call screen only (no call); mode "calls": the real calls listed in plan.json run
+# (hard cap 6 calls in total, counted in plan.json). The PNGs and INDEX.md are added to the branch live-expressive-shots
+# (a normal commit on top, never a force-push). test.enara.app is frozen: never called. Secrets are never printed.
+name: lms-test expressive avatar screenshots
+on:
+  push:
+    branches: ['claude/lms-live-expressive-shots-run']
+    paths: ['deploy/lms-test/expressive/**', '.github/workflows/lms-test-expressive-shots.yml']
+permissions:
+  contents: write
+concurrency:
+  group: lms-test-expressive-shots
+  cancel-in-progress: false
+jobs:
+  shots:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: deploy/lms-test/expressive
+    env:
+      EXPR_OUT: ${{ github.workspace }}/expr-out
+      PIPER_VOICES: ${{ github.workspace }}/piper-voices
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Synthetic learner voices (Piper)
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg >/dev/null
+          pip install -q piper-tts==1.8.0
+          mkdir -p "$PIPER_VOICES"
+          for m in en/en_US/ryan/medium/en_US-ryan-medium en/en_US/amy/medium/en_US-amy-medium; do
+            b=$(basename "$m")
+            curl -sfL -o "$PIPER_VOICES/$b.onnx" "https://huggingface.co/rhasspy/piper-voices/resolve/main/$m.onnx"
+            curl -sfL -o "$PIPER_VOICES/$b.onnx.json" "https://huggingface.co/rhasspy/piper-voices/resolve/main/$m.onnx.json"
+          done
+      - name: Browser (Google Chrome: the avatar video may need H.264)
+        run: |
+          npm init -y >/dev/null
+          npm i --no-save --no-audit --no-fund playwright@1.49.1
+          npx playwright install --with-deps chrome
+      - name: Sign in, open the live call, speak, capture
+        env:
+          SEED_USER_PASSWORD: ${{ secrets.SEED_USER_PASSWORD }}
+          LMSTEST_MAINTENANCE_TOKEN: ${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}
+        run: node shots.mjs
+      - name: What the tutor said (its own audio, to check no cue word is spoken)
+        if: always()
+        run: |
+          if ls "$EXPR_OUT"/audio/*.webm >/dev/null 2>&1; then pip install -q faster-whisper==1.1.1 && python transcribe.py "$EXPR_OUT" || echo "transcription failed"; fi
+      - name: INDEX.md
+        if: always()
+        run: if [ -f "$EXPR_OUT/results.json" ]; then node index.mjs "$EXPR_OUT"; fi
+      - name: Add the PNGs to live-expressive-shots (a new commit; never a force-push)
+        if: always()
+        working-directory: ${{ github.workspace }}
+        run: |
+          set -e
+          ls "$EXPR_OUT"/shots/*.png >/dev/null 2>&1 || { echo "no PNGs"; exit 0; }
+          git config user.name github-actions
+          git config user.email github-actions@users.noreply.github.com
+          if git fetch -q origin live-expressive-shots 2>/dev/null; then
+            git worktree add -q pub FETCH_HEAD
+            git -C pub checkout -q -B live-expressive-shots
+          else
+            git worktree add -q --orphan -b live-expressive-shots pub
+          fi
+          cp "$EXPR_OUT"/shots/* pub/
+          git -C pub add -A
+          git -C pub commit -qm "expressive avatar screenshots (run ${GITHUB_RUN_ID})" || { echo "nothing new"; exit 0; }
+          git -C pub push -q origin live-expressive-shots
+          echo "published: $(ls pub/*.png | wc -l) PNGs" >> "$GITHUB_STEP_SUMMARY"
+      - name: Artifact (screens of each step, results, recordings)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: expressive-shots-${{ github.run_id }}
+          path: ${{ github.workspace }}/expr-out
+          retention-days: 14
