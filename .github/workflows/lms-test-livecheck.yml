@@ -36,7 +36,8 @@ jobs:
         if: steps.plan.outputs.ids == ''
         env:
           LMSTEST_MAINTENANCE_TOKEN: ${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}
-        run: if node -e "process.exit(require('./plan.json').run.usageOnly ? 0 : 1)"; then node run.mjs usage; else echo "nothing to run"; fi
+        run: |
+          if node -e "process.exit(require('./plan.json').run.usageOnly ? 0 : 1)"; then node run.mjs usage; else echo "nothing to run"; fi
       - uses: actions/setup-python@v5
         if: steps.plan.outputs.ids != ''
         with:
