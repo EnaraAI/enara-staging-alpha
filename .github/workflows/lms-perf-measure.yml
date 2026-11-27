@@ -10,6 +10,10 @@ on:
     branches: ['claude/lms-perf-measure']
     paths: ['deploy/lms-test/perf/**', '.github/workflows/lms-perf-measure.yml']
   workflow_dispatch:
+    inputs:
+      phases: { description: 'Comma list of phases (env,public,login,pages,api,model,cold)', required: false, default: '' }
+      idle_min: { description: 'Idle minutes before a cold probe', required: false, default: '' }
+      label: { description: 'Free label for this run (e.g. after PR 164)', required: false, default: '' }
 permissions:
   contents: write  # only to publish results to the orphan branch lms-perf-results
   actions: read    # to see whether an lms-test deploy is running
@@ -37,7 +41,8 @@ jobs:
           SEED_USER_PASSWORD: ${{ secrets.SEED_USER_PASSWORD }}
           LMSTEST_MAINTENANCE_TOKEN: ${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}
           GITHUB_TOKEN: ${{ github.token }}
-          PHASES: ${{ vars.LMS_PERF_PHASES || 'env,public,login,pages,api,model,cold' }}
+          PHASES: ${{ inputs.phases || vars.LMS_PERF_PHASES || 'env,public,login,pages,api,model,cold' }}
+          IDLE_MIN: ${{ inputs.idle_min || '11' }}
         run: node measure.mjs
       - name: Publish results (orphan branch lms-perf-results, overwritten each run)
         if: always()
