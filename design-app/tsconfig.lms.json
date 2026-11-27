@@ -1,0 +1,12 @@
+// The copied lms-test kids app (src/lms) with frontend/tsconfig.json's options (not strict), so the copies stay unedited.
+// lucide-react resolves to lucide-react-lms (0.574.0, lms-test's version), as in vite.config.ts. The node:test file is left out.
+{
+  "compilerOptions": {
+    "target": "ES2022", "experimentalDecorators": true, "useDefineForClassFields": false, "module": "ESNext",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"], "skipLibCheck": true, "types": ["vite/client"], "moduleResolution": "bundler",
+    "isolatedModules": true, "moduleDetection": "force", "allowJs": true, "jsx": "react-jsx", "allowImportingTsExtensions": true,
+    "noEmit": true, "baseUrl": ".", "paths": { "lucide-react": ["node_modules/lucide-react-lms"] }
+  },
+  "include": ["src/lms"],
+  "exclude": ["src/lms/kids/kidsData.test.ts"]
+}

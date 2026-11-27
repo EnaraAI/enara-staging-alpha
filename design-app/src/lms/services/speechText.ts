@@ -1,4 +1,3 @@
-// Copied from frontend/services/speechText.ts (itself a copy of backend/src/services/speechText.ts): keep the copies in step.
 // What the tutor's voice says: the reply without Markdown symbols, citation
 // markers or LaTeX, with simple maths turned into words. The same code as
 // backend/src/services/speechText.ts (the avatar's server-spoken sentences),

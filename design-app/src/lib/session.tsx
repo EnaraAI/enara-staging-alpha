@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { api, getDeviceToken, getToken, post, setDeviceToken, setToken, setUnauthorizedHandler } from './api';
+import { clearLmsSession } from '@/kids-lms/bridge';
 
 export type Role = 'student' | 'teacher' | 'admin' | 'academic_manager' | 'enara-admin' | 'parent';
 export interface SessionUser { id?: string; email: string; role: Role; name?: string; studentId?: string; institutionId?: string; uiMode?: 'kids' | 'adult' | string; lmsAccount?: boolean }
@@ -29,7 +30,8 @@ export function homeFor(u: SessionUser | null): string {
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<SessionUser | null>(null);
   const [ready, setReady] = useState(false);
-  const signOutLocal = useCallback(() => { setToken(null); setUser(null); }, []);
+  // Signing out also removes the token handed to the copied lms-test screens (src/kids-lms/bridge.ts).
+  const signOutLocal = useCallback(() => { setToken(null); clearLmsSession(); setUser(null); }, []);
 
   useEffect(() => {
     setUnauthorizedHandler(() => { signOutLocal(); window.location.hash = '#/login'; });

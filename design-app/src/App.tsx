@@ -1,14 +1,19 @@
-import { useEffect, useMemo, useState } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from 'react';
 import { PreviewContext, type Lang, type PreviewState } from '@/lib/preview';
 import { SessionProvider, homeFor, useSession, type Role } from '@/lib/session';
 import { SCREENS } from '@/screens/registry';
+import { getToken } from '@/lib/api';
+import { clearLmsSession, isKidsLearner, writeLmsSession } from '@/kids-lms/bridge';
+
+// #/kids and below: the lms-test kids app as it is (src/lms, copied by scripts/sync-lms-kids.mjs), in its own chunk.
+const KidsLms = lazy(() => import('@/kids-lms/KidsLms'));
 
 // Real routes (hash-based, so the static host needs no rewrites): #/login, #/student/chat, #/parent/fees …
-// Each route maps to one approved screen; an area is open only to its roles.
+// Each route maps to one approved screen; an area is open only to its roles. The kids area (#/kids…) is not a screen here:
+// it is the copied lms-test kids app with its own navigation (the new-design kids screens stay in screens/kids, unrouted).
 export const ROUTES: Record<string, string> = {
   '/login': 'login', '/parent-code': 'parent-code',
   '/student': 'student-home', '/student/chat': 'student-chat', '/student/avatar': 'student-avatar', '/student/assignment': 'student-assignment', '/student/results': 'student-results',
-  '/kids': 'kids-home', '/kids/lesson': 'kids-lesson', '/kids/chat': 'kids-chat', '/kids/reward': 'kids-reward',
   '/parent': 'parent-home', '/parent/progress': 'parent-progress', '/parent/fees': 'parent-fees', '/parent/bus': 'parent-bus', '/parent/attendance': 'parent-attendance', '/parent/chat': 'parent-chat',
   '/teacher': 'teacher-class', '/teacher/grading': 'teacher-grading', '/teacher/builder': 'teacher-builder', '/teacher/errors': 'teacher-errors',
   '/school': 'school-dashboard', '/school/imports': 'school-imports', '/school/announcements': 'school-announcements', '/school/requests': 'school-requests', '/school/sections': 'school-sections',
@@ -46,7 +51,7 @@ export default function App() { return <SessionProvider><Router /></SessionProvi
 function Router() {
   const [route, setRoute] = useState(parse);
   useEffect(() => { const on = () => setRoute(parse()); window.addEventListener('hashchange', on); return () => window.removeEventListener('hashchange', on); }, []);
-  const { user, ready } = useSession();
+  const { user, ready, logout } = useSession();
 
   // Where to go: signed out -> login (the parent code page stays open); signed in -> the role's own area only.
   const area = route.path.split('/')[1] ?? '';
@@ -57,20 +62,42 @@ function Router() {
     else if (user && AREA_ROLES[area] && !AREA_ROLES[area].includes(user.role)) path = homeFor(user);
     else if (user && area === 'kids' && user.uiMode !== 'kids') path = homeFor(user);
     else if (user && area === 'student' && user.uiMode === 'kids') path = homeFor(user);
-    else if (!ROUTES[path]) path = user ? homeFor(user) : '/login';
+    else if (!ROUTES[path] && area !== 'kids') path = user ? homeFor(user) : '/login';
   }
+  const kids = ready && path === route.path && area === 'kids' && isKidsLearner(user);
+  // Kids sign-out: end the design session, remove what the copied app keeps, and reload on the login page
+  // (a fresh page, so none of the kids app's styles stay behind).
+  const kidsSignOut = useCallback(async () => {
+    await logout();
+    clearLmsSession();
+    window.location.replace('#/login');
+    window.location.reload();
+  }, [logout]);
   useEffect(() => { if (ready && path !== route.path) window.location.replace('#' + path); }, [ready, path, route.path]);
 
   const screen = SCREENS.find((s) => s.id === ROUTES[path]) ?? SCREENS.find((s) => s.id === 'login')!;
   const state: PreviewState = useMemo(() => ({ lang: route.lang, theme: screen.theme, dark: route.dark }), [route.lang, route.dark, screen.theme]);
   useEffect(() => {
+    if (kids) return; // the kids app sets the page up as lms-test does
     const el = document.documentElement;
     el.lang = state.lang; el.dir = state.lang === 'ar' ? 'rtl' : 'ltr';
     el.dataset.theme = state.theme; el.classList.toggle('dark', state.dark);
     document.title = `${screen.title[state.lang]} · ENARA`;
-  }, [state, screen]);
+  }, [state, screen, kids]);
 
   if (!ready) return <div className="grid min-h-screen place-items-center text-sm text-muted-foreground">…</div>;
+  if (kids && user) {
+    // Sign-in bridge: the copied apiService reads the token and user from its own keys; hand them over before it mounts.
+    writeLmsSession(getToken() ?? '', user);
+    // #/kids?lang=ar|en opens the kids app in that language (it keeps its own choice, as on lms-test).
+    const lang = route.query.get('lang');
+    if (lang === 'ar' || lang === 'en') { try { localStorage.setItem('enara_kids_lang', lang); } catch { /* storage blocked */ } }
+    return (
+      <Suspense fallback={<div className="grid min-h-screen place-items-center text-sm text-muted-foreground">Loading…</div>}>
+        <KidsLms onSignOut={kidsSignOut} />
+      </Suspense>
+    );
+  }
   return (
     <PreviewContext.Provider value={state}>
       <screen.render />
