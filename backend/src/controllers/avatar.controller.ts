@@ -1,5 +1,5 @@
 import { engineV2 } from '../services/engineV2';
-import { expressivePersona, startExpressiveCall, type ExpressiveCall, type VoiceProfile } from '../services/liveExpressive';
+import { expressivePersona, planTurnCues, secondSentenceAt, startExpressiveCall, stripCueTags, type Cue, type CuePlan, type ExpressiveCall, type VoiceProfile } from '../services/liveExpressive';
 import { guardedEmitter } from '../services/guardedStream';
 import { guardSpokenMarker, spokenLines } from '../services/spokenInput';
 import { DEMO_LIMITS, isDemoSessionInstitution } from '../config/demo';
@@ -842,12 +842,37 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
   // it's clear whether it does.
   let head = '';
   let headDone = false;
-  const emit = (text: string) => {
+  const emitText = (text: string) => {
     if (!text) return;
     firstTextAt ??= Date.now();
     spoken += text;
     res.write(JSON.stringify({ content: text }) + '\n');
     if (inlineSpeech) for (const sentence of splitter.push(text)) sayInline(sentence);
+  };
+  // liveExpressive: the turn's cues, chosen by code from the engine's verdict (never by the model). Each is its own line
+  // ({"cue":"happy"}) before the words it applies to, so it is never spoken by ENARA's voice, captioned or stored; any
+  // cue tag the model wrote is removed from the text.
+  const cueCall = session.expressive?.on && session.expressive.cara4 ? session.expressive : undefined;
+  let cuePlan: CuePlan | null | undefined;
+  const writeCue = (cue: Cue) => res.write(JSON.stringify({ cue }) + '\n');
+  const emit = (raw: string) => {
+    let text = cueCall ? stripCueTags(raw) : raw;
+    if (!text) return;
+    if (cueCall && cuePlan === undefined) {
+      cuePlan = planTurnCues({ call: cueCall, kind, language: languagePrep?.context, marker: languageMarker, reply: text, learnerText: last?.content ?? '', drawing: visualStarted });
+      if (cuePlan) writeCue(cuePlan.first);
+    }
+    if (cuePlan?.then) {
+      // The second cue (stuck: concerned, then supportive) starts with the reply's second sentence.
+      const at = /[.!?؟]["')\]]*\s*$/.test(spoken) ? 0 : secondSentenceAt(text);
+      if (at >= 0) {
+        emitText(text.slice(0, at));
+        writeCue(cuePlan.then);
+        cuePlan = { first: cuePlan.first };
+        text = text.slice(at);
+      }
+    }
+    emitText(text);
   };
   try {
     const modelParams: Parameters<typeof streamDirectTutorModel>[0] = {

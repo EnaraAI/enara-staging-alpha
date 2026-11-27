@@ -218,3 +218,43 @@ describe('liveExpressive: Cara 4 and a baseline style by age band', () => {
     });
   });
 });
+
+describe('liveExpressive: cues by code', () => {
+  it('maps each verdict to its cue, calmer for children, and never a blocked cue', () => {
+    const turn = { kind: 'turn' as const };
+    expect(L.cuesForTurn({ ...turn, verdict: 'CORRECT' }, 'adult')).toEqual({ first: 'happy' });
+    expect(L.cuesForTurn({ ...turn, verdict: 'CORRECT_WITH_EQUIVALENT_FORMULATION', next: 'NEW_ITEM' }, 'teen')).toEqual({ first: 'happy', then: 'curious' });
+    expect(L.cuesForTurn({ ...turn, verdict: 'CORRECT' }, 'child')).toEqual({ first: 'warm' });
+    expect(L.cuesForTurn({ ...turn, verdict: 'INCORRECT' }, 'adult')).toEqual({ first: 'supportive' });
+    expect(L.cuesForTurn({ ...turn, verdict: 'PARTIALLY_CORRECT' }, 'child')).toEqual({ first: 'supportive' });
+    expect(L.cuesForTurn({ ...turn, verdict: 'NOT_EVALUATED', next: 'NEW_ITEM' }, 'adult')).toEqual({ first: 'curious' });
+    expect(L.cuesForTurn({ ...turn, stuck: true, verdict: 'INCORRECT' }, 'adult')).toEqual({ first: 'concerned', then: 'supportive' });
+    expect(L.cuesForTurn({ ...turn, drawing: true }, 'adult')).toEqual({ first: 'curious' });
+    expect(L.cuesForTurn({ ...turn, verdict: 'NOT_EVALUATED', next: 'NONE' }, 'adult')).toBeNull();
+    expect(L.cuesForTurn({ kind: 'opening' }, 'adult')).toEqual({ first: 'warm' });
+    expect(L.cuesForTurn({ kind: 'nudge' }, 'child')).toEqual({ first: 'supportive' });
+    const every = ['CORRECT', 'INCORRECT', 'PARTIALLY_CORRECT', 'NOT_EVALUATED', 'AMBIGUOUS', undefined].flatMap((verdict) => ['adult', 'teen', 'child'].flatMap((band) =>
+      [true, false].map((stuck) => L.cuesForTurn({ kind: 'turn', verdict, stuck, next: 'NEW_ITEM' }, band as 'adult'))));
+    for (const plan of every) for (const cue of [plan?.first, plan?.then].filter(Boolean)) expect(L.ALLOWED_CUES).toContain(cue);
+  });
+
+  it('stuck: "I don\'t know", a hint request, confusion, "why" after a try, or a third failed try on one item', () => {
+    expect(L.stuckFromSignals({ learnerResponse: 'dont_know' })).toBe(true);
+    expect(L.stuckFromSignals({ learnerResponse: 'hint_request' })).toBe(true);
+    expect(L.stuckFromSignals({ learnerResponse: 'confusion' })).toBe(true);
+    expect(L.stuckFromSignals({ learnerResponse: 'answer', whyAfterAttempt: true })).toBe(true);
+    expect(L.stuckFromSignals({ learnerResponse: 'answer', learning: { attemptsOnItem: 2 } }, 'INCORRECT')).toBe(true);
+    expect(L.stuckFromSignals({ learnerResponse: 'answer', learning: { attemptsOnItem: 1 } }, 'INCORRECT')).toBe(false);
+    expect(L.stuckFromSignals({ learnerResponse: 'answer', learning: { attemptsOnItem: 3 } }, 'CORRECT')).toBe(false);
+  });
+
+  it('removes only cue tags from text', () => {
+    expect(L.stripCueTags('[happy] Well done!')).toBe('Well done!');
+    expect(L.stripCueTags('Good. [Curious] What next?')).toBe('Good. What next?');
+    expect(L.stripCueTags('He [laughs harder] said it [sad].')).toBe('He said it.');
+    expect(L.stripCueTags('Choose [a] or [an].')).toBe('Choose [a] or [an].');
+    expect(L.stripCueTags('No tags')).toBe('No tags');
+    expect(L.secondSentenceAt('That is fine. Now try again.')).toBe(14);
+    expect(L.secondSentenceAt('Only one sentence.')).toBe(-1);
+  });
+});
