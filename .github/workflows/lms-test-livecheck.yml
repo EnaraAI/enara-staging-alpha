@@ -1,0 +1,70 @@
+# Live tutor quick fixes (mute, captions, time used): one short scripted live call per feature on lms-test.enara.app
+# ONLY, after each feature's deploy (owner: a few cents per call, at most 3 calls in total; deploy/lms-test/livecheck).
+# Reuses the avatar cost harness (branch claude/tutor-lms-avatarcost-run). test.enara.app is frozen: never called.
+# Secrets are never printed. The calls to run are named in deploy/lms-test/livecheck/plan.json (run.ids).
+name: lms-test live tutor check
+on:
+  push:
+    branches: ['claude/lms-live-check']
+    paths: ['deploy/lms-test/livecheck/**', '.github/workflows/lms-test-livecheck.yml']
+permissions:
+  contents: read
+concurrency:
+  group: lms-test-livecheck
+  cancel-in-progress: false
+jobs:
+  run:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: deploy/lms-test/livecheck
+    env:
+      LC_OUT: ${{ github.workspace }}/lc-out
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Nothing to run?
+        id: plan
+        run: echo "ids=$(node -e "console.log(require('./plan.json').run.ids.join(' '))")" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-python@v5
+        if: steps.plan.outputs.ids != ''
+        with:
+          python-version: '3.12'
+      - name: Synthetic learner audio (Piper TTS)
+        if: steps.plan.outputs.ids != ''
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg >/dev/null
+          pip install -q piper-tts==1.8.0
+          mkdir -p voices
+          for m in $(python -c "import json;p=json.load(open('plan.json'));print(' '.join(sorted({v['model'] for v in p['voices'].values()})))"); do
+            b=$(basename "$m")
+            curl -sfL -o "voices/$b.onnx" "https://huggingface.co/rhasspy/piper-voices/resolve/main/$m.onnx"
+            curl -sfL -o "voices/$b.onnx.json" "https://huggingface.co/rhasspy/piper-voices/resolve/main/$m.onnx.json"
+          done
+          python tts.py plan.json voices "$LC_OUT/audio" ${{ steps.plan.outputs.ids }}
+      - name: Browser, Anam SDK and ENARA's caption cleaner
+        if: steps.plan.outputs.ids != ''
+        run: |
+          npm init -y >/dev/null
+          npm i --no-save --no-audit --no-fund playwright@1.49.1 @anam-ai/js-sdk@4.29.1 esbuild@0.24.2
+          npx playwright install --with-deps chrome
+          mkdir -p "$LC_OUT"
+          npx esbuild ../../../frontend/services/speechText.ts --bundle --format=iife --global-name=enaraSpeech --outfile="$LC_OUT/speechText.js"
+      - name: Calls
+        if: steps.plan.outputs.ids != ''
+        env:
+          LMSTEST_MAINTENANCE_TOKEN: ${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}
+        run: node run.mjs calls "$LC_OUT/audio"
+      - name: Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: livecheck-${{ github.run_id }}
+          path: ${{ github.workspace }}/lc-out
+          retention-days: 14
