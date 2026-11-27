@@ -1,26 +1,9 @@
 {
  "$comment": "Expressive-avatar screenshots on lms-test only (owner, 27 Nov 2026). 'mode' dry = sign in and open the live call screen, no call; calls = run 'run' below. Hard cap: 6 real calls in total (callsUsed counts them; raise it with every run).",
- "mode": "calls",
+ "mode": "dry",
  "callsUsed": 4,
  "maxCalls": 6,
- "run": [
-  {
-   "who": "adult",
-   "expressive": "on"
-  },
-  {
-   "who": "child",
-   "expressive": "on"
-  },
-  {
-   "who": "adult",
-   "expressive": "off"
-  },
-  {
-   "who": "child",
-   "expressive": "off"
-  }
- ],
+ "run": [],
  "learners": {
   "adult": {
    "email": "hassan.shaker@school.enara.app",
@@ -50,16 +33,14 @@
    "subject": "maths"
   }
  },
- "dryCheck": [
-  "menna.osman@school.enara.app"
- ],
+ "dryCheck": [],
  "admin": "mariam.shawky@school.enara.app",
  "$runs": [
   "run 1 (17:18 UTC): adult off, child off - did not reach the call (lms-test slow), no call made: 0 calls",
-  "run 2: adult on/off, child on/off, English (calls 1-4)"
+  "run 2: adult on/off, child on/off, English (calls 1-4)",
+  "run 2 (17:34-17:51 UTC): 4 calls made (adult on/off, child on/off); Anam Free plan: 3-minute sessions, 30 minutes a period, now used up"
  ],
  "voiceProbe": [
-  "arabic",
   "english"
  ]
 }

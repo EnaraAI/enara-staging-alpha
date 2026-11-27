@@ -1,6 +1,7 @@
 # Expressive avatar (live tutor item 5): screenshots of the live tutor's face for the owner, on lms-test.enara.app ONLY
 # (deploy/lms-test/expressive). Runs on a push to the run branch below that changes the harness or its plan.json.
-# plan.json mode "dry": sign-ins and the call screen only (no call); mode "calls": the real calls listed in plan.json run
+# plan.json mode "dry": sign-ins and the call screen only (no call); mode "calls": the real calls listed in plan.json run;
+# mode "sim": the 5-learner simulation on the text path (sim.mjs; no video, no paid voice)
 # (hard cap 6 calls in total, counted in plan.json). The PNGs and INDEX.md are added to the branch live-expressive-shots
 # (a normal commit on top, never a force-push). test.enara.app is frozen: never called. Secrets are never printed.
 name: lms-test expressive avatar screenshots
@@ -52,6 +53,13 @@ jobs:
           SEED_USER_PASSWORD: ${{ secrets.SEED_USER_PASSWORD }}
           LMSTEST_MAINTENANCE_TOKEN: ${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}
         run: node shots.mjs
+      - name: "Simulation on the text path (plan.json mode sim, DeepSeek on lms-test, no video)"
+        if: always()
+        env:
+          SEED_USER_PASSWORD: ${{ secrets.SEED_USER_PASSWORD }}
+          LMSTEST_MAINTENANCE_TOKEN: ${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}
+        run: |
+          if grep -q '"mode": "sim"' plan.json; then node sim.mjs; else echo "not a simulation run"; fi
       - name: What the tutor said (its own audio, to check no cue word is spoken)
         if: always()
         run: |

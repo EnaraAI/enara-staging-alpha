@@ -105,6 +105,7 @@ export function mathsAnswers(question) {
 
 // ---------- the in-page fake microphone, remote-audio recorder and frame grabber (added before the app loads)
 const INIT = () => {
+  if (window.top !== window) return; // the page only, never the sandboxed drawing frame
   const ctx = new AudioContext({ sampleRate: 48000 });
   const dest = ctx.createMediaStreamDestination();
   const noise = ctx.createBufferSource();
@@ -151,6 +152,19 @@ const INIT = () => {
     if (!rec) return resolve(null);
     rec.onstop = async () => { const b = new Blob(chunks, { type: 'audio/webm' }); const buf = new Uint8Array(await b.arrayBuffer()); let s = ''; for (let i = 0; i < buf.length; i += 0x8000) s += String.fromCharCode(...buf.subarray(i, i + 0x8000)); resolve(btoa(s)); };
     rec.stop(); rec = null;
+  });
+  // A ~3 s clip of the avatar (its video and voice) for each moment.
+  window.__clip = (ms) => new Promise((resolve) => {
+    const v = document.getElementById('enara-anam-video');
+    if (!v || !v.captureStream) return resolve(null);
+    const tracks = [...v.captureStream().getVideoTracks(), ...window.__remoteAudio.filter((t) => t.readyState === 'live').slice(-1)];
+    if (!tracks.length) return resolve(null);
+    const parts = [];
+    const r = new MediaRecorder(new MediaStream(tracks), { mimeType: 'video/webm', videoBitsPerSecond: 600_000 });
+    r.ondataavailable = (e) => parts.push(e.data);
+    r.onstop = async () => { const b = new Blob(parts, { type: 'video/webm' }); const buf = new Uint8Array(await b.arrayBuffer()); let s = ''; for (let i = 0; i < buf.length; i += 0x8000) s += String.fromCharCode(...buf.subarray(i, i + 0x8000)); resolve(btoa(s)); };
+    r.start(250);
+    setTimeout(() => r.stop(), ms);
   });
   window.__grabFrame = () => {
     const v = document.getElementById('enara-anam-video');
@@ -262,7 +276,8 @@ async function oneCall(browser, spec) {
   await site('/api/auth/tour/complete', { method: 'POST', headers: { Authorization: `Bearer ${auth.token}` } }).catch(() => undefined);
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1, permissions: ['microphone'] });
   await context.addInitScript(([token, user]) => {
-    for (const store of [localStorage, sessionStorage]) { try { store.setItem('enara_token', token); store.setItem('enara_user', JSON.stringify({ ...user, tourPending: false })); store.setItem('enara_ui_role', 'student'); } catch { /* blocked */ } }
+    if (window.top !== window) return; // never inside the sandboxed drawing frame (no storage there)
+    try { for (const store of [localStorage, sessionStorage]) { store.setItem('enara_token', token); store.setItem('enara_user', JSON.stringify({ ...user, tourPending: false })); store.setItem('enara_ui_role', 'student'); } } catch { /* blocked */ }
   }, [auth.token, auth.user]);
   await context.addInitScript(INIT);
   const page = await context.newPage();
@@ -306,8 +321,11 @@ async function oneCall(browser, spec) {
       const started = await page.waitForFunction((prev) => { const el = document.querySelector('[data-testid="live-avatar-frame"]'); return el && el.dataset.personaTurn && el.dataset.personaTurn !== prev; }, before.persona, { timeout: 30_000 }).then(() => true, () => false);
       turn.started = started;
       await page.evaluate(() => window.__recStart()).catch(() => false);
+      // The clip starts with the reply (the cue) and runs ~3 s; the frame is taken 1 s in.
+      const clip = page.evaluate(() => window.__clip(3000)).catch(() => null);
       await sleep(1000);
       await saveFrame(page, `${who}--${m.id}--${expressive}`);
+      clip.then((b64) => { if (b64) writeFileSync(join(OUT, 'shots', `${who}--${m.id}--${expressive}.webm`), Buffer.from(b64, 'base64')); });
       turn.cueSent = await frame.getAttribute('data-cue-sent').catch(() => null);
       turn.cueApplied = await frame.getAttribute('data-cue-applied').catch(() => null);
       turn.personaCue = await frame.getAttribute('data-persona-turn').catch(() => null);
@@ -321,7 +339,9 @@ async function oneCall(browser, spec) {
         await saveFrame(page, `${who}--${m.id}-then--${expressive}`);
         turn.secondCueApplied = second;
       }
-      await page.waitForFunction((prev) => { const el = document.querySelector('[data-testid="live-avatar-frame"]'); return el && el.dataset.personaDone && el.dataset.personaDone !== prev; }, before.done, { timeout: 30_000 }).catch(() => undefined);
+      await page.waitForFunction((prev) => { const el = document.querySelector('[data-testid="live-avatar-frame"]'); return el && el.dataset.personaDone && el.dataset.personaDone !== prev; }, before.done, { timeout: 20_000 }).catch(() => undefined);
+      // The reply's text arrives when its stream ends (Anam's 3-minute session cap leaves no time to spare).
+      for (let w = 0; w < 10 && replies.length <= before.replies; w++) await sleep(500);
       const audio = await page.evaluate(() => window.__recStop()).catch(() => null);
       if (audio) writeFileSync(join(OUT, 'audio', `${who}--${m.id}--${expressive}.webm`), Buffer.from(audio, 'base64'));
       const reply = replies.slice(before.replies).at(-1);
@@ -329,7 +349,7 @@ async function oneCall(browser, spec) {
       if (reply?.text) lastQuestion = reply.text;
       result.turns.push(turn);
       log(`  ${tag} ${m.id}: said "${text}" cues=${JSON.stringify(turn.cues)} applied=${turn.cueApplied} reply="${(turn.reply ?? '').slice(0, 100)}"`);
-      await sleep(800);
+      await sleep(300);
     }
   } catch (e) {
     result.errors.push(`harness ${mask(e?.message ?? e).slice(0, 200)}`);
@@ -379,6 +399,7 @@ async function dry(browser) {
 }
 
 async function main() {
+  if (plan.mode === 'sim') { log('mode sim: no browser (sim.mjs runs instead)'); return; }
   if (!PW) throw new Error('SEED_USER_PASSWORD is not set');
   if (!CI_TOKEN) throw new Error('LMSTEST_MAINTENANCE_TOKEN is not set');
   const { chromium } = await import('playwright');
