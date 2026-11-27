@@ -40,7 +40,8 @@ export interface RolePlayTag {
   err?: string;
   /** How the learner got in: asked, or accepted an offer. */
   via?: 'ask' | 'offer';
-  help?: 'hint' | 'model';
+  /** hint / model: help after a failed try; retry: a wrong computed answer, the learner tries again first (owner decision 27 Nov 2026). */
+  help?: 'hint' | 'model' | 'retry';
   /** debrief: the scene's last line, said in character first (the last beat flows into the debrief instead of a bare "goodbye"). */
   closing?: boolean;
 }
@@ -367,6 +368,9 @@ export async function rolePlayStep(i: StepInput): Promise<RolePlayTurn | undefin
       // second failed try on this beat: the line is said for them and the scene moves on (a change of method, never a third same try)
       return n + 1 >= scene.beats.length ? { ...base, phase: 'debrief', help: 'model', beat: n, closing: true } : { ...base, phase: 'beat', beat: n + 1, tries: 0, help: 'model' };
     }
+    // A wrong computed answer (owner decision 27 Nov 2026): the learner tries again first. The character gives one in-scene nudge and asks
+    // again, without the answer; only after a second genuine wrong try does the character correct it, in character, and the scene goes on.
+    if (error?.code === 'wrong_number' && !(last.tries ?? 0)) return { ...base, phase: 'beat', beat: n, tries: 1, help: 'retry' };
     // The last beat (the character's goodbye) is said at the start of the debrief reply.
     return n + 1 >= scene.beats.length ? { ...base, phase: 'debrief', closing: true } : { ...base, phase: 'beat', beat: n + 1, tries: 0 };
   }
@@ -413,7 +417,8 @@ const labels = (lang: LessonLang) => (lang === 'ar' ? { rule: 'القاعدة', 
 function recastLine(t: RolePlayTurn, s: RolePlayScene): string {
   const who = tx(s.character, t.lang ?? 'en');
   const e = t.error;
-  if (e?.code === 'wrong_number') return `Their answer has a wrong number: they said ${q(e.evidence)}, the right answer is ${q(e.expected ?? '')}. In character, say the right amount naturally with the short working (a recast, for example "Let me check: 100 minus 56... that is 44 pounds."). Do not call their answer right, correct or good (no "yes", "right", "صحيح", "أحسنت" before it), never say "wrong" or "mistake", and do not ask them to calculate it again.`;
+  if (e?.code === 'wrong_number' && t.help === 'retry') return `Their answer has a wrong number: they said ${q(e.evidence)}. Let them try again first: do NOT give the right answer or any number that is the answer. In character, give ONE short nudge or hint (remind them of the numbers or the step, for example "Three bags at 12 pounds each... how much is that?") and ask your question again. Do not call their answer right, correct or good, and never say "wrong" or "mistake".`;
+  if (e?.code === 'wrong_number') return `Their answer is wrong again: they said ${q(e.evidence)}, the right answer is ${q(e.expected ?? '')}. Now correct it. In character, say the right amount naturally with the short working (a recast, for example "Let me check: 100 minus 56... that is 44 pounds."). Do not call their answer right, correct or good (no "yes", "right", "صحيح", "أحسنت" before it), never say "wrong" or "mistake", and do not ask them to calculate it again.`;
   if (e?.code === 'idea_missing') return `Their answer may miss the key idea (a right answer mentions something like: ${q(e.expected ?? '')}). If what they said is wrong, say the right idea in character in a few words, kindly; if it is right in other words, accept it and go on. Never say "wrong".`;
   if (e) return `Their last message has a small error (${ERROR_LABEL[e.code] ?? e.code.replace(/_/g, ' ')}: "${q(e.evidence)}"). Before your line, say that part back correctly once, the way ${who} naturally would in the conversation (a recast: echo their words in the right form). No grammar explanation, never say "wrong" or "mistake", at most one correction.`;
   if (s.subject === 'english') return 'If their last message has an error in grammar, a word form or a missing small word (for example "I goed", "He go", "I have banana"), say that part back correctly once inside your line, the way the character naturally would (a recast: "Oh, you went to the beach!"). Never repeat a wrong form as if it were right, never call it right, and never explain it.';
@@ -499,7 +504,8 @@ export function sceneReplyProblems(t: RolePlayTurn, reply: string): string[] {
   if (words.length > maxWords) out.push(`too long (${words.length} words, at most ${maxWords})`);
   if (t.child && sentencesOf(reply).length > 4) out.push('more than 3 short sentences for a child');
   const content = wordsOf(tx(beat.say, lang), lang).filter((w) => w.length >= 4 && !STOP_WORDS.has(w));
-  if (content.length && !content.some((w) => words.includes(w) || words.some((x) => x.startsWith(w.slice(0, 5)))) && !(t.help === 'hint')) out.push('does not voice the scene line');
+  if (content.length && !content.some((w) => words.includes(w) || words.some((x) => x.startsWith(w.slice(0, 5)))) && !(t.help === 'hint' || t.help === 'retry')) out.push('does not voice the scene line');
+  if (t.help === 'retry' && t.error?.expected && numbersIn(reply).includes(Number(t.error.expected))) out.push('gives away the answer before their second try');
   if (t.child && lang === 'en') {
     const list = childWords();
     const off = [...new Set(words.filter((w) => !/^\d+$/.test(w) && !inList(w, list) && !own.has(w)))];
@@ -508,7 +514,7 @@ export function sceneReplyProblems(t: RolePlayTurn, reply: string): string[] {
   return out;
 }
 /** Problems that make a reply unusable (the beat's fixed line is used if the regeneration still has one); the others only ask for the regeneration. */
-const HARD = /^(asks for personal details|Arabic in an English scene|English in an Arabic scene|a lesson task inside the scene|words a young learner may not know)/;
+const HARD = /^(gives away the answer before their second try|asks for personal details|Arabic in an English scene|English in an Arabic scene|a lesson task inside the scene|words a young learner may not know)/;
 export const hardSceneProblems = (t: RolePlayTurn, reply: string): string[] => sceneReplyProblems(t, reply).filter((p) => HARD.test(p));
 /** The note added to the one regeneration. */
 export const SCENE_REGEN_NOTE = (problems: string[]) => `Your last draft left the role-play scene (${problems.join('; ')}). Write the reply again: only the scene line in character, as the role-play instruction says.`;
