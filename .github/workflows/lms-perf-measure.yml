@@ -1,0 +1,51 @@
+# lms-test speed, MEASURE ONLY (owner, 27 Nov 2026: "measure first, then fix"). Runs deploy/lms-test/perf/measure.mjs
+# against https://lms-test.enara.app and https://design.enara.app: Lighthouse per role (mobile, desktop), the API calls
+# each page makes, p50/p95 per endpoint (at most 2 requests in flight, spaced), model time to first token (DeepSeek on
+# Modal only; no live avatar call), and the first request after idle. Changes nothing, deploys nothing. Waits while an
+# lms-test deploy is running. test.enara.app is never called. Secrets are never printed.
+# Results: orphan branch lms-perf-results (overwritten each run) and the run's artifact.
+name: lms-test perf measure
+on:
+  push:
+    branches: ['claude/lms-perf-measure']
+    paths: ['deploy/lms-test/perf/**', '.github/workflows/lms-perf-measure.yml']
+  workflow_dispatch:
+permissions:
+  contents: write  # only to publish results to the orphan branch lms-perf-results
+  actions: read    # to see whether an lms-test deploy is running
+concurrency:
+  group: lms-perf-measure
+  cancel-in-progress: false
+jobs:
+  measure:
+    if: github.repository == 'EnaraAI/enara-staging-alpha'
+    runs-on: ubuntu-latest
+    container: { image: 'mcr.microsoft.com/playwright:v1.56.1-noble' }  # browsers included
+    timeout-minutes: 150
+    defaults: { run: { working-directory: deploy/lms-test/perf } }
+    env:
+      OUT: ${{ github.workspace }}/perf-out/
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm init -y >/dev/null && npm i --no-save --no-audit --no-fund lighthouse@12.8.2 playwright@1.56.1
+      - name: Measure (lms-test and design.enara.app)
+        env:
+          SEED_USER_PASSWORD: ${{ secrets.SEED_USER_PASSWORD }}
+          LMSTEST_MAINTENANCE_TOKEN: ${{ secrets.LMSTEST_MAINTENANCE_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
+          PHASES: ${{ vars.LMS_PERF_PHASES || 'env,public,login,pages,api,model,cold' }}
+        run: node measure.mjs
+      - name: Publish results (orphan branch lms-perf-results, overwritten each run)
+        if: always()
+        working-directory: ${{ github.workspace }}/perf-out
+        shell: bash
+        run: |
+          git init -q && git checkout -q -b r && git config user.name github-actions && git config user.email github-actions@users.noreply.github.com
+          git add -A && git commit -qm "lms perf measure ${GITHUB_SHA::8} run ${GITHUB_RUN_ID}" && git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" "r:lms-perf-results"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: lms-perf-results, path: perf-out, retention-days: 14 }
