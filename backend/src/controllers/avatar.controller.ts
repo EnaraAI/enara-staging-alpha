@@ -9,6 +9,7 @@ import { SentenceSplitter } from '../services/sentenceSplitter';
 import { stripMarkdownForSpeech } from '../services/speechText';
 import { avatarSpeakingOn, avatarSpeakingUsesAnamVoice, isWavClip, LATENCY_KEEP, MAX_CLIP_BYTES, pronunciationReady, PRONUNCIATION_NOTE_LINE, SPEAKING_PRACTICE_LINE } from '../services/avatarSpeaking';
 import { assessPronunciation } from '../services/pronunciation';
+import { SUBJECT_GRADE_LINE } from '../services/subjectPractice';
 import { ageFromBirthDate } from '../services/languageTeachingContext';
 import { Student } from '../models/Student';
 import { TutorSession } from '../models/TutorSession';
@@ -880,13 +881,23 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
       curriculum,
       mode: 'voice',
       learner: learner ? describeSnapshot(learner) : undefined,
-      pedagogy: arbitratePedagogy([plan?.prompt, policyRule(tutorPolicy.policy)].filter(Boolean).join('\n\n') || undefined, Boolean(languagePrep)),
+      // liveExpressive, every other subject: the reply opens with the hidden grading line, so its cue follows the verdict.
+      pedagogy: arbitratePedagogy([plan?.prompt, policyRule(tutorPolicy.policy), cueCall && !languagePrep ? SUBJECT_GRADE_LINE : undefined].filter(Boolean).join('\n\n') || undefined, Boolean(languagePrep)),
       planActive: Boolean(plan),
       ...(languagePrep?.parts ? { languageContextStable: languagePrep.parts.stable, languageContextDynamic: `${languagePrep.parts.dynamic}${speakingLines}${heardLines}` } : { languageContext: languagePrep?.prompt ? `${languagePrep.prompt}${speakingLines}${heardLines}` : languagePrep?.prompt }),
     });
     // Language course: buffer the reply so the shared guards and marker handling run BEFORE anything is spoken or shown (same guarantees as the text chat).
     async function* chunks(): AsyncGenerator<string> {
-      if (!languagePrep) { yield* modelStream; return; }
+      if (!languagePrep && !cueCall) { yield* modelStream; return; }
+      if (!languagePrep) { // liveExpressive, another subject: still streamed; the hidden line is read and removed first
+        const filter = new AssessmentMarkerFilter();
+        let seen = '';
+        for await (const d of modelStream) { if (closed) break; const v = filter.push(d); if (!v) continue; seen += v; languageMarker ??= filterSummary(filter, seen); yield v; }
+        const tail = filter.end();
+        languageMarker ??= filterSummary(filter, seen + tail);
+        if (tail) yield tail;
+        return;
+      }
       if (engineV2('avatarSentences')) { // speed step 6: speak each sentence once the guards keep it (guardedStream.ts)
         const filter = new AssessmentMarkerFilter();
         const em = guardedEmitter((t) => applyReplyGuards(languagePrep.context, t, last?.content ?? ''));
