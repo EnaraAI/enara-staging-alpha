@@ -9,9 +9,9 @@ _Waiting for your "go". Nothing here is built or deployed yet. test.enara.app st
 - **Accounts:** the seed accounts. The password stays the shared `SEED_USER_PASSWORD`, never in chat.
 
 ## Steps only you can do (I'll give exact clicks when we get there)
-1. **Tell me where enara.app's DNS is hosted:** Cloudflare, Vercel, or the registrar. The setup depends on it:
-   - **If enara.app is on Cloudflare** (best): a Workers static-assets app with a custom domain. Cloudflare adds the DNS record itself. The password gate is **Cloudflare Access** (Zero Trust → Access → Application `design.enara.app`): you choose who gets in and set it yourself, with no password in code.
-   - **If not:** Cloudflare Pages. You add one record where your DNS lives: `design  CNAME  enara-design.pages.dev`. The gate is basic auth inside the app, with the password stored as a Pages secret that you type into the Cloudflare dashboard yourself.
+1. **DNS: checked on 27 Nov.** enara.app is on Cloudflare (nameservers `cheryl.ns.cloudflare.com` and `clint.ns.cloudflare.com`). Today's records are DNS-only and point to Vercel: lms-test, test, www and the apex. `design.enara.app` does not exist yet.
+   - **So:** a Workers static-assets app with a **custom domain** `design.enara.app`. Cloudflare creates that DNS record when the domain is attached; no other record changes.
+   - **Password gate:** **Cloudflare Access** (Zero Trust → Access → Applications → add `design.enara.app`). You choose who gets in (for example, your email with a one-time code) and set it yourself; there's no password in code. Basic auth stays the fallback if you'd rather not use Access.
 2. **Give CI deploy access to Cloudflare:** an API token limited to Workers/Pages edit on one account. Save it as GitHub secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in a GitHub **Environment** "design" that needs your approval to run. This follows the security audit's C1 lesson: no deploy key reachable from a plain branch push.
 3. **Relay Worker:** tell me who deploys it today. Its allow list is in code (`relay/worker.js`); I'll prepare the one-line change, and it deploys like the relay does now, or through the same Environment.
 4. **The Playwright checks need to pass the password gate:**
@@ -59,6 +59,6 @@ From the API inventory, most screens already have their endpoints:
 
 ## Your decisions
 1. "go" on this plan.
-2. Where enara.app's DNS is hosted, and whether you want Access or basic auth.
+2. ~~Where enara.app's DNS is hosted~~: Cloudflare (checked). Access or basic auth? (I recommend Access.)
 3. L1: should the pipeline set CORS, or will you set it in Vercel?
 4. Who deploys the relay Worker today?
