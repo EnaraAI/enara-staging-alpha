@@ -56,6 +56,8 @@ export interface IAvatarSession extends Document {
   // avatarSpeaking: the last pronunciation feedback (summary and focus words only; the audio is never stored) and recent reply latencies (ms).
   lastPronunciation?: { summary: string; words: string[]; at: Date };
   latencyMs?: number[];
+  // liveExpressive: the call's Director Notes band, and whether Anam took Cara 4.1 Express (false: today's call).
+  expressive?: { on: boolean; band?: 'adult' | 'teen' | 'child'; cara4?: boolean };
   createdAt: Date;
 }
 
@@ -93,6 +95,7 @@ const avatarSessionSchema = new Schema<IAvatarSession>(
     retentionExpiresAt: Date,
     lastPronunciation: { type: new Schema({ summary: String, words: [String], at: Date }, { _id: false }), default: undefined },
     latencyMs: { type: [Number], default: undefined },
+    expressive: { type: new Schema({ on: Boolean, band: { type: String, enum: ['adult', 'teen', 'child'] }, cara4: Boolean }, { _id: false }), default: undefined },
   },
   { timestamps: true }
 );

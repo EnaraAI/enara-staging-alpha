@@ -18,9 +18,17 @@ export interface AvatarChoice {
 const LIST_TTL_MS = 60 * 60 * 1000;
 let cached: { at: number; avatars: AvatarChoice[] } | undefined;
 const imageSources = new Map<string, string>();
+// The provider's model versions each face offers (liveExpressive: Cara 4.1 Express), server-side only.
+const versionsOf = new Map<string, string[]>();
 
 export function faceImageUrl(avatarId: string): string {
   return `/api/tutor-faces/image/${encodeURIComponent(avatarId)}`;
+}
+
+/** The model versions a face offers (never sent to the browser); empty when unknown. */
+export async function faceVersions(avatarId: string): Promise<string[]> {
+  if (!versionsOf.has(avatarId)) await listAvatarChoices();
+  return versionsOf.get(avatarId) ?? [];
 }
 
 // The provider's picture for a face, for the image route only.
@@ -54,6 +62,7 @@ export async function listAvatarChoices(): Promise<AvatarChoice[]> {
     for (const a of body.data || []) {
       const source = (a.portraitImageUrl || a.imageUrl) as string | undefined;
       if (source) imageSources.set(String(a.id), source);
+      if (Array.isArray(a.availableVersions)) versionsOf.set(String(a.id), a.availableVersions.map(String));
       avatars.push({
         id: String(a.id),
         name: String(a.displayName || 'Tutor'),
