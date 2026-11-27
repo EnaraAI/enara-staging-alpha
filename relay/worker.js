@@ -11,7 +11,7 @@
 // Live video and audio (WebRTC) still flow directly between the browser and
 // the video provider's media servers.
 
-const ALLOWED_ORIGIN = /^(https:\/\/test\.enara\.app|https:\/\/enara-staging-alpha(-[a-z0-9]+)?(-[a-z0-9-]+)?\.vercel\.app|http:\/\/localhost:\d+)$/;
+const ALLOWED_ORIGIN = /^(https:\/\/test\.enara\.app|https:\/\/design\.enara\.app|https:\/\/enara-staging-alpha(-[a-z0-9]+)?(-[a-z0-9-]+)?\.vercel\.app|http:\/\/localhost:\d+)$/;
 const VIDEO_HOST = (host) => host === 'anam.ai' || host.endsWith('.anam.ai');
 const STT_ORIGIN = 'https://api.elevenlabs.io';
 // Upstream headers that would name the provider in the browser.
