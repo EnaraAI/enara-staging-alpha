@@ -21,9 +21,26 @@ export const getDashboard = asyncHandler(async (req: AuthRequest, res: Response)
   const student = await getStudentOrThrow(studentId);
   const instances = await getEnrolledInstances(studentId);
 
-  const courses = await Promise.all(
-    instances.map(async (instance) => buildCourseTree(studentId, instance.courseId))
-  );
+  // lms-speed-5: the course trees and the three lists below are read at the same time, not one after another.
+  const [courses, recentResults, recentTutor, upcomingAssessments] = await Promise.all([
+    Promise.all(instances.map(async (instance) => buildCourseTree(studentId, instance.courseId))),
+    AssessmentAttempt.find({ studentId, status: 'submitted' })
+      .sort({ submittedAt: -1 })
+      .limit(5)
+      .select('assessmentTitle score submittedAt')
+      .lean(),
+    // Only the fields shown (a session may still hold legacy embedded messages).
+    TutorSession.find({ studentId }).sort({ lastMessageAt: -1 }).limit(3).select('title lastMessageAt').lean(),
+    studentGroupIds(student, 'student_app').then((groups) =>
+      Assessment.find({
+        ...(student.institutionId ? { institutionId: student.institutionId } : {}),
+        $or: [{ studentId }, ...groupClause(groups)],
+        status: { $in: ['upcoming', 'active', 'pending'] },
+      })
+        .sort({ dueDate: 1 })
+        .limit(5),
+    ),
+  ]);
 
   const activeCourse =
     courses.find((c) => c.progressPct > 0 && c.progressPct < 100) || courses[0] || null;
@@ -56,17 +73,6 @@ export const getDashboard = asyncHandler(async (req: AuthRequest, res: Response)
       lessonsCount: m.lessonsCount,
     })) || [];
 
-  const recentResults = await AssessmentAttempt.find({
-    studentId,
-    status: 'submitted',
-  })
-    .sort({ submittedAt: -1 })
-    .limit(5);
-
-  const recentTutor = await TutorSession.find({ studentId })
-    .sort({ lastMessageAt: -1 })
-    .limit(3);
-
   const recentActivity = [
     ...recentResults.map((r) => ({
       title: r.assessmentTitle,
@@ -83,14 +89,6 @@ export const getDashboard = asyncHandler(async (req: AuthRequest, res: Response)
   ]
     .sort((a, b) => new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime())
     .slice(0, 8);
-
-  const upcomingAssessments = await Assessment.find({
-    ...(student.institutionId ? { institutionId: student.institutionId } : {}),
-    $or: [{ studentId }, ...groupClause(await studentGroupIds(student, 'student_app'))],
-    status: { $in: ['upcoming', 'active', 'pending'] },
-  })
-    .sort({ dueDate: 1 })
-    .limit(5);
 
   res.json({
     student: ownStudentView(toPlainObject(student)),
