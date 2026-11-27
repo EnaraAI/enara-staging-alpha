@@ -403,7 +403,7 @@ async function prepareTutorTurn(req: AuthRequest): Promise<TutorTurn> {
       history,
       teachingMethod: method,
       curriculum,
-      pedagogy: arbitratePedagogy([turn.plan?.prompt, ...extraRules, turn.subjectGrading ? SUBJECT_GRADE_LINE : undefined, turn.outOfScope ? OUT_OF_SCOPE_LINE : undefined, turn.injection === 'learner' ? INJECTION_NOTE : undefined, turn.spoken && turn.language ? spokenLines(turn.text).trim() : undefined, rolePlayActive(turn.rolePlay) ? rolePlayLine(turn.rolePlay!) : undefined].filter(Boolean).join('\n\n') || undefined, Boolean(turn.language)),
+      pedagogy: arbitratePedagogy([turn.plan?.prompt, ...extraRules, turn.subjectGrading ? SUBJECT_GRADE_LINE : undefined, turn.outOfScope ? OUT_OF_SCOPE_LINE : undefined, turn.injection === 'learner' ? INJECTION_NOTE : undefined, turn.spoken && turn.language ? spokenLines(turn.text).trim() : undefined, rolePlayActive(turn.rolePlay) || turn.rolePlay?.phase === 'after' ? rolePlayLine(turn.rolePlay!) : undefined].filter(Boolean).join('\n\n') || undefined, Boolean(turn.language)),
       planActive: Boolean(turn.plan),
       sourcesPrompt: turn.sources.length ? sourcesPrompt(turn.sources) : undefined,
       ...(engineV2('cache') && turn.language?.parts ? { languageContextStable: turn.language.parts.stable, languageContextDynamic: turn.language.parts.dynamic } : { languageContext: turn.language?.prompt }),

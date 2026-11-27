@@ -900,7 +900,7 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
       mode: 'voice',
       learner: learner ? describeSnapshot(learner) : undefined,
       // liveExpressive, every other subject: the reply opens with the hidden grading line, so its cue follows the verdict.
-      pedagogy: arbitratePedagogy([plan?.prompt, policyRule(tutorPolicy.policy), cueCall && !languagePrep ? SUBJECT_GRADE_LINE : undefined, sceneActive ? rolePlayLine(subjectRolePlay!) : undefined].filter(Boolean).join('\n\n') || undefined, Boolean(languagePrep)),
+      pedagogy: arbitratePedagogy([plan?.prompt, policyRule(tutorPolicy.policy), cueCall && !languagePrep ? SUBJECT_GRADE_LINE : undefined, sceneActive || subjectRolePlay?.phase === 'after' ? rolePlayLine(subjectRolePlay!) : undefined].filter(Boolean).join('\n\n') || undefined, Boolean(languagePrep)),
       planActive: Boolean(plan),
       ...(languagePrep?.parts ? { languageContextStable: languagePrep.parts.stable, languageContextDynamic: `${languagePrep.parts.dynamic}${speakingLines}${heardLines}` } : { languageContext: languagePrep?.prompt ? `${languagePrep.prompt}${speakingLines}${heardLines}` : languagePrep?.prompt }),
     };

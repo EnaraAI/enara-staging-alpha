@@ -89,7 +89,8 @@ describe('role-play in the live call (switch liveRolePlay on)', () => {
     // 5. back to the lesson: no scene, the card goes away
     reply('[[assess verdict=NOT_EVALUATED relevance=NO_ACTIVE_ITEM next=NEW_ITEM item=i1]]\nCorrect the verb: "She go to bed at ten."');
     r = await say(sid, 'My brother is a teacher.');
-    expect(ctx(5)).not.toMatch(/ROLE-PLAY/);
+    expect(ctx(5)).not.toMatch(/ROLE-PLAY \(set by the system\), beat|ROLE-PLAY DEBRIEF/);
+    expect(ctx(5)).toMatch(/ROLE-PLAY OVER \(set by the system\).*Speak as yourself, the tutor, not as Karim, a waiter/);
     expect(r.scene).toBeNull();
     expect((await storedAi(sid)).at(-1)!.meta.languageTurn.rolePlay).toEqual({ scene: 'restaurant-order', phase: 'after' });
   });

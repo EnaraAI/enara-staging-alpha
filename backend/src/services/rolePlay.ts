@@ -439,6 +439,7 @@ export function rolePlayLine(t: RolePlayTurn): string {
     const kind = s.subject === 'english' || s.subject === 'arabic' ? 'rule' : 'rule or method';
     return `ROLE-PLAY DEBRIEF (set by the system): the scene "${tx(s.title, lang)}" is over.${closing} Then step out of the role and speak as the tutor again.${recast} If their last message asks you something, answer it in one short sentence first; if it has an error, say that part correctly in passing. (1) One short sentence that says the role-play is finished and praises their effort, naming ONE thing they did in the scene (if you quote them, copy their exact words from the conversation above; never "you are clever"). ${e ? `(2) Then say you will look at one point from it, and give exactly these lines: "${L.rule}: ${q(e.rule)}" and ${pair}. (3) Then ONE new practice item on this ${kind}, as a clear question or a one-sentence task set in the same place as the scene (a new one, not one from the scene), and stop.` : '(2) Then ONE new practice item on today\'s lesson point, and stop.'} No other rule, no recap ask, no second task. ${only} ${over}`;
   }
+  if (t.phase === 'after') return `ROLE-PLAY OVER (set by the system): the role-play scene "${tx(s.title, lang)}" is finished. Speak as yourself, the tutor, not as ${tx(s.character, lang)}.`;
   if (t.phase !== 'beat' || !t.beat) return '';
   const beat = s.beats[t.beat - 1];
   const prev = s.beats[t.beat - 2];
