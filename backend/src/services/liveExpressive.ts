@@ -186,6 +186,9 @@ export function cuesForTurn(t: TurnFacts, band: ExpressiveBand): CuePlan | null 
 // The simulation (docs/tutor/EXPRESSIVE_SIM.md) saw Arabic-medium replies drift into English after the English-language
 // grading instruction; the reply's language is the call's, whatever the hidden line says.
 export const SUBJECT_CUE_LINE = `${SUBJECT_GRADE_LINE}\nAfter the hidden line, reply exactly as you would without it: in the language the request asks for (an Arabic lesson stays in Arabic), with the same length and tone.`;
+// An Arabic-medium call: the same, plus the language rule in Arabic itself (the English-only line still let 1 reply in 8 drift).
+export const SUBJECT_CUE_LINE_AR = `${SUBJECT_CUE_LINE}\nبعد السطر المخفي اكتب ردك كله باللغة العربية فقط، حتى لو كان السطر المخفي بالإنجليزية. لا تكتب جملة واحدة بالإنجليزية.`;
+export const subjectCueLine = (arabicCall: boolean): string => (arabicCall ? SUBJECT_CUE_LINE_AR : SUBJECT_CUE_LINE);
 
 // Every other subject (maths, science, Arabic, social studies...): the learner's own words say they are stuck.
 const STUCK_WORDS = /\b(i\s*(really\s*)?(don'?t|do not|dont) (know|understand|get it)|no idea|not sure|i'?m (confused|lost|stuck)|i give up|give me a hint|can you help|why is (that|it) wrong)\b|مش عارف|مش فاهم|لا أعرف|لا اعرف|لا أفهم|لا افهم|ما فهمت|ساعدني|محتار/i;
@@ -238,8 +241,14 @@ export function planTurnCues(p: {
 // PR 3: "look at the drawing", worked around (Anam has no gaze, nod or pointing control: Director Notes "do not provide
 // deterministic gesture, gaze, or pose control"). When a drawing opens, the tutor says so, the browser pulses the panel,
 // and the panel sits on the side the face is turned to.
-export const LOOK_LINE = { english: 'Look at the picture.', arabic: 'انظر إلى الصورة.' } as const;
-const SAYS_LOOK = /\blook at (the|this) (picture|drawing|screen|board|visual)\b|انظر (إلى|الى) (الصورة|الرسم|الشاشة)/i;
+// Arabic: "let us look" (لننظر), the same for a girl or a boy (the simulation's teacher check: "انظر" is masculine only).
+export const LOOK_LINE = { english: 'Look at the picture.', arabic: 'لننظرْ إلى الصورة.' } as const;
+const SAYS_LOOK = /\blook at (the|this) (picture|drawing|screen|board|visual)\b|(انظر|انظري|انظروا|لننظر|ننظر)ْ? (إلى|الى) (الصورة|الرسم|الشاشة)/i;
+/** Where the look line goes: after the reply's first sentence (a greeting or a word of praise comes first), else at the start. */
+export function withLookLine(text: string, look: string): { text: string; at: number } {
+  const at = secondSentenceAt(text);
+  return at > 0 ? { text: `${text.slice(0, at)}${look} ${text.slice(at)}`, at } : { text: `${look} ${text}`, at: -1 };
+}
 /** The line the tutor says when a drawing opens with its reply, unless the reply already says it. */
 export function lookLine(reply: string, language: 'english' | 'arabic'): string | null {
   return SAYS_LOOK.test(reply) ? null : LOOK_LINE[language];
