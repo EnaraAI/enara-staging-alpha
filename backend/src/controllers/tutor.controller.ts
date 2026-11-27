@@ -15,7 +15,7 @@ import { OUT_OF_SCOPE_LINE, outOfScopeTurn } from '../services/groundedRefusal';
 import { asksToExplainAgain, retrieveWithRewrite, reusePassages } from '../services/retrievalBoost';
 import { gradeAllSubjectsOn, practiceOutcome, practiceTurnFrom, SUBJECT_GRADE_LINE } from '../services/subjectPractice';
 import { recordOutcomeForError, recordTutorOutcome, adaptiveSpacingOn, removeExamItems } from '../services/errorsToWorkOn';
-import { prepareLanguageContext, applyReplyGuards, completeLanguageTurn, languageHistoryFrom, arbitratePedagogy, exampleGuardCheck, exampleGuardRegenNote, type ClosingAskStatus } from '../services/languageTurnPipeline'; // shared with the live avatar
+import { prepareLanguageContext, applyReplyGuards, completeLanguageTurn, languageHistoryFrom, arbitratePedagogy, exampleGuardCheck, exampleGuardRegenNote, rolePlayRegenNote, type ClosingAskStatus } from '../services/languageTurnPipeline'; // shared with the live avatar
 import { AssessmentMarkerFilter, filterSummary, stripAssessmentMarkers, type StrippedReply } from '../services/languageLearningState';
 import {
   curriculumFromCourse,
@@ -442,7 +442,7 @@ async function finishTutorTurn(turn: TutorTurn, reply: TutorReply | null) {
   turn.reservation = undefined;
   // Fix 1: before the learner's first attempt, example lines that show the tested
   // form are removed (stored and sent text alike; the stream gets a replace event).
-  let preAttemptRemoved = 0; let closingAsk: ClosingAskStatus | undefined; let postCheck: string[] | undefined;
+  let preAttemptRemoved = 0; let closingAsk: ClosingAskStatus | undefined; let postCheck: string[] | undefined; let rolePlayFixed = false;
   if (turn.language && reply) {
     const g = applyReplyGuards(turn.language, aiResult.answer, turn.text);
     postCheck = g.postCheck;
@@ -450,6 +450,7 @@ async function finishTutorTurn(turn: TutorTurn, reply: TutorReply | null) {
     // g.text also changes when the engine adds the closing ask (closing / shortRecap) without removing anything.
     if (g.removed || g.text !== aiResult.answer) { aiResult = { ...aiResult, answer: g.text }; preAttemptRemoved = g.removed; }
     closingAsk = g.closingAsk;
+    rolePlayFixed = Boolean(g.rolePlayFixed);
   }
   // workOn (learner memory phase 1): never the learner's own assessment questions in a tutor reply (the brief's errors; server-side texts).
   if (reply && turn.plan?.workOn?.guardTexts.length) {
@@ -524,7 +525,7 @@ async function finishTutorTurn(turn: TutorTurn, reply: TutorReply | null) {
     turn.turnLockReleased = true;
   }
   await session.save();
-  return { aiResult, assistantMessage, preAttemptRemoved };
+  return { aiResult, assistantMessage, preAttemptRemoved, rolePlayFixed };
 }
 
 const replyMeta = (aiResult: TutorReply, method: TeachingMethod) => ({
@@ -560,6 +561,15 @@ export const sendTutorMessage = asyncHandler(async (req: AuthRequest, res: Respo
           const stripped2 = stripAssessmentMarkers(again.answer);
           if (stripped2.text && !exampleGuardCheck(turn.language, stripped2.text, turn.text).length) { turn.languageMarker = turn.spoken && turn.language ? guardSpokenMarker(stripped2, turn.text) : stripped2; reply = { ...again, answer: stripped2.text }; }
         }
+      }
+    }
+    // liveRolePlay: a scene reply that leaves the scene gets ONE regeneration with the reason (the guards use the beat's fixed line if it still fails).
+    const sceneNote = reply && turn.language ? rolePlayRegenNote(turn.language, reply.answer) : undefined;
+    if (reply && turn.language && sceneNote) {
+      const again = await queryDirectTutorModel({ ...params, pedagogy: [params.pedagogy, sceneNote].filter(Boolean).join('\n\n') });
+      if (again) {
+        const stripped2 = stripAssessmentMarkers(again.answer);
+        if (stripped2.text && !rolePlayRegenNote(turn.language, stripped2.text)) { turn.languageMarker = turn.spoken ? guardSpokenMarker(stripped2, turn.text) : stripped2; reply = { ...again, answer: stripped2.text }; }
       }
     }
     // repairOnce: a graded turn whose reply has no trusted hidden line gets ONE regeneration with the reason; otherwise the first draft stays.
@@ -640,8 +650,8 @@ export const streamTutorMessage = asyncHandler(async (req: AuthRequest, res: Res
       const ok = answer.trim() && !status.refused && !status.failed;
       reply = ok ? { answer: answer.trim(), intent: 'direct_model', context_found: status.contextFound ?? 0, version: `anthropic:${status.model ?? 'unknown'}` } : null;
     }
-    const { aiResult, assistantMessage, preAttemptRemoved } = await finishTutorTurn(turn, reply);
-    if (!reply || preAttemptRemoved) send({ type: 'replace', text: aiResult.answer });
+    const { aiResult, assistantMessage, preAttemptRemoved, rolePlayFixed } = await finishTutorTurn(turn, reply);
+    if (!reply || preAttemptRemoved || rolePlayFixed) send({ type: 'replace', text: aiResult.answer });
     send({ type: 'done', messageId: assistantMessage.id, assistantMessage, meta: replyMeta(aiResult, turn.method), session: await toSessionResponse(turn.session) });
   } catch (error) {
     if (turn.reservation) await releaseUsage(turn.reservation).catch(() => undefined);

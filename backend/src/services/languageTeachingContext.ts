@@ -14,6 +14,8 @@ import { priorAnsweredItems } from './learnerMemory';
 import { loadProfileLines, loadEsl5Record, errorTypeLabel, type Esl5Record } from './learnerLanguageProfile';
 import { graderV2On } from './graderV2';
 import { KIDS_PICS_LINE } from './kidsPictures';
+import { sceneById } from './roleplayScenes';
+import { rolePlayStep, rolePlayLine, rolePlayActive, pickScene, debriefEntry, scenesIn, type RolePlayTurn, type RolePlayTag } from './rolePlay';
 import { engineV2, arbitrationForced } from './engineV2';
 import { RULE_BANK, ruleBankEntry, type RuleBankEntry } from './ruleBank';
 import {
@@ -393,6 +395,8 @@ export interface LanguageTeachingContext {
   ruleFirst?: { criteria: number[]; texts: string[] };
   // realChat (NEXT_PLAN item 3): this reply is turn 1 or 2 of the session's short real conversation.
   realChat?: number;
+  // liveRolePlay (live tutor item 4): this reply's role-play step (offer, beat, debrief, or the carried after/declined tag).
+  rolePlay?: RolePlayTurn;
   // v2 (levelExplicit): this learner is explicit-first for this objective (A1-A2 course, or objective record not_assessed/emerging). Set only when the switch is on.
   explicitFirst?: boolean;
   // v2 (arbitration): primary method of the active teaching plan.
@@ -502,6 +506,8 @@ export interface LanguageTurnEvidence {
   ownSentence?: 'asked' | 'feedback';
   // realChat (tag only): this reply was conversation turn 1 or 2 of the session's short real chat.
   realChat?: number;
+  // liveRolePlay (ids and codes only): the scene, its phase and beat, failed tries on the beat, error codes seen in the scene.
+  rolePlay?: RolePlayTag;
   // TRACK 2 (tags only, no learner text): rule-bank entry and template, the worked example's form, the feedback rung, interleaving, the under-13 frame;
   // example-guard hits on the model's draft (and whether a regeneration cleared them), and post-check problems.
   teach2?: { rule?: string; template?: 'grammar' | 'vocab'; model?: string; rung?: FeedbackRung; interleave?: true; kidsFrame?: true };
@@ -2377,6 +2383,46 @@ export function reviewFirstAdjust(i: { signals: TurnSignals; moves: SelectedMove
 export const REVIEW_FIRST_LINE = (step: number, due: number) => `REVIEW FIRST (set by the system): this reply is review ${step} of ${Math.min(due, 2)} from the "Reviews due" list (review E${step}). ${step === 1 ? 'A short greeting, then ' : 'Respond to their last answer as the "Reviews due" lines say (if wrong: the rule in one plain sentence), then '}ONE new practice item you write yourself on review E${step}, and let them answer it on their own first: no rule, hint or example before their try. No lesson exercise and no new rule of today's lesson in this reply: the lesson starts after the reviews. Add focus=E${step} in the hidden assess line. This overrides any instruction above to state today's rule first, to present a lesson exercise, or to start with the last session's next step.${mixedReviewOn() ? MIXED_ITEM_CLAUSE : ''}`;
 export const QUICK_CHECK_LINE = 'QUICK CHECK (set by the system): this opening reply gives ONE short exercise from the lesson to see what the learner already knows. Do not teach, explain, hint or give any answer in this reply: a short greeting, then the exercise. The teaching starts in your next reply. This overrides any instruction above to explain, model or give an answer.';
 
+/** liveRolePlay: moves that teach or set a lesson exercise, removed in a scene reply (the scene line replaces them). */
+export const ROLE_PLAY_DROPPED = new Set<MoveId>(['present_lesson_item', 'independent_practice', 'general_practice', 'comprehension_check', 'distinct_example', 'restate_task', 'corrective_feedback_retry', 'scaffold_hint', 'reteach_simpler', 'answer_with_reasoning', 'short_explanation', 'comprehensible_model', 'activate_prior_knowledge']);
+/** liveRolePlay: this turn's step. The scene is picked by code (age band, level, interests, scenes not had recently); interests and recent scenes are read only when a scene is picked. */
+async function rolePlayForTurn(i: { params: { studentId?: string; message: string; history: Turn[]; objectiveCode?: string }; learner: LanguageLearnerContext; child: boolean; signals: TurnSignals; blocked: boolean; busy: boolean }): Promise<RolePlayTurn | undefined> {
+  if (!engineV2('liveRolePlay')) return undefined;
+  try {
+    const step = await rolePlayStep({
+      history: i.params.history, message: i.params.message, signals: i.signals, blocked: i.blocked, busy: i.busy,
+      pick: async () => {
+        const mem = i.params.studentId ? await loadRolePlayMemory(i.params.studentId) : { interests: [], recent: [] };
+        return pickScene({ child: i.child, ageBand: i.learner.ageBand.status === 'known' ? i.learner.ageBand.value : 'unknown', level: i.learner.proficiency.value, interests: mem.interests, recent: [...mem.recent, ...scenesIn(i.params.history)], ask: i.params.message, objectiveCode: i.params.objectiveCode, seed: `${i.params.studentId ?? ''}|${new Date().toISOString().slice(0, 10)}` });
+      },
+    });
+    if (!step) return undefined;
+    const out: RolePlayTurn = { ...step, ...(i.child ? { child: true } : {}), ...(under9(i.learner.ageYears) ? { under9: true } : {}) };
+    if (out.phase === 'debrief') {
+      const scene = sceneById(out.scene);
+      const e = scene ? debriefEntry(scene, out.errs) : undefined;
+      if (e) out.entryId = e.id;
+    }
+    return out;
+  } catch (error) {
+    logger.warn('roleplay_step_failed', { error: serializeError(error) });
+    return undefined;
+  }
+}
+/** liveRolePlay: the learner's interests (learner profile) and the scenes of their recent sessions (session summaries). Codes and ids only. */
+export async function loadRolePlayMemory(studentId: string): Promise<{ interests: string[]; recent: string[] }> {
+  try {
+    const { LearnerProfile, SessionSummary } = await import('../models/LearnerMemory');
+    const [p, sums] = await Promise.all([
+      engineV2('learnerProfile') ? LearnerProfile.findOne({ studentId }).select('interests').lean() : null,
+      engineV2('sessionMemory') ? SessionSummary.find({ studentId }).sort({ endedAt: -1 }).limit(5).select('roleplayScenes').lean() : [],
+    ]);
+    return { interests: (p as { interests?: string[] } | null)?.interests ?? [], recent: (sums as { roleplayScenes?: string[] }[]).flatMap((x) => x.roleplayScenes ?? []) };
+  } catch {
+    return { interests: [], recent: [] };
+  }
+}
+
 export async function buildLanguageTeachingContext(params: {
   institutionId?: string;
   curriculumId?: string;
@@ -2443,12 +2489,22 @@ export async function buildLanguageTeachingContext(params: {
     const rf = reviewFirstAdjust({ signals: adjusted.signals, moves: adjusted.moves, history: params.history, reviewsDue: params.reviewsDue });
     const reviewStep = rf.step; adjusted.signals = rf.signals; adjusted.moves = rf.moves;
     // realChat: two conversation replies after the first exercises (not during the reviews, the quick check or a closing turn).
-    const chatStep = reviewStep || params.quickCheck ? undefined : realChatStep(params.history, adjusted.signals);
+    let chatStep = reviewStep || params.quickCheck ? undefined : realChatStep(params.history, adjusted.signals);
     if (chatStep === 1 && adjusted.signals.presentLessonItem) {
       const { presentLessonItem: _skip2, ...rest2 } = adjusted.signals;
       adjusted.signals = rest2 as TurnSignals; adjusted.moves = adjusted.moves.filter((m) => m.id !== 'present_lesson_item');
     }
     const quickCheck = Boolean(params.quickCheck) && engineV2('planner2') && !reviewStep;
+    // liveRolePlay: a role-play scene (asked for, or offered by the OFFER RULE) replaces the lesson exercise, the real chat and the closing ask for its replies.
+    const child = learner.ageBand.status === 'known' && learner.ageBand.value === 'child';
+    const rolePlay = await rolePlayForTurn({ params, learner, child, signals: adjusted.signals, blocked: Boolean(reviewStep || quickCheck || params.hintsOnly || params.ladStep || params.taskStep || /arabic/i.test(learner.targetLanguage.value ?? '') || !learner.targetLanguage.value), busy: Boolean(chatStep) });
+    const inScene = rolePlayActive(rolePlay);
+    if (inScene) {
+      chatStep = undefined;
+      const { presentLessonItem: _skip3, ...rest3 } = adjusted.signals;
+      adjusted.signals = rest3 as TurnSignals;
+      adjusted.moves = adjusted.moves.filter((m) => !ROLE_PLAY_DROPPED.has(m.id));
+    }
     const signals = adjusted.signals;
     // planner2 quick check: only presenting and recording; every teaching or correcting move is dropped for these 3 items.
     const ladStep = Boolean(params.ladStep) && engineV2('planner2') && engineV2('kidsPack') && !quickCheck && !reviewStep;
@@ -2464,10 +2520,10 @@ export async function buildLanguageTeachingContext(params: {
     // levelExplicit: decided per learner and objective; explicit-first learners get the rule before their first try (rulesToIntroduce, once per rule per session).
     const outcomeId = ruleBankEntry(params.objectiveCode) ? params.objectiveCode : params.objectiveId;
     const teach2 = buildTeach2({ signals, lesson, moves, learner }, { objectiveId: outcomeId, history: params.history, assessmentItems: engineV2('exampleGuard') || engineV2('ruleBank') ? await loadObjectiveItems(params.institutionId, [params.objectiveId, params.objectiveCode, outcomeId]) : [] });
-    const { explicit, ruleFirst } = quickCheck || reviewStep ? { explicit: undefined, ruleFirst: undefined } : ruleFirstDecision({ band: learner.proficiency.band, masteryStatus: params.masteryStatus, history: params.history, signals, spec: lesson.spec, moves, record, lessonId: lesson.lessonId, entry: ruleBankEntry(teach2?.entryId) });
-    const base = { version: LANGUAGE_CONTEXT_VERSION, learner, lesson, signals, moves, length, ...(history.length ? { history } : {}), ...(research ? { research } : {}), ...(ruleFirst ? { ruleFirst } : {}), ...(chatStep ? { realChat: chatStep } : {}), ...(explicit !== undefined ? { explicitFirst: explicit } : {}), ...(prevTurn?.moves?.length ? { prevMoves: prevTurn.moves } : {}), ...(params.planPrimary ? { planPrimary: params.planPrimary } : {}), ...(record ? { record } : {}), ...(teach2 ? { teach2 } : {}) } as const;
+    const { explicit, ruleFirst } = quickCheck || reviewStep || inScene ? { explicit: undefined, ruleFirst: undefined } : ruleFirstDecision({ band: learner.proficiency.band, masteryStatus: params.masteryStatus, history: params.history, signals, spec: lesson.spec, moves, record, lessonId: lesson.lessonId, entry: ruleBankEntry(teach2?.entryId) });
+    const base = { version: LANGUAGE_CONTEXT_VERSION, learner, lesson, signals, moves, length, ...(history.length ? { history } : {}), ...(research ? { research } : {}), ...(ruleFirst ? { ruleFirst } : {}), ...(chatStep ? { realChat: chatStep } : {}), ...(rolePlay ? { rolePlay } : {}), ...(explicit !== undefined ? { explicitFirst: explicit } : {}), ...(prevTurn?.moves?.length ? { prevMoves: prevTurn.moves } : {}), ...(params.planPrimary ? { planPrimary: params.planPrimary } : {}), ...(record ? { record } : {}), ...(teach2 ? { teach2 } : {}) } as const;
     const parts0 = engineV2('cache') ? renderLanguageContextParts(base) : undefined;
-    const tail = reviewStep ? REVIEW_FIRST_LINE(reviewStep, params.reviewsDue ?? 1) : chatStep ? REAL_CHAT_LINE(chatStep, learner.ageBand.status === 'known' && learner.ageBand.value === 'child') : quickCheck ? QUICK_CHECK_LINE : ladStep ? LAD_STEP_LINE : taskStep ? TASK_STEP_LINE : '';
+    const tail = inScene ? rolePlayLine(rolePlay!) : reviewStep ? REVIEW_FIRST_LINE(reviewStep, params.reviewsDue ?? 1) : chatStep ? REAL_CHAT_LINE(chatStep, learner.ageBand.status === 'known' && learner.ageBand.value === 'child') : quickCheck ? QUICK_CHECK_LINE : ladStep ? LAD_STEP_LINE : taskStep ? TASK_STEP_LINE : '';
     const parts = parts0 && tail ? { ...parts0, dynamic: `${parts0.dynamic}\n\n${tail}` } : parts0;
     const prompt = renderLanguageContextPrompt(base);
     return { ...base, ...(quickCheck ? { quickCheck: true } : {}), ...(ladStep ? { ladStep: true } : {}), ...(taskStep ? { taskStep: true } : {}), ...(parts ? { parts } : {}), prompt: tail ? `${prompt}\n\n${tail}` : prompt };
