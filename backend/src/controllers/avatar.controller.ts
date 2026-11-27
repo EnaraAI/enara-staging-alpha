@@ -1,5 +1,5 @@
 import { engineV2 } from '../services/engineV2';
-import { expressivePersona, planTurnCues, secondSentenceAt, startExpressiveCall, stripCueTags, type Cue, type CuePlan, type ExpressiveCall, type VoiceProfile } from '../services/liveExpressive';
+import { expressivePersona, lookLine, panelSide, planTurnCues, secondSentenceAt, startExpressiveCall, stripCueTags, type Cue, type CuePlan, type ExpressiveCall, type VoiceProfile } from '../services/liveExpressive';
 import { guardedEmitter } from '../services/guardedStream';
 import { guardSpokenMarker, spokenLines } from '../services/spokenInput';
 import { DEMO_LIMITS, isDemoSessionInstitution } from '../config/demo';
@@ -387,6 +387,8 @@ export const startAvatarSession = asyncHandler(async (req: AuthRequest, res: Res
     // Live call controls the browser may show (each its own switch); absent when none is on.
     ...liveCallFeatures(),
     // The CI screenshot run only (per-call test override): what the call was started with. Names and numbers, no ids.
+    // liveExpressive: the browser pulses a drawing's panel when it opens, on the side the face is turned to.
+    ...(expressive.on && expressiveApplied.applied ? { expressive: { panel: panelSide(face?.avatarId || requireAnam().avatarId) } } : {}),
     ...(expressive.test ? { expressive_test: { on: expressive.on, band: expressive.band ?? null, cara4: expressiveApplied.applied, speed: expressiveApplied.speed, voice: expressiveApplied.voice } } : {}),
   });
 });
@@ -856,13 +858,18 @@ export const streamAvatarAnswer = asyncHandler(async (req: AuthRequest, res: Res
   const emit = (raw: string) => {
     let text = cueCall ? stripCueTags(raw) : raw;
     if (!text) return;
+    let lookChars = 0;
     if (cueCall && cuePlan === undefined) {
       cuePlan = planTurnCues({ call: cueCall, kind, language: languagePrep?.context, marker: languageMarker, reply: text, learnerText: last?.content ?? '', drawing: visualStarted });
       if (cuePlan) writeCue(cuePlan.first);
+      // A drawing opens with this reply: the tutor tells the learner to look at it (Anam cannot turn the face to it).
+      const look = visualStarted ? lookLine(text, !languagePrep && (spokenLanguage ?? session.language) === 'arabic' ? 'arabic' : 'english') : null;
+      if (look) { text = `${look} ${text}`; lookChars = look.length + 1; }
     }
     if (cuePlan?.then) {
       // The second cue (stuck: concerned, then supportive) starts with the reply's second sentence.
-      const at = /[.!?؟]["')\]]*\s*$/.test(spoken) ? 0 : secondSentenceAt(text);
+      const second = secondSentenceAt(text.slice(lookChars));
+      const at = /[.!?؟]["')\]]*\s*$/.test(spoken) ? 0 : second < 0 ? -1 : second + lookChars;
       if (at >= 0) {
         emitText(text.slice(0, at));
         writeCue(cuePlan.then);

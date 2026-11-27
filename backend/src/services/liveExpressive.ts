@@ -215,3 +215,19 @@ export function planTurnCues(p: {
   const asks = !p.language && /[?؟]\s*$/.test(p.reply.trim());
   return cuesForTurn({ kind: p.kind, verdict, next, stuck, drawing: p.drawing, asks }, p.call.band ?? 'child');
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// PR 3: "look at the drawing", worked around (Anam has no gaze, nod or pointing control: Director Notes "do not provide
+// deterministic gesture, gaze, or pose control"). When a drawing opens, the tutor says so, the browser pulses the panel,
+// and the panel sits on the side the face is turned to.
+export const LOOK_LINE = { english: 'Look at the picture.', arabic: 'انظر إلى الصورة.' } as const;
+const SAYS_LOOK = /\blook at (the|this) (picture|drawing|screen|board|visual)\b|انظر (إلى|الى) (الصورة|الرسم|الشاشة)/i;
+/** The line the tutor says when a drawing opens with its reply, unless the reply already says it. */
+export function lookLine(reply: string, language: 'english' | 'arabic'): string | null {
+  return SAYS_LOOK.test(reply) ? null : LOOK_LINE[language];
+}
+// The panel's side, from each stock face's picture (checked 27 Nov 2026: every face looks at the camera; most sit left of
+// centre with open space on the viewer's right, where the panel already is). Faces sitting right of centre, turned to the
+// viewer's left, get the panel on the left.
+const PANEL_LEFT = new Set(['27e12daa-50fc-4384-93c2-ebca73f1f78d']); // Anne (home)
+export const panelSide = (avatarId: string | undefined): 'left' | 'right' => (avatarId && PANEL_LEFT.has(avatarId) ? 'left' : 'right');

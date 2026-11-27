@@ -257,4 +257,28 @@ describe('liveExpressive: cues by code', () => {
     expect(L.secondSentenceAt('That is fine. Now try again.')).toBe(14);
     expect(L.secondSentenceAt('Only one sentence.')).toBe(-1);
   });
+
+  it('says "look at the picture" in the call\'s language and puts the panel on the side the face is turned to', () => {
+    expect(L.lookLine('Here it is.', 'english')).toBe('Look at the picture.');
+    expect(L.lookLine('هذه هي الصورة.', 'arabic')).toBe('انظر إلى الصورة.');
+    expect(L.lookLine('Look at the drawing: three apples.', 'english')).toBeNull();
+    expect(L.lookLine('انظر إلى الرسم.', 'arabic')).toBeNull();
+    expect(L.panelSide('27e12daa-50fc-4384-93c2-ebca73f1f78d')).toBe('left');
+    expect(L.panelSide('avatar-1')).toBe('right');
+    expect(L.panelSide(undefined)).toBe('right');
+  });
+
+  it('an Arabic call (not a language lesson) opening a drawing: the line is in formal Arabic', async () => {
+    await withSwitch('liveExpressive', async () => {
+      const auth = await token('grown-ar', 'stu-grown');
+      const start = await request(app).post('/api/avatar/session').set('Authorization', auth).send({ preferred_language: 'arabic' });
+      expect(start.body.expressive).toEqual({ panel: 'right' });
+      mocks.stream.mockImplementationOnce(async function* () { yield 'هذا رسم للدورة اليومية.'; });
+      const res = await request(app).post('/api/avatar/query-stream').set('Authorization', auth).send({ session_id: start.body.session_id, messages: [{ role: 'user', content: 'ارسم لي صورة من فضلك' }] });
+      const lines = res.text.trim().split('\n').map((l) => JSON.parse(l));
+      expect(lines.some((l) => l.visual === 'drawing')).toBe(true);
+      expect(lines.filter((l) => l.content).map((l) => l.content).join('')).toBe('انظر إلى الصورة. هذا رسم للدورة اليومية.');
+      expect(lines.filter((l) => l.cue).map((l) => l.cue)).toEqual(['curious']);
+    });
+  });
 });
