@@ -18,8 +18,15 @@ const AREA_ROLES: Record<string, Role[]> = {
   student: ['student'], kids: ['student'], parent: ['parent'], teacher: ['teacher', 'admin'],
   school: ['admin', 'academic_manager', 'enara-admin'], platform: ['enara-admin'],
 };
-/** Screens already wired to the lms-test API. The rest still show sample data, marked with a ribbon. */
-export const WIRED = new Set<string>(['login', 'parent-code']);
+/** Screens already wired to the lms-test API (each area lists its own in screens/<area>/wired.ts). The rest show sample data. */
+import { wired as wShared } from '@/screens/shared/wired';
+import { wired as wStudent } from '@/screens/student/wired';
+import { wired as wKids } from '@/screens/kids/wired';
+import { wired as wParent } from '@/screens/parent/wired';
+import { wired as wTeacher } from '@/screens/teacher/wired';
+import { wired as wSchool } from '@/screens/school/wired';
+import { wired as wPlatform } from '@/screens/platform/wired';
+export const WIRED = new Set<string>([...wShared, ...wStudent, ...wKids, ...wParent, ...wTeacher, ...wSchool, ...wPlatform]);
 
 const LANG_KEY = 'enara_design_lang';
 function parse() {
