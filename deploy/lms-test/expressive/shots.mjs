@@ -173,21 +173,20 @@ async function openCallScreen(page, who, app) {
   if (app === 'kids') {
     await clickOne(page, 'learning tab', [page.getByRole('button', { name: /^(Learning|My learning|Lessons|Learn)$/i }), page.getByRole('link', { name: /Learning|Lessons/i }), page.getByRole('tab', { name: /Learning|Lessons/i })]);
     await snap(page, `${who}-2-learning`);
-    await clickOne(page, 'English course', [page.getByRole('button', { name: /English/ }), page.getByText(/^English$/)]);
+    // Courses and lessons can take a while to load on lms-test.
+    await clickOne(page, 'English course', [page.getByRole('button', { name: /English/ }).filter({ hasNotText: /^EN/ }), page.getByText(/^English$/)], 90_000);
     await snap(page, `${who}-3-course`);
-    let picked = false;
-    for (const re of LESSON_PREF) if (!picked) picked = await clickOne(page, `lesson ${re}`, [page.getByRole('button', { name: re })], 3000);
-    if (!picked) await clickOne(page, 'first lesson', [page.locator('.ek-lessonmap button, [class*=lesson] button')]);
+    if (!(await clickOne(page, 'lesson', LESSON_PREF.map((re) => page.getByRole('button', { name: re })), 90_000))) await clickOne(page, 'first lesson', [page.locator('.ek-lessonmap button, [class*=lesson] button')]);
     await snap(page, `${who}-4-lesson`);
-    await clickOne(page, 'Ask Enara about this lesson', [page.getByRole('button', { name: /Ask Enara about this (lesson|video)/ }), page.getByRole('button', { name: /Ask Enara/ })]);
+    if (!(await clickOne(page, 'Ask Enara about this lesson', [page.getByRole('button', { name: /Ask Enara about this (lesson|video)/ })], 60_000))) await clickOne(page, 'Ask Enara', [page.getByRole('button', { name: /Ask Enara/ })]);
     await snap(page, `${who}-5-drawer`);
     await clickOne(page, 'Talk live', [page.getByRole('button', { name: /Talk live/ })], 30_000);
   } else {
     await clickOne(page, 'My learning', [page.getByRole('button', { name: 'My learning', exact: true }), page.getByRole('link', { name: 'My learning' })]);
     await snap(page, `${who}-2-learning`);
-    await clickOne(page, 'English course', [page.getByRole('button', { name: /English/ })]);
+    await clickOne(page, 'English course', [page.getByRole('button', { name: /English/ })], 90_000);
     await snap(page, `${who}-3-course`);
-    for (const re of LESSON_PREF) if (await clickOne(page, `lesson ${re}`, [page.getByRole('button', { name: re })], 3000)) break;
+    await clickOne(page, 'lesson', LESSON_PREF.map((re) => page.getByRole('button', { name: re })), 60_000);
     await snap(page, `${who}-4-lesson`);
     await clickOne(page, 'Live AI Tutor', [page.getByRole('button', { name: /Live AI Tutor/ })], 30_000);
   }
@@ -319,6 +318,15 @@ async function dry(browser) {
   for (const email of plan.dryCheck ?? []) {
     const a = await login(email);
     summary(`LEARNER ${email.split('@')[0]} login=${a.token ? 'ok' : a.status} role=${a.user?.role ?? '-'} uiMode=${a.user?.uiMode ?? '-'} ageBand=${a.user?.learnerAgeBand ?? '-'}`);
+  }
+  // Which Arabic voice a child's call gets and whether it can be slowed: start a call (a token only, never connected) and end it.
+  for (const lang of plan.voiceProbe ?? []) {
+    const a = await login(plan.learners.child.email);
+    if (!a.token) continue;
+    const r = await site('/api/avatar/session', { method: 'POST', headers: { Authorization: `Bearer ${a.token}`, 'Content-Type': 'application/json', 'x-enara-expressive-test': 'on', 'x-enara-ci-token': CI_TOKEN }, body: JSON.stringify({ preferred_language: lang }) });
+    const j = await r.json().catch(() => ({}));
+    summary(`VOICE_PROBE ${lang} ${r.status} ${JSON.stringify(j.expressive_test ?? null)}`);
+    if (j.session_id) await site(`/api/avatar/session/${encodeURIComponent(j.session_id)}`, { method: 'DELETE', headers: { Authorization: `Bearer ${a.token}` } }).catch(() => undefined);
   }
   const out = [];
   for (const who of Object.keys(plan.learners)) out.push(await oneCall(browser, { who, expressive: 'on' }));
