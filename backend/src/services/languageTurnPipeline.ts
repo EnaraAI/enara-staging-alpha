@@ -14,6 +14,18 @@ import { exampleGuardHits, removeGuardHits, ruleLinePostCheck, GUARD_REGEN_REASO
 import { ruleBankEntry } from './ruleBank';
 import { removeFalseWrongs } from './pairCheck';
 import { under9 } from './languageTeachingContext';
+import { rolePlayActive, sceneReplyProblems, sceneFallback, ensureDebrief, ensureOffer, rolePlayTagOf, sceneCard, SCENE_REGEN_NOTE, type SceneCard } from './rolePlay';
+import { recordRolePlayError } from './errorsToWorkOn';
+
+/** liveRolePlay: the note for ONE regeneration when a scene reply leaves the scene (both channels call this before the guards); undefined = keep it. */
+export function rolePlayRegenNote(language: LanguageTeachingContext | null | undefined, answer: string): string | undefined {
+  const t = language?.rolePlay;
+  if (!t || t.phase !== 'beat') return undefined;
+  const p = sceneReplyProblems(t, answer);
+  return p.length ? SCENE_REGEN_NOTE(p) : undefined;
+}
+/** liveRolePlay: the scene card for the client (the live call's side panel); null outside a scene. */
+export const rolePlayCardOf = (language: LanguageTeachingContext | null | undefined): SceneCard | null => sceneCard(language?.rolePlay);
 
 /** TRACK 2 (exampleGuard, plan §2): the guard check on its own (no change to the text), for the one regeneration in the chat path and for the harness. */
 export function exampleGuardCheck(language: LanguageTeachingContext, answer: string, learnerText: string): GuardHit[] {
@@ -87,8 +99,22 @@ export function trimChildReply(text: string): { text: string; removed: number } 
   return removed > 0 ? { text: out, removed } : { text, removed: 0 };
 }
 
-export function applyReplyGuards(language: LanguageTeachingContext, answer: string, learnerText: string): { text: string; removed: number; closingAsk?: ClosingAskStatus; guardHits?: number; postCheck?: string[] } {
+export function applyReplyGuards(language: LanguageTeachingContext, answer: string, learnerText: string): { text: string; removed: number; closingAsk?: ClosingAskStatus; guardHits?: number; postCheck?: string[]; rolePlayFixed?: boolean } {
   let text = answer; let removed = 0; let closingAsk: ClosingAskStatus | undefined; let guardHits = 0; let postCheck: string[] | undefined;
+  // liveRolePlay: a beat reply that still leaves the scene (after the one regeneration) becomes the beat's fixed line; the debrief's rule line and
+  // right/wrong pair, and the offer question, are guaranteed by code.
+  const rp = language.rolePlay; let rolePlayFixed = false;
+  if (rp && rp.phase === 'beat') {
+    const p = sceneReplyProblems(rp, text);
+    if (p.length) { const fb = sceneFallback(rp); if (fb) { text = fb; rolePlayFixed = true; postCheck = [...(postCheck ?? []), 'roleplay_fallback']; } }
+  } else if (rp && rp.phase === 'debrief') {
+    const d = ensureDebrief(rp, text);
+    if (d.added) { text = d.text; rolePlayFixed = true; postCheck = [...(postCheck ?? []), 'roleplay_debrief_added']; }
+  } else if (rp && rp.phase === 'offer') {
+    const o = ensureOffer(rp, text);
+    if (o.added) { text = o.text; rolePlayFixed = true; postCheck = [...(postCheck ?? []), 'roleplay_offer_added']; }
+  }
+  const inScene = rolePlayActive(rp);
   // TRACK 2 (exampleGuard): a modelled sentence that completes an item the learner will solve is removed (the fallback after the one regeneration).
   const hits = exampleGuardCheck(language, text, learnerText);
   if (hits.length) { text = removeGuardHits(text, hits); removed += hits.length; guardHits = hits.length; }
@@ -123,7 +149,9 @@ export function applyReplyGuards(language: LanguageTeachingContext, answer: stri
   // the recap is folded into the task reply as one message ("Rule in one line, then your task"), so it is never skipped for good.
   // reviewOpen (ESL5, framework §7): the closing is one new item in a new context, not a rule recap: no rule ask is appended, a rule ask written next to
   // the item is removed (one task), and the closing counts as done once the reply sets a task (once only). A task-free reply gets one short item ask.
-  if (language.research && isClosingTurn(language.research) && (engineV2('closing') || engineV2('shortRecap')) && engineV2('reviewOpen')) {
+  if (inScene) {
+    // liveRolePlay: no closing ask inside a scene reply (it comes after the scene, on the next task-free reply).
+  } else if (language.research && isClosingTurn(language.research) && (engineV2('closing') || engineV2('shortRecap')) && engineV2('reviewOpen')) {
     const one = enforceSingleAsk(text);
     if (one.droppedClosing) text = one.text;
     const asks = learnerAsks(text);
@@ -143,11 +171,11 @@ export function applyReplyGuards(language: LanguageTeachingContext, answer: stri
   }
   // levelExplicit one-task rule: a reply sets exactly one task. If the model wrote the closing ask next to another task, the ask is removed and deferred
   // (it comes back on the next task-free reply, or folded, as above). The folded form ("Rule in one line ... Then your task") holds no ask and is left alone.
-  if (engineV2('levelExplicit') && !FOLDED.test(text)) {
+  if (engineV2('levelExplicit') && !FOLDED.test(text) && !inScene) {
     const one = enforceSingleAsk(text);
     if (one.droppedClosing) { text = one.text; closingAsk = 'deferred'; }
   }
-  return { text, removed, ...(closingAsk ? { closingAsk } : {}), ...(guardHits ? { guardHits } : {}), ...(postCheck ? { postCheck } : {}) };
+  return { text, removed, ...(closingAsk ? { closingAsk } : {}), ...(guardHits ? { guardHits } : {}), ...(postCheck ? { postCheck } : {}), ...(rolePlayFixed ? { rolePlayFixed } : {}) };
 }
 
 /** Evidence stored with the reply and used by the next turn's engine state; also records the cross-session learner profile. */
@@ -168,6 +196,7 @@ export async function completeLanguageTurn(opts: {
     // ownSentence (ESL5, tag only): the task counts as set only when the reply actually set it; feedback is tagged on the next turn.
     ...(ownSentenceNow(language) === 'ask' && OWN_SENTENCE_SET.test(opts.reply) ? { ownSentence: 'asked' as const } : ownSentenceNow(language) === 'feedback' ? { ownSentence: 'feedback' as const } : {}),
     ...(language.realChat ? { realChat: language.realChat } : {}),
+    ...(language.rolePlay ? { rolePlay: rolePlayTagOf(language.rolePlay) } : {}),
     ...(opts.closingAsk ? { closingAsk: opts.closingAsk } : {}),
     ...(opts.guardHits ? { exampleGuardHits: opts.guardHits } : {}),
     ...(opts.regenerated !== undefined ? { exampleGuardRegenerated: opts.regenerated } : {}),
@@ -180,6 +209,8 @@ export async function completeLanguageTurn(opts: {
   const belief = (lt as { assessment?: { belief?: string } }).assessment?.belief;
   // liveError (ESL5): the error type seen now, and the one the previous reply targeted when this answer got it right (codes only).
   const live = engineV2('liveError') ? { ...(language.signals.liveError ? { liveError: language.signals.liveError.code } : {}), ...(language.signals.liveTarget && isSuccess(lt.assessment.verdict) ? { liveCorrect: language.signals.liveTarget } : {}) } : {};
+  // liveRolePlay: an error corrected in the scene is logged with its code to errors to work on (codes and ids only).
+  if (language.rolePlay?.error) await recordRolePlayError({ institutionId: opts.institutionId, studentId: opts.studentId, code: language.rolePlay.error.code, outcomeId: language.rolePlay.error.outcome, sceneId: language.rolePlay.scene, messageId: opts.messageId });
   await recordProfileTurn(opts.institutionId, opts.studentId, { errorCode: language.signals.diagnosis?.code, independentSuccessOn: independentSuccessItem(language, lt), ...(belief ? { belief } : {}), lessonId: language.lesson.lessonId, lessonTitle: language.lesson.title, style: styleFromMoves(language.prevMoves), ...live, ...known, ...(engineV2('reviewOpen') && lt.rulesIntroduced?.length ? { rulesIntroduced: lt.rulesIntroduced.map((c) => knownKey(language.lesson.lessonId, c)) } : {}) });
   return lt as unknown as LanguageTurnEvidence;
 }

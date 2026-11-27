@@ -5,7 +5,7 @@ import { Schema, model, Document } from 'mongoose';
 // No question text, answer or learner text is stored: only ids, codes and the question's own error label (school content).
 // Status: open -> resolved after two independent rights in a row in later sessions; any wrong answer on it reopens it.
 // A teacher can dismiss a row. Deleted with the learner (studentErasure).
-export interface IErrorSource { kind: 'assignment_attempt' | 'practice_attempt' | 'moodle_quiz_attempt'; attemptId: string; assessmentId: string; assignmentId?: string; questionId: string; at: Date }
+export interface IErrorSource { kind: 'assignment_attempt' | 'practice_attempt' | 'moodle_quiz_attempt' | 'roleplay'; attemptId: string; assessmentId: string; assignmentId?: string; questionId: string; at: Date }
 export interface IErrorToWorkOn extends Document {
   id: string;
   institutionId?: string;
@@ -36,7 +36,7 @@ export interface IErrorToWorkOn extends Document {
   statusHistory: { at: Date; by?: string; from?: string; to: string; reason?: string }[];
 }
 
-const SourceSchema = new Schema<IErrorSource>({ kind: { type: String, enum: ['assignment_attempt', 'practice_attempt', 'moodle_quiz_attempt'], required: true }, attemptId: { type: String, required: true }, assessmentId: { type: String, required: true }, assignmentId: String, questionId: { type: String, required: true }, at: { type: Date, required: true } }, { _id: false });
+const SourceSchema = new Schema<IErrorSource>({ kind: { type: String, enum: ['assignment_attempt', 'practice_attempt', 'moodle_quiz_attempt', 'roleplay'], required: true }, attemptId: { type: String, required: true }, assessmentId: { type: String, required: true }, assignmentId: String, questionId: { type: String, required: true }, at: { type: Date, required: true } }, { _id: false });
 const schema = new Schema<IErrorToWorkOn>(
   {
     id: { type: String, required: true, unique: true },
