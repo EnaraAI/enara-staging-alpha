@@ -125,15 +125,21 @@ async function kidsSide(side, view) {
   };
   for (const lang of ['en', 'ar']) {
     await page.evaluate((l) => localStorage.setItem('enara_kids_lang', l), lang);
-    await page.reload(); await page.locator('.ek-root nav.ek-rail').waitFor({ timeout: 30_000 }).catch(() => {});
+    await page.reload();
+    const railOk = await page.locator('.ek-root nav.ek-rail').waitFor({ timeout: 30_000 }).then(() => true, () => false);
     const tabs = page.locator('nav.ek-rail .ek-tab:not(.ek-tab--quiet)');
+    if (!railOk || !(await tabs.count())) {
+      await page.screenshot({ path: `${OUT}kidscompare--norail--${lang}--${view.name}--${side === 'design' ? 'design' : 'lmstest'}.png` });
+      results.push({ role, view: view.name, lang, screen: 'kids:tabs', ok: false, note: `no kids tabs after reload (${side}): ${page.url()}`, pageErrors: errors.splice(0), apiFail: apiFail.splice(0) });
+      continue;
+    }
     for (let i = 0; i < await tabs.count(); i++) {
       const label = (await tabs.nth(i).innerText()).trim();
       await tabs.nth(i).click(); await settle();
       await shot(TAB_KEYS[label] ?? `tab${i + 1}`, lang);
     }
     // The tutor drawer (text chat; nothing is sent, and the live call button is never pressed).
-    await tabs.first().click(); await settle();
+    await tabs.first().click({ timeout: 10_000 }).catch(() => {}); await settle();
     const ask = page.locator('.ek-app__tutor').first();
     if (await ask.count()) {
       await ask.click(); await page.locator('.ek-drawer__panel').waitFor({ timeout: 10_000 }).catch(() => {}); await settle();
@@ -143,7 +149,9 @@ async function kidsSide(side, view) {
   await ctx.close();
 }
 if (!only.length || only.includes('kids')) {
-  for (const view of VIEWS) await Promise.all([kidsSide('design', view), kidsSide('lmstest', view)]);
+  // One side failing (or lms-test being slow) never stops the run: it is recorded as a failure with a screenshot.
+  const safe = (side, view) => kidsSide(side, view).catch((e) => { results.push({ role: 'kids (compare)', view: view.name, screen: `kids:${side}`, ok: false, note: `crashed: ${String(e?.message ?? e).split('\n')[0]}` }); });
+  for (const view of VIEWS) await Promise.all([safe('design', view), safe('lmstest', view)]);
 }
 
 await browser.close();
