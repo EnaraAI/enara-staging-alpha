@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
-import { MongoRateLimitStore } from '../services/mongoRateLimitStore';
+import { BatchedRateLimitStore } from '../services/mongoRateLimitStore';
 import { authMiddleware, requireRole, type AuthRequest } from '../middleware/auth.middleware';
 import { getFlags, getLearningSettings, setFlags, setLearningSettings } from '../controllers/learningFlags.controller';
 import {
@@ -60,7 +60,7 @@ router.use(
   rateLimit({
     windowMs: 60 * 1000,
     max: 240,
-    store: new MongoRateLimitStore('learning-user'),
+    store: new BatchedRateLimitStore('learning-user'), // lms-speed-5: no database round trip per request
     passOnStoreError: true,
     keyGenerator: (req) => `user:${(req as AuthRequest).user!.id}`,
     standardHeaders: true,

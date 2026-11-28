@@ -16,7 +16,7 @@ import { setupSwagger } from './config/swagger';
 import { errorHandler, AppError } from './middleware/errorHandler';
 import { isValidUploadSignature, uploadLinkSigning } from './utils/uploadSigning';
 import { resolveUpload } from './services/uploadAccess';
-import { MongoRateLimitStore } from './services/mongoRateLimitStore';
+import { BatchedRateLimitStore, MongoRateLimitStore } from './services/mongoRateLimitStore';
 import { captureRawBody, requestContext, requestLogger } from './middleware/requestContext';
 import authRoutes from './routes/auth.routes';
 import curriculumRoutes from './routes/curriculum.routes';
@@ -74,6 +74,9 @@ function corsOptions(): CorsOptions {
     credentials: false,
     // Read by the live call to know the reply carries its own speech.
     exposedHeaders: ['X-Enara-Speech'],
+    // lms-speed-5: browsers keep a preflight answer for 2 hours (Chrome caps it there) instead of asking
+    // again before every cross-origin call (design.enara.app made one OPTIONS round trip per API call).
+    maxAge: 7200,
     origin(origin, callback) {
       if (!origin) {
         callback(null, true);
@@ -96,12 +99,13 @@ function verifiedUserKey(req: Request): string | undefined {
   }
 }
 
-function makeLimiter(name: string, windowMs: number, max: number, message: string, perUser: boolean | 'verified' = false, skip?: (req: Request) => boolean) {
+function makeLimiter(name: string, windowMs: number, max: number, message: string, perUser: boolean | 'verified' = false, skip?: (req: Request) => boolean, batched = false) {
   return rateLimit({
     windowMs,
     max,
     ...(skip ? { skip } : {}),
-    store: new MongoRateLimitStore(name),
+    // lms-speed-5: the general /api limits count without a database round trip per request.
+    store: batched ? new BatchedRateLimitStore(name) : new MongoRateLimitStore(name),
     // Don't take the API down if the counter store fails.
     passOnStoreError: true,
     // Per signed-in user where a school's students share one IP address.
@@ -228,8 +232,8 @@ export function createApp() {
   // API_RATE_LIMIT_MAX: 300 per minute per verified user unless set (the E2E stack, where one admin account drives many
   // scenarios back to back, sets it higher; with a faster front end it went over 300 in a minute).
   const apiUserMax = Math.max(1, Number(process.env.API_RATE_LIMIT_MAX) || 300);
-  app.use('/api', makeLimiter('api', 60 * 1000, apiUserMax, 'Too many API requests', 'verified', (req) => learningOwnLimiter(req) || callOwnLimiter(req)));
-  app.use('/api', makeLimiter('api-ip', 60 * 1000, 3000, 'Too many API requests from this network', false, learningOwnLimiter));
+  app.use('/api', makeLimiter('api', 60 * 1000, apiUserMax, 'Too many API requests', 'verified', (req) => learningOwnLimiter(req) || callOwnLimiter(req), true));
+  app.use('/api', makeLimiter('api-ip', 60 * 1000, 3000, 'Too many API requests from this network', false, learningOwnLimiter, true));
 
   app.use(express.json({ limit: config.requestBodyLimit, verify: captureRawBody }));
   app.use(express.urlencoded({ extended: false, limit: config.formBodyLimit, verify: captureRawBody }));

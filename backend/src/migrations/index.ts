@@ -624,6 +624,19 @@ export const MIGRATIONS: Migration[] = [
       await m.SchoolColumnMapping.createIndexes();
     },
   },
+  {
+    id: '2026-12-10-speed-upload-lookup-indexes',
+    description: 'Speed (lms-speed-5): indexes for the file lookups behind course, dashboard and lesson reads: curriculum_file_jobs.fileUrl, students.photoUrl and students.pendingPhotoUrl (sparse), curricula.chapters.uploads; and the expiry index of next_steps_notes (new collection, the shared home-page note). Indexes only; no document is changed.',
+    up: async () => {
+      const { Student } = await import('../models/Student');
+      const { Curriculum } = await import('../models/Curriculum');
+      await CurriculumFileJob.createIndexes();
+      await Student.createIndexes();
+      await Curriculum.createIndexes();
+      const { NextStepsNote } = await import('../models/NextStepsNote');
+      await NextStepsNote.createIndexes();
+    },
+  },
 ];
 
 type TtlCollection = { collectionName: string; indexes(): Promise<{ key: Record<string, unknown>; expireAfterSeconds?: number }[]>; createIndex(key: Record<string, 1>, opts: { expireAfterSeconds: number }): Promise<unknown> };

@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { User } from '../models/User';
+import { User, type IUser } from '../models/User';
 import { UserRole } from '../auth/roles';
 import { verifyAccessToken } from '../auth/jwt';
 import { Institution } from '../models/Institution';
@@ -55,9 +55,12 @@ export async function authMiddleware(req: AuthRequest, res: Response, next: Next
   const token = header.slice(7);
   try {
     const verified = verifyAccessToken(token);
-    const user = await User.findById(verified.subject);
-    // A logout or password reset since the token was issued revokes it (S-1).
-    if (!user || user.status !== 'active' || (user.tokenVersion ?? 0) !== verified.tokenVersion) {
+    // lms-speed-5: only the fields used here, as a plain object (no full document per request).
+    const user = await User.findById(verified.subject)
+      .select('_id email role studentId institutionId status permissions tokenVersion')
+      .lean<Pick<IUser, 'email' | 'role' | 'studentId' | 'institutionId' | 'status' | 'permissions' | 'tokenVersion'> & { _id: { toString(): string } }>();
+    // A logout or password reset since the token was issued revokes it (S-1). A missing status is the schema default, active.
+    if (!user || (user.status ?? 'active') !== 'active' || (user.tokenVersion ?? 0) !== verified.tokenVersion) {
       res.status(401).json({
         error: {
           code: 'INVALID_TOKEN',

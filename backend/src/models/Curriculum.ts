@@ -122,5 +122,7 @@ const curriculumSchema = new Schema<ICurriculum>(
 
 curriculumSchema.index({ institutionId: 1, status: 1 });
 curriculumSchema.index({ institutionId: 1, updatedAt: -1 });
+// lms-speed-5: resolveUploads finds which course lists a file.
+curriculumSchema.index({ 'chapters.uploads': 1 });
 
 export const Curriculum = model<ICurriculum>('Curriculum', curriculumSchema);
