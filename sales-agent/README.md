@@ -50,8 +50,10 @@ SQL aggregates over Cairo days, charts drawn as inline SVG), **Ask** (`POST /api
 below) and **Settings** (run controls, uploads, agent settings, do-not-contact list, recent runs). Lead segments include
 English teaching centres (`language_center`) and training centres (`training_center`).
 
-Ask: the Worker calls the Anthropic Messages API with the secret `ANTHROPIC_API_KEY` (model from the optional var
-`CHAT_MODEL`, default `claude-sonnet-5-5`). The model gets read-only tools (search_leads, get_lead, get_insights,
+Ask: the Worker calls DeepSeek V4.1 Flash on ENARA's Modal endpoint when the secret `DEEPSEEK_API_KEY` is set (optional vars
+`DEEPSEEK_ENDPOINT`, `DEEPSEEK_MODEL`; OpenAI-style chat completions), otherwise the Anthropic Messages API with `ANTHROPIC_API_KEY`
+(`CHAT_MODEL`, default `claude-sonnet-5-5`); `CHAT_PROVIDER=anthropic` forces Anthropic. If the DeepSeek server rejects tools, the chat
+answers from a read-only snapshot (no proposals). The model gets read-only tools (search_leads, get_lead, get_insights,
 list_runs, list_imports, get_settings; every query is SELECT-only) and `propose_action`, which only shows the owner a card
 with a Confirm button. Confirm calls the normal endpoints with the lead's version. The draft rules in the chat's system
 prompt are copied from agent/PROMPT.md at build time. 30 messages per 10 minutes per session (`chat_hits` table).

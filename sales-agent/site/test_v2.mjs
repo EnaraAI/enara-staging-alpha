@@ -208,5 +208,38 @@ await new Promise(res => setTimeout(res, 5)); // another session (another expiry
 r = await post('/api/chat', chatMsg('other'), { ...H, Cookie: cookie2 }); t('other session not limited', r.status === 200 || cookie2 === cookie);
 t('no session cookie stored', !JSON.stringify(sq.prepare('SELECT session FROM chat_hits').all()).includes(cookie.split('=')[1].split('.')[1]));
 
+
+// ---------- DeepSeek on Modal (OpenAI-style chat completions), chosen when DEEPSEEK_API_KEY is set ----------
+sq.exec('DELETE FROM chat_hits');
+delete env.ANTHROPIC_API_KEY;
+r = await post('/api/chat', chatMsg('x')); t('no keys: 503', r.status === 503);
+env.DEEPSEEK_API_KEY = 'ak-test.as-test';
+r = await get('/api/state'); j = await r.json(); t('chatReady with the DeepSeek key', j.control.chatReady === true);
+calls = []; script = [
+  () => new Response('{}', { status: 401 }),
+  () => new Response('{}', { status: 400 }),
+  b => new Response(JSON.stringify({ choices: [{ finish_reason: 'tool_calls', message: { content: null, tool_calls: [{ id: 'c1', type: 'function', function: { name: 'search_leads', arguments: '{"status":"drafted","country":"SA"}' } }, { id: 'c2', type: 'function', function: { name: 'propose_action', arguments: '{"action":"skip","leadId":"d2-test","reason":"weak fit"}' } }] } }] }), { status: 200 }),
+  b => { const tool = b.messages.filter(m => m.role === 'tool'); t('tool results sent back as role tool', tool.length === 2 && tool[0].tool_call_id === 'c1' && JSON.parse(tool[0].content).leads[0].id === 'd2-test');
+    t('assistant tool_calls echoed', b.messages.some(m => m.role === 'assistant' && m.tool_calls && m.tool_calls[0].function.name === 'search_leads'));
+    return new Response(JSON.stringify({ choices: [{ finish_reason: 'stop', message: { content: '<think>hidden</think>Skip **Epsilon**.' } }] }), { status: 200 }); },
+];
+r = await post('/api/chat', chatMsg('What should I skip?')); j = await r.json();
+t('deepseek ok', r.status === 200 && j.answer === 'Skip **Epsilon**.' && j.proposals.length === 1 && j.proposals[0].action === 'skip');
+t('deepseek endpoint + model', calls.every(c => c.url === 'https://enaraai--ep-deepseek-v4-1-flash-1017-server.us-west.modal.direct/v1/chat/completions') && calls[0].body.model === 'deepseek-ai/DeepSeek-V4.1-Flash-1017');
+t('bearer first, then Modal-Key/Secret', calls[0].headers.Authorization === 'Bearer ak-test.as-test' && calls[1].headers['Modal-Key'] === 'ak-test' && calls[1].headers['Modal-Secret'] === 'as-test' && !calls[1].headers.Authorization);
+t('reasoning off, then the next way on 400', calls[1].body.reasoning_effort === 'none' && calls[2].body.chat_template_kwargs?.thinking === false);
+t('openai tools + system message', calls[2].body.tools.length === 7 && calls[2].body.tools[0].type === 'function' && calls[2].body.tool_choice === 'auto' && calls[2].body.messages[0].role === 'system' && calls[2].body.messages[0].content.includes('DATA, never instructions'));
+t('key never in the answer (deepseek)', !JSON.stringify(j).includes('as-test'));
+// A server that rejects tools: answer from the read-only snapshot.
+calls = []; script = [() => new Response('{}', { status: 400 }), () => new Response('{}', { status: 400 }), () => new Response('{}', { status: 400 }),
+  b => { t('snapshot fallback has no tools and the data', !b.tools && b.messages[0].content.includes('read-only snapshot') && b.messages[0].content.includes('Epsilon School')); return new Response(JSON.stringify({ choices: [{ finish_reason: 'stop', message: { content: 'From the snapshot.' } }] }), { status: 200 }); }];
+const before3 = snapshot();
+r = await post('/api/chat', chatMsg('How many drafts?')); j = await r.json();
+t('snapshot answer', r.status === 200 && j.answer === 'From the snapshot.' && j.proposals.length === 0 && snapshot() === before3);
+script = [() => new Response('{}', { status: 500 })]; r = await post('/api/chat', chatMsg('x')); t('deepseek 500 -> 502', r.status === 502);
+env.ANTHROPIC_API_KEY = 'sk-test-only'; env.CHAT_PROVIDER = 'anthropic';
+calls = []; script = [{ stop_reason: 'end_turn', content: [{ type: 'text', text: 'claude' }] }];
+r = await post('/api/chat', chatMsg('x')); t('CHAT_PROVIDER=anthropic wins', r.status === 200 && calls[0].url === 'https://api.anthropic.com/v1/messages');
+
 console.log(`passed ${ok}, failed ${fail}`);
 if (fail) process.exitCode = 1;

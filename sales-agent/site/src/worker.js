@@ -175,7 +175,7 @@ async function api(req, env, url) {
     const tasks = (await db.prepare("SELECT id, data, version FROM docs WHERE coll = 'tasks' AND json_extract(data, '$.done') = 0 ORDER BY json_extract(data, '$.due') LIMIT 500").all()).results
       .map(r => ({ ...JSON.parse(r.data), id: r.id, version: r.version }));
     const dnc = (await db.prepare("SELECT data FROM docs WHERE coll = 'dnc' ORDER BY json_extract(data, '$.at') DESC LIMIT 300").all()).results.map(r => JSON.parse(r.data));
-    return json({ leads, settings: s ? JSON.parse(s.data) : null, runs, imports, tasks, dnc, control: { ...ctl, runReady: runReady(env), chatReady: !!env.ANTHROPIC_API_KEY } });
+    return json({ leads, settings: s ? JSON.parse(s.data) : null, runs, imports, tasks, dnc, control: { ...ctl, runReady: runReady(env), chatReady: !!chatProvider(env) } });
   }
 
   if (url.pathname === '/api/insights' && req.method === 'GET') {
@@ -195,7 +195,7 @@ async function api(req, env, url) {
   if (url.pathname === '/api/chat') {
     const chat = cleanChat(await readBody(req, 120000));
     if (!chat) return json({ error: 'bad_request' }, 400);
-    if (!env.ANTHROPIC_API_KEY) return json({ error: 'chat_not_set_up' }, 503);
+    if (!chatProvider(env)) return json({ error: 'chat_not_set_up' }, 503);
     if (!await chatRateOk(db, await sessionKey(req))) return json({ error: 'rate_limited' }, 429);
     const out = await chatReply(env, chat);
     if (out.error) return json({ error: out.error }, out.status);

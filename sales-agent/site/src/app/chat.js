@@ -39,7 +39,7 @@ function propCard(p, mi, pi) {
 
 function renderChat() {
   const ready = !!control.chatReady;
-  $('#chatNote').innerHTML = loaded && !ready ? '<div class="empty" style="margin-bottom:12px">Chat isn’t connected yet. It starts working once the Anthropic API key is added to the website’s settings in Cloudflare.</div>' : '';
+  $('#chatNote').innerHTML = loaded && !ready ? '<div class="empty" style="margin-bottom:12px">Chat isn’t connected yet. It starts working once the model key (DEEPSEEK_API_KEY) is added to the website’s settings in Cloudflare.</div>' : '';
   $('#chatLog').innerHTML = chat.map((m, mi) => m.role === 'user'
     ? `<div class="msg me" dir="auto">${esc(m.content)}</div>`
     : `<div class="msg ai">${md(m.content)}</div>${(m.proposals || []).map((p, pi) => propCard(p, mi, pi)).join('')}`).join('')
