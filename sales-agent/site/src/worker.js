@@ -8,7 +8,7 @@ const SESSION_DAYS = 30;
 const CSP = "default-src 'none'; script-src 'self' https://cdnjs.cloudflare.com; worker-src 'self' blob: https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://assets.enara.app; connect-src 'self' https://cdnjs.cloudflare.com; form-action 'self'; frame-ancestors 'none'; base-uri 'none'";
 const STATUSES = new Set(['drafted', 'approved', 'sent', 'replied', 'not_interested', 'do_not_contact', 'skipped']);
 const COUNTRY_CODES = new Set(['EG', 'SA', 'IQ', 'AE', 'KW', 'QA', 'BH', 'OM']);
-const SEGMENT_CODES = new Set(['international_school', 'private_school', 'school_group', 'language_center', 'university']);
+const SEGMENT_CODES = new Set(['international_school', 'private_school', 'school_group', 'language_center', 'training_center', 'university']);
 
 function headers(extra = {}) {
   return {
@@ -47,6 +47,11 @@ const passKey = env => sha256hex('enara-sales:' + (env.SITE_PASSWORD || ''));
 async function makeSession(env) {
   const exp = String(Date.now() + SESSION_DAYS * DAY * 1000);
   return exp + '.' + await hmac(env.SESSION_KEY, exp + '.' + await passKey(env));
+}
+// A per-session key for the chat rate limit (a hash of the session cookie's signature, never the cookie itself).
+async function sessionKey(req) {
+  const m = (req.headers.get('Cookie') || '').match(/(?:^|;\s*)es=([0-9]+)\.([A-Za-z0-9_-]+)/);
+  return (await sha256hex('chat:' + (m ? m[2] : ''))).slice(0, 32);
 }
 async function signedIn(req, env) {
   if (!env.SITE_PASSWORD || !env.SESSION_KEY) return false;
@@ -90,7 +95,10 @@ function cleanLeadPatch(p) {
         log.push(item);
       }
       out.sentLog = log;
-    } else return null;
+    } else {
+      const c = cleanCrmField(k, v, out);
+      if (c !== true) return null;
+    }
   }
   return out;
 }
@@ -164,10 +172,42 @@ async function api(req, env, url) {
       .map(r => JSON.parse(r.data));
     const ctl = (await readDoc(db, 'control')) || {};
     const imports = (await db.prepare("SELECT id, json_extract(data, '$.name') AS name, json_extract(data, '$.kind') AS kind, json_extract(data, '$.status') AS status, json_extract(data, '$.total') AS total, json_extract(data, '$.processed') AS processed, json_extract(data, '$.leadsCreated') AS leadsCreated, json_extract(data, '$.uploadedAt') AS uploadedAt, json_extract(data, '$.agentNote') AS agentNote FROM docs WHERE coll = 'imports' ORDER BY json_extract(data, '$.uploadedAt') DESC LIMIT 20").all()).results;
-    return json({ leads, settings: s ? JSON.parse(s.data) : null, runs, imports, control: { ...ctl, runReady: runReady(env) } });
+    const tasks = (await db.prepare("SELECT id, data, version FROM docs WHERE coll = 'tasks' AND json_extract(data, '$.done') = 0 ORDER BY json_extract(data, '$.due') LIMIT 500").all()).results
+      .map(r => ({ ...JSON.parse(r.data), id: r.id, version: r.version }));
+    const dnc = (await db.prepare("SELECT data FROM docs WHERE coll = 'dnc' ORDER BY json_extract(data, '$.at') DESC LIMIT 300").all()).results.map(r => JSON.parse(r.data));
+    return json({ leads, settings: s ? JSON.parse(s.data) : null, runs, imports, tasks, dnc, control: { ...ctl, runReady: runReady(env), chatReady: !!env.ANTHROPIC_API_KEY } });
+  }
+
+  if (url.pathname === '/api/insights' && req.method === 'GET') {
+    const range = url.searchParams.get('range') || '30';
+    if (!Object.prototype.hasOwnProperty.call(RANGES, range)) return json({ error: 'bad_request' }, 400);
+    return json(await insightsData(db, range));
+  }
+
+  const lg = url.pathname.match(/^\/api\/leads\/([A-Za-z0-9_.~:@+-]{1,200})$/);
+  if (lg && req.method === 'GET') {
+    const d = await leadDetail(db, lg[1]);
+    return d ? json(d) : json({ error: 'not_found' }, 404);
   }
 
   if (req.method !== 'POST') return json({ error: 'not_found' }, 404);
+
+  if (url.pathname === '/api/chat') {
+    const chat = cleanChat(await readBody(req, 120000));
+    if (!chat) return json({ error: 'bad_request' }, 400);
+    if (!env.ANTHROPIC_API_KEY) return json({ error: 'chat_not_set_up' }, 503);
+    if (!await chatRateOk(db, await sessionKey(req))) return json({ error: 'rate_limited' }, 429);
+    const out = await chatReply(env, chat);
+    if (out.error) return json({ error: out.error }, out.status);
+    return json(out);
+  }
+
+  if (url.pathname === '/api/export') {
+    const b = await readBody(req, 300000);
+    if (!isObj(b) || !Array.isArray(b.ids) || !b.ids.length || b.ids.length > 5000 || !b.ids.every(leadIdOk)) return json({ error: 'bad_request' }, 400);
+    const csv = await exportCsv(db, [...new Set(b.ids)]);
+    return new Response(csv, { headers: headers({ 'Content-Type': 'text/csv; charset=utf-8', 'Content-Disposition': 'attachment; filename="enara-leads.csv"' }) });
+  }
 
   if (url.pathname === '/api/upload') {
     const b = await readBody(req, 1600000);
@@ -190,6 +230,43 @@ async function api(req, env, url) {
     return json({ ok: true });
   }
 
+  if (url.pathname === '/api/leads') {
+    const m = cleanManualLead(body.lead);
+    if (!m) return json({ error: 'bad_request' }, 400);
+    const out = await addManualLead(db, m, now);
+    return out.error ? json(out, 409) : json({ ok: true, id: out.id });
+  }
+
+  const ac = url.pathname.match(/^\/api\/leads\/([A-Za-z0-9_.~:@+-]{1,200})\/activity$/);
+  if (ac) {
+    const a = cleanActivity(body);
+    if (!a) return json({ error: 'bad_request' }, 400);
+    if (!await db.prepare("SELECT 1 AS x FROM docs WHERE coll = 'leads' AND id = ?1").bind(ac[1]).first()) return json({ error: 'not_found' }, 404);
+    return json({ ok: true, id: await addActivity(db, ac[1], a.kind, a.text, now) });
+  }
+
+  if (url.pathname === '/api/tasks') {
+    const t = cleanTask(body);
+    if (!t) return json({ error: 'bad_request' }, 400);
+    if (!await db.prepare("SELECT 1 AS x FROM docs WHERE coll = 'leads' AND id = ?1").bind(t.leadId).first()) return json({ error: 'not_found' }, 404);
+    const id = 'tsk-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 7);
+    await db.prepare("INSERT INTO docs (coll, id, data, version, updated_at) VALUES ('tasks', ?1, ?2, 1, ?3)").bind(id, JSON.stringify({ ...t, createdAt: now }), now).run();
+    return json({ ok: true, id });
+  }
+  const tk = url.pathname.match(/^\/api\/tasks\/(tsk-[a-z0-9-]{3,40})$/);
+  if (tk) {
+    const patch = cleanTaskPatch(body.patch);
+    if (!patch || !Number.isInteger(body.version)) return json({ error: 'bad_request' }, 400);
+    const row = await db.prepare("SELECT data, version FROM docs WHERE coll = 'tasks' AND id = ?1").bind(tk[1]).first();
+    if (!row) return json({ error: 'not_found' }, 404);
+    if (row.version !== body.version) return json({ error: 'conflict' }, 409);
+    if (patch.done !== undefined) patch.doneAt = patch.done ? now : null;
+    const r = await db.prepare("UPDATE docs SET data = ?1, version = version + 1, updated_at = ?2 WHERE coll = 'tasks' AND id = ?3 AND version = ?4")
+      .bind(JSON.stringify({ ...JSON.parse(row.data), ...patch }), now, tk[1], body.version).run();
+    if (!r.meta || !r.meta.changes) return json({ error: 'conflict' }, 409);
+    return json({ ok: true });
+  }
+
   const m = url.pathname.match(/^\/api\/leads\/([A-Za-z0-9_.~:@+-]{1,200})$/);
   if (m) {
     const id = m[1];
@@ -198,10 +275,13 @@ async function api(req, env, url) {
     const row = await db.prepare("SELECT data, version FROM docs WHERE coll = 'leads' AND id = ?1").bind(id).first();
     if (!row) return json({ error: 'not_found' }, 404);
     if (row.version !== body.version) return json({ error: 'conflict' }, 409);
+    const old = JSON.parse(row.data);
+    applyLeadRules(old, patch, now);
     const merged = merge(JSON.parse(row.data), patch);
     const r = await db.prepare("UPDATE docs SET data = ?1, version = version + 1, updated_at = ?2 WHERE coll = 'leads' AND id = ?3 AND version = ?4")
       .bind(JSON.stringify(merged), now, id, body.version).run();
     if (!r.meta || !r.meta.changes) return json({ error: 'conflict' }, 409);
+    await logLeadChange(db, id, old, patch, now);
     return json({ ok: true });
   }
 
@@ -296,6 +376,8 @@ export default {
       if (!await signedIn(req, env)) return new Response('', { status: 401, headers: headers() });
       return new Response(APP_JS, { headers: headers({ 'Content-Type': 'text/javascript; charset=utf-8' }) });
     }
+
+    if (url.pathname === '/favicon.svg') return new Response(FAVICON_SVG, { headers: headers({ 'Content-Type': 'image/svg+xml', 'Cache-Control': 'public, max-age=86400' }) });
 
     if (url.pathname === '/robots.txt') return new Response('User-agent: *\nDisallow: /\n', { headers: headers({ 'Content-Type': 'text/plain' }) });
 
