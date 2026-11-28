@@ -1,0 +1,23 @@
+# Cloudflare Worker for sales.enara.app (the sales agent's private website).
+# Build first: python3 build.py  (writes out/site.mjs)
+# Deploy:      npx wrangler deploy   (needs CLOUDFLARE_API_TOKEN in the environment; never commit it)
+# Secrets live in Cloudflare, not here: SITE_PASSWORD, SESSION_KEY, ROUTINE_FIRE_URL, ROUTINE_TOKEN.
+# "wrangler deploy" keeps existing secrets.
+
+name = "enara-sales"
+main = "out/site.mjs"
+compatibility_date = "2025-06-01"
+account_id = "4bbeac055aa068c06982f55728ad856d"
+workers_dev = false
+
+routes = [
+  { pattern = "sales.enara.app", custom_domain = true }
+]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "enara-sales"
+database_id = "0e4dcb52-f906-404f-adda-74b8b94d6af0"
+
+[observability]
+enabled = true

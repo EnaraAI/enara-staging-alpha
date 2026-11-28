@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ENARA Sales</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+/* VOICE work: a calm sales desk the owner checks on a phone
+   IDEA a survey map's route: each lead travels found → approved → sent → replied
+   PICTURE the pipeline route with stations and live counts; tapping a station filters the leads
+   COLOUR land #fbfbf2 ground, sea #bfe3ee header, ink #13242e, route magenta #d6127e, contour brown #a8551b
+   TYPE Overpass 800 for titles and figures, Overpass for text
+   LAYOUT header band with the route, then filters, then the lead cards in one column; settings and runs below */
+:root{color-scheme:light dark;--bg:light-dark(#fbfbf2,#0d1c24);--ink:light-dark(#13242e,#e6eef2);--sea:light-dark(#bfe3ee,#12303c);--mag:light-dark(#d6127e,#ff4fa7);--brown:light-dark(#a8551b,#e09a62);--card:light-dark(#ffffff,#132833);--line:light-dark(#e4dccb,#24404d);--soft:light-dark(#5a6a72,#9fb3bc);--ok:light-dark(#0f7a4a,#5fd39b);--bad:light-dark(#b42318,#ff8a80)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 Overpass,system-ui,sans-serif;overflow-x:clip}
+.band{padding-block:clamp(20px,3.5vw,44px);padding-inline:max(4vw,16px)}
+.wrap{max-width:900px;margin:0 auto}
+header.band{background:var(--sea)}
+.hint{font-size:15px;margin:0 0 4px}
+.imp{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 12px;align-items:center}
+.imp button{min-height:40px;padding:0 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:600 14px Overpass,sans-serif;cursor:pointer}
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.ctl{min-height:44px;padding:0 16px;border-radius:10px;border:1px solid var(--ink);background:var(--card);color:var(--ink);font:700 15px Overpass,sans-serif;cursor:pointer}
+.ctl.go{background:var(--mag);border-color:var(--mag);color:#fff}
+.ctl:disabled{opacity:.5;cursor:not-allowed}
+.ctlnote{margin:8px 0 0;font-size:14px;min-height:1.4em}
+.ctlnote a{color:var(--ink);font-weight:700}
+.toprow{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.out{min-height:40px;padding:0 14px;border-radius:10px;border:1px solid var(--ink);background:transparent;color:var(--ink);font:600 14px Overpass,sans-serif;cursor:pointer;white-space:nowrap}
+h1{font-weight:800;font-size:clamp(30px,6vw,44px);line-height:1.05;letter-spacing:-.02em;margin:0 0 6px;text-wrap:balance}
+.lede{margin:0;max-width:62ch;color:var(--ink)}
+.pill{display:inline-flex;gap:8px;align-items:center;margin-top:12px;padding:6px 12px;border-radius:999px;background:var(--card);font-size:14px;font-weight:600}
+.pill i{width:9px;height:9px;border-radius:50%;background:var(--ok)}
+.pill.off i{background:var(--bad)}
+.route{position:relative;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:26px}
+.route::before{content:"";position:absolute;left:12.5%;right:12.5%;top:27px;height:6px;border-radius:3px;background:var(--mag)}
+.stn{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:0;color:var(--ink);font:inherit;cursor:pointer;padding:0 2px 6px;min-height:44px}
+.stn b{display:grid;place-items:center;width:60px;height:60px;border-radius:50%;background:var(--card);border:6px solid var(--mag);font-weight:800;font-size:22px;font-variant-numeric:tabular-nums}
+.stn span{font-size:14px;font-weight:600;text-align:center;line-height:1.2}
+.stn.on b{background:var(--mag);color:#fff}
+.stn:focus-visible{outline:3px solid var(--brown);outline-offset:2px;border-radius:12px}
+.under{display:flex;flex-wrap:wrap;gap:6px 20px;margin-top:14px;font-size:14px;color:var(--ink)}
+.under strong{font-variant-numeric:tabular-nums}
+.bar{position:sticky;top:0;z-index:2;background:var(--bg);border-bottom:1px solid var(--line);padding-block:10px}
+.tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
+.tabs button{flex:none;min-height:40px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:600 15px Overpass,sans-serif;cursor:pointer}
+.tabs button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.filters{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;margin-top:8px}
+input,select,textarea{font:16px/1.45 Overpass,system-ui,sans-serif;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%}
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible{outline:3px solid var(--brown);outline-offset:1px}
+select{width:auto}
+#list{display:grid;gap:14px;padding-block:16px 8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+.card h3{margin:0;font-size:20px;font-weight:800;line-height:1.2}
+.meta{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:4px;font-size:14px;color:var(--soft)}
+.tag{display:inline-block;padding:1px 9px;border-radius:999px;font-size:13px;font-weight:600;background:var(--sea);color:var(--ink);white-space:nowrap}
+.tag.warn{background:color-mix(in srgb,var(--brown) 22%,transparent)}
+.dots{letter-spacing:2px;color:var(--mag);white-space:nowrap}
+.who{margin:10px 0 0;font-size:15px}
+.who .em{font-weight:600;overflow-wrap:anywhere}
+.why{margin:8px 0 0;font-size:15px}
+.src{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:6px;font-size:14px}
+.src a{color:var(--brown);overflow-wrap:anywhere}
+.err{margin-top:8px;color:var(--bad);font-size:14px;font-weight:600}
+label{display:block;font-size:13px;font-weight:600;color:var(--soft);margin:12px 0 4px}
+textarea{min-height:200px;resize:vertical}
+.acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.acts button{min-height:44px;padding:0 16px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:600 15px Overpass,sans-serif;cursor:pointer}
+.acts button.go{background:var(--mag);border-color:var(--mag);color:#fff}
+.acts button.quiet{border-color:transparent;color:var(--soft)}
+.acts button:disabled{opacity:.5;cursor:wait}
+.log{margin-top:10px;font-size:14px;color:var(--soft)}
+.empty{padding:28px 18px;border:1px dashed var(--line);border-radius:14px;text-align:center;color:var(--soft)}
+details{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px 16px}
+summary{cursor:pointer;font-weight:800;font-size:18px;padding:12px 0;min-height:44px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px}
+.checks{display:flex;flex-wrap:wrap;gap:6px 14px}
+.checks label{display:flex;gap:6px;align-items:center;margin:4px 0;font-size:15px;color:var(--ink);font-weight:400}
+.checks input{width:20px;height:20px}
+.runs{display:grid;gap:8px;padding-bottom:14px}
+.run{font-size:14px;border-top:1px solid var(--line);padding-top:8px}
+.run b{font-variant-numeric:tabular-nums}
+.note{font-size:13px;color:var(--soft);margin:18px 0 30px}
+#toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);max-width:min(92vw,520px);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s}
+#toast.show{opacity:1}
+@media(max-width:600px){.stn b{width:50px;height:50px;font-size:19px;border-width:5px}.route::before{top:22px}.stn span{font-size:13px}.grid2{grid-template-columns:minmax(0,1fr)}}
+@media(prefers-reduced-motion:reduce){#toast{transition:none}}
+</style>
+</head>
+<body>
+<header class="band">
+  <div class="wrap">
+    <div class="toprow"><h1>ENARA sales agent</h1><form method="post" action="/logout"><button class="out" type="submit">Sign out</button></form></div>
+    <p class="lede">Finds schools and decision-makers across Egypt, Saudi Arabia, Iraq and the GCC, and drafts emails from your ENARA address. Nothing is sent until you approve it here.</p>
+    <div class="pill" id="pill"><i></i><span id="pillText">Connecting…</span></div>
+    <div class="controls">
+      <button id="runFull" class="ctl go" type="button" disabled>Run now</button>
+      <button id="runSend" class="ctl" type="button" disabled>Send approved now</button>
+      <button id="pauseBtn" class="ctl" type="button" disabled>Pause agent</button>
+    </div>
+    <p class="ctlnote"><span id="ctlNote"></span> <a id="ctlLink" target="_blank" rel="noopener noreferrer" hidden>Watch the run</a></p>
+    <div class="route" id="route">
+      <button class="stn" data-view="review"><b id="c-review">–</b><span>To review</span></button>
+      <button class="stn" data-view="queued"><b id="c-queued">–</b><span>Approved</span></button>
+      <button class="stn" data-view="sent"><b id="c-sent">–</b><span>Sent</span></button>
+      <button class="stn" data-view="replied"><b id="c-replied">–</b><span>Replied</span></button>
+    </div>
+    <div class="under"><span>Sent today: <strong id="today">0</strong> of <strong id="cap">50</strong></span><span>Closed: <strong id="c-closed">0</strong></span><span>All leads: <strong id="c-all">0</strong></span></div>
+  </div>
+</header>
+
+<div class="bar band" style="padding-block:10px">
+  <div class="wrap">
+    <div class="tabs" id="tabs">
+      <button data-view="review">To review</button>
+      <button data-view="queued">Approved</button>
+      <button data-view="sent">Sent</button>
+      <button data-view="replied">Replied</button>
+      <button data-view="closed">Closed</button>
+      <button data-view="all">All</button>
+    </div>
+    <div class="filters">
+      <input id="q" type="search" placeholder="Search school, city, email" autocomplete="off">
+      <select id="country" aria-label="Country"><option value="all">All countries</option></select>
+    </div>
+  </div>
+</div>
+
+<main class="band" style="padding-top:0">
+  <div class="wrap">
+    <div id="list"><div class="empty">Loading leads…</div></div>
+
+    <details id="uploadBox" open>
+      <summary>Upload a list</summary>
+      <p class="hint">Add a spreadsheet (.xlsx, .xls or .csv) of schools or contacts, or a PDF such as a school directory. The agent turns it into leads, finds the person in charge and drafts emails for you to approve. It works through about 6 schools per run.</p>
+      <label for="upFile">File</label>
+      <input id="upFile" type="file" accept=".xlsx,.xls,.csv,.pdf">
+      <label for="upNote">Note for the agent (optional)</label>
+      <input id="upNote" placeholder="e.g. Riyadh schools we met at the education fair">
+      <p class="ctlnote" id="upInfo"></p>
+      <div class="acts"><button id="upGo" class="go" type="button" disabled>Upload</button></div>
+      <div id="upList" class="runs"></div>
+    </details>
+
+    <details id="settingsBox">
+      <summary>Agent settings</summary>
+      <form id="settings">
+        <div class="grid2">
+          <div><label for="s-new">New leads per day</label><input id="s-new" type="number" min="1" max="20" inputmode="numeric"></div>
+          <div><label for="s-cap">Most emails sent per day</label><input id="s-cap" type="number" min="1" max="100" inputmode="numeric"></div>
+        </div>
+        <label>Countries to search</label><div class="checks" id="s-countries"></div>
+        <label>Who to look for</label><div class="checks" id="s-segments"></div>
+        <div class="grid2">
+          <div><label for="s-name">Your name in emails</label><input id="s-name" autocomplete="name"></div>
+          <div><label for="s-title">Your title</label><input id="s-title"></div>
+        </div>
+        <label for="s-phone">Phone or WhatsApp in your signature</label><input id="s-phone" inputmode="tel">
+        <label for="s-form">Demo booking form link (added to every email)</label><input id="s-form" type="url" placeholder="https://forms.gle/…">
+        <label for="s-focus">Note for the agent (e.g. "focus on British-curriculum schools in Riyadh this week")</label><textarea id="s-focus" style="min-height:90px"></textarea>
+        <div class="checks"><label><input type="checkbox" id="s-paused"> Pause the agent (no searching, no sending)</label></div>
+        <div class="acts"><button type="submit" class="go">Save settings</button></div>
+      </form>
+      <p class="note" style="margin:12px 0">Every email also goes as BCC to you and Ahmed, and each copy counts toward Resend's free plan (100 a day, 3,000 a month, shared with ENARA's own app emails). On the free plan that allows about 28 sales emails a day; the agent stops before the limit and sends the rest on the next run.</p>
+    </details>
+
+    <details open>
+      <summary>Recent runs</summary>
+      <div class="runs" id="runs"><div class="run">No runs yet. The agent runs every day, every hour from 8:14 to 16:14 Cairo time.</div></div>
+    </details>
+
+    <p class="note">Replies arrive in your Roundcube inbox. Mark them here as Replied or Not interested so the agent stops follow-ups. Anyone marked Do not contact is never emailed again.</p>
+  </div>
+</main>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="/app.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>ENARA Sales</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light dark;--bg:light-dark(#fbfbf2,#0d1c24);--ink:light-dark(#13242e,#e6eef2);--sea:light-dark(#bfe3ee,#12303c);--mag:light-dark(#d6127e,#ff4fa7);--card:light-dark(#ffffff,#132833);--line:light-dark(#e4dccb,#24404d);--soft:light-dark(#5a6a72,#9fb3bc);--bad:light-dark(#b42318,#ff8a80);--brown:light-dark(#a8551b,#e09a62)}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0;height:100%}
+body{background:var(--sea);color:var(--ink);font:16px/1.55 Overpass,system-ui,sans-serif;display:grid;place-items:center;padding:16px}
+main{width:min(420px,100%);background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px 24px}
+.logo{height:40px;width:auto;display:block;margin-bottom:18px}
+.logo-dark{display:none}
+@media(prefers-color-scheme:dark){.logo-light{display:none}.logo-dark{display:block}}
+h1{font-weight:800;font-size:30px;line-height:1.1;letter-spacing:-.02em;margin:0 0 6px}
+p{margin:0 0 18px;color:var(--soft)}
+label{display:block;font-size:14px;font-weight:600;margin-bottom:6px}
+input{font:16px Overpass,system-ui,sans-serif;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px;width:100%}
+button{margin-top:14px;width:100%;min-height:48px;border:0;border-radius:10px;background:var(--mag);color:#fff;font:700 16px Overpass,sans-serif;cursor:pointer}
+input:focus-visible,button:focus-visible{outline:3px solid var(--brown);outline-offset:2px}
+.err{color:var(--bad);font-weight:600;margin:0 0 12px}
+</style>
+</head>
+<body>
+<main>
+  <img class="logo logo-light" src="https://assets.enara.app/email/enara-logo.png" alt="ENARA" width="87" height="40">
+  <img class="logo logo-dark" src="https://assets.enara.app/email/enara-logo-white.png" alt="ENARA" width="87" height="40">
+  <h1>Sales agent</h1>
+  <p>Enter the team password to open the lead tracker.</p>
+  <!--ERROR-->
+  <form method="post" action="/login">
+    <label for="password">Password</label>
+    <input id="password" name="password" type="password" autocomplete="current-password" required autofocus>
+    <button type="submit">Open tracker</button>
+  </form>
+</main>
+</body>
+</html>
