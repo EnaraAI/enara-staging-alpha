@@ -46,7 +46,11 @@
 | 1 (46048454372) | PR 2b | 30/30 | 0 | yes | 0 | 19/20 | 0 → 1 (on-arm turns timed out on lms-test) | 0 / 2 |
 | 2 (46067233332) | PR 4 | 40/40 | 0 | yes | 0 | **15/20** | 1 → 1 | 0 / 1 |
 | 3 (46071044923) | PR 5a | 48/48 | 0 | yes | 0 | 19/20 | 1 → 0 | **0 / 3** |
-| 4 | PR 5b | see below | | | | | | |
+| 4 (46077155511) | PR 5b | 42/48 (one transcript unread) | 0 | yes | 0 | 17/20 | 1 → 0 | 0 / 0 |
+| 5 (46077800522) | sim fixes only | 48/48 | 0 | yes | 0 | 18/20 | 1 → 0 | 0 / 0 (one mixed reply still seen) |
+| **6 (46080798213)** | **PR 5c** | **48/48 (100%)** | **0** | **yes** | **0** | **20/20 (100%)** | **1 → 1** | **0 / 0** |
+
+**Run 6 passes every bar, so `liveExpressive` is switched on for lms-test.** Turn latency: median 1.8 s off, 2.4 s on.
 
 ### What the runs found, and what changed
 - **Run 1.**
@@ -65,6 +69,13 @@
   - the language rule is also given in Arabic;
   - the judge is retried.
 - **Run 3.** Every bar passed. But the 8-year-old's Arabic lesson still had 3 English replies in 8 with the switch on (0 off), and the teacher pre-screen let them through. Fixed in PR 5b: an Arabic-medium reply that opens in English is made again without the hidden line (in Arabic, neutral cue). The simulation now checks this.
+- **Run 4.** The Arabic problem was fixed: 0 English replies. Two problems in the measurement:
+  - One session's stored transcript could not be read (lms-test answered 503), so its six turns had no stored verdict. Their cues were right on reading. The transcript read is now retried, and unread turns are left out of the check and counted.
+  - Two of the three teacher "no"s said the picture "does not exist": the judge had no idea drawings appear beside the tutor. It is now told so.
+
+  No product change.
+- **Run 5.** Every bar passed, but one Arabic-lesson reply was still mostly English with Arabic words in it ("Great job! Yes, مشرقةٌ is the خبر…"). Fixed in PR 5c: a reply whose opening has more Latin than Arabic letters counts as English.
+- **Run 6.** Every bar passed. Teacher check 20/20. The stuck 11-year-old was stuck in both arms (no worse). Her two "I don't know" turns were cued concerned, then supportive.
 
 ## Screenshots (real calls, branch `live-expressive-shots`)
 - **Calls.** Four real calls (adult hassan.shaker, child khaled.nasser in the kids app, switch on and off), about 11.6 Anam minutes.
