@@ -5,7 +5,9 @@
 // by: 'agent', and non-email actions can be undone for 1 hour.
 
 const AUTONOMY_SWITCHES = ['bounces', 'staleTasks', 'weeklyReport', 'replies', 'noThanks', 'meetingDrafts', 'autoFollowUps', 'autoFirst', 'learn'];
-const AUTONOMY_DEFAULTS = { bounces: false, staleTasks: false, weeklyReport: false, replies: false, noThanks: false, meetingDrafts: false, autoFollowUps: false, autoFirst: false, learn: false, learnLocked: false, holdHours: 12, followUpsPerDay: 15, firstPerDay: 5 };
+const AUTONOMY_DEFAULTS = { bounces: false, staleTasks: false, weeklyReport: false, replies: false, noThanks: false, meetingDrafts: false, autoFollowUps: false, autoFirst: false, learn: false, learnLocked: false, holdHours: 12, followUpsPerDay: 15, firstPerDay: 5, checkBy: 'agent' };
+// checkBy 'agent' (owner's choice, 28 Nov): the agent re-reads each waiting draft as a separate review step and writes autoCheck
+// {ok, problems, at, hash: the lead's autoHash}. 'deepseek': the Worker asks DeepSeek (needs DEEPSEEK_API_KEY).
 const UNDO_MS = 60 * 60 * 1000;
 const STALE_MS = 7 * DAY_MS;
 
@@ -20,6 +22,7 @@ function cleanAutonomy(a) {
   const out = {}, int = (v, lo, hi) => Number.isInteger(v) && v >= lo && v <= hi;
   for (const [k, v] of Object.entries(a)) {
     if (AUTONOMY_SWITCHES.includes(k) || k === 'learnLocked') { if (typeof v !== 'boolean') return null; out[k] = v; }
+    else if (k === 'checkBy') { if (v !== 'agent' && v !== 'deepseek') return null; out[k] = v; }
     else if (k === 'holdHours') { if (!int(v, 1, 72)) return null; out[k] = v; }
     else if (k === 'followUpsPerDay') { if (!int(v, 0, 50)) return null; out[k] = v; }
     else if (k === 'firstPerDay') { if (!int(v, 0, 20)) return null; out[k] = v; }
@@ -90,7 +93,8 @@ async function autoSendPass(env, a, nowMs, out) {
       await patchLeadDoc(db, r.id, r.version, { autoSendAt: new Date(nowMs + a.holdHours * 3600000).toISOString(), autoCheck: null, autoHash: hash }, now);
       continue;
     }
-    if (!l.autoCheck || l.autoCheck.retry) {
+    if (a.checkBy !== 'deepseek') { if (!l.autoCheck) continue; } // wait for the agent's review of this exact draft
+    else if (!l.autoCheck || l.autoCheck.retry) {
       if (checks >= 10) continue;
       checks++;
       const c = await checkDraft(env, l);

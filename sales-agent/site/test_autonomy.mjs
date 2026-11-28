@@ -48,7 +48,9 @@ const before = JSON.stringify(sq.prepare("SELECT * FROM docs ORDER BY coll,id").
 await cron(); t('all off: the cron changes nothing', JSON.stringify(sq.prepare("SELECT * FROM docs ORDER BY coll,id").all()) === before && checkCalls === 0);
 
 // Follow-ups: hold, then the check, then approval after the hold.
-r = await post('/api/autonomy', { data: { autoFollowUps: true } }); j = await r.json(); t('switch on', r.status === 200 && j.autonomy.autoFollowUps === true && j.autonomy.autoFirst === false);
+t('agent review is the default check', j.autonomy.checkBy === 'agent');
+r = await post('/api/autonomy', { data: { checkBy: 'robot' } }); t('checkBy validated', r.status === 400);
+r = await post('/api/autonomy', { data: { autoFollowUps: true, checkBy: 'deepseek' } }); j = await r.json(); t('switch on', r.status === 200 && j.autonomy.autoFollowUps === true && j.autonomy.autoFirst === false);
 await cron();
 let L = lead('fu-1'); const hold = (Date.parse(L.autoSendAt) - Date.now()) / 36e5;
 t('follow-up scheduled 12h out', L.autoKind === 'followup' && hold > 11.9 && hold <= 12 && L.status === 'drafted');
@@ -129,6 +131,18 @@ r = await post('/api/leads/deal-2', { patch: { replyDraft: { subject: 'Re: demo'
 L = lead('deal-2'); t('reply approved', r.status === 200 && L.replyStatus === 'approved' && L.replyApprovedAt && L.replyDraft.body.includes('Tuesday'));
 r = await post('/api/leads/deal-2', { patch: { replyStatus: 'sent' }, version: lead('deal-2').version }); t('owner cannot mark a reply sent', r.status === 400);
 r = await post('/api/leads/deal-2', { patch: { autoHold: 'yes' }, version: lead('deal-2').version }); t('autoHold must be boolean', r.status === 400);
+
+// Agent review (checkBy 'agent', the default): the Worker never calls DeepSeek; it waits for the agent's autoCheck on this exact draft.
+await post('/api/autonomy', { data: { checkBy: 'agent', staleTasks: false } });
+put('leads', 'fu-agent', { org: 'Agent Check', status: 'drafted', step: 2, email: 'h@fua.test', draft: { subject: 'Re: a', body: 'b' }, sentLog: [{ step: 1, at: ago(6) }] });
+checkCalls = 0; await cron(); await cron(); setLead('fu-agent', { autoSendAt: ago(0.01) }); await cron();
+L = lead('fu-agent'); t('agent mode: no DeepSeek call, waits without a review', checkCalls === 0 && L.status === 'drafted' && !L.autoCheck && L.autoHash);
+setLead('fu-agent', { autoCheck: { ok: true, problems: [], at: ago(0), hash: 'not-this-draft', by: 'agent' } }); await cron();
+t('a review of another version of the draft does not count', lead('fu-agent').status === 'drafted');
+setLead('fu-agent', { autoCheck: { ok: false, problems: ['No opt-out line'], at: ago(0), hash: lead('fu-agent').autoHash, by: 'agent' } }); await cron();
+t('failed agent review never approves', lead('fu-agent').status === 'drafted');
+setLead('fu-agent', { autoSendAt: ago(0.01), autoCheck: { ok: true, problems: [], at: ago(0), hash: lead('fu-agent').autoHash, by: 'agent' } }); await cron();
+t('passed agent review approves after the hold', lead('fu-agent').status === 'approved' && lead('fu-agent').approvedBy === 'auto' && checkCalls === 0);
 
 console.log(`passed ${ok}, failed ${fail}`);
 if (fail) process.exitCode = 1;
