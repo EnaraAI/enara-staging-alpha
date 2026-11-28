@@ -5,31 +5,40 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>ENARA Sales</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-:root{color-scheme:light dark;--bg:light-dark(#fbfbf2,#0d1c24);--ink:light-dark(#13242e,#e6eef2);--sea:light-dark(#bfe3ee,#12303c);--mag:light-dark(#d6127e,#ff4fa7);--card:light-dark(#ffffff,#132833);--line:light-dark(#e4dccb,#24404d);--soft:light-dark(#5a6a72,#9fb3bc);--bad:light-dark(#b42318,#ff8a80);--brown:light-dark(#a8551b,#e09a62)}
+/* ENARA admin theme tokens (design-app/src/styles.css, [data-theme='admin'] and its dark values). */
+:root{color-scheme:light;--font-latin:Inter,ui-sans-serif,system-ui,sans-serif;--radius:.5rem;
+--background:oklch(0.982 0.003 255);--foreground:oklch(0.22 0.025 262);--card:oklch(1 0 0);--primary:oklch(0.33 0.08 263);--primary-foreground:oklch(0.985 0 0);
+--accent:oklch(0.82 0.15 78);--muted-foreground:oklch(0.5 0.02 260);--border:oklch(0.91 0.006 255);--input:oklch(0.82 0.008 255);--ring:oklch(0.58 0.14 255);
+--destructive-text:oklch(0.5 0.19 27);--mark:#071530}
+@media (prefers-color-scheme:dark){:root{color-scheme:dark;--background:oklch(0.18 0.015 262);--foreground:oklch(0.94 0.006 255);--card:oklch(0.22 0.018 262);
+--primary:oklch(0.78 0.09 255);--primary-foreground:oklch(0.2 0.04 262);--muted-foreground:oklch(0.72 0.015 255);--border:oklch(0.3 0.02 262);--input:oklch(0.42 0.02 262);--destructive-text:oklch(0.78 0.13 27);--mark:#ffffff}}
 *{box-sizing:border-box;min-width:0}
-html,body{margin:0;height:100%}
-body{background:var(--sea);color:var(--ink);font:16px/1.55 Overpass,system-ui,sans-serif;display:grid;place-items:center;padding:16px}
-main{width:min(420px,100%);background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px 24px}
-.logo{height:40px;width:auto;display:block;margin-bottom:18px}
-.logo-dark{display:none}
-@media(prefers-color-scheme:dark){.logo-light{display:none}.logo-dark{display:block}}
-h1{font-weight:800;font-size:30px;line-height:1.1;letter-spacing:-.02em;margin:0 0 6px}
-p{margin:0 0 18px;color:var(--soft)}
+html,body{margin:0;min-height:100%}
+body{background:var(--background);color:var(--foreground);font:15px/1.55 var(--font-latin);display:grid;place-items:center;min-height:100dvh;padding:16px;
+background-image:linear-gradient(180deg,color-mix(in oklch,var(--primary) 8%,transparent),transparent 45%)}
+main{width:min(400px,100%);background:var(--card);border:1px solid var(--border);border-top:4px solid var(--accent);border-radius:14px;padding:28px 24px}
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:22px}
+.mark{width:34px;height:34px;color:var(--mark)}
+.word{font-weight:700;font-size:22px;letter-spacing:.06em}
+.sub{font-weight:500;color:var(--muted-foreground);padding-left:10px;border-left:1px solid var(--border)}
+h1{font-weight:700;font-size:24px;line-height:1.2;margin:0 0 4px}
+p{margin:0 0 18px;color:var(--muted-foreground)}
 label{display:block;font-size:14px;font-weight:600;margin-bottom:6px}
-input{font:16px Overpass,system-ui,sans-serif;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px;width:100%}
-button{margin-top:14px;width:100%;min-height:48px;border:0;border-radius:10px;background:var(--mag);color:#fff;font:700 16px Overpass,sans-serif;cursor:pointer}
-input:focus-visible,button:focus-visible{outline:3px solid var(--brown);outline-offset:2px}
-.err{color:var(--bad);font-weight:600;margin:0 0 12px}
+input{font:16px var(--font-latin);color:var(--foreground);background:var(--card);border:1px solid var(--input);border-radius:var(--radius);padding:12px;width:100%;min-height:48px}
+button{margin-top:14px;width:100%;min-height:48px;border:0;border-radius:var(--radius);background:var(--primary);color:var(--primary-foreground);font:600 16px var(--font-latin);cursor:pointer}
+input:focus-visible,button:focus-visible{outline:3px solid var(--ring);outline-offset:2px}
+.err{color:var(--destructive-text);font-weight:600;margin:0 0 12px}
 </style>
 </head>
 <body>
+<!--ENARA_MARK-->
 <main>
-  <img class="logo logo-light" src="https://assets.enara.app/email/enara-logo.png" alt="ENARA" width="87" height="40">
-  <img class="logo logo-dark" src="https://assets.enara.app/email/enara-logo-white.png" alt="ENARA" width="87" height="40">
+  <div class="brand"><svg class="mark" role="img" aria-label="ENARA"><use href="#enara-mark"/></svg><span class="word" aria-hidden="true">ENARA</span><span class="sub">Sales</span></div>
   <h1>Sales agent</h1>
   <p>Enter the team password to open the lead tracker.</p>
   <!--ERROR-->
