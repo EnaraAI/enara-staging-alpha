@@ -127,3 +127,41 @@ $('#dncForm').addEventListener('submit', async e => {
   await load();
 });
 renderers.push(() => { renderRuns(); fillSettings(); renderControls(); renderImports(); renderDnc(); });
+
+// Autonomy: one switch per action (all off by default), the limits, the reply inbox and the targeting note.
+const AUTO = [
+  ['bounces', 'Bounces', 'When an email bounces, mark the school and look for another work contact; the new draft waits for you.'],
+  ['staleTasks', 'Stale deals', 'A deal with no next step for 7 days gets a task.'],
+  ['weeklyReport', 'Weekly report', 'Every Sunday morning, a short email to you: replies, meetings, deals, best and worst segments.'],
+  ['replies', 'Spot replies', 'Reads the reply inbox and marks schools that wrote back as Replied (follow-ups stop).'],
+  ['noThanks', 'Respect "no thanks"', 'An unsubscribe or "not interested" reply puts the school on the do-not-contact list.'],
+  ['meetingDrafts', 'Draft answers to meeting requests', 'Drafts a reply with your demo link. It waits for you; it is never sent on its own.'],
+  ['autoFollowUps', 'Follow-ups send themselves', 'For schools whose first email you approved, after the hold, if the check passes.'],
+  ['autoFirst', 'Some first emails send themselves', 'Only score 5, a named person and a work email, after the hold, if the check passes.'],
+  ['learn', 'Aim where replies come from', 'Each week, shift research toward the countries, types and languages with the best reply rates.'],
+];
+function renderAutonomy() {
+  const a = autonomy || {};
+  $('#autoList').innerHTML = AUTO.map(([k, t, d]) => `<div class="switch"><input type="checkbox" role="switch" id="as-${k}" data-auto="${k}"${a[k] ? ' checked' : ''}${!loaded ? ' disabled' : ''}><label for="as-${k}">${esc(t)}<small>${esc(d)}</small></label></div>`).join('')
+    + (a.learn ? `<div class="switch"><input type="checkbox" role="switch" id="as-lock" data-auto="learnLocked"${a.learnLocked ? ' checked' : ''}><label for="as-lock">Keep the current targeting<small>The agent reports what it would change but doesn't change research.</small></label></div>` : '');
+  const f = $('#autoLimits'); if (!f.contains(document.activeElement)) { $('#al-hold').value = a.holdHours ?? 12; $('#al-fu').value = a.followUpsPerDay ?? 15; $('#al-first').value = a.firstPerDay ?? 5; }
+  $('#autoCheckNote').textContent = control.checkReady ? 'Before any automatic send, a second model (DeepSeek) checks the draft against the claims rules. If it is unsure, the draft waits for you.' : 'Automatic sends stay off until the DeepSeek key (DEEPSEEK_API_KEY) is added in Cloudflare: every draft must pass that check first.';
+  const ib = inbox && typeof inbox.forwardTo === 'string' ? inbox : null;
+  $('#autoInbox').innerHTML = (a.replies || a.noThanks || a.meetingDrafts) ? `<p class="note" style="margin:10px 0 0">Reply inbox: ${ib ? `forward replies from your mailbox to <code class="addr">${esc(ib.forwardTo)}</code> (in Roundcube: Settings → Filters → a rule that redirects a copy). The agent reads them at ${esc(ib.inboxAddress || 'the sales inbox')}.` : 'not set up yet.'}</p>` : '';
+  $('#autoTarget').innerHTML = targeting && targeting.note ? `<p class="note" style="margin:10px 0 0"><strong>Targeting</strong> (${esc(fmt(targeting.at))}): ${esc(targeting.note)}</p>` : '';
+}
+$('#autoList').addEventListener('change', async e => {
+  const c = e.target.closest('input[data-auto]'); if (!c) return;
+  c.disabled = true;
+  try { const r = await api('/api/autonomy', {data:{[c.dataset.auto]: c.checked}}); autonomy = r.autonomy || autonomy; toast(c.checked ? 'Switched on' : 'Switched off'); }
+  catch { c.checked = !c.checked; toast('Could not change it. Try again.'); }
+  c.disabled = false; renderAll();
+});
+$('#autoLimits').addEventListener('submit', async e => {
+  e.preventDefault();
+  const n = (id, lo, hi) => Math.min(hi, Math.max(lo, Math.round(Number($(id).value) || 0)));
+  try { const r = await api('/api/autonomy', {data:{holdHours:n('#al-hold', 1, 72), followUpsPerDay:n('#al-fu', 0, 50), firstPerDay:n('#al-first', 0, 20)}}); autonomy = r.autonomy || autonomy; toast('Limits saved'); document.activeElement?.blur?.(); }
+  catch { toast('Could not save the limits.'); }
+  renderAll();
+});
+renderers.push(renderAutonomy);

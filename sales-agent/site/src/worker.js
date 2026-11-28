@@ -175,7 +175,8 @@ async function api(req, env, url) {
     const tasks = (await db.prepare("SELECT id, data, version FROM docs WHERE coll = 'tasks' AND json_extract(data, '$.done') = 0 ORDER BY json_extract(data, '$.due') LIMIT 500").all()).results
       .map(r => ({ ...JSON.parse(r.data), id: r.id, version: r.version }));
     const dnc = (await db.prepare("SELECT data FROM docs WHERE coll = 'dnc' ORDER BY json_extract(data, '$.at') DESC LIMIT 300").all()).results.map(r => JSON.parse(r.data));
-    return json({ leads, settings: s ? JSON.parse(s.data) : null, runs, imports, tasks, dnc, control: { ...ctl, runReady: runReady(env), chatReady: !!chatProvider(env) } });
+    return json({ leads, settings: s ? JSON.parse(s.data) : null, runs, imports, tasks, dnc, autonomy: await readAutonomy(db), targeting: await readConfig(db, 'targeting'), inbox: await readConfig(db, 'inbox'),
+      control: { ...ctl, runReady: runReady(env), chatReady: !!chatProvider(env), checkReady: !!env.DEEPSEEK_API_KEY } });
   }
 
   if (url.pathname === '/api/insights' && req.method === 'GET') {
@@ -323,6 +324,20 @@ async function api(req, env, url) {
     return json({ ok: true, session });
   }
 
+  if (url.pathname === '/api/autonomy') {
+    const a = cleanAutonomy(body.data);
+    if (!a) return json({ error: 'bad_request' }, 400);
+    const cur = (await readConfig(db, 'autonomy')) || {};
+    await writeDoc(db, 'autonomy', { ...cur, ...a, updatedAt: now }, now);
+    return json({ ok: true, autonomy: await readAutonomy(db) });
+  }
+
+  const un = url.pathname.match(/^\/api\/activity\/([A-Za-z0-9_.~:@+-]{1,240})\/undo$/);
+  if (un) {
+    const r = await undoActivity(db, un[1], now);
+    return r.error ? json({ error: r.error }, r.status) : json({ ok: true });
+  }
+
   if (url.pathname === '/api/pause') {
     if (typeof body.paused !== 'boolean') return json({ error: 'bad_request' }, 400);
     const s = (await readDoc(db, 'settings')) || {};
@@ -344,6 +359,7 @@ async function api(req, env, url) {
 }
 
 export default {
+  async scheduled(event, env, ctx) { ctx.waitUntil(runCron(env)); },
   async fetch(req, env) {
     const url = new URL(req.url);
     if (url.protocol !== 'https:' && url.hostname !== 'localhost') return Response.redirect('https://' + url.host + url.pathname, 301);

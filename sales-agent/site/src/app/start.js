@@ -5,6 +5,7 @@ async function load() {
     const j = await api('/api/state');
     leads = Array.isArray(j.leads) ? j.leads : []; settings = j.settings || null; runs = Array.isArray(j.runs) ? j.runs : []; control = j.control || {};
     imports = Array.isArray(j.imports) ? j.imports : []; tasks = Array.isArray(j.tasks) ? j.tasks : []; dnc = Array.isArray(j.dnc) ? j.dnc : [];
+    autonomy = j.autonomy || {}; targeting = j.targeting || null; inbox = j.inbox || null;
     loaded = true; renderAll();
   } catch (e) {
     if (e && e.code === 'signed_out') return;

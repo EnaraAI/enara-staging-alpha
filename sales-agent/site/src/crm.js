@@ -22,12 +22,22 @@ function cleanCrmField(k, v, out) {
   if (k === 'nextStep') { if (!str(v, 300)) return false; out.nextStep = v; return true; }
   if (k === 'nextStepDue') { if (v !== '' && !dateOnly(v)) return false; out.nextStepDue = v; return true; }
   if (k === 'repliedStep') { if (!Number.isInteger(v) || v < 1 || v > 3) return false; out.repliedStep = v; return true; }
+  if (k === 'autoHold') { if (typeof v !== 'boolean') return false; out.autoHold = v; return true; }
+  if (k === 'replyDraft') { if (!isObj(v) || !str(v.subject, 300) || !str(v.body, 8000)) return false; out.replyDraft = { subject: v.subject, body: v.body }; return true; }
+  if (k === 'replyStatus') { if (!['drafted', 'approved', 'discarded'].includes(v)) return false; out.replyStatus = v; return true; }
   return null; // not a CRM field
 }
 
 // Server-side rules on a lead change: marking replied also sets the stage and repliedStep; a stage change stamps
 // stageAt and keeps stageBest (the furthest stage reached, for the funnel).
 function applyLeadRules(old, patch, now) {
+  if (patch.status === 'approved' && old.status !== 'approved') patch.approvedBy = 'owner';
+  // Editing a waiting draft stops its automatic send (the owner can allow it again).
+  if (patch.draft && old.status === 'drafted' && patch.status === undefined && patch.autoHold === undefined && old.draft
+    && (patch.draft.subject !== old.draft.subject || patch.draft.body !== old.draft.body)) patch.autoHold = true;
+  // Moving an approved email back to review also stops any automatic send of it.
+  if (patch.status === 'drafted' && old.status === 'approved') patch.autoHold = true;
+  if (patch.replyStatus === 'approved' && old.replyStatus !== 'approved') patch.replyApprovedAt = now;
   if (patch.status === 'replied' && old.status !== 'replied') {
     if (patch.repliedStep === undefined) patch.repliedStep = Math.min(3, Math.max(1, Number.isInteger(old.step) ? old.step : 1));
     if (patch.repliedAt === undefined) patch.repliedAt = now;

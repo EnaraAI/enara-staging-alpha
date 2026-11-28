@@ -21,3 +21,7 @@ database_id = "0e4dcb52-f906-404f-adda-74b8b94d6af0"
 
 [observability]
 enabled = true
+
+# Hourly cron (autonomy: stale-deal tasks and automatic approval after the hold). Does nothing while every switch is off.
+[triggers]
+crons = ["5 * * * *"]

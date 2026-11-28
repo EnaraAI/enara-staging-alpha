@@ -1,5 +1,5 @@
 // Review: today's drafts and every lead list, with the same actions as before, plus tasks due and CSV export.
-const MSG = {approve:'Approved. It goes out within the hour.',save:'Saved',unapprove:'Moved back to review',skip:'Skipped',dnc:'Marked do not contact',replied:'Marked as replied',noint:'Marked not interested',reopen:'Back in review',contacted:'Marked as contacted'};
+const MSG = {hold:'Automatic send held',allowauto:'Automatic send allowed again',replyok:'Reply approved. It goes out with the next run.',replydiscard:'Reply discarded',approve:'Approved. It goes out within the hour.',save:'Saved',unapprove:'Moved back to review',skip:'Skipped',dnc:'Marked do not contact',replied:'Marked as replied',noint:'Marked not interested',reopen:'Back in review',contacted:'Marked as contacted'};
 const EMPTY = {review:'Nothing to review. New drafts appear after each run.',queued:'No approved emails waiting.',sent:'Nothing sent yet.',replied:'No replies marked yet.',closed:'Nothing closed.',manual:'No schools added by hand yet. Use "Add a school".',all:'No leads yet. The first run fills this list.'};
 let view = 'review', country = 'all', q = '';
 const dirty = {}; const busy = new Set(); let pending = false, hold = false;
@@ -73,16 +73,42 @@ function contactLine(l) {
 }
 const sourcesOf = l => (Array.isArray(l.sources) ? l.sources : []).filter(u => typeof u === 'string' && u.startsWith('https://'));
 
+// Automatic send status (autonomy switches): when it sends, why it won't, or that it is held.
+const autoOn = kind => !!(kind === 'followup' ? autonomy.autoFollowUps : kind === 'first' ? autonomy.autoFirst : false);
+function autoLine(l) {
+  const b = busy.has(l.id) ? ' disabled' : '';
+  if (l.status === 'approved' && l.approvedBy === 'auto') return `<p class="auto">Approved automatically after the hold. It goes out with the agent's next run; "Back to review" stops it.</p>`;
+  if (l.status !== 'drafted' || !(autonomy.autoFollowUps || autonomy.autoFirst)) return '';
+  if (l.autoHold) return `<p class="auto warn">Automatic send held. <button class="btn sm" data-act="allowauto"${b}>Allow automatic send</button></p>`;
+  if (!l.autoSendAt || !autoOn(l.autoKind)) return '';
+  if (l.autoCheck && !l.autoCheck.ok && !l.autoCheck.retry) return `<p class="auto warn">Won't send automatically: ${esc((l.autoCheck.problems || []).join(' · ') || 'the check did not pass it')}. Review it yourself.</p>`;
+  return `<p class="auto">Approved automatically at ${esc(fmtTime(l.autoSendAt))} unless you edit it${l.autoCheck && l.autoCheck.ok ? ' (the check passed)' : ' (if the check passes)'}, then sent with the agent's next run. <button class="btn sm" data-act="hold"${b}>Hold</button></p>`;
+}
+// A reply the agent drafted for a school that wrote back (approve, edit or discard).
+function replyBlock(l) {
+  if (!l.replyDraft) return '';
+  const lg = langOf(l), b = busy.has(l.id) ? ' disabled' : '', d = dirty[l.id] || {};
+  if (l.replyStatus === 'approved') return `<div class="reply"><h4>Reply approved</h4><p class="note" style="margin:4px 0 0">It goes out with the agent's next run.</p></div>`;
+  if (l.replyStatus === 'sent') return `<div class="reply"><h4>Reply sent</h4></div>`;
+  if (l.replyStatus !== 'drafted') return '';
+  return `<div class="reply"><h4>Reply drafted by the agent</h4>
+    <label for="rs-${esc(l.id)}">Subject</label><input id="rs-${esc(l.id)}" name="replySubject" dir="auto" lang="${lg}" value="${esc(d.replySubject ?? l.replyDraft.subject)}">
+    <label for="rb-${esc(l.id)}">Message</label><textarea id="rb-${esc(l.id)}" name="replyBody" dir="auto" lang="${lg}">${esc(d.replyBody ?? l.replyDraft.body)}</textarea>
+    <div class="acts"><button class="btn primary" data-act="replyok"${b}>Approve reply</button><button class="btn ghost" data-act="replydiscard"${b}>Discard</button></div></div>`;
+}
+
 function card(l) {
   const srcs = sourcesOf(l).slice(0, 4);
   return `<article class="card" data-id="${esc(l.id)}">
     <div class="card-top"><h3>${esc(l.org || 'Unnamed organisation')}</h3><button class="btn sm" data-act="open" aria-label="Open ${esc(l.org || 'lead')}">Open</button></div>
-    <div class="meta"><span>${esc(placeOf(l))}</span><span>${esc(SEGMENT_ONE[l.segment] || l.segment || '')}</span>${scoreDots(l)}${statusTag(l.status)}${stageTag(l)}${l.step > 1 ? `<span class="tag warn">${esc(STEP[l.step])}</span>` : ''}</div>
+    <div class="meta"><span>${esc(placeOf(l))}</span><span>${esc(SEGMENT_ONE[l.segment] || l.segment || '')}</span>${scoreDots(l)}${statusTag(l.status)}${stageTag(l)}${l.step > 1 ? `<span class="tag warn">${esc(STEP[l.step])}</span>` : ''}${l.bounced ? '<span class="tag bad">Bounced</span>' : ''}</div>
     ${contactLine(l)}
     ${l.whyFit ? `<p class="why">${esc(l.whyFit)}</p>` : ''}
     ${srcs.length ? `<div class="src">${srcs.map(u => `<a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${esc(srcLabel(u))}</a>`).join('')}</div>` : ''}
     ${l.error ? `<div class="err" style="margin-top:8px">Last send failed: ${esc(l.error)}</div>` : ''}
     ${sentLine(l)}
+    ${autoLine(l)}
+    ${replyBlock(l)}
     ${draftFields(l)}
     ${notesField(l, 'nt')}
     <div class="acts">${actionsFor(l)}</div>
@@ -120,7 +146,7 @@ renderers.push(renderList);
 list.addEventListener('pointerdown', () => { hold = true; }, true);
 document.addEventListener('pointerup', () => setTimeout(() => { hold = false; if (pending) renderList(); }, 400));
 list.addEventListener('focusout', () => setTimeout(() => { if (pending) renderList(); }, 450));
-document.addEventListener('input', e => { const el = e.target, id = el.closest('[data-id]')?.dataset.id; if (!id || !['subject','body','notes'].includes(el.name)) return; dirty[id] = {...(dirty[id] || {}), [el.name]: el.value}; });
+document.addEventListener('input', e => { const el = e.target, id = el.closest('[data-id]')?.dataset.id; if (!id || !['subject','body','notes','replySubject','replyBody'].includes(el.name)) return; dirty[id] = {...(dirty[id] || {}), [el.name]: el.value}; });
 document.addEventListener('click', e => { const btn = e.target.closest('button[data-act]'); if (!btn) return; const id = btn.closest('[data-id]')?.dataset.id; if (id) act(id, btn.dataset.act); });
 
 async function act(id, a) {
@@ -136,6 +162,10 @@ async function act(id, a) {
   else if (a === 'dnc') patch = {status:'do_not_contact', notes};
   else if (a === 'replied') patch = {status:'replied', repliedAt:now, repliedStep:Math.min(3, Math.max(1, l.step || 1)), notes};
   else if (a === 'noint') patch = {status:'not_interested', notes};
+  else if (a === 'hold') patch = {autoHold:true};
+  else if (a === 'allowauto') patch = {autoHold:false};
+  else if (a === 'replyok') { const rs = String(d.replySubject ?? l.replyDraft?.subject ?? '').trim(), rb = String(d.replyBody ?? l.replyDraft?.body ?? ''); if (!rs || !rb.trim()) return toast('Add a subject and a message first.'); patch = {replyDraft:{subject:rs, body:rb}, replyStatus:'approved'}; }
+  else if (a === 'replydiscard') patch = {replyStatus:'discarded'};
   else if (a === 'contacted') patch = {status:'sent', draft:{subject, body}, notes, nextFollowUp:null, sentLog:[...(l.sentLog || []), {step:l.step || 1, at:now, manual:true, subject}]};
   else return;
   busy.add(id); renderAll();

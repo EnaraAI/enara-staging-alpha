@@ -14,7 +14,7 @@ const CURRENCIES = ['EGP','SAR','AED','KWD','QAR','BHD','OMR','IQD','USD'];
 const STEP = {1:'First email',2:'Follow-up 1',3:'Follow-up 2'};
 const DEF = {newPerDay:8,sendCapPerDay:50,paused:false,countries:Object.keys(COUNTRIES),segments:['international_school','private_school','school_group','language_center','training_center'],senderName:'Mohamed Elkholy',senderTitle:'',senderPhone:'',focus:'',demoFormUrl:''};
 
-let leads = [], settings = null, runs = [], imports = [], tasks = [], dnc = [], control = {}, loaded = false, running = false;
+let leads = [], settings = null, runs = [], imports = [], tasks = [], dnc = [], control = {}, autonomy = {}, targeting = null, inbox = null, loaded = false, running = false;
 let tab = 'review';
 
 const cairoDay = d => new Intl.DateTimeFormat('en-CA',{timeZone:'Africa/Cairo'}).format(d);

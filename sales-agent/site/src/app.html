@@ -211,6 +211,15 @@ th{color:var(--muted-foreground);font-weight:600}
 .run{font-size:14px;border-top:1px solid var(--border);padding-top:8px}
 .imp{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 12px;align-items:center}
 .note{font-size:13px;color:var(--muted-foreground)}
+.auto{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0 0;padding:8px 10px;border-radius:var(--radius);background:var(--info-soft);color:var(--info-text);font-size:14px}
+.auto.warn{background:var(--warning-soft);color:var(--warning-foreground)}
+.switch{display:flex;gap:12px;align-items:flex-start;border-top:1px solid var(--border);padding-top:10px}
+.switch input{width:22px;height:22px;min-height:22px;margin-top:2px;flex:none;accent-color:var(--primary)}
+.switch label{margin:0;font-size:15px;color:var(--foreground);font-weight:600}
+.switch small{display:block;font-weight:400;color:var(--muted-foreground);font-size:13px}
+.reply{margin-top:12px;padding:12px;border:1px solid var(--border);border-left:4px solid var(--chart-2);border-radius:var(--radius)}
+.reply h4{margin:0;font-size:15px}
+code.addr{font-size:14px;background:var(--muted);padding:2px 6px;border-radius:4px;overflow-wrap:anywhere}
 dialog{border:0;border-radius:14px;padding:0;width:min(560px,calc(100vw - 24px));max-height:calc(100dvh - 24px);background:var(--background);color:var(--foreground)}
 dialog::backdrop{background:oklch(0.2 0.02 262 / .45)}
 dialog form{padding:16px}
@@ -298,6 +307,21 @@ dialog form{padding:16px}
       <button id="pauseBtn" class="btn" type="button" disabled>Pause agent</button>
     </div>
     <p class="note" style="margin:8px 0 0"><span id="ctlNote"></span> <a id="ctlLink" target="_blank" rel="noopener noreferrer" hidden>Watch the run</a></p>
+  </div>
+
+  <div class="panel" id="autoBox">
+    <h2>Autonomy</h2>
+    <p class="muted" style="margin:0 0 8px">What the agent may do on its own. Each switch starts off. Pause stops everything. Every automatic action shows in the school's activity log, marked "by the agent".</p>
+    <div id="autoList" class="runs"></div>
+    <form id="autoLimits" class="grid2" style="align-items:end;margin-top:8px">
+      <div><label for="al-hold">Hold before an automatic send (hours)</label><input id="al-hold" type="number" min="1" max="72" inputmode="numeric"></div>
+      <div><label for="al-fu">Automatic follow-ups per day</label><input id="al-fu" type="number" min="0" max="50" inputmode="numeric"></div>
+      <div><label for="al-first">Automatic first emails per day</label><input id="al-first" type="number" min="0" max="20" inputmode="numeric"></div>
+      <div><button class="btn" type="submit">Save limits</button></div>
+    </form>
+    <p class="note" id="autoCheckNote" style="margin:10px 0 0"></p>
+    <div id="autoInbox"></div>
+    <div id="autoTarget"></div>
   </div>
 
   <div class="panel" id="uploadBox">

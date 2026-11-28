@@ -35,7 +35,7 @@ def section(title):
     return '## ' + title + '\n' + m.group(1).strip()
 claims = '\n\n'.join(section(t) for t in ['Writing a first draft (status "drafted", step 1)', 'What you may say about ENARA', 'Never say'])
 
-WORKER_PARTS = ['worker.js', 'crm.js', 'insights.js', 'chat.js']  # worker.js first: chat.js uses its constants at load
+WORKER_PARTS = ['worker.js', 'crm.js', 'insights.js', 'chat.js', 'autonomy.js']  # worker.js first: chat.js uses its constants at load
 worker = '\n'.join(squeeze(read(p), drop_comments=True) for p in WORKER_PARTS)
 out = ('const APP_HTML = %s;\nconst APP_JS = %s;\nconst LOGIN_HTML = %s;\nconst FAVICON_SVG = %s;\nconst CHAT_CLAIMS = %s;\n' % (
     json.dumps(page('app.html')), json.dumps(app_js), json.dumps(page('login.html')), json.dumps(mark_svg), json.dumps(claims))) + ascii_js(worker)

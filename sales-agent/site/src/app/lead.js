@@ -41,7 +41,7 @@ function renderLead() {
   const srcs = sourcesOf(lead);
   const sent = (lead.sentLog || []).slice().reverse();
   const opts = (vals, cur, lab) => vals.map(v => `<option value="${esc(v)}"${v === cur ? ' selected' : ''}>${esc(lab ? lab[v] : v)}</option>`).join('');
-  const draftPanel = `<div class="panel"><h2>Draft</h2>${draftFields(lead)}${notesField(lead, 'snt')}<div class="acts">${actionsFor(lead)}</div></div>`;
+  const draftPanel = `<div class="panel"><h2>Draft</h2>${autoLine(lead)}${draftFields(lead)}${notesField(lead, 'snt')}<div class="acts">${actionsFor(lead)}</div></div>`;
   sheetBody.innerHTML = `<div data-id="${esc(lead.id)}" style="display:grid;gap:14px">
     <div class="panel">
       <div class="meta" style="margin:0 0 8px">${statusTag(lead.status)}${stageTag(lead)}${scoreDots(lead)}${lead.step > 1 ? `<span class="tag warn">${esc(STEP[lead.step])}</span>` : ''}</div>
@@ -74,7 +74,7 @@ function renderLead() {
     </form>
 
     ${editableOf(lead) ? '' : lead.draft?.subject ? `<div class="panel"><h2>Last draft</h2>${draftFields(lead)}${notesField(lead, 'snt')}<div class="acts">${actionsFor(lead)}</div></div>`
-      : `<div class="panel"><h2>Notes</h2>${notesField(lead, 'snt')}<div class="acts">${actionsFor(lead) || `<button class="btn" data-act="save">Save note</button>`}</div></div>`}
+      : `<div class="panel"><h2>Notes</h2>${replyBlock(lead)}${notesField(lead, 'snt')}<div class="acts">${actionsFor(lead) || `<button class="btn" data-act="save">Save note</button>`}</div></div>`}
 
     <div class="panel"><h2>Tasks</h2>
       ${tk === null ? '<p class="muted">Loading…</p>' : tk.length ? `<div class="due">${tk.map(t => `<div class="task${t.done ? ' done' : ''}"><input type="checkbox" data-done="${esc(t.id)}" aria-label="Done: ${esc(t.title)}"${t.done ? ' checked' : ''}><div class="tt"><span>${esc(t.title)}</span>${t.due ? `<small>due ${esc(fmtDay(t.due))}</small>` : ''}</div></div>`).join('')}</div>` : '<p class="muted" style="margin:0">No tasks yet.</p>'}
@@ -83,7 +83,7 @@ function renderLead() {
 
     <div class="panel"><h2>Activity</h2>
       <form id="actForm"><div class="row" style="flex-wrap:nowrap"><label class="sr" for="a-kind">Kind</label><select id="a-kind">${opts(['note','call','meeting','email_in'], 'note', KIND)}</select><label class="sr" for="a-text">What happened</label><input id="a-text" maxlength="2000" dir="auto" placeholder="What happened?" required></div><div class="acts"><button class="btn" type="submit">Add to log</button></div></form>
-      ${act === null ? '<p class="muted">Loading…</p>' : act.length ? `<ul class="timeline" style="margin-top:12px">${act.map(a => `<li class="k-${esc(a.kind)}"><time datetime="${esc(a.at)}">${esc(fmtTime(a.at))} · ${esc(KIND[a.kind] || a.kind)}</time><span dir="auto">${esc(a.text)}</span></li>`).join('')}</ul>` : '<p class="muted">Nothing logged yet.</p>'}
+      ${act === null ? '<p class="muted">Loading…</p>' : act.length ? `<ul class="timeline" style="margin-top:12px">${act.map(a => `<li class="k-${esc(a.kind)}"><time datetime="${esc(a.at)}">${esc(fmtTime(a.at))} · ${esc(KIND[a.kind] || a.kind)}${a.by === 'agent' ? ' · by the agent' : ''}</time><span dir="auto">${esc(a.text)}</span>${a.undo && !a.undoneAt && Date.now() - Date.parse(a.at) < 36e5 ? ` <button type="button" class="linkbtn" data-undo="${esc(a.id)}">Undo</button>` : a.undoneAt ? ' <span class="tag">Undone</span>' : ''}</li>`).join('')}</ul>` : '<p class="muted">Nothing logged yet.</p>'}
     </div>
 
     <div class="panel"><h2>Emails</h2>
@@ -111,5 +111,13 @@ sheetBody.addEventListener('submit', async e => {
       toast('Added to the log');
     } else return;
   } catch (err) { toast(errMsg(err)); }
+  await load(); refreshLead();
+});
+
+sheetBody.addEventListener('click', async e => {
+  const b = e.target.closest('[data-undo]'); if (!b) return;
+  b.disabled = true;
+  try { await api('/api/activity/' + encodeURIComponent(b.dataset.undo) + '/undo', {}); toast('Undone'); }
+  catch (err) { toast(err && err.code === 'too_late' ? 'Undo is only possible for 1 hour.' : err && err.code === 'changed' ? 'This school changed since, so it can\u2019t be undone here.' : 'Could not undo it.'); }
   await load(); refreshLead();
 });
