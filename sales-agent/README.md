@@ -31,9 +31,33 @@ checks the version it read (optimistic concurrency), so the website and the agen
 | `dnc` | `e-<email>` | do-not-contact entries |
 | `runs` | `YYYY-MM-DD-HHMM` (Cairo) | one record per run that did something |
 | `imports` | `imp-...` | uploaded lists: spreadsheet rows or PDF text, with progress |
+| `activity` | `<leadId>-<ms timestamp>` | the lead's log: `{leadId, at, kind, text}`; kinds note, call, meeting, email_in (by the owner) and status, stage (written by the site on every change) |
+| `tasks` | `tsk-...` | `{leadId, title, due (YYYY-MM-DD), done, doneAt}`; overdue and due-today tasks show at the top of Review |
 
-Lead `status`: `drafted` → `approved` → `sent` → (`replied` / `not_interested`), plus `do_not_contact` and `skipped`.
+CRM fields on a lead (added by the website; the agent leaves them alone): `stage` (none, replied, meeting_booked, demo_done,
+proposal_sent, won, lost), `stageAt`, `stageBest` (furthest stage reached, for the funnel), `dealValue`, `currency`
+(EGP, SAR, AED, KWD, QAR, BHD, OMR, IQD, USD), `nextStep`, `nextStepDue`, `repliedStep` (the email a school replied to).
+
+Lead `status`: `drafted` → `approved` → `sent` → (`replied` / `not_interested`), plus `do_not_contact`, `skipped` and
+`manual` (a school the owner added by hand: never emailed, drafted or followed up, but counted in duplicate checks).
 The agent only acts on `approved` (send) and `sent` with a due `nextFollowUp` (draft a follow-up).
+
+## Website
+
+Five tabs (bottom bar on phones, top bar on wide screens): **Review** (drafts and lead lists, tasks due, CSV export,
+search), **Pipeline** (stages after a reply, deal values per currency, "Add a school"), **Insights** (`GET /api/insights`,
+SQL aggregates over Cairo days, charts drawn as inline SVG), **Ask** (`POST /api/chat`: the owner's AI assistant, see
+below) and **Settings** (run controls, uploads, agent settings, do-not-contact list, recent runs). Lead segments include
+English teaching centres (`language_center`) and training centres (`training_center`).
+
+Ask: the Worker calls DeepSeek V4.1 Flash on ENARA's Modal endpoint when the secret `DEEPSEEK_API_KEY` is set (optional vars
+`DEEPSEEK_ENDPOINT`, `DEEPSEEK_MODEL`; OpenAI-style chat completions), otherwise the Anthropic Messages API with `ANTHROPIC_API_KEY`
+(`CHAT_MODEL`, default `claude-sonnet-5-5`); `CHAT_PROVIDER=anthropic` forces Anthropic. If the DeepSeek server rejects tools, the chat
+answers from a read-only snapshot (no proposals). The model gets read-only tools (search_leads, get_lead, get_insights,
+list_runs, list_imports, get_settings; every query is SELECT-only) and `propose_action`, which only shows the owner a card
+with a Confirm button. Confirm calls the normal endpoints with the lead's version. The draft rules in the chat's system
+prompt are copied from agent/PROMPT.md at build time. 30 messages per 10 minutes per session (`chat_hits` table).
+Without the key the tab says "Chat isn't connected yet".
 
 ## Website security
 
@@ -50,7 +74,8 @@ The agent only acts on `approved` (send) and `sent` with a due `nextFollowUp` (d
 ```
 cd sales-agent/site
 python3 build.py                                  # inlines src/ into out/site.mjs
-node test_site.mjs schema.sql "$PWD/out/site.mjs" # Node 22+ (uses node:sqlite as a stand-in for D1)
+node test_all.mjs schema.sql "$PWD/out/site.mjs"  # Node 22+ (node:sqlite stands in for D1); runs every test file
+node dev_server.mjs                               # local preview with made-up data, password preview-only
 npx wrangler deploy                               # needs CLOUDFLARE_API_TOKEN; keeps existing secrets
 ```
 
