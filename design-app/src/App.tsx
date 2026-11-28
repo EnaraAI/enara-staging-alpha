@@ -52,6 +52,8 @@ function Router() {
   const [route, setRoute] = useState(parse);
   useEffect(() => { const on = () => setRoute(parse()); window.addEventListener('hashchange', on); return () => window.removeEventListener('hashchange', on); }, []);
   const { user, ready, logout } = useSession();
+  // lms-speed-6: fetch the requested screen's code while the session is checked, not after.
+  useEffect(() => { (SCREENS.find((s) => s.id === ROUTES[route.path])?.render as { preload?: () => Promise<unknown> } | undefined)?.preload?.(); }, [route.path]);
 
   // Where to go: signed out -> login (the parent code page stays open); signed in -> the role's own area only.
   const area = route.path.split('/')[1] ?? '';

@@ -1,10 +1,10 @@
-import { lazy } from 'react';
+import { lazyScreen } from '../lazyScreen';
 import type { ScreenDef } from '../types';
 // lms-speed-6: each screen's code loads when its route opens (App.tsx shows a fallback meanwhile).
 import Login from './Login';
 import ParentCode from './ParentCode';
-const EmptyStates = lazy(() => import('./EmptyStates'));
-const ErrorStates = lazy(() => import('./ErrorStates'));
+const EmptyStates = lazyScreen(() => import('./EmptyStates'));
+const ErrorStates = lazyScreen(() => import('./ErrorStates'));
 
 export const screens: ScreenDef[] = [
   { id: 'login', area: 'shared', theme: 'learner', title: { en: 'Login', ar: 'تسجيل الدخول' }, render: Login },

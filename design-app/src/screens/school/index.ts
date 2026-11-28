@@ -1,11 +1,11 @@
-import { lazy } from 'react';
+import { lazyScreen } from '../lazyScreen';
 import type { ScreenDef } from '../types';
 // lms-speed-6: each screen's code loads when its route opens (App.tsx shows a fallback meanwhile).
-const SchoolDashboard = lazy(() => import('./Dashboard'));
-const SchoolImports = lazy(() => import('./Imports'));
-const SchoolAnnouncements = lazy(() => import('./Announcements'));
-const SchoolRequests = lazy(() => import('./Requests'));
-const SchoolSections = lazy(() => import('./Sections'));
+const SchoolDashboard = lazyScreen(() => import('./Dashboard'));
+const SchoolImports = lazyScreen(() => import('./Imports'));
+const SchoolAnnouncements = lazyScreen(() => import('./Announcements'));
+const SchoolRequests = lazyScreen(() => import('./Requests'));
+const SchoolSections = lazyScreen(() => import('./Sections'));
 
 export const screens: ScreenDef[] = [
   { id: 'school-dashboard', area: 'school', theme: 'admin', title: { en: 'Dashboard', ar: 'لوحة المتابعة' }, render: SchoolDashboard },

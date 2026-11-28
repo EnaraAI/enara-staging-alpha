@@ -1,10 +1,10 @@
-import { lazy } from 'react';
+import { lazyScreen } from '../lazyScreen';
 import type { ScreenDef } from '../types';
 // lms-speed-6: each screen's code loads when its route opens (App.tsx shows a fallback meanwhile).
-const ClassOverview = lazy(() => import('./ClassOverview'));
-const Grading = lazy(() => import('./Grading'));
-const Builder = lazy(() => import('./Builder'));
-const Errors = lazy(() => import('./Errors'));
+const ClassOverview = lazyScreen(() => import('./ClassOverview'));
+const Grading = lazyScreen(() => import('./Grading'));
+const Builder = lazyScreen(() => import('./Builder'));
+const Errors = lazyScreen(() => import('./Errors'));
 
 export const screens: ScreenDef[] = [
   { id: 'teacher-class', area: 'teacher', theme: 'admin', title: { en: 'Class overview', ar: 'نظرة عامة على الفصل' }, render: ClassOverview },

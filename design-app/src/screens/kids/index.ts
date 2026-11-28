@@ -1,10 +1,10 @@
-import { lazy } from 'react';
+import { lazyScreen } from '../lazyScreen';
 import type { ScreenDef } from '../types';
 // lms-speed-6: each screen's code loads when its route opens (App.tsx shows a fallback meanwhile).
-const KidsHome = lazy(() => import('./KidsHome'));
-const KidsLesson = lazy(() => import('./KidsLesson'));
-const KidsChat = lazy(() => import('./KidsChat'));
-const KidsReward = lazy(() => import('./KidsReward'));
+const KidsHome = lazyScreen(() => import('./KidsHome'));
+const KidsLesson = lazyScreen(() => import('./KidsLesson'));
+const KidsChat = lazyScreen(() => import('./KidsChat'));
+const KidsReward = lazyScreen(() => import('./KidsReward'));
 
 export const screens: ScreenDef[] = [
   { id: 'kids-home', area: 'kids', theme: 'kids', title: { en: 'Kids home', ar: 'الصفحة الرئيسية للأطفال' }, render: KidsHome },

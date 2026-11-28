@@ -1,11 +1,11 @@
-import { lazy } from 'react';
+import { lazyScreen } from '../lazyScreen';
 import type { ScreenDef } from '../types';
 // lms-speed-6: each screen's code loads when its route opens (App.tsx shows a fallback meanwhile).
-const StudentHome = lazy(() => import('./StudentHome'));
-const StudentChat = lazy(() => import('./StudentChat'));
-const StudentAvatar = lazy(() => import('./StudentAvatar'));
-const StudentAssignment = lazy(() => import('./StudentAssignment'));
-const StudentResults = lazy(() => import('./StudentResults'));
+const StudentHome = lazyScreen(() => import('./StudentHome'));
+const StudentChat = lazyScreen(() => import('./StudentChat'));
+const StudentAvatar = lazyScreen(() => import('./StudentAvatar'));
+const StudentAssignment = lazyScreen(() => import('./StudentAssignment'));
+const StudentResults = lazyScreen(() => import('./StudentResults'));
 
 export const screens: ScreenDef[] = [
   { id: 'student-home', area: 'student', theme: 'learner', title: { en: 'Student home', ar: 'الصفحة الرئيسية للطالب' }, render: StudentHome },
